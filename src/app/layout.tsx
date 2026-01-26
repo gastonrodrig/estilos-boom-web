@@ -1,31 +1,17 @@
-"use client";
-
+// src/app/layout.tsx
 import "./globals.css";
-import { Navbar, Footer } from "@components";
-import { CartSidebar } from "./(public)/cart/_components";
-import { usePathname } from "next/navigation";
+import { ReduxProvider } from "./providers/redux-provider";
+import { AuthProvider } from "./providers/auth-provider";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  const isAdmin = pathname.startsWith("/admin");
-
+export default function RootLayout({ children } : { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body className="min-h-screen flex flex-col bg-white">
-
-        {/* ❌ Ocultar Navbar en admin */}
-        {!isAdmin && <Navbar />}
-
-        <main className="flex-1 bg-white">
-          {children}
-        </main>
-
-        {/* ❌ Ocultar Footer en admin */}
-        {!isAdmin && <Footer />}
-
-        {/* ❌ Ocultar Sidebar en admin */}
-        {!isAdmin && <CartSidebar />}
+        <ReduxProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

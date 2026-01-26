@@ -14,15 +14,39 @@
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
-      {
-        "name": "next"
-      }
+      { "name": "next" }
     ],
+    "baseUrl": "src",
     "paths": {
-      "@components": ["./src/components"],
-      "@hooks": ["./src/hooks"],
+      "@/*": ["./*"],
+      // Config client and server
+      "@config-client": ["core/config/env.client.ts"],
+      "@config-server": ["core/config/env.server.ts"],
+      // Constants
+      "@constants": ["core/constants/index.ts"],
+      // Enums
+      "@enums": ["core/enums/index.ts"],
+      // Helpers
+      "@helpers": ["core/helpers/index.ts"],
+      // Libs
+      "@lib": ["core/lib/index.ts"],
+      // Models
+      "@models": ["core/models/index.ts"],
+      // Types
+      "@types": ["core/types/index.ts"],
+      // Utils
+      "@utils": ["core/utils/index.ts"],
+      // Api
+      "@api": ["api/index.ts"],
+      // Hooks
+      "@hooks": ["hooks/index.ts"],
+      // Store
+      "@store": ["store/index.ts"],
+      // Components
+      "@components": ["components/index.ts"]
     }
   },
+
   "include": [
     "next-env.d.ts",
     "**/*.ts",

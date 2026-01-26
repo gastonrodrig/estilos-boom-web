@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Label, Button, Checkbox } from "@components";
+import { Input, Label, Button } from "@components";
 import { Mail, Lock, ArrowLeft, ShoppingBag, Gift, Heart } from "lucide-react";
 import Link from "next/link";
 
