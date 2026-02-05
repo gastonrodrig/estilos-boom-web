@@ -10,7 +10,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isHome = pathname === "/home";
+  const isHome = pathname === "/" || pathname === "/home";
 
   const [searchOpen, setSearchOpen] = useState(false);
 

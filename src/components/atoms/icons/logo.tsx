@@ -17,20 +17,15 @@ export const Logo = ({
   isHome,
 }: LogoProps) => {
   const finalHeight = height ?? Math.round(width * 0.4);
-  
-  const Wrapper = isHome ? motion.div : "div";
-  
-  const wrapperProps = isHome ? {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: { opacity: 1, scale: 1 },
-    transition: { duration: 0.6 }
-  } : {};
-  
+
   return (
-    <Wrapper
+    <motion.div
       onClick={onClick}
       className={`${onClick ? "cursor-pointer" : ""} max-w-[120px]`}
-      {...wrapperProps}
+      style={{ height: finalHeight }}
+      initial={isHome ? { opacity: 0, scale: 0.8 } : undefined}
+      animate={isHome ? { opacity: 1, scale: 1 } : undefined}
+      transition={isHome ? { duration: 0.6 } : undefined}
     >
       <Image
         src="/assets/logo-eb.png"
@@ -40,6 +35,6 @@ export const Logo = ({
         priority={priority}
         className="w-auto h-auto"
       />
-    </Wrapper>
+    </motion.div>
   );
 };

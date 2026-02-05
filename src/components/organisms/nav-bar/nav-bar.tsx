@@ -76,7 +76,7 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
             scrolled ? "shadow-md backdrop-blur-md" : ""
           } transition-all duration-300`}
         >
-          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 flex items-center justify-between">
+          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-[64px] flex items-center justify-between">
             {/* Logo */}
             <Link href="/">
               <Logo width={135} height={30} isHome={isHome} />
