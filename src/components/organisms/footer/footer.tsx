@@ -93,15 +93,6 @@ export const Footer = () => {
               <li>
                 <Link href="/catalog" className="hover:text-[#7b5050]">Dresses</Link>
               </li>
-              <li>
-                <Link href="/catalog" className="hover:text-[#7b5050]">Party</Link>
-              </li>
-              <li>
-                <Link href="/catalog" className="hover:text-[#7b5050]">Basics</Link>
-              </li>
-              <li>
-                <Link href="/offers" className="hover:text-[#7b5050]">Sale</Link>
-              </li>
             </ul>
           </div>
 
