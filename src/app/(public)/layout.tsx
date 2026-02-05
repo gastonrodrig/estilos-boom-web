@@ -1,7 +1,6 @@
 "use client";
 
 import { Navbar, Footer, SearchDrawer } from "@/components/organisms";
-import { CartSidebar } from "./cart/_components";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -25,8 +24,6 @@ export default function PublicLayout({
       </div>
 
       <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
-
-      <CartSidebar />
     </>
   );
 }
