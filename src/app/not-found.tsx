@@ -9,7 +9,6 @@ import { CTA } from "@/components";
 export default function NotFound() {
   return (
     <>
-      <Navbar isHome={false} />
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6 text-center relative overflow-hidden">
 
         <motion.div
@@ -77,7 +76,6 @@ export default function NotFound() {
           </motion.div>
         </motion.div>
       </div>
-      <Footer />
     </>
   );
 }
