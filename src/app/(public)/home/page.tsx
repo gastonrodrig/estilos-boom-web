@@ -1,14 +1,14 @@
 "use client";
 
-import { View01Hero, View02WhyChooseUs, View03FeaturedProducts, View04Testimonials } from "./views";
+import { Hero, NewArrivals, SummerSale, Benefits } from "@/components/organisms";
 
 export default function HomePage() {
   return (
     <div className="space-y-16">
-      <View01Hero onToggleAccessible={() => console.log("Accesible ON/OFF")} />
-      <View02WhyChooseUs />
-      <View03FeaturedProducts />
-      <View04Testimonials />
+      <Hero />
+      <NewArrivals />
+      <SummerSale />
+      <Benefits />
     </div>
   );
 }

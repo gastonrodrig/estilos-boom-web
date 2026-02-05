@@ -1,4 +1,3 @@
-export * from './footer';
-export * from './nav-bar';
-export * from './drawer';
-export * from './ui';
+export * from "./atoms";
+export * from "./molecules";
+export * from "./organisms";
