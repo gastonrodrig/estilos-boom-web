@@ -1,16 +1,31 @@
 "use client";
 
-import { Navbar, Footer } from "@components";
+import { Navbar, Footer, SearchDrawer } from "@/components/organisms";
 import { CartSidebar } from "./cart/_components";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-export default function PublicLayout({ children } : { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isHome = pathname === "/home";
+
+  const [searchOpen, setSearchOpen] = useState(false);
+
   return (
     <>
-      <Navbar />
-      <main className="flex-1 bg-white">
-        {children}
-      </main>
-      <Footer />
+      <Navbar isHome={isHome} onSearchOpen={() => setSearchOpen(true)} />
+
+      <div className="relative">
+        <main>{children}</main>
+        <Footer />
+      </div>
+
+      <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
+
       <CartSidebar />
     </>
   );

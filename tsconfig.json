@@ -43,7 +43,9 @@
       // Store
       "@store": ["store/index.ts"],
       // Components
-      "@components": ["components/index.ts"]
+      "@components": ["components/index.ts"],
+      // Data
+      "@data": ["core/data/index.ts"]
     }
   },
 
