@@ -22,7 +22,7 @@ export const Logo = ({
     <motion.div
       onClick={onClick}
       className={`${onClick ? "cursor-pointer" : ""} max-w-[120px]`}
-      style={{ height: finalHeight }}
+      style={{ width, height: finalHeight }}
       initial={isHome ? { opacity: 0, scale: 0.8 } : undefined}
       animate={isHome ? { opacity: 1, scale: 1 } : undefined}
       transition={isHome ? { duration: 0.6 } : undefined}
