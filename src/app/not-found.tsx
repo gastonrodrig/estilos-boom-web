@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Search, ShoppingBag } from "lucide-react";
+import { Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { Footer, Navbar } from "@/components/organisms";
 import { CTA } from "@/components";
