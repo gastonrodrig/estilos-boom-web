@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Search, User, Heart, ShoppingBag, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -105,7 +107,7 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
                 <Search className={iconClass} />
               </button>
 
-              <Link href="/account">
+              <Link href="/auth/login">
                 <User className={iconClass} />
               </Link>
 

@@ -5,3 +5,4 @@ export * from "./benefits";
 export * from "./nav-bar";
 export * from "./footer";
 export * from "./search-drawer";
+export * from "./auth-split-card";
