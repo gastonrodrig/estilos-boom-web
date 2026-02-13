@@ -30,7 +30,7 @@ export const AuthSplitCard = ({
         {/* Columna Derecha */}
         <div className="flex flex-col items-center justify-center px-6 text-center md:px-16">
           <div className="flex items-center justify-center gap-3">
-            <Image src="/assets/loto-flower.png" alt="Logo" width={50} height={100} />
+            <Image src="/assets/auth-icon.png" alt="Logo" width={50} height={35} />
             <h1 className="text-2xl font-semibold">{title}</h1>
           </div>
 

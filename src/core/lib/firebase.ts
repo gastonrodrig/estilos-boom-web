@@ -4,13 +4,6 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { clientEnv } from "@config-client";
 
-// Debug: Verificar variables de entorno
-console.log('🔧 Firebase Config Debug:', {
-  apiKey: clientEnv.FIREBASE.API_KEY ? '✅ Set' : '❌ Missing',
-  authDomain: clientEnv.FIREBASE.AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
-  projectId: clientEnv.FIREBASE.PROJECT_ID ? '✅ Set' : '❌ Missing',
-});
-
 // Configuración usando variables de entorno
 const firebaseConfig = {
   apiKey: clientEnv.FIREBASE.API_KEY,
