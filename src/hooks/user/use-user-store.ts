@@ -1,6 +1,6 @@
 "use client";
 
-import { userApi } from "@api";
+import { clientApi } from "@api";
 import {
   useAppDispatch, 
   useAppSelector,
@@ -52,7 +52,7 @@ export const useUsersStore = () => {
       };
 
       const payload = modelMap[method](user);
-      const { data } = await userApi.post("/client-landing", payload);
+      const { data } = await clientApi.post("/client-landing", payload);
 
       return { ok: true, data };
     } catch (error: unknown) {
@@ -67,7 +67,7 @@ export const useUsersStore = () => {
     email: string
   ) => {
     try {
-      const { data } = await userApi.get(`find/${email}`);
+      const { data } = await clientApi.get(`find/${email}`);
       return data ? { ok: true, data } : { ok: false, data: null };
     } catch {
       return { ok: false, data: null };
@@ -82,7 +82,7 @@ export const useUsersStore = () => {
   ) => {
     try {
       const token = await getFirebaseAuthToken();
-      const { data } = await userApi.get(
+      const { data } = await clientApi.get(
         `/get/document?document_number=${documentNumber}&document_type=${documentType}&client_type=${clientType}`,
         getAuthConfig({ token })
       );
@@ -104,7 +104,7 @@ export const useUsersStore = () => {
     try {
       const token = await getFirebaseAuthToken();
       const payload = updateClientDataModel(extraData);
-      const { data } = await userApi.patch(
+      const { data } = await clientApi.patch(
         `extra-data/${uid}`,
         payload,
         getAuthConfig({ token })
@@ -142,7 +142,7 @@ export const useUsersStore = () => {
       const token = await getFirebaseAuthToken();
       const payload = updateClientDataModel(profileData);
 
-      const { data } = await userApi.patch(
+      const { data } = await clientApi.patch(
         `client-profile/${uid}`,
         payload,
         getAuthConfig({ token })
@@ -180,7 +180,7 @@ export const useUsersStore = () => {
       const token = await getFirebaseAuthToken();
       const payload = updateClientProfileModel(profileData);
 
-      const { data } = await userApi.patch(
+      const { data } = await clientApi.patch(
         `upload-photo/${uid}`,
         payload,
         getAuthConfig({ token, isFormData: true })
@@ -205,7 +205,7 @@ export const useUsersStore = () => {
 
     try {
       const token = await getFirebaseAuthToken();
-      await userApi.patch(`remove-photo/${uid}`, {}, getAuthConfig({ token }));
+      await clientApi.patch(`remove-photo/${uid}`, {}, getAuthConfig({ token }));
 
       dispatch(removeClientProfile());
       openSnackbar("Foto de perfil eliminada correctamente.");

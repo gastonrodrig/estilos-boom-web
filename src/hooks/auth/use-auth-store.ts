@@ -27,7 +27,7 @@ import {
   confirmPasswordReset,
 } from "firebase/auth";
 import { useUsersStore } from "@hooks";
-import { userApi } from "@api";
+import { clientApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
 
 // Google Auth Provider
@@ -274,7 +274,7 @@ export const useAuthStore = () => {
 
       const token = await getFirebaseAuthToken();
 
-      await userApi.patch(
+      await clientApi.patch(
         `/reset-password-flag/${uid}`,
         {},
         getAuthConfig({ token })
@@ -302,7 +302,7 @@ export const useAuthStore = () => {
     try {
       dispatch(sendingResetEmail());
 
-      await userApi.post("/forgot-password", { email });
+      await clientApi.post("/forgot-password", { email });
 
       openSnackbar("Correo enviado correctamente.");
       return true;

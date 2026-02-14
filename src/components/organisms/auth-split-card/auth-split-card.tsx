@@ -1,4 +1,3 @@
-import { Logo } from "@/components/atoms"
 import Image from "next/image"
 
 type AuthSplitCardProps = {

@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "./auth";
-import { uiSlice } from "./ui";
 import { 
   clientCompanySlice, 
   clientPersonSlice, 
@@ -12,9 +11,6 @@ export const store = configureStore({
   reducer: {
     // Slices de autenticación
     auth: authSlice.reducer,
-
-    // Slices de UI
-    ui: uiSlice.reducer,
 
     // Slices de cliente
     clientCompany: clientCompanySlice.reducer,

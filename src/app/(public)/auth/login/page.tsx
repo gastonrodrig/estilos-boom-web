@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -9,6 +10,7 @@ import {
   GoogleButton,
 } from "@/components/atoms";
 import { AuthSplitCard } from "@/components/organisms";
+import { useAuthStore } from "@/hooks/auth";
 
 type LoginFormValues = {
   email: string;
@@ -16,15 +18,27 @@ type LoginFormValues = {
 };
 
 export default function LoginPage() {
+  const { 
+    status,
+    startLogin, 
+    onGoogleSignIn
+  } = useAuthStore();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>();
 
   const onSubmit = (data: LoginFormValues) => {
-    console.log(data);
+    startLogin(data);
   };
+
+  const handleGoogleSignIn = () => {
+    onGoogleSignIn();
+  }
+
+  const isAuthenticated = useMemo(() => status === "checking", [status]);
 
   return (
     <AuthSplitCard title="¡Bienvenido!" subtitle="Inicia sesión en tu cuenta">
@@ -61,11 +75,19 @@ export default function LoginPage() {
           </a>
         </div>
 
-        <CTA type="submit" className="w-full">
+        <CTA 
+          type="submit" 
+          className="w-full" 
+          disabled={isAuthenticated || isSubmitting}
+        >
           Ingresar
         </CTA>
 
-        <GoogleButton className="w-full mt-4">
+        <GoogleButton 
+          className="w-full mt-4" 
+          onClick={handleGoogleSignIn} 
+          disabled={isAuthenticated || isSubmitting}
+        >
           Continuar con Google
         </GoogleButton>
 
