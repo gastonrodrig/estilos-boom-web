@@ -28,6 +28,7 @@ import {
 import { useUsersStore } from "@hooks";
 import { clientApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { UserStatus } from "@enums";
 
@@ -38,6 +39,7 @@ googleProvider.addScope("email");
 
 export const useAuthStore = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const auth = useAppSelector((state) => state.auth);
   const { uid } = auth ;
@@ -263,6 +265,7 @@ export const useAuthStore = () => {
   const onLogout = async () => {
     await signOut(FirebaseAuth);
     dispatch(logout());
+    router.replace("/auth/login");
   };
 
   // Cambio de contraseña en primer login

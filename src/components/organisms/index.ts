@@ -7,3 +7,5 @@ export * from "./footer";
 export * from "./search-drawer";
 export * from "./auth-split-card";
 export * from "./modals";
+export * from "./loaders";
+export * from "./access-denied";

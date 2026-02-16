@@ -25,7 +25,7 @@ const baseClasses =`
   text-black hover:opacity-90 active:scale-95 hover:cursor-pointer
 `
 
-const MotionLink = motion(Link)
+const MotionLink = motion.create(Link)
 
 export const CTA: React.FC<CTAProps> = (props) => {
   const Icon = props.icon
