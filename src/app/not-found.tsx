@@ -3,10 +3,37 @@
 import Link from "next/link";
 import { Home } from "lucide-react";
 import { motion } from "framer-motion";
-import { Footer, Navbar } from "@/components/organisms";
 import { CTA } from "@/components";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@store";
 
 export default function NotFound() {
+  const router = useRouter();
+  const { status, role } = useAppSelector((state) => state.auth);
+
+  const handleRedirect = () => {
+    if (status === "authenticated") {
+      if (role === "Cliente") {
+        router.push("/client");
+        return;
+      }
+
+      if (role === "Administrador") {
+        router.push("/admin");
+        return;
+      }
+    }
+
+    router.push("/home");
+  };
+
+  const accountHref =
+    status === "authenticated"
+      ? role === "Administrador"
+        ? "/admin"
+        : "/client"
+      : "/auth/login";
+
   return (
     <>
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6 text-center relative overflow-hidden">
@@ -45,19 +72,21 @@ export default function NotFound() {
             Parece que te perdiste en nuestro catálogo. La página que buscas no existe o fue movida.
           </motion.p>
 
-          {/* Action buttons */}
+          {/* Botón dinámico */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <CTA href="/home" icon={Home}>
-              Volver al inicio
-            </CTA>
+            <div onClick={handleRedirect}>
+              <CTA icon={Home}>
+                Volver al inicio
+              </CTA>
+            </div>
           </motion.div>
 
-          {/* Helpful links */}
+          {/* Links dinámicos */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -66,10 +95,17 @@ export default function NotFound() {
           >
             <p className="text-[#594346]/70 text-sm mb-3">¿Buscas algo específico?</p>
             <div className="flex flex-wrap gap-3 justify-center">
-              <Link href="/catalog" className="text-[#F2778D] hover:text-[#F391A3] text-sm font-medium underline">
+              <Link
+                href="/catalog"
+                className="text-[#F2778D] hover:text-[#F391A3] text-sm font-medium underline"
+              >
                 Productos
               </Link>
-              <Link href="/auth/login" className="text-[#F2778D] hover:text-[#F391A3] text-sm font-medium underline">
+
+              <Link
+                href={accountHref}
+                className="text-[#F2778D] hover:text-[#F391A3] text-sm font-medium underline"
+              >
                 Mi cuenta
               </Link>
             </div>

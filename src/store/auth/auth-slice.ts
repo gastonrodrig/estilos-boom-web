@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthState, LoginPayload, ClientDataPayload } from "@types";
+import { AuthState, LoginPayload, ClientDataPayload } from "@/core/models";
+import { ClientType } from "@/core/enums";
 
 // Estado inicial
 const initialState: AuthState = {
   status: "not-authenticated",
-  _id: null,
+  id: null,
   uid: null,
   email: null,
   firstName: null,
@@ -13,10 +14,12 @@ const initialState: AuthState = {
   documentType: null,
   documentNumber: null,
   role: null,
+  clientType: null,
   needsPasswordChange: null,
   userStatus: null,
   photoURL: null,
   isExtraDataCompleted: false,
+  companyData: null,
 };
 
 // Auth Slice
@@ -24,39 +27,13 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // Para el Auth Provider (Firebase)
-    loginBasic: (
-      state, 
-      {
-        payload,
-      }: PayloadAction<{
-        uid: string;
-        email: string | null;
-        photoURL?: string | null;
-      }>
-    ) => {
-      state.uid = payload.uid;
-      state.email = payload.email;
-      state.photoURL = payload.photoURL ?? null;
-      state.status = "authenticated";
-      state._id = null;
-      state.role = null;
-      state.needsPasswordChange = null;
-      state.userStatus = null;
-      state.isExtraDataCompleted = false;
-    },
-
-    // Para hidratar el perfil completo tras login
-    hydrateProfile: (
-      state, 
-      { payload }: PayloadAction<LoginPayload>
-    ) => {
-      // Bloquear acceso si el usuario está inactivo
+    // Login
+    login: (state, { payload }: PayloadAction<LoginPayload>) => {
       if (payload.userStatus === "Inactivo") {
         return initialState;
       }
 
-      state._id = payload._id;
+      state.id = payload.id;
       state.uid = payload.uid;
       state.email = payload.email;
       state.firstName = payload.firstName ?? null;
@@ -69,8 +46,13 @@ export const authSlice = createSlice({
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL ?? null;
       state.isExtraDataCompleted = payload.isExtraDataCompleted;
+      state.companyData = payload.companyData ?? null;
 
-      // Determinar estado final
+      state.clientType =
+        payload.role === "Cliente"
+          ? payload.clientType ?? null
+          : null;
+
       state.status = payload.needsPasswordChange
         ? "first-login-password"
         : "authenticated";
@@ -102,14 +84,30 @@ export const authSlice = createSlice({
       state.status = "changing-password";
     },
 
-    setClientData: (state, { payload }: PayloadAction<ClientDataPayload>) => {
-      state.firstName = payload.firstName;
-      state.lastName = payload.lastName;
+    setClientData: (
+      state,
+      { payload }: PayloadAction<ClientDataPayload>
+    ) => {
       state.phone = payload.phone;
       state.documentType = payload.documentType;
       state.documentNumber = payload.documentNumber;
       state.needsPasswordChange = false;
       state.isExtraDataCompleted = true;
+
+      if (payload.clientType === ClientType.PERSON) {
+        state.firstName = payload.firstName;
+        state.lastName = payload.lastName;
+        state.companyData = null;
+      }
+
+      if (payload.clientType === ClientType.COMPANY) {
+        state.firstName = null;
+        state.lastName = null;
+        state.companyData = {
+          companyName: payload.companyName,
+          contactName: payload.contactName,
+        };
+      }
     },
 
     setClientProfile: (
@@ -127,8 +125,7 @@ export const authSlice = createSlice({
 
 // Exportar las acciones
 export const {
-  loginBasic,
-  hydrateProfile,
+  login,
   logout,
   checkingCredentials,
   authenticated,

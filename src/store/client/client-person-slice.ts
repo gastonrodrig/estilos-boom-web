@@ -3,7 +3,7 @@ import {
   ClientPerson,
   ClientPersonState,
   RefreshClientsPersonPayload,
-} from "@types";
+} from "@/core/models";
 
 const initialState: ClientPersonState = {
   clientsPerson: [],

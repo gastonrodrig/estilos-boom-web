@@ -5,22 +5,24 @@ import {
   useAppDispatch, 
   useAppSelector,
   removeClientProfile,
-  setClientData,
-  setClientProfile,
+  // setClientProfile,
   setLoadingClientProfile,
   stopLoadingClientProfile,
-  showSnackbar,
+  setClientData,
 } from "@store";
 import {
-  createUserGoogleModel,
-  createUserEmailPasswordModel,
-  updateClientDataModel,
-  updateClientProfileModel,
+  createUserGoogleToApi,
+  createUserEmailPasswordToApi,
+  updateClientDataToApi,
+  ExtraInformationValues,
+  CreateUserValues,
+  HttpError
+  // updateClientDataToApi,
 } from "@models";
 import { getAuthConfig } from "@utils";
-import { HttpError } from "@types";
 import { getFirebaseAuthToken } from "@helpers";
-
+import { ClientType } from "@enums";
+import toast from "react-hot-toast";
 
 export const useUsersStore = () => {
   const dispatch = useAppDispatch();
@@ -38,34 +40,29 @@ export const useUsersStore = () => {
 
   const { loadingClientProfile } = useAppSelector((state) => state.clientProfile);
 
-  const openSnackbar = (message: string) => dispatch(showSnackbar({ message }));
-
   // Crear usuario (google o email/password)
   const startCreateUser = async (
-    user: any,
+    user: CreateUserValues,
     method: "google" | "email/password"
   ) => {
     try {
-      const modelMap = {
-        "google": createUserGoogleModel,
-        "email/password": createUserEmailPasswordModel,
-      };
+      let payload;
 
-      const payload = modelMap[method](user);
+      if (method === "google") payload = createUserGoogleToApi(user);
+      else payload = createUserEmailPasswordToApi(user);
+
       const { data } = await clientApi.post("/client-landing", payload);
 
       return { ok: true, data };
     } catch (error: unknown) {
       const message = (error as HttpError).response?.data?.message;
-      openSnackbar(message ?? "Ocurrió un error al registrar el cliente.");
+      toast.error(message ?? "Ocurrió un error.");
       return { ok: false, data: null };
     }
   };
 
   // Encontrar usuario por email
-  const findUserByEmail = async (
-    email: string
-  ) => {
+  const findUserByEmail = async (email: string) => {
     try {
       const { data } = await clientApi.get(`find/${email}`);
       return data ? { ok: true, data } : { ok: false, data: null };
@@ -86,10 +83,10 @@ export const useUsersStore = () => {
         `/get/document?document_number=${documentNumber}&document_type=${documentType}&client_type=${clientType}`,
         getAuthConfig({ token })
       );
-      return data;
+      return data ?? null;
     } catch (error: unknown) {
       const message = (error as HttpError).response?.data?.message
-      openSnackbar(message ?? "Ocurrió un error al buscar el usuario.");
+      toast.error(message ?? "Ocurrió un error al buscar el usuario.");
       return null;
     }
   };
@@ -97,34 +94,40 @@ export const useUsersStore = () => {
   // Modificar datos extra del cliente
   const startUpdateExtraData = async (
     uid: string,
-    extraData: any
+    extraData: ExtraInformationValues
   ): Promise<boolean> => {
     dispatch(setLoadingClientProfile());
 
     try {
       const token = await getFirebaseAuthToken();
-      const payload = updateClientDataModel(extraData);
+      const payload = updateClientDataToApi(extraData);
       const { data } = await clientApi.patch(
         `extra-data/${uid}`,
         payload,
         getAuthConfig({ token })
       );
+      const isCompany = !!data.company_name;
 
       dispatch(
         setClientData({
-          firstName: data.first_name,
-          lastName: data.last_name,
           phone: data.phone,
           documentType: data.document_type,
           documentNumber: data.document_number,
+          clientType: isCompany ? ClientType.COMPANY : ClientType.PERSON,
+
+          firstName: isCompany ? null : data.first_name,
+          lastName: isCompany ? null : data.last_name,
+
+          companyName: isCompany ? data.company_name : null,
+          contactName: isCompany ? data.contact_name : null,
         })
       );
 
-      openSnackbar("Datos actualizados correctamente.");
+      toast.success("Datos actualizados correctamente.");
       return true;
     } catch (error: unknown) {
       const message = (error as HttpError).response?.data?.message
-      openSnackbar(message ?? "Ocurrió un error al actualizar los datos.");
+      toast.error(message ?? "Ocurrió un error al actualizar los datos.");
       return false;
     } finally {
       dispatch(stopLoadingClientProfile());
@@ -132,72 +135,72 @@ export const useUsersStore = () => {
   };
 
   // Modificar datos del perfil del cliente
-  const startUpdateClientProfileData = async (
-    uid: string,
-    profileData: any
-  ): Promise<boolean> => {
-    dispatch(setLoadingClientProfile());
+  // const startUpdateClientProfileData = async (
+  //   uid: string,
+  //   profileData: any
+  // ): Promise<boolean> => {
+  //   dispatch(setLoadingClientProfile());
 
-    try {
-      const token = await getFirebaseAuthToken();
-      const payload = updateClientDataModel(profileData);
+  //   try {
+  //     const token = await getFirebaseAuthToken();
+  //     const payload = updateClientDataModel(profileData);
 
-      const { data } = await clientApi.patch(
-        `client-profile/${uid}`,
-        payload,
-        getAuthConfig({ token })
-      );
+  //     const { data } = await clientApi.patch(
+  //       `client-profile/${uid}`,
+  //       payload,
+  //       getAuthConfig({ token })
+  //     );
 
-      dispatch(
-        setClientData({
-          firstName: data.first_name,
-          lastName: data.last_name,
-          phone: data.phone,
-          documentType: data.document_type,
-          documentNumber: data.document_number,
-        })
-      );
+  //     dispatch(
+  //       setClientData({
+  //         firstName: data.first_name,
+  //         lastName: data.last_name,
+  //         phone: data.phone,
+  //         documentType: data.document_type,
+  //         documentNumber: data.document_number,
+  //       })
+  //     );
 
-      openSnackbar("Datos actualizados correctamente.");
-      return true;
-    } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message
-      openSnackbar(message ?? "Ocurrió un error al actualizar los datos.");
-      return false;
-    } finally {
-      dispatch(stopLoadingClientProfile());
-    }
-  };
+  //     toast.success("Datos actualizados correctamente.");
+  //     return true;
+  //   } catch (error: unknown) {
+  //     const message = (error as HttpError).response?.data?.message
+  //     toast.error(message ?? "Ocurrió un error al actualizar los datos.");
+  //     return false;
+  //   } finally {
+  //     dispatch(stopLoadingClientProfile());
+  //   }
+  // };
 
   // Modificar foto de perfil del cliente
-  const startUpdateClientProfilePicture = async (
-    uid: string,
-    profileData: any
-  ): Promise<boolean> => {
-    dispatch(setLoadingClientProfile());
+  // const startUpdateClientProfilePicture = async (
+  //   uid: string,
+  //   profileData: any
+  // ): Promise<boolean> => {
+  //   dispatch(setLoadingClientProfile());
 
-    try {
-      const token = await getFirebaseAuthToken();
-      const payload = updateClientProfileModel(profileData);
+  //   try {
+  //     const token = await getFirebaseAuthToken();
+  //     const payload = updateClientProfileModel(profileData);
 
-      const { data } = await clientApi.patch(
-        `upload-photo/${uid}`,
-        payload,
-        getAuthConfig({ token, isFormData: true })
-      );
+  //     const { data } = await clientApi.patch(
+  //       `upload-photo/${uid}`,
+  //       payload,
+  //       getAuthConfig({ token, isFormData: true })
+  //     );
 
-      dispatch(setClientProfile({ photoURL: data.profile_picture }));
+  //     dispatch(setClientProfile({ photoURL: data.profile_picture }));
 
-      openSnackbar("Foto de perfil actualizada correctamente.");
-      return true;
-    } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message
-      openSnackbar(message ?? "Ocurrió un error al actualizar la foto.");
-      return false;
-    } finally {
-      dispatch(stopLoadingClientProfile());
-    }
-  };
+  //     toast.success("Foto de perfil actualizada correctamente.");
+  //     return true;
+  //   } catch (error: unknown) {
+  //     const message = (error as HttpError).response?.data?.message
+  //     toast.error(message ?? "Ocurrió un error al actualizar la foto.");
+  //     return false;
+  //   } finally {
+  //     dispatch(stopLoadingClientProfile());
+  //   }
+  // };
 
   // Eliminar foto de perfil del cliente
   const startRemoveClientProfilePicture = async (uid: string): Promise<boolean> => {
@@ -208,12 +211,12 @@ export const useUsersStore = () => {
       await clientApi.patch(`remove-photo/${uid}`, {}, getAuthConfig({ token }));
 
       dispatch(removeClientProfile());
-      openSnackbar("Foto de perfil eliminada correctamente.");
+      toast.success("Foto de perfil eliminada correctamente.");
 
       return true;
     } catch (error: unknown) {
       const message = (error as HttpError).response?.data?.message 
-      openSnackbar(message ?? "Ocurrió un error al eliminar la foto de perfil.");
+      toast.error(message ?? "Ocurrió un error al eliminar la foto de perfil.");
       return false;
     } finally {
       dispatch(stopLoadingClientProfile());
@@ -236,8 +239,8 @@ export const useUsersStore = () => {
     startCreateUser,
     findUserByEmail,
     startUpdateExtraData,
-    startUpdateClientProfileData,
-    startUpdateClientProfilePicture,
+    // startUpdateClientProfileData,
+    // startUpdateClientProfilePicture,
     startRemoveClientProfilePicture,
     startLoadingUserDocument,
   };

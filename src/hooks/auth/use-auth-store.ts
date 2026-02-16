@@ -9,12 +9,11 @@ import {
   sendingResetEmail,
   resetEmailSent,
   changingPassword,
-  showSnackbar,
-  hydrateProfile
+  login,
 } from "@store";
 import { getAuthConfig } from "@utils";
 import { FirebaseAuth } from "@lib";
-import { HttpError } from "@types";
+import { HttpError } from "@models";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -29,6 +28,8 @@ import {
 import { useUsersStore } from "@hooks";
 import { clientApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
+import { toast } from "react-hot-toast";
+import { UserStatus } from "@enums";
 
 // Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
@@ -43,79 +44,85 @@ export const useAuthStore = () => {
 
   const { findUserByEmail, startCreateUser } = useUsersStore();
 
-  const openSnackbar = (message: string) => dispatch(showSnackbar({ message }));
 
   // Login con Google
   const onGoogleSignIn = async (): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
 
-      const { user } = await signInWithPopup(FirebaseAuth, googleProvider) as any;
+      const { user } = 
+      await signInWithPopup(FirebaseAuth, googleProvider) as any;
 
       const email = user.providerData[0]?.email;
       if (!email) return false;
 
       const { ok, data } = await findUserByEmail(email);
 
+      // Crear usuario si no existe
       if (!ok) {
-        // Crear nuevo usuario
         const response = await startCreateUser(user, "google");
 
         if (!response.ok) return false;
         const newUser = response.data;
 
         dispatch(
-          hydrateProfile({
-            _id: newUser._id,
-            uid: newUser.auth_id,
-            email: newUser.email,
+          login({
+            id: newUser.user.id_user,
+            uid: newUser.user.auth_id,
+            email: newUser.user.email,
             firstName: null,
             lastName: null,
             phone: null,
             documentType: null,
             documentNumber: null,
-            role: newUser.role,
+            role: newUser.user.role,
             needsPasswordChange: false,
-            userStatus: newUser.status,
-            photoURL: newUser.profile_picture ?? null,
-            isExtraDataCompleted: newUser.is_extra_data_completed,
+            userStatus: newUser.user.status,
+            photoURL: newUser.client.profile_picture ?? null,
+            isExtraDataCompleted: newUser.client.is_extra_data_completed,
+            companyData: null,
+            clientType: null,
           })
         );
 
         return true;
       }
 
-      // Usuario encontrado
-      if (data.status === "Inactivo") {
+      if (data.status === UserStatus.INACTIVO) {
+        toast.error("Tu cuenta está inactiva. Contacta al soporte para más información.");
         dispatch(logout());
         return false;
       }
 
       const needsPassword = !!data.needs_password_change;
 
+      // Login normal
       dispatch(
-        hydrateProfile({
-          _id: data._id,
+        login({
+          id: data.id_user,
           uid: data.auth_id,
           email: data.email,
           firstName: data.first_name ?? null,
           lastName: data.last_name ?? null,
-          phone: data.phone ?? null,
-          documentType: data.document_type ?? null,
-          documentNumber: data.document_number ?? null,
+          phone: data.phone,
+          documentType: data.document_type,
+          documentNumber: data.document_number,
           role: data.role,
-          needsPasswordChange: data.needs_password_change,
+          needsPasswordChange: data.client.needs_password_change,
           userStatus: data.status,
-          photoURL: data.profile_picture ?? null,
-          isExtraDataCompleted: data.is_extra_data_completed,
+          photoURL: data.client.profile_picture ?? null,
+          isExtraDataCompleted: data.client.is_extra_data_completed,
+          companyData: data.client.client_company ?? null,
+          clientType: data.client.client_type
         })
       );
 
       return !needsPassword;
+
     } catch (error: unknown) {
       const err = error as HttpError;
       dispatch(logout());
-      openSnackbar(
+      toast.error(
         err.response?.data?.message ?? 
           "Error al iniciar sesión."
       );
@@ -143,14 +150,13 @@ export const useAuthStore = () => {
       const { data } = await findUserByEmail(user.providerData[0].email!);
 
       if (data.status === "Inactivo") {
+        toast.error("Usuario inactivo. Contacta al soporte.");
         dispatch(logout());
         return false;
       }
 
       if (data.role === "Cliente") {
-        openSnackbar(
-          "Este rol no tiene permitido iniciar sesión en esta aplicación."
-        );
+        toast.error("Este rol no tiene permitido iniciar sesión en esta aplicación.");
         dispatch(logout());
         return false;
       }
@@ -158,28 +164,32 @@ export const useAuthStore = () => {
       const needsPassword = !!data.needs_password_change;
 
       dispatch(
-        hydrateProfile({
-          _id: data._id,
+        login({
+          id: data.id_user,
           uid: data.auth_id,
           email: data.email,
           firstName: data.first_name ?? null,
           lastName: data.last_name ?? null,
-          phone: data.phone ?? null,
-          documentType: data.document_type ?? null,
-          documentNumber: data.document_number ?? null,
+          phone: data.phone,
+          documentType: data.document_type,
+          documentNumber: data.document_number,
           role: data.role,
-          needsPasswordChange: data.needs_password_change,
+          needsPasswordChange: data.client.needs_password_change,
           userStatus: data.status,
-          photoURL: data.profile_picture ?? null,
-          isExtraDataCompleted: data.is_extra_data_completed,
+          photoURL: data.client.profile_picture ?? null,
+          isExtraDataCompleted: data.client.is_extra_data_completed,
+          companyData: data.client.client_company ?? null,
+          clientType: data.client.client_type
         })
       );
+
+      toast.success("Inicio de sesión exitoso.");
 
       return !needsPassword;
     } catch (error: unknown) {
       const err = error as HttpError;
       dispatch(logout());
-      openSnackbar(
+      toast.error(
         err.response?.data?.message ??
           "Error al iniciar sesión."
       );
@@ -200,7 +210,7 @@ export const useAuthStore = () => {
 
       const exists = await findUserByEmail(email);
       if (exists.ok) {
-        openSnackbar("Este correo ya está registrado.");
+        toast.error("Este correo ya está registrado.");
         dispatch(logout());
         return false;
       }
@@ -215,23 +225,25 @@ export const useAuthStore = () => {
 
       if (!response.ok) return false;
 
-      const data = response.data;
+      const newUser = response.data;
 
       dispatch(
-        hydrateProfile({
-          _id: data._id,
-          uid: data.auth_id,
-          email: data.email,
+        login({
+          id: newUser.user.id_user,
+          uid: newUser.user.auth_id,
+          email: newUser.user.email,
           firstName: null,
           lastName: null,
           phone: null,
           documentType: null,
           documentNumber: null,
-          role: data.role,
+          role: newUser.user.role,
           needsPasswordChange: false,
-          userStatus: data.status,
+          userStatus: newUser.user.status,
           photoURL: null,
-          isExtraDataCompleted: data.is_extra_data_completed,
+          isExtraDataCompleted: newUser.client.is_extra_data_completed,
+          companyData: null,
+          clientType: null,
         })
       );
 
@@ -239,9 +251,9 @@ export const useAuthStore = () => {
     } catch (error: unknown) {
       const err = error as HttpError;
       dispatch(logout());
-      openSnackbar(
-        err.response?.data?.message 
-          ?? "Error al crear usuario."
+      toast.error(
+        err.response?.data?.message ??
+          "Error al crear usuario."
       );
       return false;
     }
@@ -262,7 +274,7 @@ export const useAuthStore = () => {
     confirmPassword: string;
   }): Promise<boolean> => {
     if (password !== confirmPassword) {
-      openSnackbar("Las contraseñas no coinciden.");
+      toast.error("Las contraseñas no coinciden.");
       return false;
     }
 
@@ -281,11 +293,11 @@ export const useAuthStore = () => {
       );
 
       dispatch(authenticated());
-      openSnackbar("Contraseña actualizada correctamente.");
+      toast.success("Contraseña actualizada correctamente.");
       return true;
     } catch (error: unknown) {
       const err = error as HttpError;
-      openSnackbar(
+      toast.error(
         err.response?.data?.message ??
           "Error al actualizar la contraseña."
       );
@@ -304,11 +316,11 @@ export const useAuthStore = () => {
 
       await clientApi.post("/forgot-password", { email });
 
-      openSnackbar("Correo enviado correctamente.");
+      toast.success("Correo enviado correctamente.");
       return true;
     } catch (error: unknown) {
       const err = error as HttpError;
-      openSnackbar(
+      toast.error(
         err.response?.data?.message ??
           "Error al enviar enlace de recuperación."
       );
@@ -327,7 +339,7 @@ export const useAuthStore = () => {
     confirmPassword: string;
   }): Promise<boolean> => {
     if (password !== confirmPassword) {
-      openSnackbar("Las contraseñas no coinciden.");
+      toast.error("Las contraseñas no coinciden.");
       return false;
     }
 
@@ -338,7 +350,7 @@ export const useAuthStore = () => {
       const code = params.get("oobCode");
 
       if (!code) {
-        openSnackbar("El enlace no es válido.");
+        toast.error("El enlace no es válido.");
         return false;
       }
 
@@ -350,12 +362,12 @@ export const useAuthStore = () => {
 
       await startLogin({ email, password });
 
-      openSnackbar("Contraseña actualizada correctamente.");
+      toast.success("Contraseña actualizada correctamente.");
       return true;
     } catch (error: unknown) {
       const err = error as HttpError;
 
-      openSnackbar(
+      toast.error(
         err.response?.data?.message ??
           "No se pudo actualizar la contraseña."
       );

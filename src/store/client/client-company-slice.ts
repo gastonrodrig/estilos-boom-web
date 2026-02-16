@@ -3,7 +3,7 @@ import {
   ClientCompany,
   ClientCompanyState,
   RefreshClientsCompanyPayload,
-} from "@types";
+} from "@/core/models";
 
 const initialState: ClientCompanyState = {
   clientsCompany: [],

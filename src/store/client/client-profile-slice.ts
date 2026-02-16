@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ClientProfileState } from "@types";
+import { ClientProfileState } from "@/core/models";
 
 const initialState: ClientProfileState = {
   loadingClientProfile: false,

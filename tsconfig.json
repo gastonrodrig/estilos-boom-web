@@ -32,8 +32,6 @@
       "@lib": ["core/lib/index.ts"],
       // Models
       "@models": ["core/models/index.ts"],
-      // Types
-      "@types": ["core/types/index.ts"],
       // Utils
       "@utils": ["core/utils/index.ts"],
       // Api
