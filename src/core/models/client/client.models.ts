@@ -82,18 +82,14 @@ export type CreateUserValues = {
 // Modelos Mappers de Client (HOOK)
 
 export interface CreateUserGoogleModelInput {
-  uid: string;
-  providerData: Array<{
-    email: string;
-  }>;
-  photoURL: string | null;
+  auth_id: string;
+  email: string;
+  profile_picture: string | null;
 }
 
 export interface CreateUserEmailPasswordModelInput {
-  uid: string;
-  providerData: Array<{
-    email: string;
-  }>;
+  auth_id: string;
+  email: string;
 }
 
 export interface UpdateClientDataModelInput {

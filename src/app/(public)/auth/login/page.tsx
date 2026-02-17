@@ -11,6 +11,7 @@ import {
 } from "@/components/atoms";
 import { AuthSplitCard } from "@/components/organisms";
 import { useAuthStore } from "@/hooks/auth";
+import Link from "next/link";
 
 type LoginFormValues = {
   email: string;
@@ -93,12 +94,12 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-neutral-500">
           ¿Aún no tienes una cuenta?{" "}
-          <a
+          <Link
             href="/auth/register"
             className="font-medium text-neutral-700 hover:text-[#f2b6c1] transition"
           >
             Crear Cuenta
-          </a>
+          </Link>
         </p>
       </form>
     </AuthSplitCard>

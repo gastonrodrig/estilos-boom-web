@@ -68,6 +68,8 @@ export const useAuthStore = () => {
         if (!response.ok) return false;
         const newUser = response.data;
 
+        console.log("New User Data:", newUser);
+
         dispatch(
           login({
             id: newUser.user.id_user,
@@ -129,6 +131,7 @@ export const useAuthStore = () => {
         err.response?.data?.message ?? 
           "Error al iniciar sesión."
       );
+      console.log(err);
       return false;
     }
   };
@@ -258,6 +261,7 @@ export const useAuthStore = () => {
         err.response?.data?.message ??
           "Error al crear usuario."
       );
+      console.log(err);
       return false;
     }
   };

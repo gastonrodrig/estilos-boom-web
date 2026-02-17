@@ -12,9 +12,9 @@ export const createUserGoogleToApi = (data: {
   email: string;
   photoURL?: string | null;
 }): CreateUserGoogleModelInput => ({
-  uid: data.uid,
-  providerData: [{ email: data.email }],
-  photoURL: data.photoURL ?? null,
+  auth_id: data.uid,
+  email: data.email,
+  profile_picture: data.photoURL ?? null,
 });
 
 // Crear usuario con email/password
@@ -22,8 +22,8 @@ export const createUserEmailPasswordToApi = (data: {
   uid: string;
   email: string;
 }): CreateUserEmailPasswordModelInput => ({
-  uid: data.uid,
-  providerData: [{ email: data.email }],
+  auth_id: data.uid,
+  email: data.email,
 });
 
 // Actualizar datos del cliente
