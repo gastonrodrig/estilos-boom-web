@@ -28,7 +28,6 @@ export interface AuthState {
   photoURL: string | null;
   isExtraDataCompleted: boolean;
   companyData?: CompanyData | null;
-  lastLogoutAt?: number | null;
   suppressAccessDenied?: boolean;
 }
 
