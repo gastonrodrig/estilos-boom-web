@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  setLogoutSuppression,
   useAppDispatch, 
   useAppSelector,
   checkingCredentials,
@@ -265,6 +266,8 @@ export const useAuthStore = () => {
   const onLogout = async () => {
     await signOut(FirebaseAuth);
     dispatch(logout());
+    dispatch(setLogoutSuppression(true));
+    setTimeout(() => dispatch(setLogoutSuppression(false)), 400);
     router.replace("/auth/login");
   };
 

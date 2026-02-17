@@ -20,6 +20,8 @@ const initialState: AuthState = {
   photoURL: null,
   isExtraDataCompleted: false,
   companyData: null,
+  lastLogoutAt: null,
+  suppressAccessDenied: false,
 };
 
 // Auth Slice
@@ -47,6 +49,7 @@ export const authSlice = createSlice({
       state.photoURL = payload.photoURL ?? null;
       state.isExtraDataCompleted = payload.isExtraDataCompleted;
       state.companyData = payload.companyData ?? null;
+      state.lastLogoutAt = null;
 
       state.clientType =
         payload.role === "Cliente"
@@ -60,7 +63,14 @@ export const authSlice = createSlice({
 
     // Logout
     logout: () => {
-      return initialState;
+      return {
+        ...initialState,
+        lastLogoutAt: Date.now(),
+      };
+    },
+
+    setLogoutSuppression: (state, { payload }: PayloadAction<boolean>) => {
+      state.suppressAccessDenied = payload;
     },
 
     checkingCredentials: (state) => {
@@ -127,6 +137,7 @@ export const authSlice = createSlice({
 export const {
   login,
   logout,
+  setLogoutSuppression,
   checkingCredentials,
   authenticated,
   sendingResetEmail,
