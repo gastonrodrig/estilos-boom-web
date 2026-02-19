@@ -12,11 +12,9 @@ export default function NotFound() {
   const pathname = usePathname();
   const { status, role } = useAppSelector((state) => state.auth);
 
-  // 🔥 Detectar contexto por ruta
   const isClientRoute = pathname.startsWith("/client");
   const isAdminRoute = pathname.startsWith("/admin");
 
-  // 🔥 Config dinámico
   let title = "¡Oops! Página no encontrada";
   let description =
     "Parece que te perdiste en nuestro catálogo. La página que buscas no existe o fue movida.";
@@ -39,7 +37,6 @@ export default function NotFound() {
     redirectPath = "/admin";
   }
 
-  // 🔥 Redirect inteligente
   const handleRedirect = () => {
     if (status === "authenticated") {
       if (role === "Cliente") {
@@ -77,7 +74,7 @@ export default function NotFound() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-[100px] md:text-[150px] font-bold bg-gradient-to-r from-[#F2778D] to-[#F391A3] bg-clip-text text-transparent leading-none mb-4"
+          className="text-[100px] md:text-[150px] font-bold bg-linear-to-r from-[#F2778D] to-[#F391A3] bg-clip-text text-transparent leading-none mb-4"
         >
           404
         </motion.h1>

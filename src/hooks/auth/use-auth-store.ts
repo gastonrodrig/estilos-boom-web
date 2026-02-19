@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  setLogoutSuppression,
   useAppDispatch, 
   useAppSelector,
   checkingCredentials,
@@ -26,8 +25,8 @@ import {
   verifyPasswordResetCode,
   confirmPasswordReset,
 } from "firebase/auth";
-import { useUsersStore } from "@hooks";
-import { clientApi } from "@api";
+import { FirebaseError } from "firebase/app";
+import { clientApi, AuthApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -37,6 +36,7 @@ import { UserStatus } from "@enums";
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 googleProvider.addScope("email");
+googleProvider.addScope("profile");
 
 export const useAuthStore = () => {
   const dispatch = useAppDispatch();
@@ -45,147 +45,146 @@ export const useAuthStore = () => {
   const auth = useAppSelector((state) => state.auth);
   const { uid } = auth ;
 
-  const { findUserByEmail, startCreateUser } = useUsersStore();
-
-
-  // Login con Google
   const onGoogleSignIn = async (): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
+      // 1. Login con Firebase
+      const result = await signInWithPopup(FirebaseAuth, googleProvider);
+      const firebaseUser = result.user;
 
-      const { user } = 
-      await signInWithPopup(FirebaseAuth, googleProvider) as any;
+      // 2. Token
+      const token = await firebaseUser.getIdToken();
 
-      const email = user.providerData[0]?.email;
-      if (!email) return false;
+      // 3. Sync backend
+      const { data } = await AuthApi.post(
+        "/sync",
+        {},
+        getAuthConfig({ token })
+      );
 
-      const { ok, data } = await findUserByEmail(email);
+      const user = data.user;
 
-      // Crear usuario si no existe
-      if (!ok) {
-        const response = await startCreateUser(user, "google");
-
-        if (!response.ok) return false;
-        const newUser = response.data;
-
-        console.log("New User Data:", newUser);
-
-        dispatch(
-          login({
-            id: newUser.user.id_user,
-            uid: newUser.user.auth_id,
-            email: newUser.user.email,
-            firstName: null,
-            lastName: null,
-            phone: null,
-            documentType: null,
-            documentNumber: null,
-            role: newUser.user.role,
-            needsPasswordChange: false,
-            userStatus: newUser.user.status,
-            photoURL: newUser.client.profile_picture ?? null,
-            isExtraDataCompleted: newUser.client.is_extra_data_completed,
-            companyData: null,
-            clientType: null,
-          })
-        );
-
-        return true;
-      }
-
-      if (data.status === UserStatus.INACTIVO) {
-        toast.error("Tu cuenta está inactiva. Contacta al soporte para más información.");
-        dispatch(logout());
-        return false;
-      }
-
-      const needsPassword = !!data.needs_password_change;
-
-      // Login normal
+      // 4. Dispatch login
       dispatch(
         login({
-          id: data.id_user,
-          uid: data.auth_id,
-          email: data.email,
-          firstName: data.first_name ?? null,
-          lastName: data.last_name ?? null,
-          phone: data.phone,
-          documentType: data.document_type,
-          documentNumber: data.document_number,
-          role: data.role,
-          needsPasswordChange: data.client.needs_password_change,
-          userStatus: data.status,
-          photoURL: data.client.profile_picture ?? null,
-          isExtraDataCompleted: data.client.is_extra_data_completed,
-          companyData: data.client.client_company ?? null,
-          clientType: data.client.client_type
+          id: user.id_user,
+          uid: user.auth_id,
+          email: user.email,
+          role: user.role,
+          userStatus: user.status,
+
+          firstName: user.client?.first_name ?? null,
+          lastName: user.client?.last_name ?? null,
+          phone: user.client?.phone ?? null,
+          documentType: user.client?.document_type ?? null,
+          documentNumber: user.client?.document_number ?? null,
+
+          clientType: user.client?.client_type ?? null,
+          needsPasswordChange:
+            user.client?.needs_password_change ?? null,
+          isExtraDataCompleted:
+            user.client?.is_extra_data_completed ?? false,
+
+          companyData: user.client?.client_company
+            ? {
+                companyName:
+                  user.client.client_company.company_name,
+                contactName:
+                  user.client.client_company.contact_name,
+              }
+            : null,
+
+          photoURL: firebaseUser.photoURL,
         })
       );
 
-      return !needsPassword;
-
+      return true;
     } catch (error: unknown) {
-      const err = error as HttpError;
+      const err = error as FirebaseError;
+      if (err.code === "auth/error-code:-47") {
+        toast.error("Este correo ya está registrado con otro método de autenticación.");
+      } else {
+        toast.error("Error al iniciar sesión.");
+      }
       dispatch(logout());
-      toast.error(
-        err.response?.data?.message ?? 
-          "Error al iniciar sesión."
-      );
-      console.log(err);
       return false;
     }
   };
 
-  // Login email / password
-  const startLogin = async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }): Promise<boolean> => {
+  const startLogin = ({ 
+    email, 
+    password 
+  }: { 
+    email: string; 
+    password: string 
+  }) => async (): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
 
+      // 1. Login Firebase
       const { user } = await signInWithEmailAndPassword(
         FirebaseAuth,
         email,
         password
-      ) as any;
+      );
 
-      const { data } = await findUserByEmail(user.providerData[0].email!);
+      // 2. Token
+      const token = await user.getIdToken();
 
-      if (data.status === "Inactivo") {
+      // 3. Sync backend
+      const { data } = await AuthApi.post(
+        "/sync",
+        {},
+        getAuthConfig({ token })
+      );
+
+      const backendUser = data.user;
+
+      // 4. Validaciones
+      if (backendUser.status === UserStatus.INACTIVO) {
         toast.error("Usuario inactivo. Contacta al soporte.");
+
+        await FirebaseAuth.signOut();
         dispatch(logout());
+
         return false;
       }
 
-      if (data.role === "Cliente") {
-        toast.error("Este rol no tiene permitido iniciar sesión en esta aplicación.");
-        dispatch(logout());
-        return false;
-      }
+      const needsPassword =
+        backendUser.client?.needs_password_change ?? false;
 
-      const needsPassword = !!data.needs_password_change;
-
+      // 5. Dispatch login
       dispatch(
         login({
-          id: data.id_user,
-          uid: data.auth_id,
-          email: data.email,
-          firstName: data.first_name ?? null,
-          lastName: data.last_name ?? null,
-          phone: data.phone,
-          documentType: data.document_type,
-          documentNumber: data.document_number,
-          role: data.role,
-          needsPasswordChange: data.client.needs_password_change,
-          userStatus: data.status,
-          photoURL: data.client.profile_picture ?? null,
-          isExtraDataCompleted: data.client.is_extra_data_completed,
-          companyData: data.client.client_company ?? null,
-          clientType: data.client.client_type
+          id: backendUser.id_user,
+          uid: backendUser.auth_id,
+          email: backendUser.email,
+          role: backendUser.role,
+          userStatus: backendUser.status,
+
+          firstName: backendUser.client?.first_name ?? null,
+          lastName: backendUser.client?.last_name ?? null,
+          phone: backendUser.client?.phone ?? null,
+          documentType: backendUser.client?.document_type ?? null,
+          documentNumber:
+            backendUser.client?.document_number ?? null,
+
+          clientType: backendUser.client?.client_type ?? null,
+          needsPasswordChange:
+            backendUser.client?.needs_password_change ?? null,
+          isExtraDataCompleted:
+            backendUser.client?.is_extra_data_completed ?? false,
+
+          companyData: backendUser.client?.client_company
+            ? {
+                companyName:
+                  backendUser.client.client_company.company_name,
+                contactName:
+                  backendUser.client.client_company.contact_name,
+              }
+            : null,
+
+          photoURL: backendUser.client?.profile_picture ?? null,
         })
       );
 
@@ -194,74 +193,104 @@ export const useAuthStore = () => {
       return !needsPassword;
     } catch (error: unknown) {
       const err = error as HttpError;
+
       dispatch(logout());
+
       toast.error(
         err.response?.data?.message ??
           "Error al iniciar sesión."
       );
+
       return false;
     }
   };
 
   // Registro de usuario con email / password
-  const startRegisterUser = async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }): Promise<boolean> => {
+  const startRegisterUser =({ 
+    email, 
+    password 
+  }: { 
+    email: string; 
+    password: string 
+  }) => async (): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
 
-      const exists = await findUserByEmail(email);
-      if (exists.ok) {
-        toast.error("Este correo ya está registrado.");
-        dispatch(logout());
-        return false;
-      }
-
+      // 1. Crear usuario en Firebase
       const { user } = await createUserWithEmailAndPassword(
         FirebaseAuth,
         email,
         password
-      ) as any;
+      );
 
-      const response = await startCreateUser(user, "email/password");
+      // 2. Obtener token
+      const token = await user.getIdToken();
 
-      if (!response.ok) return false;
+      // 3. Sync backend
+      const { data } = await AuthApi.post(
+        "/sync",
+        {},
+        getAuthConfig({ token })
+      );
 
-      const newUser = response.data;
+      const backendUser = data.user;
 
+      // Validación 
+      if (backendUser.status === UserStatus.INACTIVO) {
+        toast.error("Usuario inactivo.");
+
+        await FirebaseAuth.signOut();
+        dispatch(logout());
+
+        return false;
+      }
+
+      // 4. Dispatch
       dispatch(
         login({
-          id: newUser.user.id_user,
-          uid: newUser.user.auth_id,
-          email: newUser.user.email,
-          firstName: null,
-          lastName: null,
-          phone: null,
-          documentType: null,
-          documentNumber: null,
-          role: newUser.user.role,
-          needsPasswordChange: false,
-          userStatus: newUser.user.status,
-          photoURL: null,
-          isExtraDataCompleted: newUser.client.is_extra_data_completed,
-          companyData: null,
-          clientType: null,
+          id: backendUser.id_user,
+          uid: backendUser.auth_id,
+          email: backendUser.email,
+          role: backendUser.role,
+          userStatus: backendUser.status,
+
+          firstName: backendUser.client?.first_name ?? null,
+          lastName: backendUser.client?.last_name ?? null,
+          phone: backendUser.client?.phone ?? null,
+          documentType: backendUser.client?.document_type ?? null,
+          documentNumber:
+            backendUser.client?.document_number ?? null,
+
+          clientType: backendUser.client?.client_type ?? null,
+          needsPasswordChange:
+            backendUser.client?.needs_password_change ?? null,
+          isExtraDataCompleted:
+            backendUser.client?.is_extra_data_completed ?? false,
+
+          companyData: backendUser.client?.client_company
+            ? {
+                companyName:
+                  backendUser.client.client_company.company_name,
+                contactName:
+                  backendUser.client.client_company.contact_name,
+              }
+            : null,
+
+          photoURL: backendUser.client?.profile_picture ?? null,
         })
       );
 
+      toast.success("Usuario creado correctamente.");
+
       return true;
     } catch (error: unknown) {
-      const err = error as HttpError;
+      const err = error as FirebaseError;
+      if (err.code === "auth/error-code:-47") {
+        toast.error("Este correo ya está registrado con otro método de autenticación.");
+      } else {
+        toast.error("Error al crear cuenta.");
+      }
       dispatch(logout());
-      toast.error(
-        err.response?.data?.message ??
-          "Error al crear usuario."
-      );
-      console.log(err);
       return false;
     }
   };
@@ -269,10 +298,8 @@ export const useAuthStore = () => {
   // Logout
   const onLogout = async () => {
     await signOut(FirebaseAuth);
-    dispatch(logout());
-    dispatch(setLogoutSuppression(true));
-    setTimeout(() => dispatch(setLogoutSuppression(false)), 400);
     router.replace("/auth/login");
+    dispatch(logout());
   };
 
   // Cambio de contraseña en primer login

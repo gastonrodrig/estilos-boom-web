@@ -1,30 +1,8 @@
 import { ClientType, DocumentType } from "@enums";
 import {
-  CreateUserGoogleModelInput, 
-  CreateUserEmailPasswordModelInput,
   UpdateClientDataModelInput,
   ExtraInformationValues
 } from "./";
-
-// Crear usuario con Google
-export const createUserGoogleToApi = (data: {
-  uid: string;
-  email: string;
-  photoURL?: string | null;
-}): CreateUserGoogleModelInput => ({
-  auth_id: data.uid,
-  email: data.email,
-  profile_picture: data.photoURL ?? null,
-});
-
-// Crear usuario con email/password
-export const createUserEmailPasswordToApi = (data: {
-  uid: string;
-  email: string;
-}): CreateUserEmailPasswordModelInput => ({
-  auth_id: data.uid,
-  email: data.email,
-});
 
 // Actualizar datos del cliente
 export const updateClientDataToApi = (data: ExtraInformationValues): UpdateClientDataModelInput => ({

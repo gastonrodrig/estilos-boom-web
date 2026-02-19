@@ -11,11 +11,8 @@ import {
   setClientData,
 } from "@store";
 import {
-  createUserGoogleToApi,
-  createUserEmailPasswordToApi,
   updateClientDataToApi,
   ExtraInformationValues,
-  CreateUserValues,
   HttpError
   // updateClientDataToApi,
 } from "@models";
@@ -39,37 +36,6 @@ export const useUsersStore = () => {
   } = useAppSelector((state) => state.auth);
 
   const { loadingClientProfile } = useAppSelector((state) => state.clientProfile);
-
-  // Crear usuario (google o email/password)
-  const startCreateUser = async (
-    user: CreateUserValues,
-    method: "google" | "email/password"
-  ) => {
-    try {
-      let payload;
-
-      if (method === "google") payload = createUserGoogleToApi(user);
-      else payload = createUserEmailPasswordToApi(user);
-
-      const { data } = await clientApi.post("/client-landing", payload);
-
-      return { ok: true, data };
-    } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message;
-      toast.error(message ?? "Ocurrió un error.");
-      return { ok: false, data: null };
-    }
-  };
-
-  // Encontrar usuario por email
-  const findUserByEmail = async (email: string) => {
-    try {
-      const { data } = await clientApi.get(`find/${email}`);
-      return data ? { ok: true, data } : { ok: false, data: null };
-    } catch {
-      return { ok: false, data: null };
-    }
-  };
 
   // Cargar usuario por documento
   const startLoadingUserDocument = async (
@@ -236,8 +202,6 @@ export const useUsersStore = () => {
     loadingClientProfile,
 
     // actions
-    startCreateUser,
-    findUserByEmail,
     startUpdateExtraData,
     // startUpdateClientProfileData,
     // startUpdateClientProfilePicture,

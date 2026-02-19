@@ -1,15 +1,11 @@
 import { FirebaseAuth } from "@lib";
 
-/**
- * Obtiene el Firebase ID Token del usuario autenticado.
- * Firebase se encarga del refresh automáticamente.
- */
-export async function getFirebaseAuthToken(): Promise<string> {
+export const getFirebaseAuthToken = async (): Promise<string> => {
   const user = FirebaseAuth.currentUser;
 
   if (!user) {
-    throw new Error("Usuario no autenticado");
+    throw new Error("No authenticated user");
   }
 
   return await user.getIdToken();
-}
+};

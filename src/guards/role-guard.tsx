@@ -18,7 +18,6 @@ export const RoleGuard = ({ children }: Props) => {
   const isAdminArea = pathname.startsWith("/admin");
   const isAuthRoute = pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register");
 
-
   useEffect(() => {
     if (status === "checking" || (status === "authenticated" && !role)) return;
     if (status === "authenticated" && isAuthRoute) {

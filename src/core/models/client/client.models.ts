@@ -73,24 +73,7 @@ export type ExtraInformationValues = {
   clientType: ClientType;
 }
 
-export type CreateUserValues = { 
-  uid: string; 
-  email: string; 
-  photoURL?: string | null 
-}
-
 // Modelos Mappers de Client (HOOK)
-
-export interface CreateUserGoogleModelInput {
-  auth_id: string;
-  email: string;
-  profile_picture: string | null;
-}
-
-export interface CreateUserEmailPasswordModelInput {
-  auth_id: string;
-  email: string;
-}
 
 export interface UpdateClientDataModelInput {
   client_type: ClientType;
