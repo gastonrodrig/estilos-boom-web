@@ -1,11 +1,14 @@
-import type { InputHTMLAttributes } from "react"
+import type { InputHTMLAttributes } from "react";
 
-type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "placeholder"> & {
-  label: string
-  containerClassName?: string
-  error?: boolean
-  helperText?: string
-}
+type TextInputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "placeholder"
+> & {
+  label: string;
+  containerClassName?: string;
+  error?: boolean;
+  helperText?: string;
+};
 
 export const TextInput = ({
   label,
@@ -17,7 +20,7 @@ export const TextInput = ({
   id,
   ...inputProps
 }: TextInputProps) => {
-  const helperId = helperText ? `${id}-helper` : undefined
+  const helperId = helperText ? `${id}-helper` : undefined;
 
   return (
     <div className={containerClassName}>
@@ -31,8 +34,10 @@ export const TextInput = ({
           className={`
             peer w-full rounded-full
             border ${error ? "border-red-400" : "border-neutral-300"}
-            bg-white px-6 py-3
-            text-[15px] text-neutral-700
+           bg-white 
+            px-4 sm:px-6 
+            py-2.5 sm:py-3
+            text-sm sm:text-[15px] text-neutral-700
             outline-none transition-all duration-200
 
             ${
@@ -49,20 +54,20 @@ export const TextInput = ({
         <label
           htmlFor={id}
           className={`
-            pointer-events-none absolute left-6
+            pointer-events-none absolute left-4 sm:left-6
             top-1/2 -translate-y-1/2
-            bg-white px-2
-            text-[15px] ${error ? "text-red-500" : "text-neutral-500"}
+           bg-white px-2
+            text-sm sm:text-[15px] ${error ? "text-red-500" : "text-neutral-500"}
             transition-all duration-200
 
             peer-focus:top-0
             peer-focus:text-xs
-            ${error ? "peer-focus:text-red-500" : "peer-focus:text-neutral-600"}
 
             peer-not-placeholder-shown:top-0
             peer-not-placeholder-shown:text-xs
-            ${error ? "peer-not-placeholder-shown:text-red-500" : "peer-not-placeholder-shown:text-neutral-600"}
-          `}
+
+         ${error ? "peer-focus:text-red-500 peer-not-placeholder-shown:text-red-500" : "peer-focus:text-neutral-600 peer-not-placeholder-shown:text-neutral-600"}
+`}
         >
           {label}
           {required && " *"}
@@ -70,14 +75,10 @@ export const TextInput = ({
       </div>
 
       {helperText && (
-        <p
-          id={helperId}
-          role="alert"
-          className="mt-2 text-xs text-red-500"
-        >
+        <p id={helperId} role="alert" className="mt-2 text-xs text-red-500">
           {helperText}
         </p>
       )}
     </div>
-  )
-}
+  );
+};

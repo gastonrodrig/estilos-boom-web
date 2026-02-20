@@ -13,7 +13,8 @@ const baseGoogleClasses = `
   inline-flex items-center justify-center gap-3 rounded-full
   px-8 py-[14px] text-sm font-medium tracking-wide transition
   bg-gray-200 text-black hover:bg-gray-300 active:scale-95 
-  hover:cursor-pointer
+  hover:cursor-pointer mt-3 sm:mt-4 py-2.5 sm:py-3 text-sm 
+  sm:text-base
 `
 
 export const GoogleButton: React.FC<GoogleButtonProps> = ({

@@ -9,9 +9,12 @@ import {
   CTA,
   GoogleButton,
 } from "@/components/atoms";
-import { PasswordRequirements } from "@/components/molecules";
 import { AuthSplitCard } from "@/components/organisms";
 import { useAuthStore } from "@/hooks/auth";
+import {
+  getPasswordRequirementErrors,
+  hasMinimumPasswordRequirements,
+} from "@helpers";
 import Link from "next/link";
 
 type RegisterFormValues = {
@@ -25,7 +28,6 @@ export default function RegisterPage() {
     startRegisterUser, 
     onGoogleSignIn
   } = useAuthStore();
-
   const {
     register,
     handleSubmit,
@@ -38,6 +40,11 @@ export default function RegisterPage() {
     name: "password",
     defaultValue: "",
   });
+
+  const passwordRequirementErrors = useMemo(
+    () => getPasswordRequirementErrors(passwordValue),
+    [passwordValue],
+  );
 
   const onSubmit = (data: RegisterFormValues) => {
     startRegisterUser(data);
@@ -68,31 +75,36 @@ export default function RegisterPage() {
           id="password"
           label="Contraseña"
           error={Boolean(errors.password)}
-          helperText={errors.password?.message}
+          helperText={
+            errors.password?.type === "required" ? (
+              "La contraseña es obligatoria"
+            ) : errors.password ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-red-700">
+                <p className="mb-2 text-xs font-medium">Te falta:</p>
+                <div className="flex flex-wrap gap-1.5 text-[11px]">
+                  {passwordRequirementErrors.map((requirement) => (
+                    <span
+                      key={requirement}
+                      className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-white px-2 py-1 leading-none"
+                    >
+                      <span className="text-red-500">✕</span>
+                      {requirement}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : undefined
+          }
           {...register("password", {
             required: "La contraseña es obligatoria",
             validate: (value) => {
-              const hasLowercase = /[a-z]/.test(value);
-              const hasUppercase = /[A-Z]/.test(value);
-              const hasNumber = /\d/.test(value);
-              const hasSpecial = /[^A-Za-z0-9]/.test(value);
-
-              const count = [
-                hasLowercase,
-                hasUppercase,
-                hasNumber,
-                hasSpecial,
-              ].filter(Boolean).length;
-
               return (
-                count >= 3 || "Debe contener al menos 3 de los 4 requisitos"
+                hasMinimumPasswordRequirements(value)
               );
             },
           })}
-          containerClassName="mb-6"
+          containerClassName="mb-8"
         />
-
-        <PasswordRequirements password={passwordValue} />
 
         <CTA 
           type="submit" 
@@ -102,19 +114,19 @@ export default function RegisterPage() {
           Registrarse
         </CTA>
 
-        <p className="mt-6 mb-3 text-center text-sm text-neutral-500">
+        <p className="mt-6 mb-3 text-center text-xs sm:text-sm text-neutral-500">
           O crea una cuenta con
         </p>
 
         <GoogleButton 
-          className="w-full mt-4"
+          className="w-full"
           onClick={handleGoogleSignIn}
           disabled={isAuthenticated || isSubmitting}
         >
           Continuar con Google
         </GoogleButton>
 
-        <p className="mt-6 text-center text-sm text-neutral-500">
+        <p className="mt-6 text-center text-xs sm:text-sm text-neutral-500">
           ¿Ya tienes cuenta?{" "}
           <Link
             href="/auth/login"
