@@ -67,32 +67,32 @@ export default function LoginPage() {
           containerClassName="mb-2"
         />
 
-        <div className="text-right mb-8">
-          <a
+        <div className="text-right mb-6 sm:mb-8">
+          <Link
             href="/forgot-password"
-            className="text-sm text-neutral-500 hover:text-[#f2b6c1] transition"
+            className="text-xs sm:text-sm text-neutral-500 hover:text-[#f2b6c1] transition"
           >
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </div>
 
         <CTA 
           type="submit" 
-          className="w-full" 
+          className="w-full"
           disabled={isAuthenticated || isSubmitting}
         >
           Ingresar
         </CTA>
 
         <GoogleButton 
-          className="w-full mt-4" 
+          className="w-full"
           onClick={handleGoogleSignIn} 
           disabled={isAuthenticated || isSubmitting}
         >
           Continuar con Google
         </GoogleButton>
 
-        <p className="mt-6 text-center text-sm text-neutral-500">
+        <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-neutral-500">
           ¿Aún no tienes una cuenta?{" "}
           <Link
             href="/auth/register"
