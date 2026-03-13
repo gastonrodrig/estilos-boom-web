@@ -9,3 +9,4 @@ export * from "./auth-split-card";
 export * from "./modals";
 export * from "./loaders";
 export * from "./access-denied";
+export * from "./sidebar";

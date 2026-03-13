@@ -43,7 +43,7 @@ export const useAuthStore = () => {
   const router = useRouter();
 
   const auth = useAppSelector((state) => state.auth);
-  const { uid } = auth ;
+  const { uid, status, role } = auth ;
 
   const onGoogleSignIn = async (): Promise<boolean> => {
     try {

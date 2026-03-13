@@ -1,23 +1,60 @@
 "use client";
 
 import Link from "next/link";
-import { Search, User, Heart, ShoppingBag, Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import {
+  Search,
+  User,
+  Heart,
+  ShoppingBag,
+  Menu,
+  X,
+  LayoutDashboard,
+  Package,
+  LogOut,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
-import { navbarMenu } from "@/core/data";
+import { navbarMenu, getUserMenuItems, UserMenuRole } from "@data";
+import { useAuthStore } from "@hooks";
+import { usePathname } from "next/navigation";
 
 interface NavbarProps {
   isHome?: boolean;
   onSearchOpen?: () => void;
+  showTopBar?: boolean;
 }
 
-export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
+export const Navbar = ({
+  isHome = false,
+  onSearchOpen,
+  showTopBar = true,
+}: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   const pathname = usePathname();
+  const isPrivateRoute = pathname.startsWith("/admin") || pathname.startsWith("/client");
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const { status, role, onLogout } = useAuthStore();
+
+  const centerMenu = isPrivateRoute ? [] : navbarMenu;
+  const isAuthenticated = status === "authenticated";
+  const isAdmin = role === "Administrador";
+  const isClient = role === "Cliente";
+  const currentUserMenuRole: UserMenuRole | null = isAdmin
+    ? "admin"
+    : isClient
+    ? "client"
+    : null;
+
+  const userMenuItems = getUserMenuItems(currentUserMenuRole);
+
+  const userMenuIconMap = {
+    dashboard: LayoutDashboard,
+    package: Package,
+    user: User,
+  };
 
   const bgClass = isHome
     ? scrolled
@@ -34,7 +71,16 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
   const isActive = (href: string) => pathname === href;
 
   const iconClass =
-    "w-5 h-5 cursor-pointer transition-transform duration-200 hover:scale-110";
+    "w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110";
+
+  const iconButtonClass =
+    "group flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-black/5 hover:cursor-pointer";
+
+  const adminUserButtonClass =
+    "group flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 transition-colors duration-200 hover:bg-gray-200 hover:cursor-pointer";
+
+  const adminUserIconClass =
+    "h-[18px] w-[18px] text-gray-600 transition-transform duration-200 group-hover:scale-110";
 
   const menuLinkClass = (href: string) =>
     `transition-colors duration-200 ${
@@ -53,24 +99,43 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isHome]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [pathname]);
+
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50">
         {/* Top bar */}
-        {isHome ? (
-          <motion.div
-            className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-          </motion.div>
-        ) : (
-          <div className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide">
-            ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-          </div>
-        )}
+        {showTopBar &&
+          (isHome ? (
+            <motion.div
+              className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
+            </motion.div>
+          ) : (
+            <div className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide">
+              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
+            </div>
+          ))}
 
         {/* Navbar */}
         <motion.div
@@ -78,7 +143,7 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
             scrolled ? "shadow-md backdrop-blur-md" : ""
           } transition-all duration-300`}
         >
-          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-[64px] flex items-center justify-between">
+          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-16 flex items-center justify-between">
             {/* Logo */}
             <Link href="/">
               <Logo width={135} height={30} isHome={isHome} />
@@ -88,7 +153,7 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
             <ul
               className={`hidden min-[1135px]:flex items-center gap-8 text-md font-medium ${textClass}`}
             >
-              {navbarMenu.map(({ label, href }) => (
+              {centerMenu.map(({ label, href }) => (
                 <li key={href}>
                   <Link href={href} className={menuLinkClass(href)}>
                     {label}
@@ -98,38 +163,102 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
             </ul>
 
             {/* Icons */}
-            <div className={`flex items-center gap-4 ${textClass}`}>
-              {/* Search */}
-              <button
-                aria-label="Buscar"
-                onClick={onSearchOpen}
-              >
-                <Search className={iconClass} />
-              </button>
+            <div className={`flex items-center gap-2 ${textClass}`}>
+              {!isAdmin && (
+                <button
+                  aria-label="Buscar"
+                  onClick={onSearchOpen}
+                  className={iconButtonClass}
+                >
+                  <Search className={iconClass} />
+                </button>
+              )}
 
-              <Link href="/auth/login">
-                <User className={iconClass} />
-              </Link>
-
-              <Link href="/wishlist">
-                <Heart className={iconClass} />
-              </Link>
-
-              <Link href="/cart">
-                <ShoppingBag className={iconClass} />
-              </Link>
-
-              {/* Mobile menu */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="min-[1135px]:hidden"
-              >
-                {mobileMenuOpen ? (
-                  <X className={iconClass} />
+              <div className="relative" ref={userMenuRef}>
+                {isAuthenticated ? (
+                  <button
+                    aria-label="Abrir menú de usuario"
+                    onClick={() => setUserMenuOpen((prev) => !prev)}
+                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                  >
+                    <User className={isAdmin ? adminUserIconClass : iconClass} />
+                  </button>
                 ) : (
-                  <Menu className={iconClass} />
+                  <Link
+                    href="/auth/login"
+                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                  >
+                    <User className={isAdmin ? adminUserIconClass : iconClass} />
+                  </Link>
                 )}
-              </button>
+
+                <AnimatePresence>
+                  {isAuthenticated && userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl text-[#364152] md:mt-3 md:w-60 md:rounded-2xl"
+                    >
+                      <div className="py-1.5 md:py-2">
+                        {userMenuItems.map(({ label, href, icon }) => {
+                          const ItemIcon = userMenuIconMap[icon];
+
+                          return (
+                            <Link
+                              key={label}
+                              href={href}
+                              className="mx-1 flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-50 md:mx-1.5 md:gap-2.5 md:px-2.5 md:py-2"
+                            >
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 md:h-6 md:w-6">
+                                <ItemIcon className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                              </span>
+                              <span className="text-xs font-medium md:text-sm">{label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+
+                      <div className="mx-1 h-px bg-gray-200 md:mx-1.5" />
+
+                      <button
+                        onClick={onLogout}
+                        className="mx-1 mb-1 mt-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-lg px-2 py-1.5 text-left text-red-600 hover:bg-red-50 md:mx-1.5 md:mb-1.5 md:w-[calc(100%-0.75rem)] md:gap-2.5 md:px-2.5 md:py-2"
+                      >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-50 md:h-6 md:w-6">
+                          <LogOut className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                        </span>
+                        <span className="text-xs font-medium hover:cursor-pointer md:text-sm">Cerrar Sesión</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {!isAdmin && (
+                <Link href="/wishlist" className={iconButtonClass}>
+                  <Heart className={iconClass} />
+                </Link>
+              )}
+
+              {!isAdmin && (
+                <Link href="/cart" className={iconButtonClass}>
+                  <ShoppingBag className={iconClass} />
+                </Link>
+              )}
+
+              {!isAdmin && (
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className={`${iconButtonClass} min-[1135px]:hidden`}
+                >
+                  {mobileMenuOpen ? (
+                    <X className={iconClass} />
+                  ) : (
+                    <Menu className={iconClass} />
+                  )}
+                </button>
+              )}
             </div>
           </nav>
 
@@ -155,7 +284,7 @@ export const Navbar = ({ isHome = false, onSearchOpen }: NavbarProps) => {
                     }
                   }}
                 >
-                  {navbarMenu.map(({ label, href }) => (
+                  {centerMenu.map(({ label, href }) => (
                     <motion.li 
                       key={href}
                       variants={{
