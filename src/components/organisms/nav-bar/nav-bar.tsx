@@ -8,6 +8,7 @@ import {
   ShoppingBag,
   Menu,
   X,
+  ChevronDown,
   LayoutDashboard,
   Package,
   LogOut,
@@ -32,6 +33,7 @@ export const Navbar = ({
 }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const isPrivateRoute = pathname.startsWith("/admin") || pathname.startsWith("/client");
@@ -106,6 +108,7 @@ export const Navbar = ({
         !userMenuRef.current.contains(event.target as Node)
       ) {
         setUserMenuOpen(false);
+        setIsOpen(false);
       }
     };
 
@@ -179,17 +182,45 @@ export const Navbar = ({
                   <button
                     aria-label="Abrir menú de usuario"
                     onClick={() => setUserMenuOpen((prev) => !prev)}
-                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                    className={iconButtonClass}
                   >
-                    <User className={isAdmin ? adminUserIconClass : iconClass} />
+                    <div className="flex items-center gap-1">
+                      <User className={iconClass} />
+                      <ChevronDown className="w-3.5 h-3.5 text-current" />
+                    </div>
                   </button>
                 ) : (
-                  <Link
-                    href="/auth/login"
-                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
-                  >
-                    <User className={isAdmin ? adminUserIconClass : iconClass} />
-                  </Link>
+                  <div className="relative flex items-center h-full justify-center">
+                    <button
+                      aria-label="Abrir menú de usuario"
+                      className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                    >
+                      <div className="flex items-center gap-1">
+                        <User className={isAdmin ? adminUserIconClass : iconClass} />
+                        <ChevronDown className="w-3.5 h-3.5 text-current" />
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-xl transition-all duration-200">
+                        <Link
+                          href="/auth/login"
+                          onClick={() => setIsOpen(false)}
+                          className="block rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          Iniciar sesión
+                        </Link>
+                        <Link
+                          href="/auth/register"
+                          onClick={() => setIsOpen(false)}
+                          className="mt-1 block rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          Regístrate Ahora
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 <AnimatePresence>
