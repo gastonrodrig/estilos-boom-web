@@ -10,12 +10,17 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen bg-white">
       <Navbar isHome={false} showTopBar={false} />
 
-      <Sidebar items={adminModules} />
+      {/* compensar navbar fixed */}
+      <div className="flex pt-16">
+        <Sidebar items={adminModules} />
 
-      <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
