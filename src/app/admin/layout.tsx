@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <Navbar isHome={false} showTopBar={false} />
 
       {/* compensar navbar fixed */}
-      <div className="flex pt-16">
+      <div className="flex pt-16 ">
         <Sidebar items={adminModules} />
 
         <main className="flex-1 p-6">

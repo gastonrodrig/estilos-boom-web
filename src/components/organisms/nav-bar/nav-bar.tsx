@@ -15,30 +15,48 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
-import { navbarMenu, getUserMenuItems, UserMenuRole } from "@data";
+import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules } from "@data";
 import { useAuthStore } from "@hooks";
 import { usePathname } from "next/navigation";
+import { SearchDrawer } from "../search-drawer";
+import { NavDrawer, NavDrawerItem } from "../nav-drawer";
 
 interface NavbarProps {
   isHome?: boolean;
   onSearchOpen?: () => void;
   showTopBar?: boolean;
+  showClientCenterMenu?: boolean;
 }
 
 export const Navbar = ({
   isHome = false,
   onSearchOpen,
   showTopBar = true,
+  showClientCenterMenu = false,
 }: NavbarProps) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [mobileGuestMenuOpen, setMobileGuestMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [userMenuOpenPath, setUserMenuOpenPath] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [isUnder1138, setIsUnder1138] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 1137px)").matches;
+  });
   const pathname = usePathname();
-  const isPrivateRoute = pathname.startsWith("/admin") || pathname.startsWith("/client");
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isClientRoute = pathname.startsWith("/client");
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { status, role, onLogout } = useAuthStore();
 
-  const centerMenu = isPrivateRoute ? [] : navbarMenu;
+  const centerMenu = isAdminRoute
+    ? []
+    : isClientRoute
+    ? showClientCenterMenu
+      ? navbarMenu
+      : []
+    : navbarMenu;
+  const showCompactClientMenu = isClientRoute && showClientCenterMenu && centerMenu.length > 0;
   const isAuthenticated = status === "authenticated";
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
@@ -49,6 +67,7 @@ export const Navbar = ({
     : null;
 
   const userMenuItems = getUserMenuItems(currentUserMenuRole);
+  const userMenuOpen = userMenuOpenPath === pathname;
 
   const userMenuIconMap = {
     dashboard: LayoutDashboard,
@@ -89,6 +108,44 @@ export const Navbar = ({
         : "hover:opacity-70 font-light"
     }`;
 
+  const drawerItems: NavDrawerItem[] = isAdminRoute
+    ? adminModules.map((item) => ({
+        label: item.label,
+        href: item.href,
+        children: item.children?.map((child) => ({
+          label: child.label,
+          href: child.href,
+        })),
+      }))
+    : isClientRoute
+    ? clientModules.map((item) => ({
+        label: item.label,
+        href: item.href,
+        children: item.children?.map((child) => ({
+          label: child.label,
+          href: child.href,
+        })),
+      }))
+    : centerMenu.map(({ label, href }) => ({
+        label,
+        href,
+      }));
+
+  const showLeftMenuButton =
+    isUnder1138 && (isAdminRoute || isAuthenticated);
+
+  const showRightMenuButton =
+    isUnder1138 && !isAuthenticated && !isAdminRoute;
+
+  const handleSearchOpen = () => {
+    if (onSearchOpen) {
+      onSearchOpen();
+      return;
+    }
+
+    setSearchOpen(true);
+  };
+
   useEffect(() => {
     if (!isHome) return;
 
@@ -105,7 +162,7 @@ export const Navbar = ({
         userMenuRef.current &&
         !userMenuRef.current.contains(event.target as Node)
       ) {
-        setUserMenuOpen(false);
+        setUserMenuOpenPath(null);
       }
     };
 
@@ -114,8 +171,15 @@ export const Navbar = ({
   }, []);
 
   useEffect(() => {
-    setUserMenuOpen(false);
-  }, [pathname]);
+    const mediaQuery = window.matchMedia("(max-width: 1137px)");
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsUnder1138(event.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   return (
     <>
@@ -145,9 +209,29 @@ export const Navbar = ({
         >
           <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-16 flex items-center justify-between">
             {/* Logo */}
-            <Link href="/">
-              <Logo width={135} height={30} isHome={isHome} />
-            </Link>
+            <div className="flex items-center gap-2">
+              {showLeftMenuButton && (
+                <button
+                  onClick={() => {
+                    setMobileDrawerOpen((prev) => !prev);
+                    setMobileGuestMenuOpen(false);
+                  }}
+                  className={iconButtonClass}
+                >
+                  <Menu className={iconClass} />
+                </button>
+              )}
+              <Link href="/">
+                {(isAdminRoute || isClientRoute) && isUnder1138 ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/assets/auth-icon.png" alt="Logo" className="h-7 w-auto object-contain" />
+                  </>
+                ) : (
+                  <Logo width={135} height={30} isHome={isHome} />
+                )}
+              </Link>
+            </div>
 
             {/* Menu Desktop */}
             <ul
@@ -167,7 +251,7 @@ export const Navbar = ({
               {!isAdmin && (
                 <button
                   aria-label="Buscar"
-                  onClick={onSearchOpen}
+                  onClick={handleSearchOpen}
                   className={iconButtonClass}
                 >
                   <Search className={iconClass} />
@@ -178,7 +262,11 @@ export const Navbar = ({
                 {isAuthenticated ? (
                   <button
                     aria-label="Abrir menú de usuario"
-                    onClick={() => setUserMenuOpen((prev) => !prev)}
+                    onClick={() =>
+                      setUserMenuOpenPath((prev) =>
+                        prev === pathname ? null : pathname
+                      )
+                    }
                     className={isAdmin ? adminUserButtonClass : iconButtonClass}
                   >
                     <User className={isAdmin ? adminUserIconClass : iconClass} />
@@ -247,31 +335,51 @@ export const Navbar = ({
                 </Link>
               )}
 
-              {!isAdmin && (
+              {showRightMenuButton && (
                 <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className={`${iconButtonClass} min-[1135px]:hidden`}
+                  onClick={() => {
+                    setMobileGuestMenuOpen((prev) => !prev);
+                    setMobileDrawerOpen(false);
+                  }}
+                  className={iconButtonClass}
                 >
-                  {mobileMenuOpen ? (
-                    <X className={iconClass} />
-                  ) : (
-                    <Menu className={iconClass} />
-                  )}
+                  {mobileGuestMenuOpen ? <X className={iconClass} /> : <Menu className={iconClass} />}
                 </button>
               )}
+
             </div>
           </nav>
 
-          {/* Mobile menu */}
+          {showCompactClientMenu && (
+            <div className="min-[1135px]:hidden border-t border-black/10">
+              <ul className="flex items-center justify-start gap-6 overflow-x-auto px-6 py-3 whitespace-nowrap">
+                {centerMenu.map(({ label, href }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className={`text-sm md:text-base transition-colors duration-200 ${
+                        isActive(href)
+                          ? "font-semibold border-b-2 border-black pb-1"
+                          : "font-light hover:opacity-75"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <AnimatePresence>
-            {mobileMenuOpen && (
+            {mobileGuestMenuOpen && !showCompactClientMenu && (
               <motion.div
                 className={`min-[1135px]:hidden border-t ${bgClass}`}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
               >
-                <motion.ul 
+                <motion.ul
                   className={`flex flex-col gap-4 px-4 py-4 ${textClass}`}
                   initial="closed"
                   animate="open"
@@ -285,7 +393,7 @@ export const Navbar = ({
                   }}
                 >
                   {centerMenu.map(({ label, href }) => (
-                    <motion.li 
+                    <motion.li
                       key={href}
                       variants={{
                         open: { opacity: 1, x: 0 },
@@ -294,7 +402,8 @@ export const Navbar = ({
                     >
                       <Link
                         href={href}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => setMobileGuestMenuOpen(false)}
+                        className="text-sm font-light md:text-base"
                       >
                         {label}
                       </Link>
@@ -304,6 +413,19 @@ export const Navbar = ({
               </motion.div>
             )}
           </AnimatePresence>
+
+          <NavDrawer
+            open={mobileDrawerOpen}
+            onClose={() => setMobileDrawerOpen(false)}
+            items={drawerItems}
+            title={isAdminRoute ? "Panel Admin" : "Panel Cliente"}
+            widthClass="max-w-[320px]"
+            side="left"
+          />
+
+          {!onSearchOpen && (
+            <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
+          )}
         </motion.div>
       </header>
     </>

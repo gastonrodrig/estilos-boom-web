@@ -10,3 +10,4 @@ export * from "./modals";
 export * from "./loaders";
 export * from "./access-denied";
 export * from "./sidebar";
+export * from "./nav-drawer";

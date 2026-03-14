@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface SidebarChildItem {
 	label: string;
@@ -20,6 +21,7 @@ interface SidebarItem {
 
 interface SidebarProps {
 	items: SidebarItem[];
+	hasTopBar?: boolean;
 }
 
 const iconMap = {
@@ -33,11 +35,25 @@ const iconMap = {
   eye: Eye,
 } as const;
 
-export function Sidebar({ items }: SidebarProps) {
+export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 	const pathname = usePathname();
 	const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+	const [showSidebar, setShowSidebar] = useState(() => {
+		if (typeof window === "undefined") return false;
+		return window.matchMedia("(min-width: 1138px)").matches;
+	});
+	const sidebarTopClass = hasTopBar ? "top-[100px]" : "top-16";
+	const sidebarHeightClass = hasTopBar ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-64px)]";
 
-	const isPathActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+	const isPathActive = (href: string) => {
+		const isDashboardRoute = href === "/admin" || href === "/client";
+
+		if (isDashboardRoute) {
+			return pathname === href;
+		}
+
+		return pathname === href || pathname.startsWith(`${href}/`);
+	};
 
 	const handleToggleSection = (label: string) => {
 		setOpenSections((prev) => ({
@@ -46,10 +62,34 @@ export function Sidebar({ items }: SidebarProps) {
 		}));
 	};
 
-	return (
-		<aside className="w-64 bg-[#F6F7F9] p-3 h-[calc(100vh-64px)] sticky top-16">
+	const handleNavigate = () => {
+		setOpenSections({});
+	};
 
-			<nav className="space-y-2">
+	useEffect(() => {
+		const mediaQuery = window.matchMedia("(min-width: 1138px)");
+
+		const handleChange = (event: MediaQueryListEvent) => {
+			setShowSidebar(event.matches);
+		};
+
+		mediaQuery.addEventListener("change", handleChange);
+
+		return () => mediaQuery.removeEventListener("change", handleChange);
+	}, []);
+
+	return (
+		<AnimatePresence>
+			{showSidebar && (
+				<motion.aside
+					initial={{ x: -24, opacity: 0 }}
+					animate={{ x: 0, opacity: 1 }}
+					exit={{ x: -24, opacity: 0 }}
+					transition={{ duration: 0.2, ease: "easeOut" }}
+					className={`w-64 bg-[#F6F7F9] p-3 sticky ${sidebarTopClass} ${sidebarHeightClass} rounded-r-2xl border-r border-white/70`}
+				>
+
+			<nav className="space-y-1.5">
 				{items.map((item) => {
 					const ItemIcon =
 						item.icon && item.icon in iconMap
@@ -65,42 +105,43 @@ export function Sidebar({ items }: SidebarProps) {
 							<div key={item.label}>
 								<button
 									onClick={() => handleToggleSection(item.label)}
-									className={`flex items-center justify-between w-full px-3 py-2 mr-1
-										text-gray-900 rounded-md ${hasActiveChild ? "font-medium bg-white shadow" : "font-normal"}
-										hover:bg-white hover:shadow
+									className={`group flex items-center justify-between w-full px-3 py-2.5 text-[15px] leading-6
+										rounded-lg ${hasActiveChild ? "font-medium text-[#5B283A] bg-white shadow-sm" : "font-normal text-gray-900"}
+										hover:bg-white hover:shadow-sm hover:text-[#5B283A]
 										transition-all duration-200 hover:cursor-pointer`}
 								>
-									<span className={`flex items-center gap-2 ${ItemIcon ? "" : "pl-6"}`}>
-										{ItemIcon ? <ItemIcon className="w-4 h-4" /> : null}
+									<span className={`flex items-center gap-2.5 ${ItemIcon ? "" : "pl-7"}`}>
+										{ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
 										{item.label}
 									</span>
 
 									<ChevronDown
-										className={`w-4 h-4 transition-transform duration-500 ${
+										className={`w-4.5 h-4.5 transition-transform duration-300 ${
+											hasActiveChild ? "text-[#5B283A]" : "text-gray-900"
+										} ${
 											isOpen ? "rotate-180" : ""
 										}`}
 									/>
 								</button>
 
 								<div
-									className={`overflow-hidden transition-all duration-700 ${
-										isOpen ? "max-h-40 mt-2" : "mt-0 max-h-0"
+									className={`overflow-hidden transition-all duration-500 ${
+										isOpen ? "max-h-80 mt-2 opacity-100" : "mt-0 max-h-0 opacity-0"
 									}`}
 								>
-									<div className="ml-6 flex flex-col gap-2">
-										{item.children.map((child, index) => {
+									<div className="ml-6 mt-1 border-l-2 border-[#d8bcc6] pl-3 pr-1 pb-1 flex flex-col gap-1.5">
+										{item.children.map((child) => {
 											const isChildActive = isPathActive(child.href);
 
 											return (
 											<Link
 												key={child.href}
 												href={child.href}
-												className={`flex items-center w-full px-3 pr-3 mr-1
-												rounded-md text-gray-900 hover:bg-white hover:shadow
-												${isChildActive ? "font-medium bg-white shadow" : "font-normal"}
-												transition-all duration-200 hover:cursor-pointer ${
-													index === (item.children?.length ?? 0) - 1 ? "py-2 pb-4" : "py-2"
-												}`}
+												onClick={handleNavigate}
+												className={`flex items-center w-full px-3 py-2 text-[15px] leading-6
+												rounded-lg hover:bg-white hover:shadow-sm hover:text-[#5B283A]
+												${isChildActive ? "font-medium text-[#5B283A] bg-white shadow-sm" : "font-normal text-gray-900"}
+												transition-all duration-200 hover:cursor-pointer`}
 											>
 												{child.label}
 											</Link>
@@ -120,17 +161,20 @@ export function Sidebar({ items }: SidebarProps) {
 						<Link
 							key={item.label}
 							href={item.href}
-							className={`flex items-center gap-2 px-3 py-2 mr-1
-								text-gray-900 rounded-md ${isItemActive ? "font-medium bg-white shadow" : "font-normal"}
-								hover:bg-white hover:shadow
+							onClick={handleNavigate}
+							className={`group flex items-center gap-2.5 px-3 py-2.5 text-[15px] leading-6
+								rounded-lg ${isItemActive ? "font-medium text-[#5B283A] bg-white shadow-sm" : "font-normal text-gray-900"}
+								hover:bg-white hover:shadow-sm hover:text-[#5B283A]
 								transition-all duration-200`}
 						>
-							{ItemIcon ? <ItemIcon className="w-4 h-4" /> : null}
+							{ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
 							{item.label}
 						</Link>
 					);
 				})}
 			</nav>
-		</aside>
+				</motion.aside>
+			)}
+		</AnimatePresence>
 	);
 }

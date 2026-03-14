@@ -43,7 +43,7 @@ export const SearchDrawer = ({ open, onClose }: SearchDrawerProps) => {
         <>
           {/* Overlay */}
           <motion.div
-            className="fixed inset-0 z-[60] bg-white/45"
+            className="fixed inset-0 z-60 bg-white/45"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -53,7 +53,7 @@ export const SearchDrawer = ({ open, onClose }: SearchDrawerProps) => {
 
           {/* Drawer */}
           <motion.aside
-            className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 z-70 h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -83,7 +83,7 @@ export const SearchDrawer = ({ open, onClose }: SearchDrawerProps) => {
               <button
                 onClick={onClose}
                 aria-label="Cerrar búsqueda"
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>

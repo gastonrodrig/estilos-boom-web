@@ -11,11 +11,11 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar isHome={false} showTopBar={false} />
+      <Navbar isHome={false} showTopBar showClientCenterMenu />
 
       {/* compensar navbar fixed */}
-      <div className="flex pt-16">
-        <Sidebar items={clientModules} />
+      <div className="flex pt-36 min-[1138px]:pt-25">
+        <Sidebar items={clientModules} hasTopBar />
 
         <main className="flex-1 p-6">
           {children}

@@ -1,8 +1,7 @@
 "use client";
 
-import { Navbar, Footer, SearchDrawer } from "@/components/organisms";
+import { Navbar, Footer } from "@/components/organisms";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 export default function PublicLayout({
   children,
@@ -12,18 +11,14 @@ export default function PublicLayout({
   const pathname = usePathname();
   const isHome = pathname === "/" || pathname === "/home";
 
-  const [searchOpen, setSearchOpen] = useState(false);
-
   return (
     <>
-      <Navbar isHome={isHome} onSearchOpen={() => setSearchOpen(true)} />
+      <Navbar isHome={isHome} />
 
       <div className="relative">
         <main>{children}</main>
         <Footer />
       </div>
-
-      <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }
