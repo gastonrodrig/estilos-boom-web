@@ -67,6 +67,11 @@ export const Navbar = ({
   const isAuthenticated = status === "authenticated";
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
+  const hasSession =
+    isAuthenticated || status === "first-login-password" || !!role;
+  const isClientPanelNavbar = showClientCenterMenu;
+  const isPublicNavbar = !isAdminRoute && !isClientPanelNavbar;
+  const isPanelNavbar = isAdminRoute || isClientPanelNavbar;
   const currentUserMenuRole: UserMenuRole | null = isAdmin
     ? "admin"
     : isClient
@@ -137,13 +142,20 @@ export const Navbar = ({
         href,
       }));
 
-  const forceHomeGuestMenu = isHome && isClient && isAuthenticated;
+  const isAuthenticatedOutsidePanels = isPublicNavbar && hasSession;
+  const useHomeAuthenticatedLogo = isHome && isPublicNavbar && hasSession;
+  const compactLogoSrc = useHomeAuthenticatedLogo
+    ? "/assets/logo-eb.png"
+    : "/assets/auth-icon.png";
+
+  const useCompactMobileLogo =
+    isUnder1138 && (isPanelNavbar || isAuthenticatedOutsidePanels);
 
   const showLeftMenuButton =
-    isUnder1138 && (isAdminRoute || (isAuthenticated && !forceHomeGuestMenu));
+    isUnder1138 && isPanelNavbar;
 
   const showRightMenuButton =
-    isUnder1138 && !isAdminRoute && (!isAuthenticated || forceHomeGuestMenu);
+    isUnder1138 && isPublicNavbar;
 
   const handleSearchOpen = () => {
     if (onSearchOpen) {
@@ -220,10 +232,10 @@ export const Navbar = ({
                 </button>
               )}
               <Link href="/">
-                {(isAdminRoute || isClientRoute) && isUnder1138 ? (
+                {useCompactMobileLogo ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/assets/auth-icon.png" alt="Logo" className="h-7 w-auto object-contain" />
+                    <img src={compactLogoSrc} alt="Logo" className="h-7 w-auto object-contain" />
                   </>
                 ) : (
                   <Logo width={135} height={30} isHome={isHome} />
