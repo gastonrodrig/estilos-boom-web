@@ -1,15 +1,16 @@
-import { ClientType, DocumentType } from "@enums";
+import { ClientType, DocumentType, UserStatus } from "@enums";
 
 // Modelos Client Company (SLICE)
 
 export interface ClientCompany {
   email: string;
-  company_name: string;
-  contact_name: string;
+  companyName: string;
+  contactName: string;
   phone: string;
-  client_type: ClientType.COMPANY;
-  document_type: DocumentType.RUC;
-  document_number: string;
+  clientType: ClientType.COMPANY;
+  documentType: DocumentType.RUC;
+  documentNumber: string;
+  status?: UserStatus;
 }
 
 export interface RefreshClientsCompanyPayload {
@@ -31,12 +32,13 @@ export interface ClientCompanyState {
 
 export interface ClientPerson {
   email: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
-  client_type: ClientType.PERSON;
-  document_type: DocumentType;
-  document_number: string;
+  clientType: ClientType.PERSON;
+  documentType: DocumentType;
+  documentNumber: string;
+  status?: UserStatus;
 }
 
 export interface RefreshClientsPersonPayload {
