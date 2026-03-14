@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 
 type DrawerProps = {
@@ -18,6 +19,12 @@ export const Drawer: React.FC<DrawerProps> = ({
   widthClass = "max-w-md",
   side = "right",
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     if (open) document.addEventListener("keydown", onKey);
@@ -33,7 +40,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     };
   }, [open]);
 
-  if (typeof document === "undefined") return null;
+  if (!mounted) return null;
 
   const positionClass = side === "left" ? "left-0" : "right-0";
   const closedTransformClass = side === "left" ? "-translate-x-full" : "translate-x-full";
