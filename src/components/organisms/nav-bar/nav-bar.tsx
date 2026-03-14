@@ -8,11 +8,12 @@ import {
   ShoppingBag,
   Menu,
   X,
+  ChevronDown,
   LayoutDashboard,
   Package,
   LogOut,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
 import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules } from "@data";
@@ -37,12 +38,18 @@ export const Navbar = ({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileGuestMenuOpen, setMobileGuestMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [userMenuOpenPath, setUserMenuOpenPath] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isUnder1138, setIsUnder1138] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(max-width: 1137px)").matches;
-  });
+  const isUnder1138 = useSyncExternalStore(
+    (onStoreChange) => {
+      const mediaQuery = window.matchMedia("(max-width: 1137px)");
+      mediaQuery.addEventListener("change", onStoreChange);
+      return () => mediaQuery.removeEventListener("change", onStoreChange);
+    },
+    () => window.matchMedia("(max-width: 1137px)").matches,
+    () => false
+  );
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
   const isClientRoute = pathname.startsWith("/client");
@@ -67,7 +74,6 @@ export const Navbar = ({
     : null;
 
   const userMenuItems = getUserMenuItems(currentUserMenuRole);
-  const userMenuOpen = userMenuOpenPath === pathname;
 
   const userMenuIconMap = {
     dashboard: LayoutDashboard,
@@ -131,11 +137,13 @@ export const Navbar = ({
         href,
       }));
 
+  const forceHomeGuestMenu = isHome && isClient && isAuthenticated;
+
   const showLeftMenuButton =
-    isUnder1138 && (isAdminRoute || isAuthenticated);
+    isUnder1138 && (isAdminRoute || (isAuthenticated && !forceHomeGuestMenu));
 
   const showRightMenuButton =
-    isUnder1138 && !isAuthenticated && !isAdminRoute;
+    isUnder1138 && !isAdminRoute && (!isAuthenticated || forceHomeGuestMenu);
 
   const handleSearchOpen = () => {
     if (onSearchOpen) {
@@ -162,23 +170,13 @@ export const Navbar = ({
         userMenuRef.current &&
         !userMenuRef.current.contains(event.target as Node)
       ) {
-        setUserMenuOpenPath(null);
+        setUserMenuOpen(false);
+        setIsOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1137px)");
-
-    const handleChange = (event: MediaQueryListEvent) => {
-      setIsUnder1138(event.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   return (
@@ -262,22 +260,46 @@ export const Navbar = ({
                 {isAuthenticated ? (
                   <button
                     aria-label="Abrir menú de usuario"
-                    onClick={() =>
-                      setUserMenuOpenPath((prev) =>
-                        prev === pathname ? null : pathname
-                      )
-                    }
-                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                    onClick={() => setUserMenuOpen((prev) => !prev)}
+                    className={iconButtonClass}
                   >
-                    <User className={isAdmin ? adminUserIconClass : iconClass} />
+                    <div className="flex items-center">
+                      <User className={iconClass} />
+                      <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
+                    </div>
                   </button>
                 ) : (
-                  <Link
-                    href="/auth/login"
-                    className={isAdmin ? adminUserButtonClass : iconButtonClass}
-                  >
-                    <User className={isAdmin ? adminUserIconClass : iconClass} />
-                  </Link>
+                  <div className="relative flex items-center h-full justify-center">
+                    <button
+                      aria-label="Abrir menú de usuario"
+                      className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                      onClick={() => setIsOpen((prev) => !prev)}
+                    >
+                      <div className="flex items-center">
+                        <User className={isAdmin ? adminUserIconClass : iconClass} />
+                        <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-xl transition-all duration-200">
+                        <Link
+                          href="/auth/login"
+                          onClick={() => setIsOpen(false)}
+                          className="block rounded-md px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 md:text-sm"
+                        >
+                          Iniciar sesión
+                        </Link>
+                        <Link
+                          href="/auth/register"
+                          onClick={() => setIsOpen(false)}
+                          className="mt-1 block rounded-md px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 md:text-sm"
+                        >
+                          Regístrate Ahora
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 <AnimatePresence>
