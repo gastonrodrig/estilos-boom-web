@@ -382,8 +382,8 @@ export function DataTable<T extends object>({
     const isCopied = copiedCell === cellToken;
 
     return (
-      <div className="flex items-center gap-2">
-        <span className="truncate">{content}</span>
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="flex-1 min-w-0 truncate">{content}</span>
         {copyValue && (
           <button
             type="button"
@@ -439,7 +439,7 @@ export function DataTable<T extends object>({
                 className="self-start sm:self-auto"
                 onClick={onAddClick}
               >
-                Agregar
+                + Agregar
               </CTA>
             )}
           </div>
@@ -541,7 +541,7 @@ export function DataTable<T extends object>({
                       <span className="w-24 shrink-0 text-sm text-gray-500">
                         {column.label}:
                       </span>
-                      <div className="w-full text-sm text-gray-700">
+                      <div className="min-w-0 overflow-hidden w-full text-sm text-gray-700">
                         {renderCellContent(row, column, rowKey)}
                       </div>
                     </div>
