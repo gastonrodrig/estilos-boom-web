@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { clientApi } from "@api";
 import { 
   useAppDispatch,
   useAppSelector,
   setLoadingClientPerson,
-  refreshClientsPerson
+  refreshClientsPerson,
+  selectedClientPerson,
+  setPageClientPerson,
+  setRowsPerPageClientPerson
 } from "@store"
 import { 
   ClientPerson,
@@ -32,11 +35,33 @@ export const useClientPersonStore = () => {
   } = useAppSelector((state) => state.clientPerson);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('first_name');
   const [order, setOrder] = useState('asc');
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const getFriendlyErrorMessage = useCallback(
+    (error: unknown, fallbackMessage: string) => {
+      const httpError = error as HttpError;
+      const rawMessage = String(httpError.response?.data?.message ?? "");
+      const normalizedMessage = rawMessage.toLowerCase();
+
+      const isThrottled =
+        httpError.response?.status === 429 ||
+        normalizedMessage.includes("throttlerexception") ||
+        normalizedMessage.includes("too many requests");
+
+      if (isThrottled) {
+        return "Demasiadas solicitudes en poco tiempo. Intenta nuevamente en unos segundos.";
+      }
+
+      return rawMessage || fallbackMessage;
+    },
+    []
+  );
 
   const startCreateClientPerson = async (clientPerson: ClientPerson) => {
     dispatch(setLoadingClientPerson(true));
+    setLoadError(null);
     try {
       const payload = createClientPersonModel(clientPerson);
       const token = await getFirebaseAuthToken();
@@ -45,16 +70,21 @@ export const useClientPersonStore = () => {
       toast.success("El cliente persona fue creado exitosamente.");
       return true;
     } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message
-      toast.error(message ?? "Ocurrió un error al registrar el cliente persona.");
+      const friendlyMessage = getFriendlyErrorMessage(
+        error,
+        "Ocurrió un error al registrar el cliente persona."
+      );
+      setLoadError(friendlyMessage);
+      toast.error(friendlyMessage);
       return false;
     } finally {
       dispatch(setLoadingClientPerson(false));
     }
   };
 
-  const startLoadingClientsPersonPaginated = async () => {
+  const startLoadingClientsPersonPaginated = useCallback(async () => {
     dispatch(setLoadingClientPerson(true));
+    setLoadError(null);
     try {
       const token = await getFirebaseAuthToken();
       const limit = rowsPerPage;
@@ -73,26 +103,32 @@ export const useClientPersonStore = () => {
           },
         })
       );
-        dispatch(refreshClientsPerson({
+      dispatch(refreshClientsPerson({
         items: data.items,
         total: data.total,
         page: currentPage,
       }));
       return true;
     } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message
-      toast.error(message ?? "Ocurrió un error al cargar los clientes persona.");
+      const friendlyMessage = getFriendlyErrorMessage(
+        error,
+        "Ocurrió un error al cargar los clientes persona."
+      );
+
+      setLoadError(friendlyMessage);
+      toast.error(friendlyMessage);
       return false;
     } finally {
       dispatch(setLoadingClientPerson(false));
     }
-  };
+  }, [dispatch, rowsPerPage, currentPage, searchTerm, orderBy, order, getFriendlyErrorMessage]);
 
   const startUpdateClientPerson = async (
     id: string, 
     client: ClientPerson
   ) => {
     dispatch(setLoadingClientPerson(true));
+    setLoadError(null);
     try {
       const payload = updateClientPersonModel(client);
       const token = await getFirebaseAuthToken();
@@ -101,29 +137,54 @@ export const useClientPersonStore = () => {
       toast.success("El cliente persona fue actualizado exitosamente.");
       return true;
     } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message;
-      toast.error(message ?? "Ocurrió un error al actualizar el cliente.");
+      const friendlyMessage = getFriendlyErrorMessage(
+        error,
+        "Ocurrió un error al actualizar el cliente."
+      );
+      setLoadError(friendlyMessage);
+      toast.error(friendlyMessage);
       return false;
     } finally {
       dispatch(setLoadingClientPerson(false));
     }
   };
 
+  const setSelectedClientPerson = (client: ClientPerson) => {
+    dispatch(selectedClientPerson({ ...client }));
+  };
+
+  const setPageGlobal = (page: number) => {
+    dispatch(setPageClientPerson(page));
+  };
+
+  const setRowsPerPageGlobal = (rows: number) => {
+    dispatch(setRowsPerPageClientPerson(rows));
+  };
+
   return {
+    // state
     clientsPerson,
     selected,
     total,
     loading,
-    currentPage,
-    rowsPerPage,
+    loadError,
     searchTerm,
-    setSearchTerm,
+    rowsPerPage,
+    currentPage,
     orderBy,
-    setOrderBy,
     order,
+
+    // setters
+    setSearchTerm,
+    setOrderBy,
     setOrder,
+    setSelectedClientPerson,
+    setPageGlobal,
+    setRowsPerPageGlobal,
+
+    // actions
     startCreateClientPerson,
     startLoadingClientsPersonPaginated,
-    startUpdateClientPerson
+    startUpdateClientPerson,
   };
 };

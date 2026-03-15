@@ -111,13 +111,13 @@ export const useAuthStore = () => {
     }
   };
 
-  const startLogin = ({ 
+  const startLogin = async ({ 
     email, 
     password 
   }: { 
     email: string; 
     password: string 
-  }) => async (): Promise<boolean> => {
+  }): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
 
@@ -206,13 +206,13 @@ export const useAuthStore = () => {
   };
 
   // Registro de usuario con email / password
-  const startRegisterUser =({ 
+  const startRegisterUser = async ({ 
     email, 
     password 
   }: { 
     email: string; 
     password: string 
-  }) => async (): Promise<boolean> => {
+  }): Promise<boolean> => {
     try {
       dispatch(checkingCredentials());
 
