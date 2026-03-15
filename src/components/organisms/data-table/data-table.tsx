@@ -218,9 +218,21 @@ export function DataTable<T extends object>({
   globalFilter = "",
   onGlobalFilterChange,
 }: DataTableProps<T>) {
-  const { isMd, isLg } = useScreenSizes();
+  const { isMd } = useScreenSizes();
   const [copiedCell, setCopiedCell] = useState<string | null>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [viewportWidth, setViewportWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const getRowValue = useCallback((row: T, key: keyof T | string) => {
     return (row as Record<string, unknown>)[String(key)];
@@ -278,9 +290,10 @@ export function DataTable<T extends object>({
 
   const hasNoData = !loading && paginatedRows.length === 0;
   const shouldEnableRowsScroll = !loading && !hasNoData && paginatedRows.length > 5;
+  const useCardsLayout = viewportWidth < 1350;
   const mobileCardsScrollThreshold = isMd ? 3 : 2;
   const shouldEnableMobileCardsScroll =
-    !loading && !hasNoData && !isLg && paginatedRows.length >= mobileCardsScrollThreshold;
+    !loading && !hasNoData && useCardsLayout && paginatedRows.length >= mobileCardsScrollThreshold;
 
   const getVisibleActions = (row: T) => {
     const list = typeof actionsArr === "function" ? actionsArr(row) : actionsArr;
@@ -446,7 +459,7 @@ export function DataTable<T extends object>({
         </div>
       )}
 
-      {!isLg ? (
+      {useCardsLayout ? (
         <div
           className={`mt-4 grid gap-4 px-6 pb-2 ${
             isMd ? "grid-cols-2" : "grid-cols-1"
