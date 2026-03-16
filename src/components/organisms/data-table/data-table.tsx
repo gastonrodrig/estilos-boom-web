@@ -294,6 +294,7 @@ export function DataTable<T extends object>({
   const mobileCardsScrollThreshold = isMd ? 3 : 2;
   const shouldEnableMobileCardsScroll =
     !loading && !hasNoData && useCardsLayout && paginatedRows.length >= mobileCardsScrollThreshold;
+  const mobileLoadingCardsCount = isMd ? 2 : 1;
 
   const getVisibleActions = (row: T) => {
     const list = typeof actionsArr === "function" ? actionsArr(row) : actionsArr;
@@ -467,7 +468,7 @@ export function DataTable<T extends object>({
           style={{ maxHeight: shouldEnableMobileCardsScroll ? "550px" : undefined }}
         >
           {loading
-            ? Array.from({ length: Math.max(1, Math.min(safeRowsPerPage, 3)) }, (_, index) => (
+            ? Array.from({ length: mobileLoadingCardsCount }, (_, index) => (
                 <div
                   key={`mobile-skeleton-${index}`}
                   className="rounded-2xl border border-pink-100 bg-[#fffcfd] p-5 shadow-sm"
