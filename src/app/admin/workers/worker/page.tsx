@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { DataTable, DataTableColumn, DataTableAction } from '@/components/organisms';
 import { Pencil } from 'lucide-react';
 
-
+// 1. Agregamos 'worker_type' a nuestro molde
 interface WorkerData {
   id_worker: string;
   first_name: string;
@@ -13,13 +13,14 @@ interface WorkerData {
   phone: string;
   document_type: string;
   document_number: string;
+  worker_type: string; // 👈 NUEVA COLUMNA PARA EL ROL
   status: string; 
 }
 
 export default function TrabajadoresPage() {
   const [isOpenModal, setIsModalOpen] = useState(false);
 
- 
+  // 2. Agregamos la columna a la tabla (la puse justo antes del Estado)
   const columns: DataTableColumn<WorkerData>[] = [
     { id: 'first_name', label: 'Nombre', sortable: true, width: '140px', truncate: true },
     { id: 'last_name', label: 'Apellido', sortable: true, width: '140px', truncate: true },
@@ -27,23 +28,22 @@ export default function TrabajadoresPage() {
     { id: 'phone', label: '# Telefono', sortable: true, width: '140px', truncate: true },
     { id: 'document_type', label: 'Tipo Doc', sortable: true, width: '120px', truncate: true },
     { id: 'document_number', label: '# Documento', sortable: true, width: '140px', truncate: true },
-    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true }, // 👈 Usa 'status'
+    { id: 'worker_type', label: 'Rol / Tipo', sortable: true, width: '140px', truncate: true }, // 👈 AQUÍ ESTÁ
+    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true }, 
   ];
-
 
   const actions: DataTableAction<WorkerData>[] = [
     {
       label: "Editar",
       icon: <Pencil className="h-4 w-4" />,
       onClick: (row: WorkerData) => {
-
         setIsModalOpen(true);
         alert(`Abriendo edición para: ${row.first_name}`);
       },
     },
   ];
 
- 
+  // 3. Actualizamos los datos de prueba para que incluyan el rol
   const [datosDePrueba] = useState<WorkerData[]>([
     { 
       id_worker: 'WRK-001',
@@ -53,7 +53,8 @@ export default function TrabajadoresPage() {
       phone: '987654321',
       document_type: 'DNI',
       document_number: '76543210',
-      status: 'Activo',
+      worker_type: 'Administrador', // 👈 DATO NUEVO
+      status: 'Activo', 
     },
     { 
       id_worker: 'WRK-002',
@@ -63,10 +64,10 @@ export default function TrabajadoresPage() {
       phone: '912345678',
       document_type: 'CE',
       document_number: '001122334',
+      worker_type: 'Vendedor', // 👈 DATO NUEVO
       status: 'Inactivo', 
     },
   ]);
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
@@ -83,10 +84,9 @@ export default function TrabajadoresPage() {
         description="Administra el personal, filtra por cualquier campo y aplica acciones rápidas."
         onAddClick={() => setIsModalOpen(true)}
         
-      
         globalFilter={searchTerm}
         onGlobalFilterChange={setSearchTerm}
-     
+        
         columns={columns}
         order={order}
         orderBy={orderBy}

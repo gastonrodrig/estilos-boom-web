@@ -67,6 +67,20 @@ export const adminModules = [
     ],
   },
   {
+    label: "Gestionar Trabajadores",
+    icon: "briefcase", 
+    children: [
+      {
+        label: "Trabajadores",
+        href: "/admin/workers/worker",
+      },
+      {
+        label: "Roles / Tipos",
+        href: "/admin/workers/WorkerType",
+      },
+    ],
+  },
+  {
     label: "Visualizar Reseñas",
     href: "/admin/reviews",
     icon: "eye",
