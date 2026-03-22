@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { productApi } from "@api"; // <--- Importas la nueva instancia que creaste
+import { useCallback, useState } from "react";
+import { productApi } from "@api"; 
 import { 
   useAppDispatch, 
   useAppSelector, 
@@ -9,7 +9,7 @@ import {
   refreshProducts 
 } from "@store";
 import { Product, HttpError } from "@models";
-import { getAuthConfig, getAuthConfigWithParams } from "@utils";
+import { getAuthConfigWithParams } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
 import toast from "react-hot-toast";
 
@@ -18,54 +18,58 @@ export const useProductStore = () => {
   const { products, loading, currentPage, rowsPerPage } = useAppSelector((state) => state.product);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-
-  const startLoadingProducts = async () => {
+  
+  // 1. Envolvemos todo en useCallback para evitar bucles infinitos (Error 429)
+  const startLoadingProducts = useCallback(async (params: {
+    section?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    sizes?: string[];
+    colors?: string[];
+  }) => {
     dispatch(setLoadingProduct(true));
     try {
-      // 1. Manejo opcional de token (para que no explote si no hay login)
       let token = null;
-      try { token = await getFirebaseAuthToken(); } catch (e) { token = null; }
+      try { token = await getFirebaseAuthToken(); } catch (e) {}
 
+      // Construimos los Query Params dinámicamente
       const queryParams: any = {
         limit: rowsPerPage,
         offset: currentPage * rowsPerPage,
+        ...params, // Esparcimos los filtros (maxPrice, sizes, etc.)
       };
-      if (searchTerm.trim()) queryParams.search = searchTerm.trim();
-      if (categoryId) queryParams.categoryId = categoryId;
 
-      // 2. PETICIÓN: Al usar productApi, el path es "" o "/"
-      const { data } = await productApi.get(
-        "", // <--- Vacío, porque la base ya es /api/v1/products
-        getAuthConfigWithParams({
-          token,
-          params: queryParams,
-        })
-      );
-      
-      const items = data.items ?? data;
-      const totalCount = data.total ?? items.length;
-
-      dispatch(refreshProducts({
-        items: items,
-        total: totalCount,
-        page: currentPage,
+      // Si enviamos arrays (sizes/colors), Axios los convierte a ?sizes=S&sizes=M
+      const { data } = await productApi.get("", getAuthConfigWithParams({
+        token,
+        params: queryParams,
       }));
-      
-    } catch (error: unknown) {
-      const message = (error as HttpError).response?.data?.message;
-      toast.error(message ?? "Error al conectar con el catálogo.");
+
+      const rawItems = data.items ?? data;
+      const normalizedItems = rawItems.map((p: any) => ({
+        ...p,
+        id: p.id_product,
+        isNewIn: p.is_new_in,
+        basePrice: p.base_price,
+        variants: p.variants ?? [],
+      }));
+
+      dispatch(refreshProducts({ items: normalizedItems, total: data.total ?? normalizedItems.length, page: currentPage }));
+    } catch (error) {
+      toast.error("Error al filtrar productos");
     } finally {
       dispatch(setLoadingProduct(false));
     }
-  };
+  }, [dispatch, currentPage, rowsPerPage]);
+
+
 
   return {
     products,
     loading,
     searchTerm,
     setSearchTerm,
-    setCategoryId,
     startLoadingProducts,
   };
 };
