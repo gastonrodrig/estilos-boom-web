@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { clientApi } from "@api";
-import { 
+import {
   useAppDispatch,
   useAppSelector,
   setLoadingClientPerson,
@@ -11,7 +11,7 @@ import {
   setPageClientPerson,
   setRowsPerPageClientPerson
 } from "@store"
-import { 
+import {
   ClientPerson,
   createClientPersonModel,
   HttpError,
@@ -124,7 +124,7 @@ export const useClientPersonStore = () => {
   }, [dispatch, rowsPerPage, currentPage, searchTerm, orderBy, order, getFriendlyErrorMessage]);
 
   const startUpdateClientPerson = async (
-    id: string, 
+    id: string,
     client: ClientPerson
   ) => {
     dispatch(setLoadingClientPerson(true));
@@ -149,8 +149,8 @@ export const useClientPersonStore = () => {
     }
   };
 
-  const setSelectedClientPerson = (client: ClientPerson) => {
-    dispatch(selectedClientPerson({ ...client }));
+  const setSelectedClientPerson = (client: ClientPerson | null) => {
+    dispatch(selectedClientPerson(client ? { ...client } : null));
   };
 
   const setPageGlobal = (page: number) => {

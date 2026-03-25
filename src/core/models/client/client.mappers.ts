@@ -6,7 +6,6 @@ import {
   ClientCompany
 } from "./";
 
-// Actualizar datos del cliente
 export const updateClientDataToApi = (data: ExtraInformationValues): UpdateClientDataModelInput => ({
   client_type: data.clientType as ClientType,
   first_name: data.firstName ?? null,
@@ -18,42 +17,38 @@ export const updateClientDataToApi = (data: ExtraInformationValues): UpdateClien
   document_number: data.documentNumber,
 });
 
-// Agregar nuevo cliente persona
 export const createClientPersonModel = (clientPerson: ClientPerson) => ({
   email: clientPerson.email,
-  first_name: clientPerson.firstName,
-  last_name: clientPerson.lastName,
+  first_name: clientPerson.first_name,
+  last_name: clientPerson.last_name,
   phone: clientPerson.phone,
-  document_type: clientPerson.documentType as DocumentType,
-  document_number: clientPerson.documentNumber,
+  document_type: clientPerson.document_type as DocumentType,
+  document_number: clientPerson.document_number,
 });
 
-// Actualizar nuevo cliente persona
 export const updateClientPersonModel = (clientPerson: ClientPerson) => ({
   email: clientPerson.email,
-  first_name: clientPerson.firstName,
-  last_name: clientPerson.lastName,
+  first_name: clientPerson.first_name,
+  last_name: clientPerson.last_name,
   phone: clientPerson.phone,
-  document_type: clientPerson.documentType as DocumentType,
-  document_number: clientPerson.documentNumber,
+  document_type: clientPerson.document_type as DocumentType,
+  document_number: clientPerson.document_number,
   status: clientPerson.status,
 });
 
-// Agregar nuevo cliente empresa
 export const createClientCompanyModel = (clientCompany: ClientCompany) => ({
   email: clientCompany.email,
-  company_name: clientCompany.companyName,
-  contact_name: clientCompany.contactName,
+  company_name: clientCompany.company_name,
+  contact_name: clientCompany.contact_name,
   phone: clientCompany.phone,
-  document_number: clientCompany.documentNumber,
+  document_number: clientCompany.document_number,
 });
 
-// Actualizar nuevo cliente empresa
 export const updateClientCompanyModel = (clientCompany: ClientCompany) => ({
   email: clientCompany.email,
-  company_name: clientCompany.companyName,
-  contact_name: clientCompany.contactName,
+  company_name: clientCompany.company_name,
+  contact_name: clientCompany.contact_name,
   phone: clientCompany.phone,
-  document_number: clientCompany.documentNumber,
+  document_number: clientCompany.document_number,
   status: clientCompany.status,
 });
