@@ -1,13 +1,7 @@
 "use client";
-
 import { useCallback, useState } from "react";
 import { productApi } from "@api"; 
-import { 
-  useAppDispatch, 
-  useAppSelector, 
-  setLoadingProduct, 
-  refreshProducts 
-} from "@store";
+import { useAppDispatch, useAppSelector, setLoadingProduct, refreshProducts } from "@store";
 import { Product, HttpError } from "@models";
 import { getAuthConfigWithParams } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
@@ -16,10 +10,8 @@ import toast from "react-hot-toast";
 export const useProductStore = () => {
   const dispatch = useAppDispatch();
   const { products, loading, currentPage, rowsPerPage } = useAppSelector((state) => state.product);
-
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // 1. Envolvemos todo en useCallback para evitar bucles infinitos (Error 429)
+
   const startLoadingProducts = useCallback(async (params: {
     section?: string;
     category?: string;
@@ -27,26 +19,23 @@ export const useProductStore = () => {
     maxPrice?: number;
     sizes?: string[];
     colors?: string[];
+    limit?: number;  // 👈 Añadimos esto
+    offset?: number; // 👈 Añadimos esto
   }) => {
     dispatch(setLoadingProduct(true));
     try {
       let token = null;
       try { token = await getFirebaseAuthToken(); } catch (e) {}
 
-      // Construimos los Query Params dinámicamente
       const queryParams: any = {
-        limit: rowsPerPage,
-        offset: currentPage * rowsPerPage,
-        ...params, // Esparcimos los filtros (maxPrice, sizes, etc.)
+        limit: params.limit ?? rowsPerPage, // 👈 Si mandas un limit manual, lo usa
+        offset: params.offset ?? (currentPage * rowsPerPage),
+        ...params,
       };
 
-      // Si enviamos arrays (sizes/colors), Axios los convierte a ?sizes=S&sizes=M
-      const { data } = await productApi.get("", getAuthConfigWithParams({
-        token,
-        params: queryParams,
-      }));
-
+      const { data } = await productApi.get("", getAuthConfigWithParams({ token, params: queryParams }));
       const rawItems = data.items ?? data;
+      
       const normalizedItems = rawItems.map((p: any) => ({
         ...p,
         id: p.id_product,
@@ -57,19 +46,31 @@ export const useProductStore = () => {
 
       dispatch(refreshProducts({ items: normalizedItems, total: data.total ?? normalizedItems.length, page: currentPage }));
     } catch (error) {
-      toast.error("Error al filtrar productos");
+      toast.error("Error al cargar productos");
     } finally {
       dispatch(setLoadingProduct(false));
     }
   }, [dispatch, currentPage, rowsPerPage]);
 
+  // 👈 NUEVO: Función para el detalle (Soluciona el F5)
+  const getProductById = useCallback(async (id: string) => {
+    dispatch(setLoadingProduct(true));
+    try {
+      const { data } = await productApi.get(`/${id}`);
+      return {
+        ...data,
+        id: data.id_product,
+        isNewIn: data.is_new_in,
+        basePrice: data.base_price,
+        variants: data.variants ?? [],
+      } as Product;
+    } catch (error) {
+      toast.error("No se encontró el producto");
+      return null;
+    } finally {
+      dispatch(setLoadingProduct(false));
+    }
+  }, [dispatch]);
 
-
-  return {
-    products,
-    loading,
-    searchTerm,
-    setSearchTerm,
-    startLoadingProducts,
-  };
+  return { products, loading, searchTerm, setSearchTerm, startLoadingProducts, getProductById };
 };

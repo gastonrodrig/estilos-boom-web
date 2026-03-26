@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useProductStore } from "@/hooks/product/use-product-store";
 import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontal, LayoutGrid, List } from "lucide-react";
-import { ProductCardCatalogue } from "@/components/card/product-card";
+import { ProductCardCatalogue } from "@/components/molecules/product-card/product-card-catalogue";
 import { SearchDrawer } from "@/components";
 import { FilterDrawer } from "@/components";
 

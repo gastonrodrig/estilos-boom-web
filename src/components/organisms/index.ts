@@ -13,3 +13,5 @@ export * from "./access-denied";
 export * from "./sidebar";
 export * from "./nav-drawer";
 export * from "./data-table";
+export * from "./product-detail";
+export * from "./related-product";
