@@ -1,5 +1,5 @@
 export const navbarMenu = [
-  { label: "NEW IN", href: "/new-in" },
-  { label: "BEST SELLER", href: "/best-seller" },
-  { label: "DRESSES", href: "/dresses" },
+  { label: "NEW IN", href: "/catalogue/new-in" },
+  { label: "BEST SELLER", href: "/catalogue/best-seller" },
+  { label: "DRESSES", href: "/catalogue/dresses" },
 ];

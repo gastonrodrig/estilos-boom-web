@@ -5,6 +5,7 @@ export * from "./benefits";
 export * from "./nav-bar";
 export * from "./footer";
 export * from "./search-drawer";
+export * from "./filter-drawer";
 export * from "./auth-split-card";
 export * from "./modals";
 export * from "./loaders";

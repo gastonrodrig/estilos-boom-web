@@ -5,6 +5,8 @@ import {
   clientPersonSlice, 
   clientProfileSlice 
 } from "./client";
+import { productSlice } from "./product";
+import { categorySlice } from "./category";
 
 // Configuración del store
 export const store = configureStore({
@@ -16,6 +18,9 @@ export const store = configureStore({
     clientCompany: clientCompanySlice.reducer,
     clientPerson: clientPersonSlice.reducer,
     clientProfile: clientProfileSlice.reducer,
+
+    product: productSlice.reducer,
+    category: categorySlice.reducer,
   },
 });
 
