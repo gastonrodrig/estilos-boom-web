@@ -26,10 +26,3 @@ export interface CreateCategoryModelInput {
   name: string;
   description?: string;
 }
-
-export const createCategoryModel = (category: Partial<Category>): CreateCategoryModelInput => {
-  return {
-    name: category.name!.trim(),
-    description: category.description?.trim(),
-  };
-};

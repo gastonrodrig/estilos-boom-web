@@ -9,7 +9,7 @@ import {
 } from "@store";
 import { 
   Category, 
-  createCategoryModel, 
+  createCategoryToApi, 
   HttpError 
 } from "@models";
 import { getAuthConfig } from "@utils";
@@ -26,10 +26,10 @@ export const useCategoryStore = () => {
     loading,
   } = useAppSelector((state) => state.category);
 
-  const startCreateCategory = async (category: Partial<Category>) => {
+  const startCreateCategory = async (category: Category) => {
     dispatch(setLoadingCategory(true));
     try {
-      const payload = createCategoryModel(category);
+      const payload = createCategoryToApi(category);
       const token = await getFirebaseAuthToken();
       await clientApi.post("/categories", payload, getAuthConfig({ token }));
       await startLoadingCategories();
@@ -47,11 +47,10 @@ export const useCategoryStore = () => {
   const startLoadingCategories = async () => {
     dispatch(setLoadingCategory(true));
     try {
-      // Nota: Si tu API de categorías no es paginada, la llamada es directa
       const { data } = await clientApi.get("/categories");
       
       dispatch(refreshCategories({
-        items: data, // Ajustar según si tu API devuelve data directa o {items, total}
+        items: data,
         total: data.length,
       }));
       return true;

@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ITooltipProps {
   children: ReactNode;
@@ -48,26 +49,17 @@ export const Tooltip: React.FC<ITooltipProps> = ({
   };
 
   const handleMouseEnter = () => {
-    if (isControlled || trigger !== 'hover') {
-      return;
-    }
-
+    if (isControlled || trigger !== 'hover') return;
     setInternalVisible(true);
   };
 
   const handleMouseLeave = () => {
-    if (isControlled || trigger !== 'hover') {
-      return;
-    }
-
+    if (isControlled || trigger !== 'hover') return;
     setInternalVisible(false);
   };
 
   const handleClick = () => {
-    if (isControlled || trigger !== 'click') {
-      return;
-    }
-
+    if (isControlled || trigger !== 'click') return;
     setInternalVisible((prev) => !prev);
   };
 
@@ -80,35 +72,41 @@ export const Tooltip: React.FC<ITooltipProps> = ({
     >
       {children}
 
-      {visible && (
-        <div
-          className={`
-            absolute z-10
-            ${positionClasses[position]}
-            ${contentClassName ?? ''}
-          `}
-        >
-          {showArrow && (
-            <div
-              className={
-                arrowClassName ??
-                `absolute h-3 w-3 rotate-45 border border-pink-900 bg-pink-900 ${arrowPositionClasses[position]}`
-              }
-            />
-          )}
+      <AnimatePresence>
+        {visible && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 5 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 5 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className={`
+              absolute z-10
+              ${positionClasses[position]}
+              ${contentClassName ?? ''}
+            `}
+          >
+            {showArrow && (
+              <div
+                className={
+                  arrowClassName ??
+                  `absolute h-3 w-3 rotate-45 border border-pink-900 bg-pink-900 ${arrowPositionClasses[position]}`
+                }
+              />
+            )}
 
-          {content ?? (
-            <div className="min-w-72 rounded bg-pink-900 px-3 py-2 text-sm text-white shadow-lg">
-              {title && (
-                <h4 className="mb-1 text-sm font-semibold">
-                  {title}
-                </h4>
-              )}
-              {text ? <p className="leading-snug">{text}</p> : null}
-            </div>
-          )}
-        </div>
-      )}
+            {content ?? (
+              <div className="min-w-64 rounded-2xl bg-pink-900/95 backdrop-blur-sm px-4 py-3 text-sm text-white shadow-xl border border-pink-800/20">
+                {title && (
+                  <h4 className="mb-1 text-sm font-bold tracking-tight">
+                    {title}
+                  </h4>
+                )}
+                {text ? <p className="leading-relaxed opacity-95">{text}</p> : null}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

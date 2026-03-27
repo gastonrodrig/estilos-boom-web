@@ -21,11 +21,9 @@ export const categorySlice = createSlice({
       state.total = total;
       state.loading = false;
     },
-
     selectedCategory: (state, action: PayloadAction<Category>) => {
       state.selected = action.payload;
     },
-
     setLoadingCategory: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },

@@ -1,11 +1,28 @@
 "use client";
 import { useCallback, useState } from "react";
-import { productApi } from "@api"; 
-import { useAppDispatch, useAppSelector, setLoadingProduct, refreshProducts } from "@store";
 import { Product, HttpError } from "@models";
 import { getAuthConfigWithParams } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
 import toast from "react-hot-toast";
+import { productApi } from "@api";
+import { refreshProducts, setLoadingProduct, useAppDispatch, useAppSelector } from "@store";
+
+type LoadProductsParams = {
+  section?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sizes?: string[];
+  colors?: string[];
+};
+
+type RawProduct = {
+  id_product: string;
+  is_new_in: boolean;
+  base_price: number;
+  variants?: unknown[];
+  [key: string]: unknown;
+};
 
 export const useProductStore = () => {
   const dispatch = useAppDispatch();
@@ -23,9 +40,8 @@ export const useProductStore = () => {
     offset?: number; // 👈 Añadimos esto
   }) => {
     dispatch(setLoadingProduct(true));
+
     try {
-      let token = null;
-      try { token = await getFirebaseAuthToken(); } catch (e) {}
 
       const queryParams: any = {
         limit: params.limit ?? rowsPerPage, // 👈 Si mandas un limit manual, lo usa
@@ -42,7 +58,7 @@ export const useProductStore = () => {
         isNewIn: p.is_new_in,
         basePrice: p.base_price,
         variants: p.variants ?? [],
-      }));
+      })) as unknown as Product[];
 
       dispatch(refreshProducts({ items: normalizedItems, total: data.total ?? normalizedItems.length, page: currentPage }));
     } catch (error) {

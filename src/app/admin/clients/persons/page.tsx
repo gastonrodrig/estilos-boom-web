@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { DataTable, DataTableAction, DataTableColumn } from '@/components/organisms';
+import { DataTable, DataTableAction, DataTableColumn, ClientPersonModal } from '@/components/organisms';
 import { ClientPerson } from '@models';
 import { useClientPersonStore } from '@hooks';
 import { Pencil } from 'lucide-react';
@@ -55,32 +55,38 @@ export default function AdminClientPersonsPage() {
   ];
 
   return (
-    <DataTable
-      rows={clientsPerson}
-      loading={loading}
-      title="Clientes - Persona"
-      description="Gestiona clientes persona, filtra por cualquier campo y aplica acciones rápidas."
-      onAddClick={() => setIsModalOpen(true)}
-      globalFilter={searchTerm}
-      onGlobalFilterChange={setSearchTerm}
-      columns={columns}
-      order={order as "asc" | "desc"}
-      orderBy={orderBy}
-      onRequestSort={(prop) => {
-        const isAsc = orderBy === prop && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(prop);
-      }}
-      page={currentPage}
-      rowsPerPage={rowsPerPage}
-      total={total}
-      onPageChange={(_, newPage) => setPageGlobal(newPage)}
-      onRowsPerPageChange={(e) => {
-        setRowsPerPageGlobal(parseInt(e.target.value, 10));
-        setPageGlobal(0);
-      }}
-      actions={actions}
-      hasActions
-    />
+    <>
+      <DataTable
+        rows={clientsPerson}
+        loading={loading}
+        title="Clientes - Persona"
+        description="Gestiona clientes persona, filtra por cualquier campo y aplica acciones rápidas."
+        onAddClick={() => setIsModalOpen(true)}
+        globalFilter={searchTerm}
+        onGlobalFilterChange={setSearchTerm}
+        columns={columns}
+        order={order as "asc" | "desc"}
+        orderBy={orderBy}
+        onRequestSort={(prop) => {
+          const isAsc = orderBy === prop && order === 'asc';
+          setOrder(isAsc ? 'desc' : 'asc');
+          setOrderBy(prop);
+        }}
+        page={currentPage}
+        rowsPerPage={rowsPerPage}
+        total={total}
+        onPageChange={(_, newPage) => setPageGlobal(newPage)}
+        onRowsPerPageChange={(e) => {
+          setRowsPerPageGlobal(parseInt(e.target.value, 10));
+          setPageGlobal(0);
+        }}
+        actions={actions}
+        hasActions
+      />
+      <ClientPersonModal
+        open={isOpenModal}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }

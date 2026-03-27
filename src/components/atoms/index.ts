@@ -5,3 +5,4 @@ export * from "./tooltip";
 export * from "./feature-item";
 export * from "./drawer";
 export * from "./input";
+export * from "./modal";
