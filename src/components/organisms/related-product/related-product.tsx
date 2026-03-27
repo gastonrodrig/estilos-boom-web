@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useProductStore } from "@/hooks/product/use-product-store";
-import { ProductCardCatalogue } from "@/components/molecules/product-card/product-card-catalogue"; // Reutilizamos tu card
+import { ProductCardCatalogue } from "@/components/molecules/product-home-card/product-card-catalogue";// Reutilizamos tu card
 import { motion } from "framer-motion";
 
 interface Props {
