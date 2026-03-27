@@ -24,6 +24,7 @@ export const createClientPersonModel = (clientPerson: ClientPerson) => ({
   phone: clientPerson.phone,
   document_type: clientPerson.document_type as DocumentType,
   document_number: clientPerson.document_number,
+  client_type: ClientType.PERSON,
 });
 
 export const updateClientPersonModel = (clientPerson: ClientPerson) => ({
@@ -42,6 +43,7 @@ export const createClientCompanyModel = (clientCompany: ClientCompany) => ({
   contact_name: clientCompany.contact_name,
   phone: clientCompany.phone,
   document_number: clientCompany.document_number,
+  client_type: ClientType.COMPANY,
 });
 
 export const updateClientCompanyModel = (clientCompany: ClientCompany) => ({

@@ -1,6 +1,7 @@
 import { ClientType, DocumentType, UserStatus } from "@enums";
 
 export interface ClientCompany {
+  _id?: string;
   id_user?: string;
   email: string;
   company_name: string;
@@ -28,6 +29,7 @@ export interface ClientCompanyState {
 }
 
 export interface ClientPerson {
+  _id?: string;
   id_user?: string;
   email: string;
   first_name: string;

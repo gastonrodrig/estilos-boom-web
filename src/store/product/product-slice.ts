@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-// Asumiendo que crearás estas interfaces en tus modelos
 import { Product,ProductState,RefreshProductsPayload } from "@/core/models";
 
 const initialState: ProductState = {
