@@ -4,3 +4,4 @@ export * from "./store";
 export * from "./hooks";
 export * from "./product";
 export * from "./category";
+export * from "./cart";

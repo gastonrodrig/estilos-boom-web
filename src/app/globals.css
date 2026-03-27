@@ -45,6 +45,13 @@
 
 :root {
   --radius: 0.625rem;
+  --boom-100: #f2d0d3;
+  --boom-200: #f2b6c1;
+  --boom-300: #f291a3;
+  --boom-400: #f2778d;
+  --boom-900: #594246;
+  --boom-cream: #faf9f6;
+  --boom-soft: #ebeae8;
   --background: oklch(1 0 0);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
@@ -118,6 +125,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-montserrat), sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-vidaloka), serif;
+    letter-spacing: 0.01em;
   }
 }
 
