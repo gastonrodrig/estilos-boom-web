@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useProductStore } from "@/hooks/product/use-product-store";
 import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontal, LayoutGrid, List, Search } from "lucide-react";
-import { ProductCardCatalogue } from "@/components/molecules/product-catalog-card/product-catalog-card";
+import { ProductCardCatalogue } from "@/components/molecules/product-home-card/product-card-catalogue";
 import { FilterDrawer, SearchDrawer } from "@/components";
 
 export default function CollectionPage() {
@@ -13,16 +13,23 @@ export default function CollectionPage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
-    // 1. Definimos los filtros base
-    const categoryFilter = type === "dresses" ? "Dresses" : undefined;
-    const sectionFilter = type !== "dresses" ? (type as string) : undefined;
+  // Convertimos a string y minúsculas para comparar seguro
+  const currentType = String(type).toLowerCase();
 
-    // 2. CAMBIO: Envolvemos los argumentos en un objeto {}
-    startLoadingProducts({
-      section: sectionFilter,
-      category: categoryFilter,
-    });
-  }, [type, startLoadingProducts]);
+  // 1. Definimos los filtros base
+  // Si es dresses, mandamos "Dresses" (con D mayúscula como está en tu DB)
+  const categoryFilter = currentType === "dresses" ? "Dresses" : undefined;
+  
+  // Solo mandamos section si NO es una categoría
+  const sectionFilter = currentType !== "dresses" ? currentType : undefined;
+
+  console.log("📡 Petición Catálogo:", { section: sectionFilter, category: categoryFilter });
+
+  startLoadingProducts({
+    section: sectionFilter,
+    category: categoryFilter,
+  });
+}, [type]);
 
   const headerContent = useMemo(() => {
     const titles = {
