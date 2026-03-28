@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { cartApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
 import {
@@ -14,7 +14,6 @@ import { setCart, useAppDispatch, useAppSelector } from "@store";
 type CartItemWithStock = CartItem & { stock?: number };
 
 const GUEST_STORAGE_KEY = "boom_cart_guest";
-const getStorageKey = (uid: string | null) => `boom_cart_${uid ?? "guest"}`;
 
 const sameItem = (
   a: { productId: string; size: string; color: string },
@@ -59,8 +58,12 @@ export const useCartStore = () => {
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
 
+  const loadInFlightRef = useRef(false);
+  const mergeInFlightRef = useRef(false);
+
   const isAuth = Boolean(authUid) || authStatus === "authenticated";
-  const localKey = getStorageKey(authUid);
+  const isAuthChecking = authStatus === "checking";
+  const isClearlyGuest = authStatus === "not-authenticated" && !authUid;
 
   const setReduxCart = useCallback(
     (next: CartItemWithStock[]) => dispatch(setCart(next)),
@@ -74,28 +77,32 @@ export const useCartStore = () => {
   }, []);
 
   const loadCart = useCallback(async () => {
-    if (!isAuth) {
-      setReduxCart(readLocal(localKey));
-      return;
-    }
+    if (loadInFlightRef.current) return;
+    loadInFlightRef.current = true;
 
     try {
-      const config = await getAuthConfig();
-      if (!config) {
-        setReduxCart(readLocal(localKey));
+      if (isAuthChecking) return;
+
+      if (!isAuth) {
+        if (!isClearlyGuest) return;
+        setReduxCart(readLocal(GUEST_STORAGE_KEY));
         return;
       }
+
+      const config = await getAuthConfig();
+      if (!config) return;
 
       const { data } = await cartApi.get<CartResponse>("/", config);
       setReduxCart((data.items ?? []) as CartItemWithStock[]);
     } catch {
       // no-op
+    } finally {
+      loadInFlightRef.current = false;
     }
-  }, [getAuthConfig, isAuth, localKey, setReduxCart]);
+  }, [getAuthConfig, isAuth, isAuthChecking, isClearlyGuest, setReduxCart]);
 
   const addItem = useCallback(
     async (item: CartItemWithStock) => {
-      // obligatorio: talla y color
       if (!item.size || !item.color) return;
 
       const maxStock =
@@ -106,7 +113,7 @@ export const useCartStore = () => {
       if (item.quantity <= 0) return;
 
       if (!isAuth) {
-        const current = readLocal(localKey);
+        const current = readLocal(GUEST_STORAGE_KEY);
         const found = current.find((x) => sameItem(x, item));
 
         const next = found
@@ -117,7 +124,7 @@ export const useCartStore = () => {
             })
           : [{ ...item, quantity: Math.min(item.quantity, maxStock) }, ...current];
 
-        writeLocal(localKey, next);
+        writeLocal(GUEST_STORAGE_KEY, next);
         setReduxCart(next);
         return;
       }
@@ -137,7 +144,7 @@ export const useCartStore = () => {
         // no-op
       }
     },
-    [getAuthConfig, isAuth, localKey, setReduxCart],
+    [getAuthConfig, isAuth, setReduxCart],
   );
 
   const updateQuantity = useCallback(
@@ -154,7 +161,7 @@ export const useCartStore = () => {
       const payload: UpdateQuantityPayload = { productId, size, color, quantity: safeQty };
 
       if (!isAuth) {
-        const current = readLocal(localKey);
+        const current = readLocal(GUEST_STORAGE_KEY);
         const next =
           safeQty <= 0
             ? current.filter((x) => !sameItem(x, payload))
@@ -162,7 +169,7 @@ export const useCartStore = () => {
                 .map((x) => (sameItem(x, payload) ? { ...x, quantity: safeQty } : x))
                 .filter((x) => x.quantity > 0);
 
-        writeLocal(localKey, next);
+        writeLocal(GUEST_STORAGE_KEY, next);
         setReduxCart(next);
         return;
       }
@@ -187,7 +194,7 @@ export const useCartStore = () => {
         // no-op
       }
     },
-    [getAuthConfig, isAuth, items, localKey, setReduxCart],
+    [getAuthConfig, isAuth, items, setReduxCart],
   );
 
   const removeItem = useCallback(
@@ -197,8 +204,8 @@ export const useCartStore = () => {
       const payload: RemoveCartItemPayload = { productId, size, color };
 
       if (!isAuth) {
-        const next = readLocal(localKey).filter((x) => !sameItem(x, payload));
-        writeLocal(localKey, next);
+        const next = readLocal(GUEST_STORAGE_KEY).filter((x) => !sameItem(x, payload));
+        writeLocal(GUEST_STORAGE_KEY, next);
         setReduxCart(next);
         return;
       }
@@ -216,25 +223,62 @@ export const useCartStore = () => {
         // no-op
       }
     },
-    [getAuthConfig, isAuth, localKey, setReduxCart],
+    [getAuthConfig, isAuth, setReduxCart],
   );
 
   const mergeLocalCartToRemote = useCallback(async () => {
+    if (mergeInFlightRef.current) return;
     if (!isAuth) return;
 
-    const guestItems = readLocal(GUEST_STORAGE_KEY);
-    if (!guestItems.length) return;
+    mergeInFlightRef.current = true;
 
     try {
+      const mergedGuestItems = readLocal(GUEST_STORAGE_KEY).reduce<CartItemWithStock[]>(
+        (acc, item) => {
+          if (!item.size || !item.color || item.quantity <= 0) return acc;
+
+          const idx = acc.findIndex((x) => sameItem(x, item));
+          if (idx === -1) {
+            acc.push({ ...item });
+            return acc;
+          }
+
+          const prev = acc[idx];
+          const maxStock =
+            typeof prev.stock === "number" && prev.stock >= 0
+              ? prev.stock
+              : typeof item.stock === "number" && item.stock >= 0
+                ? item.stock
+                : Number.MAX_SAFE_INTEGER;
+
+          acc[idx] = {
+            ...prev,
+            stock: prev.stock ?? item.stock,
+            quantity: Math.min(prev.quantity + item.quantity, maxStock),
+          };
+
+          return acc;
+        },
+        [],
+      );
+
+      if (!mergedGuestItems.length) return;
+
       const config = await getAuthConfig();
       if (!config) return;
 
-      await cartApi.post("/merge", { items: guestItems.map(toApiItem) }, config);
+      await cartApi.post("/merge", { items: mergedGuestItems.map(toApiItem) }, config);
+
       removeLocal(GUEST_STORAGE_KEY);
+
+      const { data } = await cartApi.get<CartResponse>("/", config);
+      setReduxCart((data.items ?? []) as CartItemWithStock[]);
     } catch {
       // no-op
+    } finally {
+      mergeInFlightRef.current = false;
     }
-  }, [getAuthConfig, isAuth]);
+  }, [getAuthConfig, isAuth, setReduxCart]);
 
   const total = useMemo(
     () => items.reduce((acc, item) => acc + item.price * item.quantity, 0),
