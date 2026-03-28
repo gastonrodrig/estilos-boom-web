@@ -1,9 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartItem, CartState, UpdateQuantityPayload } from "@models";
+import {
+	CartItem,
+	CartState,
+	RemoveCartItemPayload,
+	UpdateQuantityPayload,
+} from "@models";
 
 const initialState: CartState = {
 	items: [],
 };
+
+const isSameCartItem = (
+	item: CartItem,
+	payload: { productId: string; size: string; color: string },
+) =>
+	item.productId === payload.productId &&
+	item.size === payload.size &&
+	item.color === payload.color;
 
 export const cartSlice = createSlice({
 	name: "cart",
@@ -32,20 +45,24 @@ export const cartSlice = createSlice({
 			state,
 			action: PayloadAction<UpdateQuantityPayload>,
 		) => {
-			const { productId, quantity } = action.payload;
-			const found = state.items.find((item) => item.productId === productId);
+			const { productId, size, color, quantity } = action.payload;
+			const found = state.items.find((item) =>
+				isSameCartItem(item, { productId, size, color }),
+			);
 
 			if (!found) return;
 
 			found.quantity = quantity;
 
 			if (found.quantity <= 0) {
-				state.items = state.items.filter((item) => item.productId !== productId);
+				state.items = state.items.filter(
+					(item) => !isSameCartItem(item, { productId, size, color }),
+				);
 			}
 		},
-		removeItemLocal: (state, action: PayloadAction<string>) => {
+		removeItemLocal: (state, action: PayloadAction<RemoveCartItemPayload>) => {
 			state.items = state.items.filter(
-				(item) => item.productId !== action.payload,
+				(item) => !isSameCartItem(item, action.payload),
 			);
 		},
 		clearCart: (state) => {

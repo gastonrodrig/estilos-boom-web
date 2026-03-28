@@ -90,7 +90,14 @@ export default function CartPage() {
 
                   <div className="flex items-center gap-2.5">
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.size,
+                          item.color,
+                          item.quantity - 1,
+                        )
+                      }
                       className="rounded-lg border border-[#F2D0D3] bg-[#FAF9F6] p-2 text-[#594246] transition hover:bg-[#F2D0D3]/35"
                       aria-label="Restar cantidad"
                     >
@@ -98,14 +105,23 @@ export default function CartPage() {
                     </button>
                     <span className="w-8 text-center text-base font-semibold text-[#594246]">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.productId,
+                          item.size,
+                          item.color,
+                          item.quantity + 1,
+                        )
+                      }
                       className="rounded-lg border border-[#F2D0D3] bg-[#FAF9F6] p-2 text-[#594246] transition hover:bg-[#F2D0D3]/35"
                       aria-label="Sumar cantidad"
                     >
                       <Plus size={16} />
                     </button>
                     <button
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() =>
+                        removeItem(item.productId, item.size, item.color)
+                      }
                       className="ml-2 rounded-lg p-2 text-[#594246] transition hover:bg-[#F2D0D3]/45 hover:text-[#594246]"
                       aria-label="Eliminar producto"
                     >
@@ -115,19 +131,6 @@ export default function CartPage() {
                 </div>
               </article>
             ))
-          )}
-
-          {items.length > 0 && (
-            <article className="rounded-2xl border border-[#EBEAE8] bg-white p-6 shadow-[0_2px_14px_rgba(89,66,70,0.06)]">
-              <h3 className="text-3xl font-normal text-[#594246]">Entrega</h3>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-[#594246]/80">
-                Ve todas las opciones de envio para tus productos, incluyendo
-                 plazos y precios.
-              </p>
-              <button className="mt-5 rounded-lg border border-[#594246] px-5 py-2 text-xs font-bold uppercase tracking-wide text-[#594246] transition hover:bg-[#594246] hover:text-[#FAF9F6]">
-                Calcular
-              </button>
-            </article>
           )}
         </section>
 

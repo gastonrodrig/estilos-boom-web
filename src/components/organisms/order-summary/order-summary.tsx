@@ -15,9 +15,9 @@ const currency = (value: number) =>
 
 export const OrderSummary = ({ items }: OrderSummaryProps) => {
 	const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-	const igv = total * 0.18;
-	const base = total / 1.18;
-	const discount = total * 0.2;
+	const subtotal = total;
+	const igv = subtotal * 0.18;
+	const taxedOperation = subtotal * 0.82;
 
 	return (
 		<aside className="sticky top-28 rounded-2xl border border-[#F2D0D3] bg-white p-6 shadow-[0_2px_16px_rgba(89,66,70,0.08)]">
@@ -30,22 +30,14 @@ export const OrderSummary = ({ items }: OrderSummaryProps) => {
 				</p>
 			</div>
 
-			<button className="mt-4 w-full rounded-xl border border-[#EBEAE8] bg-[#FAF9F6] px-4 py-3 text-left text-sm font-medium text-[#594246]/80 transition hover:border-[#F2D0D3]">
-				Codigo promocional
-			</button>
-
 			<div className="mt-6 space-y-3.5 text-sm font-medium text-[#594246]">
 				<div className="flex items-center justify-between">
 					<span>Subtotal (incluye IGV)</span>
-					<span className="font-medium">{currency(total)}</span>
-				</div>
-				<div className="flex items-center justify-between">
-					<span className="text-[#54A989]">Descuentos</span>
-					<span className="font-semibold text-[#54A989]">- {currency(discount)}</span>
+					<span className="font-medium">{currency(subtotal)}</span>
 				</div>
 				<div className="flex items-center justify-between">
 					<span>Envío</span>
-					<span className="font-medium">-</span>
+					<span className="font-medium">Ver al finalizar</span>
 				</div>
 				<div className="flex items-center justify-between">
 					<span>IGV (18%)</span>
@@ -53,7 +45,7 @@ export const OrderSummary = ({ items }: OrderSummaryProps) => {
 				</div>
 				<div className="flex items-center justify-between">
 					<span>Op. gravada</span>
-					<span className="font-medium">{currency(base)}</span>
+					<span className="font-medium">{currency(taxedOperation)}</span>
 				</div>
 			</div>
 
@@ -61,7 +53,7 @@ export const OrderSummary = ({ items }: OrderSummaryProps) => {
 
 			<div className="flex items-center justify-between text-[#594246]">
 				<span className="text-lg font-semibold">Total</span>
-				<span className="text-3xl font-bold text-[#F2778D]">{currency(total - discount)}</span>
+				<span className="text-3xl font-bold text-[#F2778D]">{currency(subtotal)}</span>
 			</div>
 
 			<button className="mt-6 w-full rounded-xl bg-[#F2778D] px-4 py-3 text-sm font-bold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3]">

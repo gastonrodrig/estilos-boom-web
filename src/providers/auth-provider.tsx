@@ -23,7 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {
       try {
         if (!user) {
-          // Limpia estado
           await handleLogout();
           return;
         }
