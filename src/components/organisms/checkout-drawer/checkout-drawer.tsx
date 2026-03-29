@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -18,12 +18,11 @@ type CartItemWithStock = CartItem & { stock?: number };
 
 export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
   const router = useRouter();
-  const { items, total, updateQuantity, removeItem, loadCart } = useCartStore();
+  const { items, total, updateQuantity, removeItem } = useCartStore();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
 
   const isAuthenticated = Boolean(authUid) || authStatus === "authenticated";
-  const isAuthChecking = authStatus === "checking";
   const cartItems = items as CartItemWithStock[];
 
   const itemCount = useMemo(
@@ -31,31 +30,7 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
     [cartItems],
   );
 
-  useEffect(() => {
-    if (!open) return;
-    if (isAuthChecking) return;
-
-    console.log("[CheckoutDrawer] open -> loadCart()", {
-      authUid,
-      authStatus,
-      isAuthenticated,
-      itemsCount: cartItems.length,
-    });
-
-    void loadCart();
-  }, [open, isAuthChecking, authUid, authStatus, isAuthenticated, cartItems.length, loadCart]);
-
-  useEffect(() => {
-    if (!open) return;
-    console.log("[CheckoutDrawer] cartItems changed", {
-      count: cartItems.length,
-      cartItems,
-      total,
-    });
-  }, [open, cartItems, total]);
-
   const handleGoToCatalog = () => {
-    console.log("[CheckoutDrawer] handleGoToCatalog");
     onClose();
 
     const firstItem = cartItems[0];
@@ -72,7 +47,6 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
   };
 
   const handleMainAction = () => {
-    console.log("[CheckoutDrawer] handleMainAction", { isAuthenticated });
     onClose();
 
     if (!isAuthenticated) {
@@ -162,21 +136,14 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                               disabled={!canDecrease}
                               whileTap={canDecrease ? { scale: 1.08 } : undefined}
                               transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                              onClick={() => {
-                                console.log("[CheckoutDrawer] click decrease", {
-                                  productId: item.productId,
-                                  size: item.size,
-                                  color: item.color,
-                                  fromQty: item.quantity,
-                                  toQty: item.quantity - 1,
-                                });
+                              onClick={() =>
                                 updateQuantity(
                                   item.productId,
                                   item.size,
                                   item.color,
                                   item.quantity - 1,
-                                );
-                              }}
+                                )
+                              }
                             >
                               -
                             </motion.button>
@@ -193,35 +160,23 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                               disabled={!canIncrease}
                               whileTap={canIncrease ? { scale: 1.08 } : undefined}
                               transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                              onClick={() => {
-                                console.log("[CheckoutDrawer] click increase", {
-                                  productId: item.productId,
-                                  size: item.size,
-                                  color: item.color,
-                                  fromQty: item.quantity,
-                                  toQty: item.quantity + 1,
-                                });
+                              onClick={() =>
                                 updateQuantity(
                                   item.productId,
                                   item.size,
                                   item.color,
                                   item.quantity + 1,
-                                );
-                              }}
+                                )
+                              }
                             >
                               +
                             </motion.button>
 
                             <button
                               className="ml-auto text-sm text-[#594246] underline"
-                              onClick={() => {
-                                console.log("[CheckoutDrawer] click remove", {
-                                  productId: item.productId,
-                                  size: item.size,
-                                  color: item.color,
-                                });
-                                removeItem(item.productId, item.size, item.color);
-                              }}
+                              onClick={() =>
+                                removeItem(item.productId, item.size, item.color)
+                              }
                             >
                               Eliminar
                             </button>
