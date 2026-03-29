@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CartItem } from "@models";
 import { useCartStore } from "@hooks";
@@ -82,8 +82,8 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
             exit={{ x: "100%" }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center justify-between border-b px-5 py-4 flex-shrink-0">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-[#594246]">
+            <div className="flex items-center justify-between border-b border-[#F2D0D3] px-5 py-4 flex-shrink-0">
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#594246]">
                 {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado
               </h2>
               <button onClick={onClose} aria-label="Cerrar">
@@ -92,136 +92,150 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
-              <div className="space-y-3">
-                {cartItems.map((item) => {
-                  const maxStock =
-                    typeof item.stock === "number" && item.stock >= 0
-                      ? item.stock
-                      : Number.MAX_SAFE_INTEGER;
+              {cartItems.length === 0 ? (
+                <div className="rounded-xl border border-[#F2D0D3] bg-[#FAF9F6] p-6 text-center text-sm text-[#594246]/80">
+                  Tu carrito esta vacio.
+                </div>
+              ) : (
+                <div className="space-y-0 divide-y divide-[#F5E3E6]">
+                  {cartItems.map((item) => {
+                    const maxStock =
+                      typeof item.stock === "number" && item.stock >= 0
+                        ? item.stock
+                        : Number.MAX_SAFE_INTEGER;
 
-                  const canIncrease = item.quantity < maxStock;
-                  const canDecrease = item.quantity > 1;
+                    const canIncrease = item.quantity < maxStock;
+                    const canDecrease = item.quantity > 1;
 
-                  return (
-                    <div
-                      key={`${item.productId}-${item.size}-${item.color}`}
-                      className="rounded-xl border border-[#F3D5DB] p-3"
-                    >
-                      <div className="flex gap-3">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-20 w-16 object-cover rounded-md"
-                        />
+                    return (
+                      <article
+                        key={`${item.productId}-${item.size}-${item.color}`}
+                        className="py-3"
+                      >
+                        <div className="flex gap-3">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-24 w-18 shrink-0 rounded-md object-cover"
+                          />
 
-                        <div className="flex-1">
-                          <p className="text-sm font-bold uppercase text-[#594246]">
-                            {item.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {item.color} | {item.size}
-                          </p>
-                          <p className="text-2xl font-bold text-[#F25C8D] leading-none mt-1">
-                            S/ {(item.price * item.quantity).toFixed(2)}
-                          </p>
-
-                          <div className="mt-2 flex items-center gap-2">
-                            <motion.button
-                              type="button"
-                              className={`h-7 w-7 rounded border text-sm ${
-                                canDecrease
-                                  ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                                  : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
-                              }`}
-                              disabled={!canDecrease}
-                              whileTap={canDecrease ? { scale: 1.08 } : undefined}
-                              transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                              onClick={() =>
-                                updateQuantity(
-                                  item.productId,
-                                  item.size,
-                                  item.color,
-                                  item.quantity - 1,
-                                )
-                              }
-                            >
-                              -
-                            </motion.button>
-
-                            <span className="w-6 text-center text-sm">{item.quantity}</span>
-
-                            <motion.button
-                              type="button"
-                              className={`h-7 w-7 rounded border text-sm ${
-                                canIncrease
-                                  ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                                  : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
-                              }`}
-                              disabled={!canIncrease}
-                              whileTap={canIncrease ? { scale: 1.08 } : undefined}
-                              transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                              onClick={() =>
-                                updateQuantity(
-                                  item.productId,
-                                  item.size,
-                                  item.color,
-                                  item.quantity + 1,
-                                )
-                              }
-                            >
-                              +
-                            </motion.button>
-
-                            <button
-                              className="ml-auto text-sm text-[#594246] underline"
-                              onClick={() =>
-                                removeItem(item.productId, item.size, item.color)
-                              }
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-
-                          {typeof item.stock === "number" && item.stock >= 0 && (
-                            <p className="mt-2 text-[11px] text-gray-500">
-                              Stock disponible: {item.stock}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13px] font-semibold uppercase text-[#594246]">
+                              {item.name}
                             </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                            <p className="text-[11px] text-[#594246]/70">
+                              {item.color} | {item.size}
+                            </p>
 
-              <div className="mt-5 rounded-xl border p-4">
-                <h3 className="text-sm font-bold text-[#594246] mb-2">Resumen del Pedido</h3>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Subtotal</span>
-                  <span>S/ {total.toFixed(2)}</span>
+                            <div className="mt-2 flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5">
+                                <motion.button
+                                  type="button"
+                                  className={`h-7 w-7 rounded border text-sm ${
+                                    canDecrease
+                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
+                                      : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
+                                  }`}
+                                  disabled={!canDecrease}
+                                  whileTap={canDecrease ? { scale: 1.08 } : undefined}
+                                  transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.productId,
+                                      item.size,
+                                      item.color,
+                                      item.quantity - 1,
+                                    )
+                                  }
+                                >
+                                  -
+                                </motion.button>
+
+                                <span className="w-6 text-center text-sm font-semibold text-[#594246]">
+                                  {item.quantity}
+                                </span>
+
+                                <motion.button
+                                  type="button"
+                                  className={`h-7 w-7 rounded border text-sm ${
+                                    canIncrease
+                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
+                                      : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
+                                  }`}
+                                  disabled={!canIncrease}
+                                  whileTap={canIncrease ? { scale: 1.08 } : undefined}
+                                  transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.productId,
+                                      item.size,
+                                      item.color,
+                                      item.quantity + 1,
+                                    )
+                                  }
+                                >
+                                  +
+                                </motion.button>
+                              </div>
+
+                              <button
+                                className="text-[#594246]/65 transition hover:text-[#594246] hover:cursor-pointer"
+                                onClick={() =>
+                                  removeItem(item.productId, item.size, item.color)
+                                }
+                                aria-label="Eliminar producto"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+
+                            <p className="mt-2 text-[26px] leading-none font-bold text-[#F25C8D]">
+                              S/ {(item.price * item.quantity).toFixed(2)}
+                            </p>
+
+                            {typeof item.stock === "number" && item.stock >= 0 && (
+                              <p className="mt-1 text-[11px] text-[#594246]/60">
+                                Stock disponible: {item.stock}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
-                <div className="flex justify-between text-sm text-gray-400">
-                  <span>Envío</span>
-                  <span>Delivery o recojo se elige en el carrito.</span>
+              )}
+
+              <div className="mt-5 rounded-xl border border-[#F2D0D3] bg-white p-4">
+                <h3 className="text-[13px] font-semibold text-[#594246]">Resumen del Pedido</h3>
+                <div className="mt-2 space-y-1.5 text-[12px] text-[#594246]/75">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>S/ {total.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Envío</span>
+                    <span>Ver al finalizar</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-2xl font-bold text-[#F25C8D] mt-2">
-                  <span>Total estimado</span>
+                <div className="mt-2 flex justify-between text-[28px] leading-none font-bold text-[#F25C8D]">
+                  <span>Total</span>
                   <span>S/ {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="border-t bg-white px-5 py-4 flex-shrink-0 space-y-2">
+            <div className="border-t border-[#F2D0D3] bg-white px-5 py-4 flex-shrink-0 space-y-2">
               <button
                 onClick={handleGoToCatalog}
-                className="w-full border border-[#594246] text-[#594246] py-3 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-[#594246] hover:text-white transition"
+                className="w-full border border-[#594246] text-[#594246] py-3 rounded-md text-[11px] font-bold uppercase tracking-wide hover:bg-[#594246] hover:text-white transition"
               >
                 Seguir viendo catálogo
               </button>
 
               <button
                 onClick={handleMainAction}
-                className="w-full bg-black text-white py-3 rounded-md text-sm font-bold uppercase tracking-wide hover:bg-gray-900 transition"
+                className="w-full bg-black text-white py-3 rounded-md text-[11px] font-bold uppercase tracking-wide hover:bg-gray-900 transition"
               >
                 {isAuthenticated ? "Continuar compra" : "Inicie sesión para continuar"}
               </button>

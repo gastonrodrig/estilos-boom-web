@@ -23,55 +23,19 @@ export default function CartPage() {
   const isAuthChecking = authStatus === "checking";
   const isAuth = Boolean(authUid) || authStatus === "authenticated";
 
-  console.log("[CartUI] render", {
-    authUid,
-    authStatus,
-    isAuthChecking,
-    isAuth,
-    itemsCount: items.length,
-    items,
-  });
-
   useEffect(() => {
-    console.log("[CartUI] mounted");
-  }, []);
-
-  useEffect(() => {
-    console.log("[CartUI] auth changed", {
-      authUid,
-      authStatus,
-      isAuthChecking,
-      isAuth,
-    });
-  }, [authUid, authStatus, isAuthChecking, isAuth]);
-
-  useEffect(() => {
-    if (isAuthChecking) {
-      console.log("[CartUI] loadCart skipped (auth checking)");
-      return;
-    }
-
-    console.log("[CartUI] calling loadCart");
+    if (isAuthChecking) return;
     void loadCart();
   }, [authUid, authStatus, isAuthChecking, loadCart]);
 
   useEffect(() => {
-    if (!isAuth || isAuthChecking) {
-      console.log("[CartUI] merge skipped", { isAuth, isAuthChecking });
-      return;
-    }
-
-    console.log("[CartUI] calling mergeLocalCartToRemote");
+    if (!isAuth || isAuthChecking) return;
     void mergeLocalCartToRemote();
   }, [isAuth, isAuthChecking, mergeLocalCartToRemote]);
 
-  useEffect(() => {
-    console.log("[CartUI] items changed", { count: items.length, items });
-  }, [items]);
-
   return (
-    <div className="mx-auto w-full max-w-295 px-4 py-8 md:px-6">
-      <section className="mb-6 py-1">
+    <div className="mx-auto w-full max-w-[1280px] px-4 py-7 md:px-6">
+      <section className="mb-5 py-1">
         <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
           {checkoutSteps.map((step, index) => {
             const active = index === 0;
@@ -80,12 +44,12 @@ export default function CartPage() {
               <div key={step} className="flex items-center gap-2">
                 <span
                   className={`h-2.5 w-2.5 rounded-full ${
-                    active ? "bg-black" : "bg-gray-400"
+                    active ? "bg-black" : "bg-gray-300"
                   }`}
                 />
                 <div className="flex flex-col items-start">
                   <span
-                    className={`text-xs font-semibold tracking-wide ${
+                    className={`text-[11px] font-semibold tracking-wide ${
                       active ? "text-black" : "text-gray-400"
                     }`}
                   >
@@ -98,7 +62,7 @@ export default function CartPage() {
                   />
                 </div>
                 {index < checkoutSteps.length - 1 && (
-                  <span className="mx-1 h-px w-4 bg-gray-400 md:w-6" />
+                  <span className="mx-1 h-px w-4 bg-gray-300 md:w-6" />
                 )}
               </div>
             );
@@ -106,13 +70,12 @@ export default function CartPage() {
         </div>
       </section>
 
-      <div className="mb-5 flex items-center justify-between">
-        <h1 className="text-4xl font-normal text-[#594246]">Carrito de Compras</h1>
+      <div className="mb-4 flex items-center justify-end">
         <p className="text-sm font-medium text-[#594246]/70">Mi carrito ({items.length})</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-7 lg:grid-cols-[1fr_380px]">
-        <section className="order-2 space-y-4 lg:order-1">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_370px]">
+        <section className="order-2 lg:order-1">
           {isAuthChecking ? (
             <div className="rounded-2xl border border-[#F2D0D3] bg-white p-10 text-center text-[#594246] shadow-sm">
               Cargando carrito...
@@ -122,113 +85,106 @@ export default function CartPage() {
               Tu carrito esta vacio.
             </div>
           ) : (
-            items.map((item) => {
-              const canDecrease = item.quantity > 1;
+            <div className="rounded-2xl border border-[#F2D0D3] bg-white px-4 py-2 shadow-[0_2px_14px_rgba(89,66,70,0.08)] md:px-5">
+              <div className="hidden grid-cols-[1fr_150px_140px_24px] gap-4 border-b border-[#F2D0D3] px-2 py-3 text-[12px] font-semibold text-[#594246]/70 md:grid">
+                <span>Producto</span>
+                <span className="text-center">Cantidad</span>
+                <span className="text-right">Precio</span>
+                <span />
+              </div>
 
-              return (
-                <article
-                  key={`${item.productId}-${item.size}-${item.color}`}
-                  className="rounded-2xl border border-[#F2D0D3] bg-white p-5 shadow-[0_2px_14px_rgba(89,66,70,0.08)]"
-                >
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-28 w-24 rounded-lg border border-[#EBEAE8] object-cover"
-                    />
+              <div className="divide-y divide-[#F5E3E6]">
+                {items.map((item) => {
+                  const canDecrease = item.quantity > 1;
 
-                    <div className="min-w-0 flex-1">
-                      <h2 className="text-xl font-normal text-[#594246]">{item.name}</h2>
-                      <p className="text-sm font-medium text-[#594246]/72">
-                        Color: {item.color} | Talla: {item.size}
-                      </p>
-                      <p className="mt-2 text-2xl font-bold text-[#F2778D]">
+                  return (
+                    <article
+                      key={`${item.productId}-${item.size}-${item.color}`}
+                      className="grid grid-cols-1 gap-3 px-2 py-4 md:grid-cols-[1fr_150px_140px_24px] md:items-center md:gap-4"
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-24 w-18 shrink-0 rounded-md object-cover md:h-26 md:w-20"
+                        />
+
+                        <div className="min-w-0">
+                          <h2 className="truncate text-[15px] font-semibold text-[#594246]">
+                            {item.name}
+                          </h2>
+                          <p className="text-xs font-medium text-[#594246]/70">
+                            Color: {item.color} | Talla: {item.size}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-start gap-2 md:justify-center">
+                        <motion.button
+                          type="button"
+                          onClick={() =>
+                            updateQuantity(
+                              item.productId,
+                              item.size,
+                              item.color,
+                              item.quantity - 1,
+                            )
+                          }
+                          disabled={!canDecrease}
+                          whileTap={canDecrease ? { scale: 1.08 } : undefined}
+                          transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                          className={`h-7 w-7 rounded border text-sm text-[#594246] transition ${
+                            canDecrease
+                              ? "border-[#F2D0D3] bg-[#FAF9F6] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
+                              : "border-[#F3F4F6] bg-[#FAF9F6] text-gray-300 cursor-not-allowed"
+                          }`}
+                          aria-label="Restar cantidad"
+                        >
+                          <Minus size={14} className="mx-auto" />
+                        </motion.button>
+
+                        <span className="w-7 text-center text-sm font-semibold text-[#594246]">
+                          {item.quantity}
+                        </span>
+
+                        <motion.button
+                          type="button"
+                          onClick={() =>
+                            updateQuantity(
+                              item.productId,
+                              item.size,
+                              item.color,
+                              item.quantity + 1,
+                            )
+                          }
+                          whileTap={{ scale: 1.08 }}
+                          transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                          className="h-7 w-7 rounded border border-[#F2D0D3] bg-[#FAF9F6] text-sm text-[#594246] transition hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
+                          aria-label="Sumar cantidad"
+                        >
+                          <Plus size={14} className="mx-auto" />
+                        </motion.button>
+                      </div>
+
+                      <p className="text-left text-[24px] leading-none font-bold text-[#F2778D] md:text-right">
                         S/ {(item.price * item.quantity).toFixed(2)}
                       </p>
-                    </div>
-
-                    <div className="flex items-center gap-2.5">
-                      <motion.button
-                        type="button"
-                        onClick={() => {
-                          console.log("[CartUI] click decrease", {
-                            productId: item.productId,
-                            size: item.size,
-                            color: item.color,
-                            fromQty: item.quantity,
-                            toQty: item.quantity - 1,
-                          });
-                          updateQuantity(
-                            item.productId,
-                            item.size,
-                            item.color,
-                            item.quantity - 1,
-                          );
-                        }}
-                        disabled={!canDecrease}
-                        whileHover={canDecrease ? { scale: 1.08 } : undefined}
-                        whileTap={canDecrease ? { scale: 0.94 } : undefined}
-                        transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                        className={`rounded-lg border p-2 text-[#594246] transition ${
-                          canDecrease
-                            ? "border-[#F2D0D3] bg-[#FAF9F6] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                            : "border-[#F3F4F6] bg-[#FAF9F6] text-gray-300 cursor-not-allowed"
-                        }`}
-                        aria-label="Restar cantidad"
-                      >
-                        <Minus size={16} />
-                      </motion.button>
-
-                      <span className="w-8 text-center text-base font-semibold text-[#594246]">
-                        {item.quantity}
-                      </span>
-
-                      <motion.button
-                        type="button"
-                        onClick={() => {
-                          console.log("[CartUI] click increase", {
-                            productId: item.productId,
-                            size: item.size,
-                            color: item.color,
-                            fromQty: item.quantity,
-                            toQty: item.quantity + 1,
-                          });
-                          updateQuantity(
-                            item.productId,
-                            item.size,
-                            item.color,
-                            item.quantity + 1,
-                          );
-                        }}
-                        whileHover={{ scale: 1.08 }}
-                        whileTap={{ scale: 0.94 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                        className="rounded-lg border border-[#F2D0D3] bg-[#FAF9F6] p-2 text-[#594246] transition hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                        aria-label="Sumar cantidad"
-                      >
-                        <Plus size={16} />
-                      </motion.button>
 
                       <button
-                        onClick={() => {
-                          console.log("[CartUI] click remove", {
-                            productId: item.productId,
-                            size: item.size,
-                            color: item.color,
-                          });
-                          removeItem(item.productId, item.size, item.color);
-                        }}
-                        className="ml-2 rounded-lg p-2 text-[#594246] transition hover:bg-[#F2D0D3]/45 hover:text-[#594246] hover:cursor-pointer"
+                        onClick={() =>
+                          removeItem(item.productId, item.size, item.color)
+                        }
+                        className="justify-self-start text-[#594246]/70 transition hover:text-[#594246] hover:cursor-pointer md:justify-self-end"
                         aria-label="Eliminar producto"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={15} />
                       </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </section>
 
