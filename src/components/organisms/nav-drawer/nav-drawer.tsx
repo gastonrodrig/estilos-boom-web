@@ -38,7 +38,7 @@ export const NavDrawer = ({
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const isPathActive = (href: string) => {
-    const isDashboardRoute = href === "/admin" || href === "/client";
+    const isDashboardRoute = href === "/admin" || href === "/client" || href === "/storekeeper";
 
     if (isDashboardRoute) {
       return pathname === href;

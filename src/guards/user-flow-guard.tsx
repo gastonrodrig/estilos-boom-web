@@ -9,10 +9,10 @@ interface UserFlowGuardProps {
 }
 
 export const UserFlowGuard = ({ children }: UserFlowGuardProps) => {
-  const { status, isExtraDataCompleted } = useAppSelector((state) => state.auth);
+  const { status, role, isExtraDataCompleted } = useAppSelector((state) => state.auth);
 
   const showExtraModal =
-    status === "authenticated" && isExtraDataCompleted === false;
+    status === "authenticated" && role !== "Almacenero" && isExtraDataCompleted === false;
 
   return (
     <>

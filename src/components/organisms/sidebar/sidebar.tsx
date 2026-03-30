@@ -46,7 +46,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 	const sidebarHeightClass = hasTopBar ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-64px)]";
 
 	const isPathActive = (href: string) => {
-		const isDashboardRoute = href === "/admin" || href === "/client";
+		const isDashboardRoute = href === "/admin" || href === "/client" || href === "/storekeeper";
 
 		if (isDashboardRoute) {
 			return pathname === href;
