@@ -138,6 +138,13 @@ export const useCartStore = () => {
           quantity: Math.min(item.quantity, maxStock),
         };
 
+        const found = items.find((x) => sameItem(x, item));
+        const next = found
+          ? items.map((x) => (sameItem(x, item) ? { ...x, stock: item.stock, quantity: Math.min(x.quantity + item.quantity, maxStock) } : x))
+          : [{ ...item, quantity: Math.min(item.quantity, maxStock) }, ...items];
+        
+        setReduxCart(next);
+
         const { data } = await cartApi.post<CartResponse>("/items", payload, config);
         setReduxCart((data.items ?? []) as CartItemWithStock[]);
       } catch {
@@ -178,6 +185,12 @@ export const useCartStore = () => {
         const config = await getAuthConfig();
         if (!config) return;
 
+        const localUpdate = safeQty <= 0
+          ? items.filter((x) => !sameItem(x, payload))
+          : items.map((x) => (sameItem(x, payload) ? { ...x, quantity: safeQty } : x)).filter((x) => x.quantity > 0);
+        
+        setReduxCart(localUpdate);
+
         if (safeQty <= 0) {
           const removePayload: RemoveCartItemPayload = { productId, size, color };
           const { data } = await cartApi.delete<CartResponse>("/items", {
@@ -214,6 +227,9 @@ export const useCartStore = () => {
         const config = await getAuthConfig();
         if (!config) return;
 
+        const next = items.filter((x) => !sameItem(x, payload));
+        setReduxCart(next);
+
         const { data } = await cartApi.delete<CartResponse>("/items", {
           ...config,
           data: payload,
@@ -223,7 +239,7 @@ export const useCartStore = () => {
         // no-op
       }
     },
-    [getAuthConfig, isAuth, setReduxCart],
+    [getAuthConfig, isAuth, items, setReduxCart],
   );
 
   const mergeLocalCartToRemote = useCallback(async () => {

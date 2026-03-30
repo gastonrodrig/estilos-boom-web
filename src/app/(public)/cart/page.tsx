@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { OrderSummary } from "@components";
@@ -23,10 +23,13 @@ export default function CartPage() {
   const isAuthChecking = authStatus === "checking";
   const isAuth = Boolean(authUid) || authStatus === "authenticated";
 
+  const loadInitialCartRef = useRef(false);
+
   useEffect(() => {
-    if (isAuthChecking) return;
+    if (isAuthChecking || loadInitialCartRef.current) return;
+    loadInitialCartRef.current = true;
     void loadCart();
-  }, [authUid, authStatus, isAuthChecking, loadCart]);
+  }, [isAuthChecking, loadCart]);
 
   useEffect(() => {
     if (!isAuth || isAuthChecking) return;
@@ -34,7 +37,7 @@ export default function CartPage() {
   }, [isAuth, isAuthChecking, mergeLocalCartToRemote]);
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 py-7 md:px-6">
+    <div className="mx-auto w-full max-w-[1280px] px-4 py-7 text-[#594246] md:px-6">
       <section className="mb-5 py-1">
         <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
           {checkoutSteps.map((step, index) => {
@@ -167,7 +170,7 @@ export default function CartPage() {
                         </motion.button>
                       </div>
 
-                      <p className="text-left text-[24px] leading-none font-bold text-[#F2778D] md:text-right">
+                      <p className="text-left text-[18px] leading-none font-bold text-[#F2778D] md:text-right">
                         S/ {(item.price * item.quantity).toFixed(2)}
                       </p>
 

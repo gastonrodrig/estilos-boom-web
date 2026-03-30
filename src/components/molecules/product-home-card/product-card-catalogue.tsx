@@ -5,18 +5,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Product } from "@/core/models";
-import { useCartStore } from "@hooks";
-import { CheckoutDrawer } from "@components";
 
 interface Props {
   product: Product;
 }
 
 export const ProductCardCatalogue = ({ product }: Props) => {
-  const { addItem } = useCartStore();
   const [isHovered, setIsHovered] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [lastAddedProductId, setLastAddedProductId] = useState<string | null>(null);
 
   // Colores del diseño previo
   const colors = {
@@ -36,23 +31,6 @@ export const ProductCardCatalogue = ({ product }: Props) => {
       "Azul Vintage": "#5d778a",
     };
     return colorMap[colorName] || "#e5e7eb";
-  };
-
-  const firstVariant = product.variants[0];
-
-  const handleAddToCart = async () => {
-    await addItem({
-      productId: product.id_product,
-      name: product.name,
-      price: product.base_price,
-      quantity: 1,
-      size: firstVariant?.size ?? "UNICA",
-      color: firstVariant?.color ?? "Negro",
-      image: product.images[0] ?? "/placeholder.jpg",
-    });
-
-    setLastAddedProductId(product.id_product);
-    setDrawerOpen(true);
   };
 
   return (
@@ -169,31 +147,13 @@ export const ProductCardCatalogue = ({ product }: Props) => {
           )}
         </div>
 
-        <button
-          onClick={handleAddToCart}
-          className="mt-3 w-full rounded-lg bg-[#F2778D] px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3]"
+        <Link
+          href={`/product/${product.id_product}`}
+          className="mt-3 w-full rounded-lg bg-[#F2778D] px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3]"
         >
-          Agregar al carrito
-        </button>
+          Ver detalle
+        </Link>
       </div>
-
-      <CheckoutDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        item={
-          lastAddedProductId === product.id_product
-            ? {
-                productId: product.id_product,
-                name: product.name,
-                price: product.base_price,
-                quantity: 1,
-                size: firstVariant?.size ?? "UNICA",
-                color: firstVariant?.color ?? "Negro",
-                image: product.images[0] ?? "/placeholder.jpg",
-              }
-            : undefined
-        }
-      />
     </motion.div>
   );
 };
