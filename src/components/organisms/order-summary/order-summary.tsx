@@ -6,6 +6,7 @@ import { useAppSelector } from "@store";
 
 interface OrderSummaryProps {
   items: CartItem[];
+  showButton?: boolean;
 }
 
 const currency = (value: number) =>
@@ -15,7 +16,7 @@ const currency = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-export const OrderSummary = ({ items }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) => {
   const router = useRouter();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
@@ -73,16 +74,20 @@ export const OrderSummary = ({ items }: OrderSummaryProps) => {
         <span className="text-[42px] leading-none font-bold text-[#F2778D]">{currency(subtotal)}</span>
       </div>
 
-      <button
-        onClick={handlePrimaryAction}
-        className="mt-5 w-full rounded-xl bg-[#F2778D] px-4 py-3 text-[12px] font-bold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3] hover:cursor-pointer"
-      >
-        {isAuthenticated ? "Proceder al pago" : "Inicie sesión para continuar"}
-      </button>
+      {showButton && (
+        <>
+          <button
+            onClick={handlePrimaryAction}
+            className="mt-5 w-full rounded-xl bg-[#F2778D] px-4 py-3 text-[12px] font-bold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3] hover:cursor-pointer"
+          >
+            {isAuthenticated ? "Proceder al pago" : "Inicie sesión para continuar"}
+          </button>
 
-      <p className="mt-2 text-center text-[11px] font-medium text-[#594246]/55">
-        Pago 100% seguro y protegido
-      </p>
+          <p className="mt-2 text-center text-[11px] font-medium text-[#594246]/55">
+            Pago 100% seguro y protegido
+          </p>
+        </>
+      )}
     </aside>
   );
 };
