@@ -13,7 +13,7 @@ import {
   Package,
   LogOut,
 } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
 import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules } from "@data";
@@ -21,6 +21,8 @@ import { useAuthStore } from "@hooks";
 import { usePathname } from "next/navigation";
 import { SearchDrawer } from "../search-drawer";
 import { NavDrawer, NavDrawerItem } from "../nav-drawer";
+import { CheckoutDrawer } from "../checkout-drawer";
+import { useCartStore } from "@/hooks/cart/use-cart-store";
 
 interface NavbarProps {
   isHome?: boolean;
@@ -38,6 +40,7 @@ export const Navbar = ({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileGuestMenuOpen, setMobileGuestMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -55,6 +58,11 @@ export const Navbar = ({
   const isClientRoute = pathname.startsWith("/client");
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { status, role, onLogout } = useAuthStore();
+  const { loadCart, items } = useCartStore();
+  const cartItemsCount = useMemo(
+    () => items.reduce((acc, item) => acc + item.quantity, 0),
+    [items],
+  );
 
   const centerMenu = isAdminRoute
     ? []
@@ -165,6 +173,11 @@ export const Navbar = ({
 
     setSearchOpen(true);
   };
+
+  useEffect(() => {
+    if (isAdmin) return;
+    void loadCart();
+  }, [isAdmin, loadCart]);
 
   useEffect(() => {
     if (!isHome) return;
@@ -364,9 +377,18 @@ export const Navbar = ({
               )}
 
               {!isAdmin && (
-                <Link href="/cart" className={iconButtonClass}>
+                <button
+                  aria-label="Abrir carrito"
+                  onClick={() => setCartDrawerOpen(true)}
+                  className={`${iconButtonClass} relative`}
+                >
                   <ShoppingBag className={iconClass} />
-                </Link>
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold leading-none text-white">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </button>
               )}
 
               {showRightMenuButton && (
@@ -460,6 +482,11 @@ export const Navbar = ({
           {!onSearchOpen && (
             <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
           )}
+
+          <CheckoutDrawer
+            open={cartDrawerOpen}
+            onClose={() => setCartDrawerOpen(false)}
+          />
         </motion.div>
       </header>
     </>

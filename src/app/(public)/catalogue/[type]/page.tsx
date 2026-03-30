@@ -2,26 +2,34 @@
 import { useParams } from "next/navigation";
 import { useProductStore } from "@/hooks/product/use-product-store";
 import { useEffect, useMemo, useState } from "react";
-import { SlidersHorizontal, LayoutGrid, List } from "lucide-react";
-import { ProductCardCatalogue } from "@/components/molecules/product-catalog-card/product-catalog-card";
-import { FilterDrawer } from "@/components";
+import { SlidersHorizontal, LayoutGrid, List, Search } from "lucide-react";
+import { ProductCardCatalogue } from "@/components/molecules/product-home-card/product-card-catalogue";
+import { FilterDrawer, SearchDrawer } from "@/components";
 
 export default function CollectionPage() {
   const { type } = useParams();
   const { products, loading, startLoadingProducts } = useProductStore();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
-    // 1. Definimos los filtros base
-    const categoryFilter = type === "dresses" ? "Dresses" : undefined;
-    const sectionFilter = type !== "dresses" ? (type as string) : undefined;
+  // Convertimos a string y minúsculas para comparar seguro
+  const currentType = String(type).toLowerCase();
 
-    // 2. CAMBIO: Envolvemos los argumentos en un objeto {}
-    startLoadingProducts({
-      section: sectionFilter,
-      category: categoryFilter,
-    });
-  }, [type, startLoadingProducts]);
+  // 1. Definimos los filtros base
+  // Si es dresses, mandamos "Dresses" (con D mayúscula como está en tu DB)
+  const categoryFilter = currentType === "dresses" ? "Dresses" : undefined;
+  
+  // Solo mandamos section si NO es una categoría
+  const sectionFilter = currentType !== "dresses" ? currentType : undefined;
+
+  console.log("📡 Petición Catálogo:", { section: sectionFilter, category: categoryFilter });
+
+  startLoadingProducts({
+    section: sectionFilter,
+    category: categoryFilter,
+  });
+}, [type]);
 
   const headerContent = useMemo(() => {
     const titles = {
@@ -53,7 +61,7 @@ export default function CollectionPage() {
         toda la tienda
       </div>
 
-      <header className="bg-gradient-to-b from-[#fce4ec] to-white pt-24 pb-16 px-6 text-center">
+      <header className="bg-linear-to-b from-[#fce4ec] to-white pt-24 pb-16 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-serif text-[#4a4a4a] mb-4">
           {headerContent.title}
         </h1>
@@ -65,6 +73,12 @@ export default function CollectionPage() {
       <main className="container mx-auto px-6 pb-20">
         <div className="flex justify-between items-center py-6 border-b border-gray-100 mb-10">
           <div className="flex items-center gap-6">
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="flex items-center gap-2 border px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition"
+            >
+              <Search size={16} /> Buscar
+            </button>
             <button
               onClick={() => setIsFilterOpen(true)}
               className="flex items-center gap-2 border px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-50 transition"
@@ -89,7 +103,7 @@ export default function CollectionPage() {
                 .map((_, i) => (
                   <div
                     key={i}
-                    className="animate-pulse bg-gray-100 aspect-[3/4] rounded-lg"
+                    className="animate-pulse bg-gray-100 aspect-3/4 rounded-lg"
                   />
                 ))
             : products.map((product) => (
@@ -99,7 +113,30 @@ export default function CollectionPage() {
                 />
               ))}
         </div>
+
+        {/* Barra lateral flotante de acciones para mobile/desktop */}
+        <aside className="fixed right-4 bottom-6 z-40 flex flex-col gap-3">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-[#F2778D] text-white shadow-lg hover:brightness-95 transition"
+            aria-label="Abrir búsqueda"
+          >
+            <Search size={18} />
+          </button>
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-[#594246] text-[#FAF9F6] shadow-lg hover:brightness-95 transition"
+            aria-label="Abrir filtros"
+          >
+            <SlidersHorizontal size={18} />
+          </button>
+        </aside>
       </main>
+
+      <SearchDrawer
+        open={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
       <FilterDrawer
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
