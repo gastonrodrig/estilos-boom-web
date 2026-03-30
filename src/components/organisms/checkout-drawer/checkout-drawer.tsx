@@ -16,7 +16,7 @@ interface CheckoutDrawerProps {
 
 type CartItemWithStock = CartItem & { stock?: number };
 
-export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
+export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => {
   const router = useRouter();
   const { items, total, updateQuantity, removeItem } = useCartStore();
   const authUid = useAppSelector((state) => state.auth.uid);
@@ -60,7 +60,7 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[70] flex justify-end">
+        <div className="fixed inset-0 z-[70] flex justify-end text-[#594246]">
           <motion.button
             type="button"
             aria-label="Cerrar carrito"
@@ -76,13 +76,13 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
             role="dialog"
             aria-modal="true"
             aria-label="Carrito de compras"
-            className="relative h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
+            className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex items-center justify-between border-b border-[#F2D0D3] px-5 py-4 flex-shrink-0">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#F2D0D3] px-5 py-4">
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#594246]">
                 {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado
               </h2>
@@ -97,7 +97,7 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                   Tu carrito esta vacio.
                 </div>
               ) : (
-                <div className="space-y-0 divide-y divide-[#F5E3E6]">
+                <div className="divide-y divide-[#F5E3E6] space-y-0">
                   {cartItems.map((item) => {
                     const maxStock =
                       typeof item.stock === "number" && item.stock >= 0
@@ -133,8 +133,8 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                                   type="button"
                                   className={`h-7 w-7 rounded border text-sm ${
                                     canDecrease
-                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                                      : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
+                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:cursor-pointer hover:bg-[#F2D0D3]/35"
+                                      : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
                                   }`}
                                   disabled={!canDecrease}
                                   whileTap={canDecrease ? { scale: 1.08 } : undefined}
@@ -159,8 +159,8 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                                   type="button"
                                   className={`h-7 w-7 rounded border text-sm ${
                                     canIncrease
-                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:bg-[#F2D0D3]/35 hover:cursor-pointer"
-                                      : "border-[#F3F4F6] text-gray-300 cursor-not-allowed"
+                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:cursor-pointer hover:bg-[#F2D0D3]/35"
+                                      : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
                                   }`}
                                   disabled={!canIncrease}
                                   whileTap={canIncrease ? { scale: 1.08 } : undefined}
@@ -179,7 +179,7 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                               </div>
 
                               <button
-                                className="text-[#594246]/65 transition hover:text-[#594246] hover:cursor-pointer"
+                                className="text-[#594246]/65 transition hover:cursor-pointer hover:text-[#594246]"
                                 onClick={() =>
                                   removeItem(item.productId, item.size, item.color)
                                 }
@@ -189,7 +189,7 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                               </button>
                             </div>
 
-                            <p className="mt-2 text-[26px] leading-none font-bold text-[#F25C8D]">
+                            <p className="mt-2 text-[18px] leading-none font-bold text-[#F25C8D]">
                               S/ {(item.price * item.quantity).toFixed(2)}
                             </p>
 
@@ -218,26 +218,26 @@ export const CheckoutDrawer = ({ open, onClose }: CheckoutDrawerProps) => {
                     <span>Ver al finalizar</span>
                   </div>
                 </div>
-                <div className="mt-2 flex justify-between text-[28px] leading-none font-bold text-[#F25C8D]">
+                <div className="mt-2 flex justify-between text-[22px] leading-none font-bold text-[#F25C8D]">
                   <span>Total</span>
                   <span>S/ {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-[#F2D0D3] bg-white px-5 py-4 flex-shrink-0 space-y-2">
+            <div className="shrink-0 space-y-2 border-t border-[#F2D0D3] bg-white px-5 py-4">
               <button
                 onClick={handleGoToCatalog}
-                className="w-full border border-[#594246] text-[#594246] py-3 rounded-md text-[11px] font-bold uppercase tracking-wide hover:bg-[#594246] hover:text-white transition"
+                className="w-full rounded-md border border-[#594246] py-3 text-[11px] font-bold uppercase tracking-wide text-[#594246] transition hover:bg-[#594246] hover:text-white"
               >
                 Seguir viendo catálogo
               </button>
 
               <button
                 onClick={handleMainAction}
-                className="w-full bg-black text-white py-3 rounded-md text-[11px] font-bold uppercase tracking-wide hover:bg-gray-900 transition"
+                className="w-full rounded-md bg-black py-3 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-gray-900"
               >
-                {isAuthenticated ? "Continuar compra" : "Inicie sesión para continuar"}
+                {isAuthenticated ? "Continuar con la compra" : "Inicie sesión para continuar"}
               </button>
             </div>
           </motion.aside>

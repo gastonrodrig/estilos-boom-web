@@ -38,13 +38,13 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
   };
 
   return (
-    <aside className="sticky top-28 rounded-2xl border border-[#F2D0D3] bg-white p-5 shadow-[0_2px_16px_rgba(89,66,70,0.08)] md:p-6">
-      <h3 className="text-[32px] leading-none font-normal text-[#594246]">Resumen del Pedido</h3>
+    <aside className="sticky top-28 rounded-2xl border border-[#F2D0D3] bg-white p-5 text-[#594246] shadow-[0_2px_16px_rgba(89,66,70,0.08)] md:p-6">
+      <h3 className="text-[28px] leading-none font-semibold text-[#594246]">Resumen del Pedido</h3>
 
       <div className="mt-4 rounded-xl border border-[#F2D0D3] bg-[#FAF9F6] p-4">
         <p className="text-[13px] font-semibold text-[#594246]">Estilos Boom Rewards</p>
         <p className="mt-1 text-[13px] text-[#594246]/80">
-          Podrias ganar <span className="font-semibold text-[#F2778D]">242 puntos</span> en esta compra.
+          Podrías ganar <span className="font-semibold text-[#F2778D]">242 puntos</span> en esta compra.
         </p>
       </div>
 
@@ -71,7 +71,7 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
 
       <div className="flex items-center justify-between text-[#594246]">
         <span className="text-[20px] font-semibold">Total</span>
-        <span className="text-[42px] leading-none font-bold text-[#F2778D]">{currency(subtotal)}</span>
+        <span className="text-[30px] leading-none font-bold text-[#F2778D]">{currency(subtotal)}</span>
       </div>
 
       {showButton && (
