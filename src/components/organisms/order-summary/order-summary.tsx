@@ -38,10 +38,10 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
   };
 
   return (
-    <aside className="sticky top-28 rounded-2xl border border-[#F2D0D3] bg-white p-5 text-[#594246] shadow-[0_2px_16px_rgba(89,66,70,0.08)] md:p-6">
-      <h3 className="text-[28px] leading-none font-semibold text-[#594246]">Resumen del Pedido</h3>
+    <aside className="sticky top-28  bg-[#F2D0D3]/30  rounded-sm p-5 text-[#594246]  md:p-6">
+      <h3 className="text-[22px] leading-none font-medium text-[#594246]">Resumen del Pedido</h3>
 
-      <div className="mt-4 rounded-xl border border-[#F2D0D3] bg-[#FAF9F6] p-4">
+      <div className="mt-4 rounded-sm border border-[#F2D0D3] bg-[#FAF9F6] p-4">
         <p className="text-[13px] font-semibold text-[#594246]">Estilos Boom Rewards</p>
         <p className="mt-1 text-[13px] text-[#594246]/80">
           Podrías ganar <span className="font-semibold text-[#F2778D]">242 puntos</span> en esta compra.
@@ -67,18 +67,18 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
         </div>
       </div>
 
-      <div className="my-5 h-px bg-[#EBEAE8]" />
+      <div className="my-5 h-px bg-[#F2B6C1]" />
 
       <div className="flex items-center justify-between text-[#594246]">
         <span className="text-[20px] font-semibold">Total</span>
-        <span className="text-[30px] leading-none font-bold text-[#F2778D]">{currency(subtotal)}</span>
+        <span className="text-[22px] leading-none font-semibold text-[#F2778D]">{currency(subtotal)}</span>
       </div>
 
       {showButton && (
         <>
           <button
             onClick={handlePrimaryAction}
-            className="mt-5 w-full rounded-xl bg-[#F2778D] px-4 py-3 text-[12px] font-bold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3] hover:cursor-pointer"
+            className="mt-5 w-full rounded-sm bg-[#F2778D] px-4 py-3 text-[12px] font-bold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3] hover:cursor-pointer"
           >
             {isAuthenticated ? "Proceder al pago" : "Inicie sesión para continuar"}
           </button>

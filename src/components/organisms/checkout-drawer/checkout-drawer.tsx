@@ -83,7 +83,7 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex shrink-0 items-center justify-between border-b border-[#F2D0D3] px-5 py-4">
-              <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#594246]">
+              <h2 className="text-[18px] font-medium uppercase tracking-[0.08em] text-[#000000]">
                 {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado
               </h2>
               <button onClick={onClose} aria-label="Cerrar">
@@ -112,28 +112,31 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                         key={`${item.productId}-${item.size}-${item.color}`}
                         className="py-3"
                       >
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 py-2">
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="h-24 w-18 shrink-0 rounded-md object-cover"
+                            className="h-34 w-25 shrink-0 rounded-md object-cover"
                           />
 
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-[13px] font-semibold uppercase text-[#594246]">
+                            <h2 className="truncate text-[20px] font-medium  text-[#594246]">
                               {item.name}
+                            </h2>
+                            <p className=" text-[12px] text-[#000000]/70">
+                              Color : {item.color} 
                             </p>
-                            <p className="text-[11px] text-[#594246]/70">
-                              {item.color} | {item.size}
+                            <p className=" text-[12px] text-[#000000]/70">
+                              Talla : {item.size}
                             </p>
 
                             <div className="mt-2 flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1.5">
                                 <motion.button
                                   type="button"
-                                  className={`h-7 w-7 rounded border text-sm ${
+                                  className={`size-6  text-[12px] ${
                                     canDecrease
-                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:cursor-pointer hover:bg-[#F2D0D3]/35"
+                                      ? "border-[#F2D0D3] bg-[#F2D0D3] text-[#594246] hover:cursor-pointer hover:bg-[#F291A3]/70"
                                       : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
                                   }`}
                                   disabled={!canDecrease}
@@ -151,15 +154,15 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                                   -
                                 </motion.button>
 
-                                <span className="w-6 text-center text-sm font-semibold text-[#594246]">
+                                <span className="w-6 text-center text-sm font-bold text-[#594246]">
                                   {item.quantity}
                                 </span>
 
                                 <motion.button
                                   type="button"
-                                  className={`h-7 w-7 rounded border text-sm ${
+                                  className={`size-6  text-sm ${
                                     canIncrease
-                                      ? "border-[#F2D0D3] bg-[#FAF9F6] text-[#594246] hover:cursor-pointer hover:bg-[#F2D0D3]/35"
+                                      ? "border-[#F2D0D3] bg-[#F2D0D3] text-[#000000] hover:cursor-pointer hover:bg-[#F291A3]/70"
                                       : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
                                   }`}
                                   disabled={!canIncrease}
@@ -179,17 +182,17 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                               </div>
 
                               <button
-                                className="text-[#594246]/65 transition hover:cursor-pointer hover:text-[#594246]"
+                                className="text-[#594246]/80 transition hover:cursor-pointer hover:text-[#594246]"
                                 onClick={() =>
                                   removeItem(item.productId, item.size, item.color)
                                 }
                                 aria-label="Eliminar producto"
                               >
-                                <Trash2 size={14} />
+                                <Trash2 size={22} />
                               </button>
                             </div>
 
-                            <p className="mt-2 text-[18px] leading-none font-bold text-[#F25C8D]">
+                            <p className="mt-5 text-[15px] leading-none text-[#594246]">
                               S/ {(item.price * item.quantity).toFixed(2)}
                             </p>
 
@@ -206,9 +209,9 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                 </div>
               )}
 
-              <div className="mt-5 rounded-xl border border-[#F2D0D3] bg-white p-4">
-                <h3 className="text-[13px] font-semibold text-[#594246]">Resumen del Pedido</h3>
-                <div className="mt-2 space-y-1.5 text-[12px] text-[#594246]/75">
+              <div className="mt-5 rounded-sm border border-[#F2D0D3] bg-white p-4">
+                <h3 className="text-[18px] font-medium text-[#000000] uppercase">Resumen del Pedido</h3>
+                <div className="mt-2 space-y-1.5 text-[15px] text-[#000000]/75">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>S/ {total.toFixed(2)}</span>
@@ -218,7 +221,8 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                     <span>Ver al finalizar</span>
                   </div>
                 </div>
-                <div className="mt-2 flex justify-between text-[22px] leading-none font-bold text-[#F25C8D]">
+                <hr className="my-4 border-[#F2D0D3]" />
+                <div className="mt-6 flex justify-between text-[18px] leading-none font-medium text-[#F2778D]">
                   <span>Total</span>
                   <span>S/ {total.toFixed(2)}</span>
                 </div>
@@ -228,14 +232,14 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
             <div className="shrink-0 space-y-2 border-t border-[#F2D0D3] bg-white px-5 py-4">
               <button
                 onClick={handleGoToCatalog}
-                className="w-full rounded-md border border-[#594246] py-3 text-[11px] font-bold uppercase tracking-wide text-[#594246] transition hover:bg-[#594246] hover:text-white"
+                className="w-full rounded-sm border border-[#000000] py-3 text-[12px] font-bold uppercase tracking-wide text-[#594246] transition hover:bg-[#594246] hover:text-white"
               >
                 Seguir viendo catálogo
               </button>
 
               <button
                 onClick={handleMainAction}
-                className="w-full rounded-md bg-black py-3 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-gray-900"
+                className="w-full rounded-sm bg-black py-3 text-[12px] font-bold uppercase tracking-wide text-white transition hover:bg-gray-900"
               >
                 {isAuthenticated ? "Continuar con la compra" : "Inicie sesión para continuar"}
               </button>
