@@ -5,7 +5,7 @@ export interface BillingAddress {
   lastName: string;
   address: string;
   apartment?: string;
-  city: string;
+  distric: string;
   postalCode: string;
   department: string;
 }
@@ -15,7 +15,7 @@ export interface ShippingFormValues {
   lastName: string;
   address: string;
   apartment?: string;
-  city: string;
+  district: string;
   postalCode: string;
   department: string;
   email: string;
@@ -32,12 +32,12 @@ export interface DeliveryMethod {
 }
 
 export interface PaymentFormValues {
-  paymentMethod: 'card' | 'transfer' | 'cash';
+  paymentMethod: 'card' | 'transfer' | 'cash' | 'qr';
   cardNumber?: string;
   expiryDate?: string;
   securityCode?: string;
   billingSameAsShipping: boolean;
-  billingAddress: BillingAddress;
+  billingAddress?: BillingAddress;
 }
 
 export interface CheckoutFormValues extends ShippingFormValues, PaymentFormValues {

@@ -51,7 +51,7 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="bg-[#ffffff]  rounded-sm  px-4 py-2  md:px-5">
-              <div className="hidden grid-cols-[1fr_150px_140px_24px] gap-4 border-b border-[#F2B6C1] px-2 py-3 text-[15px] font-normal text-[#594246]/80 md:grid ">
+              <div className="hidden grid-cols-[1fr_150px_140px_24px] gap-4 border-b border-[#F2B6C1] px-2 py-3 text-[15px] font-normal text-[#594246] md:grid ">
                 <span>Producto</span>
                 <span className="text-center truncate text-[15px]">Cantidad</span>
                 <span className="text-right truncate text-[15px]">Precio</span>

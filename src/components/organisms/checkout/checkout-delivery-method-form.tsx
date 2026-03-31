@@ -10,6 +10,12 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
   const { control, watch, formState: { isSubmitting } } = useFormContext<CheckoutFormValues>();
 
   const selectedDeliveryMethod = watch('selectedDeliveryMethod');
+  const address = watch('address');
+  const district = watch('district');
+  const department = watch('department');
+  const postalCode = watch('postalCode');
+
+  const displayAddress = `${address}, ${district}, ${department} ${postalCode ? `(${postalCode})` : ''}`;
 
   // Mock de métodos de entrega
   const deliveryMethods: DeliveryMethod[] = [
@@ -43,9 +49,9 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 border border-gray-200 space-y-6">
+    <div className=" rounded-sm p-8 border border-[#594246]/30 space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#594246' }}>
+        <h2 className="text-[25px] font-semibold mb-2" style={{ color: '#594246' }}>
           Método de Entrega
         </h2>
         <p className="text-sm" style={{ color: '#827D7D' }}>
@@ -57,16 +63,16 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
       <button
         type="button"
         onClick={handleGoToShipping}
-        className="w-full border-2 rounded-lg p-4 text-left hover:opacity-90 transition-opacity"
-        style={{ borderColor: '#F2778D', backgroundColor: '#FAF9F6' }}
+        className="w-full border-2 rounded-sm p-4 text-left  transition-opacity bg-[#F2D0D3]/30"
+        style={{ borderColor: '#F2B6C1' }}
       >
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-semibold" style={{ color: '#594246' }}>
+            <p className="font-semibold text-[15px]" style={{ color: '#594246' }}>
               Dirección de Entrega
             </p>
-            <p className="text-sm mt-1" style={{ color: '#827D7D' }}>
-              Av. Principal 123, Lima 15001
+            <p className="text-sm mt-1 truncate capitalize" style={{ color: '#827D7D' }}>
+              {displayAddress.toLowerCase()}
             </p>
           </div>
           <svg
@@ -88,7 +94,7 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
 
       {/* Métodos de entrega */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium" style={{ color: '#594246', marginBottom: '12px' }}>
+        <label className="block text-sm font-medium " style={{ color: '#594246', marginBottom: '12px' }}>
           Opciones de Entrega*
         </label>
 
@@ -102,19 +108,21 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
                 <div
                   key={method.id}
                   onClick={() => onChange(method)}
-                  className="border-2 rounded-lg p-4 cursor-pointer transition-all"
-                  style={{
-                    borderColor: value?.id === method.id ? '#F2778D' : '#EBEA E8',
-                    backgroundColor: value?.id === method.id ? '#FAF9F6' : '#FFFFFF',
-                  }}
+                  // Quitamos el bg fijo del className y lo hacemos todo condicional
+                  className={`border-2 rounded-sm p-4 cursor-pointer transition-all duration-200 ${
+                    value?.id === method.id
+                      ? "border-[#F2B6C1] bg-[#F2D0D3]/30 shadow-sm" // Estado Seleccionado
+                      : "border-[#594246]/30 bg-white hover:border-[#594246]/70" // Estado Normal
+                  }`}
                 >
                   <div className="flex items-start gap-4">
+                    {/* Círculo del Radio Button */}
                     <div
-                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1"
-                      style={{
-                        borderColor: value?.id === method.id ? '#F2778D' : '#EBEA E8',
-                        backgroundColor: value?.id === method.id ? '#F2778D' : 'transparent',
-                      }}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-colors duration-200 ${
+                        value?.id === method.id
+                          ? "border-[#F2778D] bg-[#F2778D]" // Seleccionado
+                          : "border-gray-300 bg-transparent" // No seleccionado
+                      }`}
                     >
                       {value?.id === method.id && (
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -128,20 +136,20 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
                     </div>
 
                     <div className="flex-1">
-                      <p className="font-semibold" style={{ color: '#594246' }}>
+                      <p className="font-semibold text-[16px] text-[#594246]">
                         {method.name}
                       </p>
-                      <p className="text-sm mt-1" style={{ color: '#827D7D' }}>
+                      <p className="text-sm mt-1 text-[#827D7D]">
                         {method.description}
                       </p>
-                      <p className="text-sm mt-1" style={{ color: '#827D7D' }}>
+                      <p className="text-[11px] mt-1 text-[#827D7D] font-medium uppercase tracking-wider">
                         Estimado: {method.estimatedDays} día(s)
                       </p>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="font-bold" style={{ color: '#594246' }}>
-                        {method.price === 0 ? 'GRATIS' : `S/ ${method.price}`}
+                      <p className={`font-semibold ${value?.id === method.id ? "text-[#F2778D]" : "text-[#594246]"}`}>
+                        {method.price === 0 ? 'GRATIS' : `S/ ${method.price.toFixed(2)}`}
                       </p>
                     </div>
                   </div>
@@ -157,8 +165,8 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
         <button
           type="button"
           onClick={handleGoToShipping}
-          className="flex-1 border-2 font-bold py-3 rounded-lg hover:opacity-90 transition-opacity"
-          style={{ borderColor: '#EBEA E8', color: '#594246' }}
+          className="flex-1 border bg-[#FAF9F6] font-semibold py-3 rounded-full hover:bg-[#EBEAE8] transition-colors "
+          style={{ color: '#594246' }}
         >
           Atrás
         </button>
@@ -166,8 +174,8 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
           type="button"
           onClick={handleNext}
           disabled={!selectedDeliveryMethod || isSubmitting}
-          className="flex-1 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-          style={{ backgroundColor: '#F2778D' }}
+          className="flex-1 border  text-black font-semibold py-3 rounded-full  hover:bg-[#F2778D]/80 bg-[#F2B6C1] transition-colors  "
+          
         >
           {isSubmitting ? 'Cargando...' : 'Siguiente: Pago'}
         </button>

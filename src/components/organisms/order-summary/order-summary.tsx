@@ -38,10 +38,10 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
   };
 
   return (
-    <aside className="sticky top-28  bg-[#F2D0D3]/30  rounded-sm p-5 text-[#594246]  md:p-6">
+    <aside className="sticky top-28  bg-[#F2B6C1]/50  rounded-sm p-5 text-[#594246]  md:p-6">
       <h3 className="text-[22px] leading-none font-medium text-[#594246]">Resumen del Pedido</h3>
 
-      <div className="mt-4 rounded-sm border border-[#F2D0D3] bg-[#FAF9F6] p-4">
+      <div className="mt-4 rounded-sm border border-[#F2D0D3] bg-[#F2D0D3] p-4">
         <p className="text-[13px] font-semibold text-[#594246]">Estilos Boom Rewards</p>
         <p className="mt-1 text-[13px] text-[#594246]/80">
           Podrías ganar <span className="font-semibold text-[#F2778D]">242 puntos</span> en esta compra.

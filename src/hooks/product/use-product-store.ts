@@ -16,15 +16,24 @@ import toast from "react-hot-toast";
 type ApiProduct = Record<string, unknown>;
 
 const normalizeProduct = (p: ApiProduct): Product => {
+  // 1. Mapeo de ID principal
   const idProduct =
     (p.id_product as string | undefined) ??
     (p._id as string | undefined) ??
     "";
 
+  // 2. Mapeo profundo de Variantes (_id -> id_variant)
   const rawVariants = Array.isArray(p.variants) ? p.variants : [];
+  const normalizedVariants = rawVariants.map((v: any) => ({
+    id_variant: v.id_variant || v._id || "",
+    size: v.size || "",
+    color: v.color || "",
+    stock: Number(v.stock || 0),
+    sku_variant: v.sku_variant || "",
+  }));
 
+  // 3. Retorno del objeto Product COMPLETO
   return {
-    ...p,
     id_product: idProduct,
     name: (p.name as string) ?? "",
     description: (p.description as string | undefined) ?? "",
@@ -35,8 +44,19 @@ const normalizeProduct = (p: ApiProduct): Product => {
     is_new_in: Boolean(p.is_new_in),
     images: Array.isArray(p.images) ? (p.images as string[]) : [],
     id_category: (p.id_category as string) ?? "",
-    category: (p.category as Product["category"]) ?? undefined,
-    variants: rawVariants as Product["variants"],
+    category: (p.category as any),
+
+    // --- NUEVOS CAMPOS (Evita el error de TypeScript) ---
+    gender: (p.gender as any) ?? "MUJER",
+    style_type: (p.style_type as string) ?? "",
+    composition: (p.composition as string) ?? "",
+    season: (p.season as string) ?? "",
+    highlights: Array.isArray(p.highlights) ? (p.highlights as string[]) : [],
+    custom_size_guide_url: (p.custom_size_guide_url as string) ?? "",
+    technical_details: (p.technical_details as any) ?? {},
+    // ----------------------------------------------------
+
+    variants: normalizedVariants,
     created_at: (p.created_at as string | undefined) ?? undefined,
     updated_at: (p.updated_at as string | undefined) ?? undefined,
   };
@@ -59,6 +79,8 @@ export const useProductStore = () => {
       colors?: string[];
       limit?: number;
       offset?: number;
+      gender?: string; // Agregamos gender a los params permitidos
+      season?: string; // Agregamos season a los params permitidos
     }) => {
       dispatch(setLoadingProduct(true));
       try {

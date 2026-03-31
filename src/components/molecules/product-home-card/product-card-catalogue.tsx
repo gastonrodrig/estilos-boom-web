@@ -107,7 +107,7 @@ export const ProductCardCatalogue = ({ product }: Props) => {
         
         <Link href={`/product/${product.id_product}`}>
           <motion.h3 
-            className="text-[#594246] font-light text-sm leading-tight tracking-wide line-clamp-1"
+            className="text-[#594246] font-light text-[18px] leading-tight tracking-wide line-clamp-1"
             animate={{ 
               color: isHovered ? "#000" : "#594246",
               x: isHovered ? 2 : 0 
