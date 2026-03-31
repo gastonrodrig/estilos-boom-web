@@ -7,6 +7,7 @@ import { CTA, Modal, SelectInput, TextInput, Tooltip, PasswordInput } from "@/co
 import { DocumentType, ClientType } from "@enums";
 import { ClientPerson } from "@models";
 import { AlertCircle, Plus, Trash2, Mail, Wand2 } from "lucide-react";
+import { generateRandomPassword as generatePwd, formatAddressesForPayload } from "@helpers";
 
 type ClientPersonModalProps = {
   open: boolean;
@@ -83,9 +84,8 @@ export const ClientPersonModal = ({
     await startPasswordReset({ email: emailValue });
   };
 
-  const generateRandomPassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    const password = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  const onGeneratePassword = () => {
+    const password = generatePwd();
     setValue("password", password, { shouldValidate: true, shouldDirty: true });
   };
 
@@ -112,14 +112,7 @@ export const ClientPersonModal = ({
         document_type,
         document_number,
         password: password || undefined,
-        addresses: addresses?.map(addr => ({
-          address_line: addr.address_line,
-          reference: addr.reference,
-          department: addr.department,
-          province: addr.province,
-          district: addr.district,
-          is_default: !!addr.is_default
-        })).filter(addr => addr.address_line.trim() !== "") || []
+        addresses: formatAddressesForPayload(addresses || [])
       };
 
       if (isEdit && (selected?._id || selected?.id_user)) {
@@ -203,7 +196,7 @@ export const ClientPersonModal = ({
               />
               <button
                 type="button"
-                onClick={generateRandomPassword}
+                onClick={onGeneratePassword}
                 className="mt-1 p-2.5 bg-white border border-gray-200 text-pink-500 hover:bg-pink-50 rounded-xl transition-all shadow-sm flex items-center gap-2 group"
               >
                 <Wand2 size={16} className="group-hover:animate-pulse" />

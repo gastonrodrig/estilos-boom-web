@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useForm, useWatch, useFieldArray } from "react-hook-form";
 import { Plus, Trash2 } from "lucide-react";
 import { useUsersStore } from "@hooks";
+import { formatAddressesForPayload } from "@helpers";
 import { CTA, Modal, SelectInput, TextInput } from "@/components/atoms";
 import { ClientType } from "@enums";
 import { ExtraInformationValues } from "@models";
@@ -85,7 +86,7 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
       // Normalizar direcciones para el backend
       const formattedData = {
         ...data,
-        addresses: data.addresses?.filter(addr => addr.address_line.trim() !== "") || []
+        addresses: formatAddressesForPayload(data.addresses || [])
       };
       const success = await startUpdateExtraData(uid, formattedData);
       if (success) onClose();
