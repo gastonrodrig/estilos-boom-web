@@ -16,7 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
-import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules } from "@data";
+import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules, storekeeperModules } from "@data";
 import { useAuthStore } from "@hooks";
 import { usePathname } from "next/navigation";
 import { SearchDrawer } from "../search-drawer";
@@ -56,6 +56,8 @@ export const Navbar = ({
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
   const isClientRoute = pathname.startsWith("/client");
+  const isStorekeeperRoute = pathname.startsWith("/storekeeper");
+  const isBackofficeRoute = isAdminRoute || isStorekeeperRoute;
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { status, role, onLogout } = useAuthStore();
   const { loadCart, items } = useCartStore();
@@ -64,7 +66,7 @@ export const Navbar = ({
     [items],
   );
 
-  const centerMenu = isAdminRoute
+  const centerMenu = isBackofficeRoute
     ? []
     : isClientRoute
     ? showClientCenterMenu
@@ -75,15 +77,19 @@ export const Navbar = ({
   const isAuthenticated = status === "authenticated";
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
+  const isStorekeeper = role === "Almacenero";
+  const isBackofficeRole = isAdmin || isStorekeeper;
   const hasSession =
     isAuthenticated || status === "first-login-password" || !!role;
   const isClientPanelNavbar = showClientCenterMenu;
-  const isPublicNavbar = !isAdminRoute && !isClientPanelNavbar;
-  const isPanelNavbar = isAdminRoute || isClientPanelNavbar;
+  const isPublicNavbar = !isAdminRoute && !isClientPanelNavbar && !isStorekeeperRoute;
+  const isPanelNavbar = isAdminRoute || isClientPanelNavbar || isStorekeeperRoute;
   const currentUserMenuRole: UserMenuRole | null = isAdmin
     ? "admin"
     : isClient
     ? "client"
+    : isStorekeeper
+    ? "storekeeper"
     : null;
 
   const userMenuItems = getUserMenuItems(currentUserMenuRole);
@@ -136,6 +142,15 @@ export const Navbar = ({
           href: child.href,
         })),
       }))
+    : isStorekeeperRoute
+    ? storekeeperModules.map((item) => ({
+        label: item.label,
+        href: item.href,
+        children: item.children?.map((child) => ({
+          label: child.label,
+          href: child.href,
+        })),
+      }))
     : isClientRoute
     ? clientModules.map((item) => ({
         label: item.label,
@@ -175,9 +190,9 @@ export const Navbar = ({
   };
 
   useEffect(() => {
-    if (isAdmin) return;
+    if (isBackofficeRole) return;
     void loadCart();
-  }, [isAdmin, loadCart]);
+  }, [isBackofficeRole, loadCart]);
 
   useEffect(() => {
     if (!isHome) return;
@@ -271,7 +286,7 @@ export const Navbar = ({
 
             {/* Icons */}
             <div className={`flex items-center gap-2 ${textClass}`}>
-              {!isAdmin && (
+              {!isBackofficeRole && (
                 <button
                   aria-label="Buscar"
                   onClick={handleSearchOpen}
@@ -286,10 +301,10 @@ export const Navbar = ({
                   <button
                     aria-label="Abrir menú de usuario"
                     onClick={() => setUserMenuOpen((prev) => !prev)}
-                    className={iconButtonClass}
+                    className={isBackofficeRoute ? adminUserButtonClass : iconButtonClass}
                   >
                     <div className="flex items-center">
-                      <User className={iconClass} />
+                      <User className={isBackofficeRoute ? adminUserIconClass : iconClass} />
                       <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
                     </div>
                   </button>
@@ -297,11 +312,11 @@ export const Navbar = ({
                   <div className="relative flex items-center h-full justify-center">
                     <button
                       aria-label="Abrir menú de usuario"
-                      className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                      className={isBackofficeRoute ? adminUserButtonClass : iconButtonClass}
                       onClick={() => setIsOpen((prev) => !prev)}
                     >
                       <div className="flex items-center">
-                        <User className={isAdmin ? adminUserIconClass : iconClass} />
+                        <User className={isBackofficeRoute ? adminUserIconClass : iconClass} />
                         <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
                       </div>
                     </button>
@@ -370,13 +385,13 @@ export const Navbar = ({
                 </AnimatePresence>
               </div>
 
-              {!isAdmin && (
+              {!isBackofficeRole && (
                 <Link href="/wishlist" className={iconButtonClass}>
                   <Heart className={iconClass} />
                 </Link>
               )}
 
-              {!isAdmin && (
+              {!isBackofficeRole && (
                 <button
                   aria-label="Abrir carrito"
                   onClick={() => setCartDrawerOpen(true)}
@@ -474,7 +489,7 @@ export const Navbar = ({
             open={mobileDrawerOpen}
             onClose={() => setMobileDrawerOpen(false)}
             items={drawerItems}
-            title={isAdminRoute ? "Panel Admin" : "Panel Cliente"}
+            title={isAdminRoute ? "Panel Admin" : isStorekeeperRoute ? "Panel Almacén" : "Panel Cliente"}
             widthClass="max-w-[320px]"
             side="left"
           />
