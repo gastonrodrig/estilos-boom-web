@@ -14,6 +14,7 @@ export default function NotFound() {
 
   const isClientRoute = pathname.startsWith("/client");
   const isAdminRoute = pathname.startsWith("/admin");
+  const isStorekeeperRoute = pathname.startsWith("/storekeeper");
 
   let title = "¡Oops! Página no encontrada";
   let description =
@@ -37,6 +38,14 @@ export default function NotFound() {
     redirectPath = "/admin";
   }
 
+  if (isStorekeeperRoute) {
+    title = "Ruta de almacén no válida";
+    description =
+      "La página que intentas acceder dentro del panel de almacén no existe.";
+    buttonText = "Ir al dashboard";
+    redirectPath = "/storekeeper";
+  }
+
   const handleRedirect = () => {
     if (status === "authenticated") {
       if (role === "Cliente") {
@@ -48,6 +57,11 @@ export default function NotFound() {
         router.push("/admin");
         return;
       }
+
+      if (role === "Almacenero") {
+        router.push("/storekeeper");
+        return;
+      }
     }
 
     router.push("/home");
@@ -57,6 +71,8 @@ export default function NotFound() {
     status === "authenticated"
       ? role === "Administrador"
         ? "/admin"
+        : role === "Almacenero"
+        ? "/storekeeper"
         : "/client"
       : "/auth/login";
 
@@ -122,6 +138,7 @@ export default function NotFound() {
           <div
             onClick={() =>
               isClientRoute || isAdminRoute
+                || isStorekeeperRoute
                 ? router.push(redirectPath)
                 : handleRedirect()
             }
@@ -131,7 +148,7 @@ export default function NotFound() {
         </motion.div>
 
         {/* Links dinámicos */}
-        {!isAdminRoute && (
+        {!isAdminRoute && !isStorekeeperRoute && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

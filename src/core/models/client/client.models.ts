@@ -11,6 +11,7 @@ export interface ClientCompany {
   document_type: DocumentType.RUC;
   document_number: string;
   status?: UserStatus;
+  addresses: AddressInput[];
 }
 
 export interface RefreshClientsCompanyPayload {
@@ -39,6 +40,7 @@ export interface ClientPerson {
   document_type: DocumentType;
   document_number: string;
   status?: UserStatus;
+  addresses: AddressInput[];
 }
 
 export interface RefreshClientsPersonPayload {
@@ -60,6 +62,15 @@ export interface ClientProfileState {
   loadingClientProfile: boolean;
 }
 
+export interface AddressInput {
+  address_line: string;
+  reference?: string;
+  department?: string;
+  province?: string;
+  district?: string;
+  is_default: boolean;
+}
+
 export type ExtraInformationValues = {
   firstName: string;
   lastName: string;
@@ -69,6 +80,7 @@ export type ExtraInformationValues = {
   documentType: string;
   documentNumber: string;
   clientType: ClientType;
+  addresses: AddressInput[];
 }
 
 export interface UpdateClientDataModelInput {
@@ -80,4 +92,5 @@ export interface UpdateClientDataModelInput {
   phone: string;
   document_type: DocumentType;
   document_number: string;
+  addresses?: AddressInput[];
 }

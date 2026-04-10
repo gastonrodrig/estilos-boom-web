@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ExtraInformationModal } from "@components";
+import { ExtraInformationModal, ChangePasswordModal } from "@components";
 import { useAppSelector } from "@store";
 
 interface UserFlowGuardProps {
@@ -9,10 +9,12 @@ interface UserFlowGuardProps {
 }
 
 export const UserFlowGuard = ({ children }: UserFlowGuardProps) => {
-  const { status, isExtraDataCompleted } = useAppSelector((state) => state.auth);
+  const { status, role, isExtraDataCompleted } = useAppSelector((state) => state.auth);
 
   const showExtraModal =
-    status === "authenticated" && isExtraDataCompleted === false;
+    status === "authenticated" && role !== "Almacenero" && isExtraDataCompleted === false;
+
+  const showChangePasswordModal = status === "first-login-password";
 
   return (
     <>
@@ -20,7 +22,12 @@ export const UserFlowGuard = ({ children }: UserFlowGuardProps) => {
 
       <ExtraInformationModal
         open={showExtraModal}
-        onClose={() => {}}
+        onClose={() => { }}
+      />
+
+      <ChangePasswordModal
+        open={showChangePasswordModal}
+        onClose={() => { }}
       />
     </>
   );

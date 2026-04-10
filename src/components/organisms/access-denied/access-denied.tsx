@@ -22,6 +22,11 @@ export const AccessDenied = () => {
         router.push("/admin");
         return;
       }
+
+      if (role === "Almacenero") {
+        router.push("/storekeeper");
+        return;
+      }
     }
 
     router.push("/auth/login");
@@ -31,6 +36,8 @@ export const AccessDenied = () => {
     status === "authenticated"
       ? role === "Administrador"
         ? "/admin"
+        : role === "Almacenero"
+        ? "/storekeeper"
         : "/client"
       : "/auth/login";
 

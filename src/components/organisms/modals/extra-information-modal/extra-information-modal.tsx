@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, useFieldArray } from "react-hook-form";
+import { Plus, Trash2 } from "lucide-react";
 import { useUsersStore } from "@hooks";
+import { formatAddressesForPayload } from "@helpers";
 import { CTA, Modal, SelectInput, TextInput } from "@/components/atoms";
 import { ClientType } from "@enums";
 import { ExtraInformationValues } from "@models";
@@ -26,7 +28,16 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
     control,
     setValue,
     reset,
-  } = useForm<ExtraInformationValues>();
+  } = useForm<ExtraInformationValues>({
+    defaultValues: {
+      addresses: []
+    }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "addresses"
+  });
 
   const clientType = useWatch({
     control,
@@ -42,9 +53,9 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
     clientType === "Empresa"
       ? [{ label: "RUC", value: "RUC" }]
       : [
-          { label: "DNI", value: "DNI" },
-          { label: "RUC", value: "RUC" },
-        ];
+        { label: "DNI", value: "DNI" },
+        { label: "RUC", value: "RUC" },
+      ];
 
   useEffect(() => {
     if (open) {
@@ -57,6 +68,7 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
         documentType: "",
         documentNumber: "",
         clientType: ClientType.PERSON,
+        addresses: []
       });
     }
   }, [open, reset]);
@@ -71,7 +83,12 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
   const onSubmit = async (data: ExtraInformationValues) => {
     try {
       if (!uid) return;
-      const success = await startUpdateExtraData(uid, data);
+      // Normalizar direcciones para el backend
+      const formattedData = {
+        ...data,
+        addresses: formatAddressesForPayload(data.addresses || [])
+      };
+      const success = await startUpdateExtraData(uid, formattedData);
       if (success) onClose();
     } catch (error) {
       console.log(error);
@@ -88,7 +105,7 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
       description="Por favor, proporciona la siguiente información adicional para completar tu perfil."
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="my-7 space-y-4">
+        <div className="my-6 space-y-4 max-h-[55vh] overflow-y-auto pt-4 pr-2 custom-scrollbar">
           {/* Tipo de cliente */}
           <SelectInput
             label="Tipo de cliente"
@@ -123,7 +140,7 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
 
           {/* Campos dinámicos Persona vs Empresa */}
           {clientType === "Empresa" ? (
-            <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextInput
                 label="Nombre de la Empresa"
                 id="companyName"
@@ -142,9 +159,9 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
                 error={!!errors.contactName}
                 helperText={errors.contactName?.message}
               />
-            </>
+            </div>
           ) : clientType === "Persona" ? (
-            <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextInput
                 label="Nombre"
                 id="firstName"
@@ -163,26 +180,26 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
                 error={!!errors.lastName}
                 helperText={errors.lastName?.message}
               />
-            </>
+            </div>
           ) : null}
 
-          {/* Teléfono */}
-          <TextInput
-            label="Teléfono"
-            id="phone"
-            {...register("phone", {
-              required: "El número es obligatorio",
-              pattern: {
-                value: /^[0-9]{9}$/,
-                message: "El número debe tener 9 dígitos",
-              },
-            })}
-            error={!!errors.phone}
-            helperText={errors.phone?.message}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Teléfono */}
+            <TextInput
+              label="Teléfono"
+              id="phone"
+              {...register("phone", {
+                required: "El número es obligatorio",
+                pattern: {
+                  value: /^[0-9]{9}$/,
+                  message: "El número debe tener 9 dígitos",
+                },
+              })}
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+            />
 
-          {/* Tipo de documento */}
-          {clientType !== "Empresa" && (
+            {/* Tipo de documento */}
             <SelectInput
               label="Tipo de documento"
               id="documentType"
@@ -199,7 +216,7 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
                 },
               })}
             />
-          )}
+          </div>
 
           {/* Número de documento */}
           <TextInput
@@ -210,37 +227,102 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
                 documentType === "RUC"
                   ? "El número de RUC es obligatorio"
                   : documentType === "DNI"
-                  ? "El número de DNI es obligatorio"
-                  : "El número de documento es obligatorio",
+                    ? "El número de DNI es obligatorio"
+                    : "El número de documento es obligatorio",
               pattern:
                 documentType === "RUC"
                   ? {
-                      value: clientType === "Empresa" ? /^20\d{9}$/ : /^10\d{9}$/,
-                      message:
-                        clientType === "Empresa"
-                          ? "El RUC debe iniciar con 20 y tener 11 dígitos"
-                          : "El RUC debe iniciar con 10 y tener 11 dígitos",
-                    }
+                    value: clientType === "Empresa" ? /^20\d{9}$/ : /^10\d{9}$/,
+                    message:
+                      clientType === "Empresa"
+                        ? "El RUC debe iniciar con 20 y tener 11 dígitos"
+                        : "El RUC debe iniciar con 10 y tener 11 dígitos",
+                  }
                   : documentType === "DNI"
-                  ? {
+                    ? {
                       value: /^\d{8}$/,
                       message: "El DNI debe tener 8 dígitos",
                     }
-                  : undefined,
+                    : undefined,
             })}
             error={!!errors.documentNumber}
             helperText={errors.documentNumber?.message}
           />
+
+          {/* SECCIÓN DINÁMICA DE DIRECCIONES */}
+          <div className="pt-4 border-t border-gray-100 mt-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-gray-700">Direcciones de entrega</h3>
+              <button
+                type="button"
+                onClick={() => append({ address_line: "", is_default: false })}
+                className="flex items-center gap-1 text-xs font-medium text-pink-500 hover:text-pink-600 transition-colors"
+              >
+                <Plus size={14} />
+                Agregar dirección
+              </button>
+            </div>
+
+            {fields.length > 0 && (
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="relative p-4 bg-gray-50 rounded-2xl border border-gray-200 transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                        Ubicación #{index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="p-1.5 bg-white text-gray-400 hover:text-red-500 hover:border-red-200 rounded-lg border border-gray-100 transition-all shadow-sm"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <TextInput
+                        label={`Dirección ${index + 1}`}
+                        id={`addresses.${index}.address_line`}
+                        {...register(`addresses.${index}.address_line` as const, {
+                          required: index === 0 ? "Al menos una dirección es obligatoria" : false
+                        })}
+                        error={!!errors.addresses?.[index]?.address_line}
+                      />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <TextInput
+                          label="Distrito"
+                          id={`addresses.${index}.district`}
+                          {...register(`addresses.${index}.district` as const)}
+                        />
+                        <TextInput
+                          label="Referencia"
+                          id={`addresses.${index}.reference`}
+                          {...register(`addresses.${index}.reference` as const)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Submit */}
-        <CTA
-          type="submit"
-          className="w-full"
-          disabled={isButtonDisabled || isSubmitting}
-        >
-          Guardar Información
-        </CTA>
+        <div className="pt-4 mt-2">
+          <CTA
+            type="submit"
+            className="w-full"
+            disabled={isButtonDisabled || isSubmitting}
+          >
+            {isSubmitting ? "Guardando..." : "Guardar Información"}
+          </CTA>
+        </div>
       </form>
     </Modal>
   );

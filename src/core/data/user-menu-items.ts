@@ -1,4 +1,4 @@
-export type UserMenuRole = "admin" | "client";
+export type UserMenuRole = "admin" | "client" | "storekeeper";
 
 export type UserMenuItem = {
   label: string;
@@ -29,6 +29,13 @@ export const userMenuItemsByRole: Record<UserMenuRole, UserMenuItem[]> = {
       label: "Mi Cuenta",
       href: "/client/settings",
       icon: "user",
+    },
+  ],
+  storekeeper: [
+    {
+      label: "Panel de Almacén",
+      href: "/storekeeper",
+      icon: "dashboard",
     },
   ],
 };
