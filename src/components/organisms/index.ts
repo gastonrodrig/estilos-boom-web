@@ -17,3 +17,4 @@ export * from "./order-summary";
 export * from "./checkout-drawer";
 export * from "./product-detail";
 export * from "./related-product";
+export * from "./direction-modal";

@@ -63,20 +63,25 @@ export const useClientPersonStore = () => {
     dispatch(setLoadingClientPerson(true));
     setLoadError(null);
     try {
-      const payload = createClientPersonModel(clientPerson);
+      // 🔴 BORRA O COMENTA ESTA LÍNEA:
+      const payload = createClientPersonModel(clientPerson); 
+      
+      // 🟢 USA ESTA LÍNEA: Mandamos el objeto directo, ¡ya está perfecto!
+      
+
       const token = await getFirebaseAuthToken();
+      
       await clientApi.post("/client-admin", payload, getAuthConfig({ token }));
+      
       await startLoadingClientsPersonPaginated();
       toast.success("El cliente persona fue creado exitosamente.");
-      return true;
-    } catch (error: unknown) {
-      const friendlyMessage = getFriendlyErrorMessage(
-        error,
-        "Ocurrió un error al registrar el cliente persona."
-      );
+      return true; 
+    } catch (error: any) {
+      console.error("Detalle del error Backend:", error.response?.data || error.message);
+      const friendlyMessage = getFriendlyErrorMessage(error, "Ocurrió un error al registrar el cliente persona.");
       setLoadError(friendlyMessage);
       toast.error(friendlyMessage);
-      return false;
+      return false; 
     } finally {
       dispatch(setLoadingClientPerson(false));
     }
@@ -123,26 +128,29 @@ export const useClientPersonStore = () => {
     }
   }, [dispatch, rowsPerPage, currentPage, searchTerm, orderBy, order, getFriendlyErrorMessage]);
 
-  const startUpdateClientPerson = async (
-    id: string,
-    client: ClientPerson
-  ) => {
+  const startUpdateClientPerson = async (id: string, client: ClientPerson) => {
     dispatch(setLoadingClientPerson(true));
     setLoadError(null);
     try {
       const payload = updateClientPersonModel(client);
       const token = await getFirebaseAuthToken();
       await clientApi.patch(`/client-admin/${id}`, payload, getAuthConfig({ token }));
+      
       await startLoadingClientsPersonPaginated();
       toast.success("El cliente persona fue actualizado exitosamente.");
       return true;
-    } catch (error: unknown) {
-      const friendlyMessage = getFriendlyErrorMessage(
-        error,
-        "Ocurrió un error al actualizar el cliente."
-      );
-      setLoadError(friendlyMessage);
-      toast.error(friendlyMessage);
+    } catch (error: any) {
+      console.error("❌ Detalle del error Backend (UPDATE):", error.response?.data || error.message);
+      
+      let errorMsg = "Ocurrió un error al actualizar el cliente.";
+      if (Array.isArray(error.response?.data?.message)) {
+        errorMsg = error.response.data.message[0]; 
+      } else if (error.response?.data?.message) {
+         errorMsg = error.response.data.message;
+      }
+
+      setLoadError(errorMsg);
+      toast.error(errorMsg);
       return false;
     } finally {
       dispatch(setLoadingClientPerson(false));
