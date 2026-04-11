@@ -8,6 +8,7 @@ import {
 import { productSlice } from "./product";
 import { categorySlice } from "./category";
 import { cartSlice } from "./cart";
+import { storekeeperWorkshopSlice } from "./storekeeper/storekeeper-workshop-slice";
 
 // Configuración del store
 export const store = configureStore({
@@ -19,6 +20,9 @@ export const store = configureStore({
     clientCompany: clientCompanySlice.reducer,
     clientPerson: clientPersonSlice.reducer,
     clientProfile: clientProfileSlice.reducer,
+    
+    //Slices de storekeeper
+    storekeeper: storekeeperWorkshopSlice.reducer,
 
     product: productSlice.reducer,
     category: categorySlice.reducer,

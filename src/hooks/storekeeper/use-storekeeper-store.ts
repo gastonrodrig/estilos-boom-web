@@ -21,21 +21,24 @@ import { getAuthConfig, getAuthConfigWithParams } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
 import { ClientType } from "@enums";
 import toast from "react-hot-toast";
+import { createWorkshopModel, updateWorkshopModel, Workshop } from "@/core/models/storekeeper/storekeeper.models";
+import { refreshWorkshops, selectedWorkshop, setLoadingWorkshop, setPageWorkshop, setRowsPerPageWorkshop } from "@/store/storekeeper/storekeeper-workshop-slice";
+import { workshopApi } from "@/api/storekeeper";
 
-export const useClientPersonStore = () => {
+export const useStorekeeperStore = () => {
   const dispatch = useAppDispatch();
 
   const {
-    clientsPerson,
+    workshops,
     selected,
     total,
     loading,
     currentPage,
     rowsPerPage,
-  } = useAppSelector((state) => state.clientPerson);
+  } = useAppSelector((state) => state.storekeeper);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [orderBy, setOrderBy] = useState('first_name');
+  const [orderBy, setOrderBy] = useState('name');
   const [order, setOrder] = useState('asc');
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -59,38 +62,38 @@ export const useClientPersonStore = () => {
     []
   );
 
-  const startCreateClientPerson = async (clientPerson: ClientPerson) => {
-    dispatch(setLoadingClientPerson(true));
+  const startCreateWorkshop = async (workshop: Workshop) => {
+    dispatch(setLoadingWorkshop(true));
     setLoadError(null);
     try {
-      const payload = createClientPersonModel(clientPerson);
+      const payload = createWorkshopModel(workshop);
       const token = await getFirebaseAuthToken();
-      await clientApi.post("/client-admin", payload, getAuthConfig({ token }));
-      await startLoadingClientsPersonPaginated();
-      toast.success("El cliente persona fue creado exitosamente.");
+      await workshopApi.post("/create", payload, getAuthConfig({ token }));
+      await startLoadingWorkshopsPaginated();
+      toast.success("El taller fue creado exitosamente.");
       return true;
     } catch (error: unknown) {
       const friendlyMessage = getFriendlyErrorMessage(
         error,
-        "Ocurrió un error al registrar el cliente persona."
+        "Ocurrió un error al registrar el taller."
       );
       setLoadError(friendlyMessage);
       toast.error(friendlyMessage);
       return false;
     } finally {
-      dispatch(setLoadingClientPerson(false));
+      dispatch(setLoadingWorkshop(false));
     }
   };
 
-  const startLoadingClientsPersonPaginated = useCallback(async () => {
-    dispatch(setLoadingClientPerson(true));
+  const startLoadingWorkshopsPaginated = useCallback(async () => {
+    dispatch(setLoadingWorkshop(true));
     setLoadError(null);
     try {
       const token = await getFirebaseAuthToken();
       const limit = rowsPerPage;
       const offset = currentPage * rowsPerPage;
-      const { data } = await clientApi.get(
-        "/customers-paginated",
+      const { data } = await workshopApi.get(
+        "/paginated",
         getAuthConfigWithParams({
           token,
           params: {
@@ -99,12 +102,11 @@ export const useClientPersonStore = () => {
             search: searchTerm.trim(),
             sortField: orderBy,
             sortOrder: order,
-            clientType: ClientType.PERSON,
           },
         })
       );
-      console.debug("Clientes persona cargados:", data);
-      dispatch(refreshClientsPerson({
+
+      dispatch(refreshWorkshops({
         items: data.items,
         total: data.total,
         page: currentPage,
@@ -113,58 +115,82 @@ export const useClientPersonStore = () => {
     } catch (error: unknown) {
       const friendlyMessage = getFriendlyErrorMessage(
         error,
-        "Ocurrió un error al cargar los clientes persona."
+        "Ocurrió un error al cargar los talleres."
       );
 
       setLoadError(friendlyMessage);
       toast.error(friendlyMessage);
       return false;
     } finally {
-      dispatch(setLoadingClientPerson(false));
+      dispatch(setLoadingWorkshop(false));
     }
   }, [dispatch, rowsPerPage, currentPage, searchTerm, orderBy, order, getFriendlyErrorMessage]);
 
-  const startUpdateClientPerson = async (
+  const startUpdateWorkshop = async (
     id: string,
-    client: ClientPerson
+    workshop: Workshop
   ) => {
-    dispatch(setLoadingClientPerson(true));
+    dispatch(setLoadingWorkshop(true));
     setLoadError(null);
     try {
-      const payload = updateClientPersonModel(client);
+      const payload = updateWorkshopModel(workshop);
       const token = await getFirebaseAuthToken();
-      await clientApi.patch(`/client-admin/${id}`, payload, getAuthConfig({ token }));
-      await startLoadingClientsPersonPaginated();
-      toast.success("El cliente persona fue actualizado exitosamente.");
+      await workshopApi.patch(`/${id}`, payload, getAuthConfig({ token }));
+      await startLoadingWorkshopsPaginated();
+      toast.success("El taller fue actualizado exitosamente.");
       return true;
     } catch (error: unknown) {
       const friendlyMessage = getFriendlyErrorMessage(
         error,
-        "Ocurrió un error al actualizar el cliente."
+        "Ocurrió un error al actualizar el taller."
       );
       setLoadError(friendlyMessage);
       toast.error(friendlyMessage);
       return false;
     } finally {
-      dispatch(setLoadingClientPerson(false));
+      dispatch(setLoadingWorkshop(false));
     }
   };
 
-  const setSelectedClientPerson = (client: ClientPerson | null) => {
-    dispatch(selectedClientPerson(client ? { ...client } : null));
+  const startSoftDeleteWorkshop = async (
+    id?: string,
+  ) => {
+    dispatch(setLoadingWorkshop(true));
+    setLoadError(null);
+    try {
+      const token = await getFirebaseAuthToken();
+      await workshopApi.delete(`/${id}`, getAuthConfig({ token }));
+      await startLoadingWorkshopsPaginated();
+      toast.success("El taller fue eliminado exitosamente.");
+      return true;
+    } catch (error: unknown) {
+      const friendlyMessage = getFriendlyErrorMessage(
+        error,
+        "Ocurrió un error al eliminar el taller."
+      );
+      setLoadError(friendlyMessage);
+      toast.error(friendlyMessage);
+      return false;
+    } finally {
+      dispatch(setLoadingWorkshop(false));
+    }
+  };
+
+  const setSelectedWorkshop = (workshop: Workshop | null) => {
+    dispatch(selectedWorkshop(workshop ? { ...workshop } : null));
   };
 
   const setPageGlobal = (page: number) => {
-    dispatch(setPageClientPerson(page));
+    dispatch(setPageWorkshop(page));
   };
 
   const setRowsPerPageGlobal = (rows: number) => {
-    dispatch(setRowsPerPageClientPerson(rows));
+    dispatch(setRowsPerPageWorkshop(rows));
   };
 
   return {
     // state
-    clientsPerson,
+    workshops,
     selected,
     total,
     loading,
@@ -179,13 +205,14 @@ export const useClientPersonStore = () => {
     setSearchTerm,
     setOrderBy,
     setOrder,
-    setSelectedClientPerson,
+    setSelectedWorkshop,
     setPageGlobal,
     setRowsPerPageGlobal,
 
     // actions
-    startCreateClientPerson,
-    startLoadingClientsPersonPaginated,
-    startUpdateClientPerson,
+    startCreateWorkshop,
+    startLoadingWorkshopsPaginated,
+    startUpdateWorkshop,
+    startSoftDeleteWorkshop,
   };
 };

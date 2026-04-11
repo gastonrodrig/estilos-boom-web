@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye, ToolCase } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface SidebarChildItem {
@@ -33,6 +33,7 @@ const iconMap = {
   banknote: Banknote,
   contact: Contact,
   eye: Eye,
+  workshop: ToolCase,
 } as const;
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
