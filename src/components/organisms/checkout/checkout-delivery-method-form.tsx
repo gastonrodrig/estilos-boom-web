@@ -20,25 +20,32 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
   // Mock de métodos de entrega
   const deliveryMethods: DeliveryMethod[] = [
     {
-      id: '1',
-      name: 'Entrega a Domicilio',
-      description: 'Entrega en 3-5 días hábiles',
+      id: 'store',
+      name: 'Recojo en Tienda',
+      description: 'Recoge tu pedido en nuestra tienda física',
       price: 0,
-      estimatedDays: 5,
+      estimatedDays: 0,
     },
     {
-      id: '2',
-      name: 'Entrega Rápida',
-      description: 'Entrega en 1-2 días hábiles',
-      price: 15,
+      id: 'point',
+      name: 'Punto de Encuentro',
+      description: 'Encuentra tu pedido en estaciones del tren',
+      price: 3,
       estimatedDays: 2,
     },
     {
-      id: '3',
-      name: 'Retiro en Tienda',
-      description: 'Retira tu pedido mañana',
-      price: 0,
+      id: 'motorized',
+      name: 'Total Motorizado',
+      description: 'Entrega directa a tu domicilio',
+      price: 10,
       estimatedDays: 1,
+    },
+    {
+      id: 'province',
+      name: 'Entrega a Provincia - Shalom',
+      description: 'Envío a todo el Perú',
+      price: 10,
+      estimatedDays: 3,
     },
   ];
 
@@ -158,6 +165,13 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
             </div>
           )}
         />
+      </div>
+
+      {/* Mensaje informativo */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+        <p className="text-xs text-yellow-800">
+          <span className="font-semibold">Nota:</span> Los pedidos realizados antes de la 1:00 PM de lunes a viernes generalmente se procesan el mismo día. El precio del envío puede actualizarse una vez que ingrese la dirección.
+        </p>
       </div>
 
       {/* Botones de navegación */}

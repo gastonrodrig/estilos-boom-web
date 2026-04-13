@@ -13,13 +13,9 @@ export interface BillingAddress {
 export interface ShippingFormValues {
   firstName: string;
   lastName: string;
-  address: string;
-  apartment?: string;
-  district: string;
-  postalCode: string;
-  department: string;
   email: string;
   phone: string;
+  selectedAddressId?: string;
   wantsNews: boolean;
 }
 

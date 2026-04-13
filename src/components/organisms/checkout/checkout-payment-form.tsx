@@ -4,7 +4,6 @@ import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { useCheckoutStore } from '@/hooks/extra';
 import { CheckoutFormValues } from '@/models/checkout';
-import { PERU_DEPARTMENTS } from '@/core/constants';
 import { IMaskInput } from 'react-imask';
 
 import Image from 'next/image';

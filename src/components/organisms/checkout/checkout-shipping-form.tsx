@@ -1,201 +1,116 @@
 'use client';
 
-import React, {useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { useCheckoutStore } from '@/hooks/extra';
 import { CheckoutFormValues } from '@/models/checkout';
 import { useAppSelector } from '@/store';
-import { PERU_DEPARTMENTS } from '@/core/constants';
+import { AddAddressModal } from '@/components/organisms/direction-modal';
+import { MapPin, Plus } from 'lucide-react';
+import { AddressInput } from '@models';
 
 const CheckoutShippingForm: React.FC = () => {
   const { handleGoToDelivery } = useCheckoutStore();
-  const { status, firstName, lastName, email, phone } = useAppSelector((state) => state.auth);
+  const { status, email, phone } = useAppSelector((state) => state.auth);
   const isAuthenticated = status === 'authenticated';
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState<AddressInput[]>([]);
+
   const {
     register,
     control,
+    watch,
     formState: { errors, isSubmitting },
     trigger,
     setValue,
   } = useFormContext<CheckoutFormValues>();
 
+  const selectedAddressId = watch('selectedAddressId');
+
+  // Cargar direcciones guardadas del usuario autenticado
   useEffect(() => {
     if (isAuthenticated) {
-      if (firstName) setValue('firstName', firstName);
-      if (lastName) setValue('lastName', lastName);
       if (email) setValue('email', email);
       if (phone) setValue('phone', phone);
+      
+      // TODO: Obtener direcciones desde el store del usuario autenticado
+      // Por ahora usamos direcciones de ejemplo
+      setSavedAddresses([
+        {
+          address_line: 'Juan Fernandez 51',
+          district: 'Barcelona',
+          department: 'Lima',
+          province: 'Lima',
+          reference: '',
+          is_default: true
+        },
+        {
+          address_line: 'Ca. Los Algarillos 1982',
+          district: 'Chorrillos',
+          department: 'Lima',
+          province: 'Lima',
+          reference: '',
+          is_default: false
+        }
+      ]);
     }
-  }, [isAuthenticated, firstName, lastName, email, phone, setValue]);
+  }, [isAuthenticated, email, phone, setValue]);
 
   const handleNext = async () => {
-    // Validar solo los campos de este paso
     const isValid = await trigger([
-      'firstName',
-      'lastName',
-      'address',
-      'district',
-      'postalCode',
-      'department',
       'email',
       'phone',
+      'selectedAddressId',
     ]);
-
-    
 
     if (isValid) {
       handleGoToDelivery();
     }
   };
 
+  const handleAddAddress = (addressData: any) => {
+    const newAddress: AddressInput = {
+      address_line: addressData.addressLine,
+      department: addressData.departmentName || addressData.department || "",
+      province: addressData.provinceName || addressData.province || "",
+      district: addressData.districtName || addressData.district || "",
+      reference: addressData.reference || "",
+      is_default: savedAddresses.length === 0,
+    };
+    
+    setSavedAddresses([...savedAddresses, newAddress]);
+    setIsAddressModalOpen(false);
+    
+    // Seleccionar la dirección recién agregada
+    setValue('selectedAddressId', String(savedAddresses.length));
+  };
+
   return (
-    <div className="bg-[white] rounded-sm p-8 border border-[#594246]/30 shadow-sm">
+    <div className="bg-white rounded-sm p-8 border border-[#594246]/30 shadow-sm space-y-6">
       <div className="mb-6">
-      {isAuthenticated ? (
+        {isAuthenticated ? (
           <>
             <h1 className="text-[25px] font-semibold mb-2 text-[#594246]">
-              Finaliza tu compra, <span className="capitalize">{firstName?.toLowerCase()}</span>
+              Completa tu información de contacto
             </h1>
-            <p className="text-sm text-gray-500">Hemos pre-llenado tus datos registrados.</p>
+            <p className="text-sm text-gray-500">Usa tus datos registrados o actualízalos.</p>
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold mb-2 text-[#594246]">Finalizar Compra como Invitado</h1>
-            <p className="text-sm text-[#F2778D]">o inicia sesión para un proceso más rápido</p>
+            <h1 className="text-2xl font-bold mb-2 text-[#594246]">Información de Contacto</h1>
+            <p className="text-sm text-[#F2778D]">Completa tu email y teléfono</p>
           </>
-        )} 
+        )}
       </div>
+
       <form className="space-y-6">
-        {/* Nombre y Apellido */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Nombre*</label>
-            <input
-              type="text"
-              placeholder="Ingresa tu nombre"
-              {...register('firstName', { required: 'El nombre es requerido' })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-                errors.firstName ? 'border-red-500' : 'border-gray-200'
-              }`}
-              style={errors.firstName ? {} : { borderColor: '#EBEA E8' }}
-            />
-            {errors.firstName && (
-              <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Apellido*</label>
-            <input
-              type="text"
-              placeholder="Ingresa tu apellido"
-              {...register('lastName', { required: 'El apellido es requerido' })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-                errors.lastName ? 'border-red-500' : 'border-gray-200'
-              }`}
-              style={errors.lastName ? {} : { borderColor: '#EBEA E8' }}
-            />
-            {errors.lastName && (
-              <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Dirección */}
-        <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Dirección*</label>
-          <input
-            type="text"
-            placeholder="Av. Principal 123"
-            {...register('address', { required: 'La dirección es requerida' })}
-            className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-              errors.address ? 'border-red-500' : 'border-gray-200'
-            }`}
-            style={errors.address ? {} : { borderColor: '#EBEA E8' }}
-          />
-          {errors.address && (
-            <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>
-          )}
-        </div>
-
-        {/* Apartamento */}
-        <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>
-            Apartamento, suite, etc. (opcional)
-          </label>
-          <input
-            type="text"
-            placeholder="Dpto 101"
-            {...register('apartment')}
-            className="w-full px-4 py-2 border rounded-sm border-gray-200   focus:ring-1 transition-colors focus:outline-[#594246]"
-            style={{ borderColor: '#EBEA E8' }}
-          />
-        </div>
-
-        {/* Departamento */}
-        <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Departamento*</label>
-          <select
-            {...register('department', { required: 'El departamento es requerido' })}
-            className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-              errors.department ? 'border-red-500' : 'border-gray-200'
-            }`}
-            style={errors.department ? {} : { borderColor: '#EBEA E8' }}
-          >
-            <option value="">Selecciona un departamento</option>
-            {PERU_DEPARTMENTS.map((dept) => (
-              <option key={dept} value={dept.toLowerCase()}>
-                {dept}
-              </option>
-            ))}
-          </select>
-          {errors.department && (
-            <p className="text-red-500 text-xs mt-1">{errors.department.message}</p>
-          )}
-        </div>
-
-        {/* Ciudad y Código Postal */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Distrito*</label>
-            <input
-              type="text"
-              placeholder="Lima"
-              {...register('district', { required: 'La ciudad es requerida' })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-                errors.district ? 'border-red-500' : 'border-gray-200'
-              }`}
-              style={errors.district ? {} : { borderColor: '#EBEA E8' }}
-            />
-            {errors.district && (
-              <p className="text-red-500 text-xs mt-1">{errors.district.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Código Postal*</label>
-            <input
-              type="text"
-              placeholder="15001"
-              {...register('postalCode', { required: 'El código postal es requerido' })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-1 transition-colors focus:outline-[#594246] ${
-                errors.postalCode ? 'border-red-500' : 'border-gray-200'
-              }`}
-              style={errors.postalCode ? {} : { borderColor: '#EBEA E8' }}
-            />
-            {errors.postalCode && (
-              <p className="text-red-500 text-xs mt-1">{errors.postalCode.message}</p>
-            )}
-          </div>
-        </div>
-        
         {/* Email y Teléfono */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>Email*</label>
+            <label className="block text-sm font-medium mb-2 text-[#594246]">Email*</label>
             <input
               type="email"
-              placeholder="tucorreo@ejemplo.com"
+              placeholder="correo@ejemplo.com"
               {...register('email', {
                 required: 'El email es requerido',
                 pattern: {
@@ -203,10 +118,9 @@ const CheckoutShippingForm: React.FC = () => {
                   message: 'Email inválido',
                 },
               })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-0 transition-colors focus:outline-[#594246] ${
+              className={`w-full px-4 py-2 border rounded-sm focus:outline-[#594246] transition-colors ${
                 errors.email ? 'border-red-500' : 'border-gray-200'
               }`}
-              style={errors.email ? {} : { borderColor: '#EBEA E8' }}
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -214,22 +128,74 @@ const CheckoutShippingForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#594246' }}>
-              Número de Teléfono*
-            </label>
+            <label className="block text-sm font-medium mb-2 text-[#594246]">Teléfono*</label>
             <input
               type="tel"
-              placeholder="987 654 321"
+              placeholder="987654321"
               {...register('phone', { required: 'El teléfono es requerido' })}
-              className={`w-full px-4 py-2 border rounded-sm  focus:ring-0 transition-colors focus:outline-[#594246] ${
+              className={`w-full px-4 py-2 border rounded-sm focus:outline-[#594246] transition-colors ${
                 errors.phone ? 'border-red-500' : 'border-gray-200'
               }`}
-              style={errors.phone ? {} : { borderColor: '#EBEA E8' }}
             />
             {errors.phone && (
               <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
             )}
           </div>
+        </div>
+
+        {/* Sección de Dirección - Similar a la imagen adjunta */}
+        <div className="pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#594246]">Elegir Dirección</h3>
+            <button
+              type="button"
+              onClick={() => setIsAddressModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-sm font-semibold hover:bg-gray-800 transition-colors"
+            >
+              <Plus size={16} />
+              Agregar
+            </button>
+          </div>
+
+          {/* Pregunta: ¿Desea agregar otra dirección? */}
+          <p className="text-sm text-[#594246] mb-4 flex items-center gap-2">
+            <MapPin size={16} className="text-[#F2778D]" />
+            ¿Desea agregar otra dirección?
+          </p>
+
+          {/* Listado de direcciones con radio buttons */}
+          <div className="space-y-3">
+            {savedAddresses.map((addr, idx) => (
+              <label
+                key={idx}
+                className={`flex items-center gap-4 p-4 border rounded-sm cursor-pointer transition-all ${
+                  selectedAddressId === String(idx)
+                    ? 'border-[#F2778D] bg-[#F2D0D3]/30'
+                    : 'border-gray-200 hover:border-[#594246]'
+                }`}
+              >
+                <input
+                  type="radio"
+                  {...register('selectedAddressId', { required: 'Debes seleccionar una dirección' })}
+                  value={String(idx)}
+                  className="w-4 h-4 accent-[#F2778D]"
+                />
+                <div className="flex-1">
+                  <p className="font-semibold text-[#594246]">
+                    {addr.address_line}
+                    {addr.reference && `, Ref: ${addr.reference}`}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {addr.district}, {addr.department} {addr.province && `• ${addr.province}`}
+                  </p>
+                </div>
+              </label>
+            ))}
+          </div>
+
+          {errors.selectedAddressId && (
+            <p className="text-red-500 text-xs mt-2">{errors.selectedAddressId.message}</p>
+          )}
         </div>
 
         {/* Checkbox Newsletter */}
@@ -244,13 +210,12 @@ const CheckoutShippingForm: React.FC = () => {
                 checked={value}
                 onChange={onChange}
                 className="w-4 h-4 rounded"
-                style={{ borderColor: '#F2778D', accentColor: '#F2778D' }}
+                style={{ accentColor: '#F2778D' }}
               />
             )}
           />
-          <label htmlFor="wantsNews" className="text-sm" style={{ color: '#594246' }}>
-            Me gustaría recibir actualizaciones sobre los últimos productos y promociones por correo
-            electrónico o otros canales.
+          <label htmlFor="wantsNews" className="text-sm text-[#594246]">
+            Me gustaría recibir actualizaciones sobre los últimos productos y promociones
           </label>
         </div>
 
@@ -260,13 +225,21 @@ const CheckoutShippingForm: React.FC = () => {
             type="button"
             onClick={handleNext}
             disabled={isSubmitting}
-            className="w-2/3 h-16 rounded-full text-black font-medium py-3  transition-opacity disabled:opacity-50 hover:cursor-pointer hover:bg-[#F2778D]/80 bg-[#F2B6C1]"
-            
+            className="w-2/3 h-14 rounded-full text-black font-bold bg-[#F2B6C1] hover:bg-[#F2778D] transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Validando...' : 'Guardar y Ver Opciones de Envío'}
+            {isSubmitting ? 'Validando...' : 'Continuar Compra'}
           </button>
         </div>
       </form>
+
+      {/* Modal para agregar nueva dirección */}
+      {isAddressModalOpen && (
+        <AddAddressModal
+          isOpen={isAddressModalOpen}
+          onClose={() => setIsAddressModalOpen(false)}
+          onSave={handleAddAddress}
+        />
+      )}
     </div>
   );
 };
