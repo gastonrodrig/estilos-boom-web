@@ -68,7 +68,7 @@ export const useStorekeeperStore = () => {
     try {
       const payload = createWorkshopModel(workshop);
       const token = await getFirebaseAuthToken();
-      await workshopApi.post("/create", payload, getAuthConfig({ token }));
+      await workshopApi.post("/", payload, getAuthConfig({ token }));
       await startLoadingWorkshopsPaginated();
       toast.success("El taller fue creado exitosamente.");
       return true;
