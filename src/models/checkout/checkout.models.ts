@@ -5,7 +5,7 @@ export interface BillingAddress {
   lastName: string;
   address: string;
   apartment?: string;
-  distric: string;
+  district: string;
   postalCode: string;
   department: string;
 }
@@ -15,6 +15,14 @@ export interface ShippingFormValues {
   lastName: string;
   email: string;
   phone: string;
+  
+  // 👇 AGREGAMOS LOS CAMPOS MANUALES DE INVITADO COMO OPCIONALES
+  address?: string;
+  apartment?: string;
+  district?: string;
+  department?: string;
+  postalCode?: string;
+  
   selectedAddressId?: string;
   wantsNews: boolean;
 }

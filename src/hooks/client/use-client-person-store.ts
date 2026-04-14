@@ -157,6 +157,18 @@ export const useClientPersonStore = () => {
     }
   };
 
+  // 🟢 NUEVA FUNCIÓN: Obtiene las direcciones del usuario logueado
+  const startLoadingMyAddresses = async () => {
+    try {
+      const token = await getFirebaseAuthToken();
+      const { data } = await clientApi.get('/my-addresses', getAuthConfig({ token }));
+      return data || [];
+    } catch (error) {
+      console.error("❌ Error al cargar mis direcciones:", error);
+      return []; // Si falla, retorna un arreglo vacío para no romper la UI
+    }
+  };
+
   const setSelectedClientPerson = (client: ClientPerson | null) => {
     dispatch(selectedClientPerson(client ? { ...client } : null));
   };
@@ -194,5 +206,6 @@ export const useClientPersonStore = () => {
     startCreateClientPerson,
     startLoadingClientsPersonPaginated,
     startUpdateClientPerson,
+    startLoadingMyAddresses,
   };
 };
