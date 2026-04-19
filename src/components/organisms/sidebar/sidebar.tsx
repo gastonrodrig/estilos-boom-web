@@ -5,18 +5,21 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuthStore } from "@/hooks";
 
 interface SidebarChildItem {
-	label: string;
-	href: string;
-	highlighted?: boolean;
+    label: string;
+    href: string;
+    highlighted?: boolean;
+    requiredPermission?: string; // <--- AGREGAR ESTO
 }
 
 interface SidebarItem {
-	label: string;
-	href?: string;
-	icon?: string;
-	children?: SidebarChildItem[];
+    label: string;
+    href?: string;
+    icon?: string;
+    requiredPermission?: string; // <--- AGREGAR ESTO
+    children?: SidebarChildItem[];
 }
 
 interface SidebarProps {
@@ -37,6 +40,7 @@ const iconMap = {
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 	const pathname = usePathname();
+	const { permissions } = useAuthStore();
 	const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 	const [showSidebar, setShowSidebar] = useState(() => {
 		if (typeof window === "undefined") return false;
@@ -78,6 +82,15 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 		return () => mediaQuery.removeEventListener("change", handleChange);
 	}, []);
 
+	const filteredItems = items
+        .filter(item => !item.requiredPermission || permissions.includes(item.requiredPermission))
+        .map(item => ({
+            ...item,
+            children: item.children?.filter(child => 
+                !child.requiredPermission || permissions.includes(child.requiredPermission)
+            )
+        }));
+
 	return (
 		<AnimatePresence>
 			{showSidebar && (
@@ -90,7 +103,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 				>
 
 			<nav className="space-y-1.5">
-				{items.map((item) => {
+				{filteredItems.map((item) => {
 					const ItemIcon =
 						item.icon && item.icon in iconMap
 							? iconMap[item.icon as keyof typeof iconMap]

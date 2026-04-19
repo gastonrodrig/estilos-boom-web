@@ -9,11 +9,13 @@ import { Drawer } from "@/components/atoms";
 export interface NavDrawerChildItem {
   label: string;
   href: string;
+  requiredPermission?: string; // <--- AGREGAR
 }
 
 export interface NavDrawerItem {
   label: string;
   href?: string;
+  requiredPermission?: string; // <--- AGREGAR
   children?: NavDrawerChildItem[];
 }
 
