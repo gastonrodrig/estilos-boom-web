@@ -1,13 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "./auth";
-import { 
-  clientCompanySlice, 
-  clientPersonSlice, 
-  clientProfileSlice 
+import {
+  clientCompanySlice,
+  clientPersonSlice,
+  clientProfileSlice
 } from "./client";
 import { productSlice } from "./product";
 import { categorySlice } from "./category";
 import { cartSlice } from "./cart";
+import { managementSlice } from "./management/management-slice";
 import checkoutReducer from "./extra/checkout-slice";
 import mockCartReducer from "./extra/mock-cart-slice";
 
@@ -27,6 +28,7 @@ export const store = configureStore({
     cart: cartSlice.reducer,
     checkout: checkoutReducer,
     mockCart: mockCartReducer,
+    management: managementSlice.reducer,
   },
 });
 

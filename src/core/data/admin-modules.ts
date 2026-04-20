@@ -99,4 +99,9 @@ export const adminModules: SidebarModule[] = [
     icon: "eye",
     requiredPermission: "reviews:view",
   },
+  {
+    label: "Usuarios y Roles",
+    href: "/admin/users-roles",
+    icon: "users",
+  },
 ];
