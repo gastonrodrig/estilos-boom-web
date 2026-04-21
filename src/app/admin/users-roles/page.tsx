@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Check, LayoutDashboard, ShoppingBag, Box, Ticket, ShieldPlus, ArrowRight } from "lucide-react";
+import { Check, LayoutDashboard, ShoppingBag, Box, Ticket, ShieldPlus, ArrowRight, Trash2, ShieldCheck, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CTA, Modal, TextInput } from "@/components/atoms";
 import { DataTable } from "@/components/organisms/data-table/data-table";
@@ -186,29 +186,56 @@ export default function UsuariosRolesPage() {
 
                     <div className="pt-2">
                         <div className="flex items-center justify-between mb-4 px-2">
-                            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest font-outfit">Accesos Seleccionados</h3>
-                            <button onClick={() => setIsPermsModalOpen(true)} className="flex items-center gap-1 text-[11px] font-bold text-pink-500 hover:text-pink-600 transition-all font-outfit bg-pink-50/50 px-3 py-1.5 rounded-full border border-pink-100">
-                                <ShieldPlus size={14} /> Configurar
+                            <h3 className="text-sm font-semibold text-[#594246]">Accesos configurados</h3>
+                            <button
+                                type="button"
+                                onClick={() => setIsPermsModalOpen(true)}
+                                className="flex items-center gap-1 text-xs font-bold text-pink-500 hover:text-pink-600 transition-colors font-outfit"
+                            >
+                                <Plus size={14} />
+                                Configurar accesos
                             </button>
                         </div>
-                        <div className="min-h-[100px] border-2 border-dashed border-gray-100 rounded-3xl p-6 flex flex-wrap gap-2 items-center justify-center">
+
+                        <div className="space-y-3">
                             {selectedPermsForNewRole.length > 0 ? (
                                 selectedPermsForNewRole.map(id => {
                                     const item = CONSOLIDATED_ITEMS.find(i => i.id === id);
+                                    const group = item ? MODULE_GROUPS[item.groupId] : null;
+                                    const Icon = group?.icon || ShieldCheck;
+
                                     return (
-                                        <div key={id} className="px-4 py-2 bg-gray-50/10 rounded-xl border border-gray-100 flex items-center gap-2">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-[#5B283A]" />
-                                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tight">{item?.title}</span>
+                                        <div key={id} className="p-4 bg-[#FAF9F6] rounded-2xl border border-gray-100 flex items-center gap-4 group animate-in slide-in-from-right-2">
+                                            <div className="bg-white p-2 rounded-xl shadow-sm text-[#F2778D]">
+                                                <Icon size={18} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold text-[#594246] truncate">
+                                                    {item?.title}
+                                                </p>
+                                                <p className="text-[10px] text-gray-400 uppercase tracking-tight">
+                                                    Módulo: {group?.label}
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => togglePermInModal(id)}
+                                                className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                     );
                                 })
                             ) : (
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sin accesos configurados</p>
+                                <div className="text-center py-6 border-2 border-dashed border-gray-100 rounded-3xl">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Sin accesos configurados</p>
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
-                <div className="pt-2"><CTA className="w-full py-4 text-[12px] shadow-lg rounded-full" onClick={handleCreateRoleFinal} disabled={!newRoleName.trim() || selectedPermsForNewRole.length === 0 || isSaving}>{isSaving ? "Guardando..." : "Crear Rol"}</CTA></div>
+                <div className="pt-2"><CTA className="w-full" onClick={handleCreateRoleFinal} disabled={!newRoleName.trim() || selectedPermsForNewRole.length === 0 || isSaving}>{isSaving ? "Guardando..." : "Crear Rol"}</CTA></div>
             </Modal>
 
             {/* Modal de Configuración - Doble Columna / Sin Scroll */}
