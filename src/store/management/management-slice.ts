@@ -28,7 +28,7 @@ const initialState: ManagementState = {
     loading: false,
     total: 0,
     currentPage: 0,
-    rowsPerPage: 10,
+    rowsPerPage: 5,
 };
 
 export const managementSlice = createSlice({
@@ -52,6 +52,15 @@ export const managementSlice = createSlice({
         setRowsPerPageManagement: (state, action: PayloadAction<number>) => {
             state.rowsPerPage = action.payload;
         },
+        addRole: (state, action: PayloadAction<Role>) => {
+            state.roles.push(action.payload);
+        },
+        updateRole: (state, action: PayloadAction<Role>) => {
+            const index = state.roles.findIndex(r => r.id === action.payload.id);
+            if (index !== -1) {
+                state.roles[index] = action.payload;
+            }
+        },
     },
 });
 
@@ -60,5 +69,7 @@ export const {
     setUsers,
     setRoles,
     setPageManagement,
-    setRowsPerPageManagement
+    setRowsPerPageManagement,
+    addRole,
+    updateRole
 } = managementSlice.actions;

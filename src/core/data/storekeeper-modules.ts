@@ -13,4 +13,10 @@ export const storekeeperModules: StorekeeperModule[] = [
     href: "/storekeeper",
     icon: "dashboard",
   },
+  {
+    label: "Almacén",
+    href: "/storekeeper/inventory",
+    icon: "inventory",
+    requiredPermission: "products_inventory:view",
+  }
 ];
