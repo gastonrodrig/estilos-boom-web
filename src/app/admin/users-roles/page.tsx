@@ -135,7 +135,7 @@ export default function UsuariosRolesPage() {
                                     {roles.map(role => (
                                         <button key={role.id} onClick={() => setSelectedRoleId(role.id)} className={`w-full text-left px-4 py-3 rounded-xl text-[13px] font-bold transition-all ${selectedRoleId === role.id ? "bg-[#5B283A] text-white shadow-md shadow-[#5B283A]/10" : "text-gray-500 hover:bg-white"}`}>{role.name}</button>
                                     ))}
-                                    <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-gray-200 text-[11px] font-bold text-gray-400 hover:border-[#5B283A] transition-colors font-bold" onClick={() => setIsAddingRole(true)}>Añadir Perfil +</button>
+                                    <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-gray-200 text-[11px] font-bold text-gray-400 hover:border-[#5B283A] transition-colors font-bold" onClick={() => setIsAddingRole(true)}>Añadir Rol +</button>
                                 </div>
                             </div>
 
