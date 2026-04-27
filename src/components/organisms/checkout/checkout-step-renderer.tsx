@@ -6,6 +6,7 @@ import {
   CheckoutShippingForm,
   CheckoutDeliveryMethodForm,
   CheckoutPaymentForm,
+  CheckoutReviewStep
 } from './index';
 
 interface CheckoutStepRendererProps {
@@ -21,7 +22,7 @@ const CheckoutStepRenderer: React.FC<CheckoutStepRendererProps> = ({ currentStep
     case 'payment':
       return <CheckoutPaymentForm />;
     case 'review':
-      return <div className="text-center p-8">Revisión de pedido (en construcción)</div>;
+      return <CheckoutReviewStep />;
     default:
       return null;
   }

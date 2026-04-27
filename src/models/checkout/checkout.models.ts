@@ -5,7 +5,7 @@ export interface BillingAddress {
   lastName: string;
   address: string;
   apartment?: string;
-  city: string;
+  district: string;
   postalCode: string;
   department: string;
 }
@@ -13,13 +13,17 @@ export interface BillingAddress {
 export interface ShippingFormValues {
   firstName: string;
   lastName: string;
-  address: string;
-  apartment?: string;
-  city: string;
-  postalCode: string;
-  department: string;
   email: string;
   phone: string;
+  
+  // 👇 AGREGAMOS LOS CAMPOS MANUALES DE INVITADO COMO OPCIONALES
+  address?: string;
+  apartment?: string;
+  district?: string;
+  department?: string;
+  postalCode?: string;
+  
+  selectedAddressId?: string;
   wantsNews: boolean;
 }
 
@@ -32,12 +36,12 @@ export interface DeliveryMethod {
 }
 
 export interface PaymentFormValues {
-  paymentMethod: 'card' | 'transfer' | 'cash';
+  paymentMethod: 'card' | 'transfer' | 'cash' | 'qr';
   cardNumber?: string;
   expiryDate?: string;
   securityCode?: string;
   billingSameAsShipping: boolean;
-  billingAddress: BillingAddress;
+  billingAddress?: BillingAddress;
 }
 
 export interface CheckoutFormValues extends ShippingFormValues, PaymentFormValues {

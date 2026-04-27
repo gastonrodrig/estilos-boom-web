@@ -73,6 +73,7 @@ export const useCartStore = () => {
   const getAuthConfig = useCallback(async () => {
     const token = await getFirebaseAuthToken();
     if (!token) return null;
+    console.log("Got auth token for cart API",token);
     return { headers: { Authorization: `Bearer ${token}` } };
   }, []);
 

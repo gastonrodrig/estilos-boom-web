@@ -16,7 +16,7 @@ const CheckoutLayout: React.FC<CheckoutLayoutProps> = ({ children }) => {
       lastName: '',
       address: '',
       apartment: '',
-      city: '',
+      district: '',
       postalCode: '',
       department: '',
       email: '',
@@ -29,12 +29,8 @@ const CheckoutLayout: React.FC<CheckoutLayoutProps> = ({ children }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Estilos Boom</h1>
-            <p className="text-gray-600 mt-2">Fashion & Style</p>
-          </div>
           {children}
         </div>
       </div>

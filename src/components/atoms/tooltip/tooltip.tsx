@@ -29,23 +29,17 @@ export const Tooltip: React.FC<ITooltipProps> = ({
   contentClassName,
   showArrow = false,
   arrowClassName,
-}: ITooltipProps) => {
+}) => {
   const [internalVisible, setInternalVisible] = useState(false);
   const isControlled = typeof open === 'boolean';
   const visible = isControlled ? open : internalVisible;
 
+  // Clases de posicionamiento estándar
   const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
-  };
-
-  const arrowPositionClasses = {
-    top: 'left-1/2 top-full -translate-x-1/2 -translate-y-1/2 border-r border-b',
-    bottom: 'left-1/2 bottom-full -translate-x-1/2 translate-y-1/2 border-l border-t',
-    left: 'left-full top-1/2 -translate-x-1/2 -translate-y-1/2 border-r border-t',
-    right: 'right-full top-1/2 translate-x-1/2 -translate-y-1/2 border-l border-b',
+    top: 'bottom-full right-0 mb-3', // Lo alineamos a la derecha para que crezca hacia la izquierda (centro de la modal)
+    bottom: 'top-full right-0 mt-3',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-3',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-3',
   };
 
   const handleMouseEnter = () => {
@@ -58,50 +52,26 @@ export const Tooltip: React.FC<ITooltipProps> = ({
     setInternalVisible(false);
   };
 
-  const handleClick = () => {
-    if (isControlled || trigger !== 'click') return;
-    setInternalVisible((prev) => !prev);
-  };
-
   return (
     <div
       className={wrapperClassName ?? 'relative inline-block'}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
     >
       {children}
 
       <AnimatePresence>
         {visible && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 5 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 5 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className={`
-              absolute z-10
-              ${positionClasses[position]}
-              ${contentClassName ?? ''}
-            `}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className={`absolute z-[9999] ${positionClasses[position]} ${contentClassName ?? ''}`}
           >
-            {showArrow && (
-              <div
-                className={
-                  arrowClassName ??
-                  `absolute h-3 w-3 rotate-45 border border-pink-900 bg-pink-900 ${arrowPositionClasses[position]}`
-                }
-              />
-            )}
-
             {content ?? (
-              <div className="min-w-64 rounded-2xl bg-pink-900/95 backdrop-blur-sm px-4 py-3 text-sm text-white shadow-xl border border-pink-800/20">
-                {title && (
-                  <h4 className="mb-1 text-sm font-bold tracking-tight">
-                    {title}
-                  </h4>
-                )}
-                {text ? <p className="leading-relaxed opacity-95">{text}</p> : null}
+              <div className="w-64 rounded-xl bg-pink-950 px-4 py-3 text-[11px] text-white shadow-2xl border border-white/10">
+                {title && <h4 className="mb-1 font-bold">{title}</h4>}
+                {text && <p className="leading-relaxed opacity-90">{text}</p>}
               </div>
             )}
           </motion.div>

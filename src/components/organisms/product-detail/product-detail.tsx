@@ -20,6 +20,7 @@ type VariantUI = {
 };
 
 export const ProductDetail = ({ product }: Props) => {
+  console.log("🚀 PRODUCT DATA EN DETALLE:", product);
   const { addItem } = useCartStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | undefined>(undefined);
@@ -96,23 +97,10 @@ export const ProductDetail = ({ product }: Props) => {
     setDrawerOpen(true);
   };
 
-  const productDetailsMock = {
-    description:
-      "Nuestra colección Premium Cotton: diseños atemporales y confort superior para el día a día, confeccionados en tejidos suaves con el ajuste perfecto de Estilos Boom.",
-    bullets: [
-      "Mezcla de algodón orgánico y elastano",
-      "Corte entallado de alta definición",
-      "Tejido transpirable de tacto suave",
-      "Lavado a máquina en frío",
-      "Secado natural recomendado",
-    ],
-    specs: {
-      sku: product.sku || "EB-2614001",
-      genero: "Mujer",
-      estilo: product.category?.name || "Casual Premium",
-      composicion: "95% Algodón, 5% Elastano",
-      temporada: "Primavera 2026",
-    },
+  // Función para abrir la guía de tallas (Fallback: Producto -> Categoría)
+  const handleOpenSizeGuide = () => {
+    const url = product.custom_size_guide_url || product.category?.default_size_guide_url;
+    if (url) window.open(url, "_blank");
   };
 
   return (
@@ -217,7 +205,10 @@ export const ProductDetail = ({ product }: Props) => {
                 <span className="text-[11px] uppercase tracking-[0.2em] font-bold">
                   Talla: <span className="font-light text-gray-500">{selectedSize || "Seleccionar"}</span>
                 </span>
-                <button className="text-[10px] uppercase tracking-widest border-b border-[#594246] pb-0.5 font-bold hover:text-[#F2778D] hover:border-[#F2778D] transition-all">
+                <button 
+                  onClick={handleOpenSizeGuide}
+                  className="text-[10px] uppercase tracking-widest border-b border-[#594246] pb-0.5 font-bold hover:text-[#F2778D] hover:border-[#F2778D] transition-all"
+                >
                   Guía de tallas
                 </button>
               </div>
@@ -309,10 +300,10 @@ export const ProductDetail = ({ product }: Props) => {
                   Detalles del Producto
                 </h3>
                 <p className="text-sm leading-relaxed text-gray-500 font-light mb-6">
-                  {productDetailsMock.description}
+                  {product.description}
                 </p>
                 <ul className="space-y-3">
-                  {productDetailsMock.bullets.map((bullet, i) => (
+                  {product.highlights?.map((bullet, i) => (
                     <li key={i} className="text-sm text-gray-500 font-light flex items-start gap-3">
                       <span className="mt-1.5 w-1 h-1 rounded-full bg-[#F2778D] shrink-0" />
                       {bullet}
@@ -323,20 +314,22 @@ export const ProductDetail = ({ product }: Props) => {
 
               <div className="pt-6 space-y-4">
                 <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-6">
-                  Ref.: <span className="text-[#594246] font-bold">{productDetailsMock.specs.sku}</span>
+                  Ref.: <span className="text-[#594246] font-bold">{product.sku}</span>
                 </p>
 
                 <div className="grid grid-cols-1 gap-y-4">
                   {[
-                    { label: "Género", value: productDetailsMock.specs.genero },
-                    { label: "Estilo", value: productDetailsMock.specs.estilo },
-                    { label: "Composición", value: productDetailsMock.specs.composicion },
-                    { label: "Temporada", value: productDetailsMock.specs.temporada },
+                    { label: "Género", value: product.gender },
+                    { label: "Estilo", value: product.style_type || product.category?.name },
+                    { label: "Composición", value: product.composition },
+                    { label: "Temporada", value: product.season },
                   ].map((spec, i) => (
-                    <div key={i} className="flex items-center text-[11px] uppercase tracking-[0.15em]">
-                      <span className="w-32 text-gray-400">{spec.label} :</span>
-                      <span className="font-bold text-[#594246]">{spec.value}</span>
-                    </div>
+                    spec.value && (
+                      <div key={i} className="flex items-center text-[11px] uppercase tracking-[0.15em]">
+                        <span className="w-32 text-gray-400">{spec.label} :</span>
+                        <span className="font-bold text-[#594246]">{spec.value}</span>
+                      </div>
+                    )
                   ))}
                 </div>
               </div>

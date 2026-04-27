@@ -111,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             documentType: u.document_type ?? null,
             documentNumber: u.document_number ?? null,
             role: u.role,
+            permissions: u.permissions,
             clientType: u.client?.client_type ?? null,
             needsPasswordChange: u.client?.needs_password_change ?? false,
             userStatus: u.status,

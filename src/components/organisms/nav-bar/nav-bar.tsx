@@ -59,7 +59,7 @@ export const Navbar = ({
   const isStorekeeperRoute = pathname.startsWith("/storekeeper");
   const isBackofficeRoute = isAdminRoute || isStorekeeperRoute;
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { status, role, onLogout } = useAuthStore();
+  const { status, role, onLogout, permissions } = useAuthStore();
   const { loadCart, items } = useCartStore();
   const cartItemsCount = useMemo(
     () => items.reduce((acc, item) => acc + item.quantity, 0),
@@ -134,36 +134,53 @@ export const Navbar = ({
     }`;
 
   const drawerItems: NavDrawerItem[] = isAdminRoute
-    ? adminModules.map((item) => ({
+  ? adminModules
+      // 1. Filtramos los módulos principales
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
         label: item.label,
         href: item.href,
-        children: item.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-        })),
+        // 2. Filtramos también los hijos de cada módulo
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
       }))
-    : isStorekeeperRoute
-    ? storekeeperModules.map((item) => ({
+
+  : isStorekeeperRoute
+  ? storekeeperModules
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
         label: item.label,
         href: item.href,
-        children: item.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-        })),
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
       }))
-    : isClientRoute
-    ? clientModules.map((item) => ({
+
+  : isClientRoute
+  ? clientModules
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
         label: item.label,
         href: item.href,
-        children: item.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-        })),
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
       }))
-    : centerMenu.map(({ label, href }) => ({
-        label,
-        href,
-      }));
+
+  : centerMenu.map(({ label, href }) => ({
+      label,
+      href,
+    }));
 
   const isAuthenticatedOutsidePanels = isPublicNavbar && hasSession;
   const useHomeAuthenticatedLogo = isHome && isPublicNavbar && hasSession;
@@ -351,7 +368,9 @@ export const Navbar = ({
                       className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl text-[#364152] md:mt-3 md:w-60 md:rounded-2xl"
                     >
                       <div className="py-1.5 md:py-2">
-                        {userMenuItems.map(({ label, href, icon }) => {
+                        {userMenuItems.map(({ label, href, icon, requiredPermission }) => {
+                          // VALIDACIÓN NUEVA:
+                          if (requiredPermission && !permissions.includes(requiredPermission)) return null;
                           const ItemIcon = userMenuIconMap[icon];
 
                           return (
