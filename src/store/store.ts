@@ -8,6 +8,8 @@ import {
 import { productSlice } from "./product";
 import { categorySlice } from "./category";
 import { cartSlice } from "./cart";
+import checkoutReducer from "./extra/checkout-slice";
+import mockCartReducer from "./extra/mock-cart-slice";
 
 // Configuración del store
 export const store = configureStore({
@@ -23,6 +25,8 @@ export const store = configureStore({
     product: productSlice.reducer,
     category: categorySlice.reducer,
     cart: cartSlice.reducer,
+    checkout: checkoutReducer,
+    mockCart: mockCartReducer,
   },
 });
 
