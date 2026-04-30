@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CheckoutState, CheckoutStep } from '@/models/checkout';
+import { CheckoutState, CheckoutStep } from '@/core/models/checkout';
 
 const initialState: CheckoutState = {
   currentStep: 'shipping',

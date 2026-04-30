@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CheckoutStep } from '@/models/checkout';
+import { CheckoutStep } from '@/core/models/checkout';
 import {
   CheckoutShippingForm,
   CheckoutDeliveryMethodForm,

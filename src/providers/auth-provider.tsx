@@ -90,6 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: data?.user?.role,
         });
 
+        // Debug: log full user object to verify presence of internal id fields
+        console.log("[AuthProvider] sync:data.user (full)", data?.user);
+        console.log("[AuthProvider] sync:data.user id candidates", {
+          id_user: data?.user?.id_user,
+          _id: data?.user?._id,
+          id: data?.user?.id,
+        });
+
         if (data.user.status === "Inactivo") {
           console.log("[AuthProvider] user:inactive -> forced logout");
           toast.error("Tu cuenta está inactiva. Contacta al soporte.");

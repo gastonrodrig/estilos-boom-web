@@ -20,5 +20,4 @@ export const storekeeperModules: StorekeeperModule[] = [
     icon: "dashboard",
     requiredPermission: "dashboard:view", // <--- ASIGNAR EL PERMISO
   },
-  // Si agregas más módulos aquí luego, ya tendrán el campo listo
 ];

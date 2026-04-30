@@ -10,7 +10,7 @@ import {
   setCheckoutStep,
   resetCheckout,
 } from '@/store/extra/checkout-slice';
-import { CheckoutStep } from '@/models/checkout';
+import { CheckoutStep } from '@/core/models/checkout';
 
 export const useCheckoutStore = () => {
   const dispatch = useDispatch();
