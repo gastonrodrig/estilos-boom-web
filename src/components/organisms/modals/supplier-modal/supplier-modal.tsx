@@ -63,11 +63,13 @@ export const SupplierModal = ({
 
   const onSubmit = async (values: Supplier) => {
     try {
+      const { status, ...payload } = values;
+
       if (selectedSupplier?._id) {
-        await supplierApi.patch(`/${selectedSupplier._id}`, values);
+        await supplierApi.patch(`/${selectedSupplier._id}`, payload);
         toast.success("Proveedor actualizado correctamente.");
       } else {
-        await supplierApi.post("/", values);
+        await supplierApi.post("/", payload);
         toast.success("Proveedor creado correctamente.");
       }
 
