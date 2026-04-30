@@ -91,6 +91,11 @@ export const adminModules: SidebarModule[] = [
         href: "/admin/clients/companies",
         requiredPermission: "clients:view",
       },
+      {
+        label: "Proveedores",
+        href: "/admin/suppliers",
+        requiredPermission: "clients:view",
+      },
     ],
   },
   {
