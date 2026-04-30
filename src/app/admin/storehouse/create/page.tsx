@@ -26,13 +26,13 @@ export default function AdminStorehouseCreatePage() {
   } = useStorehouseCreate();
 
   return (
-    <section className="space-y-4">
-      <header className="rounded-2xl border border-[#f2b6c1]/60 bg-[#fffafb] p-4 shadow-sm">
+    <section className="space-y-4  ">
+      <header className="rounded-2xl border border-[#f2b6c1]/60 bg-[#fffafb] p-4 shadow-sm max-w-[60%] mx-auto">
         <h1 className="font-(--font-vidaloka) text-3xl text-[#594246]">Crear Abastecimiento</h1>
         <p className="text-xs text-[#8f7a82]">Gestión de reposición de inventario</p>
       </header>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-2 xl:grid-cols-1 max-w-[60%] mx-auto">
         {/* Product Info Card */}
         <article className="rounded-2xl border border-[#f2b6c1]/70 bg-white p-4">
           <p className="text-sm font-semibold text-[#594246]">Información del Producto</p>
