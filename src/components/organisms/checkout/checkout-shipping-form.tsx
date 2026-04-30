@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { useCheckoutStore } from '@/hooks/extra';
 import { useClientPersonStore } from '@/hooks'; // 👈 Asegúrate de usar la ruta correcta
-import { CheckoutFormValues } from '@/models/checkout';
+import { CheckoutFormValues } from '@/core/models/checkout';
 import { useAppSelector } from '@/store';
 import { AddAddressModal } from '@/components/organisms/direction-modal';
 import { MapPin, Plus, Loader2 } from 'lucide-react';

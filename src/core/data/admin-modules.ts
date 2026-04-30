@@ -37,10 +37,9 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
-    label: "Almacén",
+    label: "Abastecimiento",
     href: "/admin/storehouse",
     icon: "store",
-    requiredPermission: "inventory:view",
   },
   {
     label: "Gestionar Ordenes",

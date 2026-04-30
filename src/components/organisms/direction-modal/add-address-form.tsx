@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { MapPin, Navigation, Map, Mail, Phone, User } from 'lucide-react';
-import { CheckoutFormValues } from '@/models/checkout';
+import { CheckoutFormValues } from '@/core/models/checkout';
 
 interface AddAddressFormProps {
   fieldPrefix: string;

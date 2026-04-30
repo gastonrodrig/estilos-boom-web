@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { CheckoutFormValues } from '@/models/checkout';
+import { CheckoutFormValues } from '@/core/models/checkout';
 
 interface CheckoutLayoutProps {
   children: React.ReactNode;

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useCheckoutStore } from '@/hooks/extra';
 import { useClientPersonStore } from '@/hooks'; // 👈 Importamos el store
-import { CheckoutFormValues } from '@/models/checkout';
+import { CheckoutFormValues } from '@/core/models/checkout';
 import { useAppSelector } from '@/store';
 import { AddressInput } from '@models';
 import { Loader2 } from 'lucide-react';

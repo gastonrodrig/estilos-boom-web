@@ -9,6 +9,7 @@ import { productSlice } from "./product";
 import { categorySlice } from "./category";
 import { cartSlice } from "./cart";
 import { managementSlice } from "./management/management-slice";
+import { storehouseSlice } from "./storehouse";
 import checkoutReducer from "./extra/checkout-slice";
 import mockCartReducer from "./extra/mock-cart-slice";
 
@@ -26,6 +27,7 @@ export const store = configureStore({
     product: productSlice.reducer,
     category: categorySlice.reducer,
     cart: cartSlice.reducer,
+    storehouse: storehouseSlice.reducer,
     checkout: checkoutReducer,
     mockCart: mockCartReducer,
     management: managementSlice.reducer,
