@@ -91,12 +91,12 @@ export const SupplierModal = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <TextInput
-            label="Razón social"
+            label="Nombre Compañía Proveedor"
             {...register("name_company", { required: true })}
             error={!!errors.name_company}
           />
           <TextInput
-            label="Contacto"
+            label="Nombre del Contacto (Representante legal)"
             {...register("contact_person", { required: true })}
             error={!!errors.contact_person}
           />
