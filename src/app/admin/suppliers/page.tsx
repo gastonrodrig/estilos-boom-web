@@ -74,8 +74,8 @@ export default function AdminSuppliersPage() {
   ];
 
   const columns: DataTableColumn<Supplier>[] = [
-    { id: "name_company", label: "Nombre", sortable: true, width: "180px", truncate: true },
-    { id: "contact_person", label: "Contacto", sortable: true, width: "160px", truncate: true },
+    { id: "name_company", label: "Nombre Compania Proovedor", sortable: true, width: "180px", truncate: true },
+    { id: "contact_person", label: "Nombre del Contacto", sortable: true, width: "160px", truncate: true },
     { id: "email", label: "Correo", sortable: true, width: "220px", truncate: true },
     { id: "phone", label: "# Teléfono", sortable: true, width: "140px", truncate: true },
     { id: "ruc", label: "RUC", sortable: true, width: "140px", truncate: true },
