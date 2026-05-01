@@ -63,7 +63,14 @@ export const SupplierModal = ({
 
   const onSubmit = async (values: Supplier) => {
     try {
-      const { status, ...payload } = values;
+      const payload = {
+        name_company: values.name_company,
+        contact_person: values.contact_person,
+        email: values.email,
+        phone: values.phone,
+        ruc: values.ruc,
+        status: values.status ?? true,
+      };
 
       if (selectedSupplier?._id) {
         await supplierApi.patch(`/${selectedSupplier._id}`, payload);
