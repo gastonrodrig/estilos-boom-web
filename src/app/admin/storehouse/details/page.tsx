@@ -13,6 +13,8 @@ import {
 import { useStorehouseStore } from "@/hooks";
 import { AnimatePresence, motion } from "framer-motion";
 import { Modal } from "@/components";
+import { ApproveInventoryModal } from "@/components/features/storehouse/aprove-order-modal";
+import { ExtendDateModal } from "@/components/features/storehouse/extended-date-modal";
 
 // --- HELPERS ---
 const formatCurrency = (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
@@ -82,15 +84,24 @@ function OPPCard({ opp }: { opp: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
-  
-  const { startUpdateSupplierQuote, startSelectWinnerAndConvert } = useStorehouseStore();
+  const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
+const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const { startUpdateSupplierQuote, startSelectWinnerAndConvert,approveInventory, extendOCDate } = useStorehouseStore();
   const { startInitalQualityCheck } = useStorehouseStore();
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
     ? opp.id_purchase_order?._id 
     : opp.id_purchase_order;
 
   const firstItem = opp.base_items?.[0]?.id_variant?.id_product;
-  
+    const handleApprove = async (rating: number) => {
+    await approveInventory(purchaseOrderId, rating);
+    setIsApproveModalOpen(false);
+  };
+
+  const handleExtend = async (date: string, reason: string) => {
+    await extendOCDate(purchaseOrderId, date, reason);
+    setIsExtendModalOpen(false);
+  };
   const getProgress = () => {
   if (opp.status === "EN_REVISION") return 100; // ✅ Salta al final al iniciar control
   if (opp.status === "CONVERTIDA") return 50; 
@@ -314,29 +325,25 @@ function OPPCard({ opp }: { opp: any }) {
 			)}
 
 			{/* FASE 3: INSPECCIÓN (Control de calidad y decisiones) */}
-			{opp.status === 'EN_REVISION' && (
-				<>
-				<button 
-					onClick={() => {
-					// Aquí abrirías el modal de prolongar fecha
-					console.log("Abrir modal prolongar fecha");
-					}}
-					className="px-8 py-3 rounded-xl border border-amber-500 text-amber-600 font-bold text-sm flex items-center gap-2 hover:bg-amber-50 transition-colors"
-				>
-					<CalendarClock className="w-4 h-4" /> Prolongar Fecha
-				</button>
+			
 
-				<button 
-					onClick={() => {
-					// Aquí llamarías a la función de inventario y cerrar la OC
-					console.log("Aprobar e Ingresar al Kardex");
-					}}
-					className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047] transition-shadow shadow-md shadow-green-100"
-				>
-					<CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
-				</button>
-				</>
-			)}
+      {opp.status === 'EN_REVISION' && (
+      <>
+        <button 
+          onClick={() => setIsExtendModalOpen(true)}
+          className="px-8 py-3 rounded-xl border border-amber-500 text-amber-600 font-bold text-sm flex items-center gap-2 hover:bg-amber-50"
+        >
+          <CalendarClock className="w-4 h-4" /> Prolongar Fecha
+        </button>
+
+        <button 
+          onClick={() => setIsApproveModalOpen(true)}
+          className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047]"
+        >
+          <CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
+        </button>
+      </>
+    )}
 
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
 			<button className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors">
@@ -386,6 +393,19 @@ function OPPCard({ opp }: { opp: any }) {
 			setIsWinnerModalOpen(false);
 		}}
 		/>
+    <ApproveInventoryModal 
+      isOpen={isApproveModalOpen}
+      onClose={() => setIsApproveModalOpen(false)}
+      onConfirm={handleApprove}
+      isLoading={false}
+    />
+    
+    <ExtendDateModal 
+      isOpen={isExtendModalOpen}
+      onClose={() => setIsExtendModalOpen(false)}
+      onConfirm={handleExtend}
+      isLoading={false}
+    />
     </article>
   );
 }

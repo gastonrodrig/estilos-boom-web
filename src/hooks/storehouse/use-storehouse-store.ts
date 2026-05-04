@@ -125,6 +125,8 @@ export const useStorehouseStore = () => {
     }, "No se pudo cargar el detalle de la orden.");
   }, [dispatch, executeRequest, getConfig]);
 
+  
+
   const startLoadingSuppliers = useCallback(async () => {
     const result = await executeRequest(async () => {
       const config = await getConfig();
@@ -339,6 +341,55 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
   }, "Error al iniciar el control de calidad.");
 }, [dispatch, executeRequest, getConfig]);
 
+/**
+   * 6. Prolongar Fecha (Acuerdo con proveedor)
+   * PATCH /purchase-orders/:id/extend
+   */
+  const extendOCDate = useCallback(async (id: string, newDate: string, reason: string) => {
+  return await executeRequest(async () => {
+    const config = await getConfig();
+    
+    // Esta es la ruta que habilitaremos en el back
+    const { data } = await storehouseApi.patch(
+      `/purchase-orders/${id}/extend`, 
+      { newDate, reason }, 
+      config
+    );
+
+    // Actualizamos la pre-orden en Redux con la nueva fecha y notas
+    dispatch(onUpdatePreOrder(data.prePurchaseOrder));
+    
+    toast.success("Fecha de entrega actualizada correctamente.");
+    return true;
+  }, "No se pudo extender la fecha de entrega.");
+}, [dispatch, executeRequest, getConfig]);
+
+  /**
+   * 7. Aprobar e Ingresar a Inventario (Fase Final)
+   * PATCH /purchase-orders/:id/approve
+   */
+  const approveInventory = useCallback(async (id: string, rating: number) => {
+  return await executeRequest(async () => {
+    const config = await getConfig();
+    
+    // Enviamos la calificación (1-5) para el RankingService
+    const { data } = await storehouseApi.patch(
+      `/purchase-orders/${id}/approve`, 
+      { quality_rating: rating }, 
+      config
+    );
+
+    // Al recibir status 'COMPLETADA', el stepper se iluminará al 100%
+    dispatch(onUpdatePreOrder(data.prePurchaseOrder));
+    
+    // Refrescamos los movimientos para ver la entrada en el Kardex
+    await startLoadingInventoryMovements();
+
+    toast.success("¡Mercadería ingresada al inventario con éxito!");
+    return true;
+  }, "Error al procesar el ingreso de mercadería.");
+}, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements]);
+
   return {
     purchaseOrders,
     prePurchaseOrders,
@@ -363,6 +414,8 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
     setPageGlobal,
     setRowsPerPageGlobal,
 
+    extendOCDate,
+    approveInventory,
     startLoadingPurchaseOrders,
     startLoadingPurchaseOrderById,
     startLoadingSuppliers,
