@@ -38,8 +38,19 @@ export const adminModules: SidebarModule[] = [
   },
   {
     label: "Abastecimiento",
-    href: "/admin/storehouse",
     icon: "store",
+    children: [
+      {
+        label: "Crear Ordenes de Pre-Compra",
+        href: "/admin/storehouse",
+        requiredPermission: "orders:view",
+      },
+      {
+        label: "Seguimiento de Ordenes",
+        href: "/admin/storehouse/details",
+        requiredPermission: "orders:view",
+      },
+    ],
   },
   {
     label: "Gestionar Ordenes",

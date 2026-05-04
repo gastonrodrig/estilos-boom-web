@@ -1,0 +1,561 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { 
+  Search, ChevronDown, Package, Truck, 
+  ClipboardCheck, CheckCircle2, XCircle, 
+  Eye,
+  Trophy,
+  Check,
+  Plus,CalendarClock
+} from "lucide-react";
+import { useStorehouseStore } from "@/hooks";
+import { AnimatePresence, motion } from "framer-motion";
+import { Modal } from "@/components";
+
+// --- HELPERS ---
+const formatCurrency = (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
+
+export default function PrePurchaseOrderTracking() {
+  const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
+  const [filter, setFilter] = useState("TODAS");
+
+  useEffect(() => {
+    startLoadingPrePurchaseOrders();
+	console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
+  }, [startLoadingPrePurchaseOrders]);
+
+  const counts = useMemo(() => ({
+    TODAS: prePurchaseOrders.length,
+    "CONTACTO INICIAL": prePurchaseOrders.filter(o => o.status === "SOLICITANDO").length,
+    "EN CAMINO": prePurchaseOrders.filter(o => o.status === "COMPARANDO").length,
+    "VERIFICADO": 0, 
+    "COMPLETADO": prePurchaseOrders.filter(o => o.status === "CONVERTIDA").length,
+    "RECHAZADO": 0,
+  }), [prePurchaseOrders]);
+
+  return (
+    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc]">
+      <header className="space-y-2">
+        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Órdenes de Compra</h1>
+        <p className="text-base text-[#9b8088]">{counts.TODAS} órdenes activas</p>
+      </header>
+
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#b79ca5]" />
+        <input
+          type="text"
+          placeholder="Buscar por N° de orden, producto o prenda..."
+          className="h-16 w-full rounded-2xl border border-rose-100 bg-white pl-14 pr-4 text-base outline-none shadow-sm focus:ring-1 focus:ring-[#F2778D]"
+        />
+      </div>
+
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {Object.entries(counts).map(([key, count]) => (
+          <button
+            key={key}
+            onClick={() => setFilter(key)}
+            className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-8 py-3 text-[12px] font-bold transition-all ${
+              filter === key 
+                ? "bg-[#F2778D] text-white shadow-md shadow-rose-100" 
+                : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
+            }`}
+          >
+            {key === "RECHAZADO" ? <XCircle className="w-4 h-4" /> : <Package className="w-4 h-4" />}
+            {key.charAt(0) + key.slice(1).toLowerCase()} ({count})
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-8">
+        {prePurchaseOrders.map((opp: any) => (
+          <OPPCard key={opp._id} opp={opp} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function OPPCard({ opp }: { opp: any }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
+  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
+  
+  const { startUpdateSupplierQuote, startSelectWinnerAndConvert } = useStorehouseStore();
+  const { startInitalQualityCheck } = useStorehouseStore();
+  const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
+    ? opp.id_purchase_order?._id 
+    : opp.id_purchase_order;
+
+  const firstItem = opp.base_items?.[0]?.id_variant?.id_product;
+  
+  const getProgress = () => {
+  if (opp.status === "EN_REVISION") return 100; // ✅ Salta al final al iniciar control
+  if (opp.status === "CONVERTIDA") return 50; 
+  if (opp.status === "COMPARANDO") return 25; 
+  return 10;
+};
+	const selectedQuote = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
+  const totalAmount = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')?.total_amount || 0;
+
+  return (
+    <article className="rounded-[30px] border border-rose-100 bg-white p-8 shadow-sm transition-all">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="flex items-start gap-6">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
+             <Image 
+                src={firstItem?.images?.[0] || "/placeholder.png"} 
+                alt="Product" 
+                fill 
+                className="object-cover" 
+             />
+          </div>
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <h3 className="text-2xl font-normal text-[#594246]">{firstItem?.name || "Producto sin nombre"}</h3>
+              <span className="rounded-md bg-[#F291A3]/80 px-3 py-1 text-[13px] font-normal text-white">
+                Pendiente
+              </span>
+				<span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
+					opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+					}`}>
+					{opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
+					</span>
+              <span className="rounded-md bg-[#F2D0D3]/40 px-3 py-1 text-[13px] font-normal text-[#b46a7c]">
+                Contacto Inicial
+              </span>
+            </div>
+            <p className="text-sm text-[#9b8088] font-medium">
+              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between lg:justify-end gap-12">
+          <div className="text-right space-y-2">
+            <div className="flex items-center justify-end gap-3 text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
+              <span>Progreso</span>
+              <span className="text-[#F2778D]">{getProgress()}%</span>
+            </div>
+            <div className="h-2.5 w-40 overflow-hidden rounded-full bg-rose-50">
+              <div className="h-full bg-[#F2778D] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
+            </div>
+            <p className="text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
+          </div>
+          
+          <div className="text-[25px] text-[#F2778D] tracking-tighter">
+            {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 675.00"}
+          </div>
+
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
+          >
+            <ChevronDown className={`h-8 w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* STEPPER DE 3 PASOS CON LÍNEA CENTRADA */}
+      <div className="mt-14 mb-6 px-16 relative">
+		<div className="absolute top-[26px] left-[17%] right-[17%] h-[8px] bg-[#868686] z-10" />
+		
+		<div className="grid grid-cols-3">
+			{/* Paso 1: Siempre activo si existe la orden */}
+			<StepItem 
+			active={true} 
+			icon={<Package className="h-6 w-6" />} 
+			label="Contacto Inicial" 
+			sub="Orden confirmada con proveedor" 
+			/>
+			
+			{/* Paso 2: Se activa cuando se convierte en OC y pasa a tránsito */}
+			<StepItem 
+				active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
+				icon={<Truck className="h-6 w-6" />} 
+				label="En Camino / Por Recoger" 
+				sub="Productos en tránsito" 
+				/>
+
+				{/* Paso 3: Activo si está EN_REVISION */}
+				<StepItem 
+				active={opp.status === "EN_REVISION"} 
+				icon={<ClipboardCheck className="h-6 w-6" />} 
+				label="Verificado / Control de Calidad" 
+				sub="Inspección en curso" 
+				/>
+		</div>
+		</div>
+    {/* ACORDEÓN DESPLEGABLE */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="mt-8 pt-8 border-t border-rose-50"
+          >
+            <h4 className="text-lg font-medium text-[#594246] mb-4">Detalle de Variantes</h4>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="text-[#9b8088] font-medium border-b border-rose-50">
+                    <th className="py-3 px-2">Talla</th>
+                    <th className="py-3 px-2">Color</th>
+                    <th className="py-3 px-2 text-center">Cantidad</th>
+                    <th className="py-3 px-2 text-center">Costo Unitario</th>
+                    <th className="py-3 px-2 text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[#594246]">
+					{opp.base_items?.map((item: any, idx: number) => {
+						// 1. Buscamos el item correspondiente en la cotización seleccionada
+						// Comparamos los IDs de las variantes para encontrar el precio exacto
+						const quoteItem = selectedQuote?.items.find(
+						(qi: any) => (qi.id_variant?._id || qi.id_variant) === (item.id_variant?._id || item.id_variant)
+						);
+
+						// 2. Lógica de precio: Si es OC (CONVERTIDA), usamos el costo de la cotización.
+						// Si sigue en OPC, mostramos 0.00.
+						const unitPrice = (opp.status === 'CONVERTIDA' || opp.status === 'EN_REVISION') 
+						? (quoteItem?.unit_cost || 0) 
+						: 0;
+						const subtotal = item.quantity * unitPrice;
+
+						return (
+						<tr key={idx} className="border-b border-rose-50/50">
+							<td className="py-4 px-2">{item.id_variant?.size || item.size}</td>
+							<td className="py-4 px-2">{item.id_variant?.color || item.color}</td>
+							<td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
+							
+							{/* Mostramos el costo unitario real solo si ya hay OC */}
+							<td className="py-4 px-2 text-center text-[#9b8088]">
+							S/ {unitPrice.toFixed(2)}
+							</td>
+							
+							<td className="py-4 px-2 text-right font-bold text-[#F2778D]">
+							S/ {subtotal.toFixed(2)}
+							</td>
+						</tr>
+						);
+					})}
+					
+					{/* Fila de Total */}
+					<tr className="font-bold text-lg">
+						<td className="py-6 px-2 uppercase">Total</td>
+						<td />
+						<td className="py-6 px-2 text-center">
+						{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0)}
+						</td>
+						<td />
+						<td className="py-6 px-2 text-right text-[#F2778D]">
+						{/* Usamos el totalAmount que calculaste arriba del componente */}
+						{formatCurrency(totalAmount)}
+						</td>
+					</tr>
+					</tbody>
+              </table>
+            </div>
+
+            {/* Cuadro de Observaciones */}
+            <div className="mt-6 p-4 rounded-2xl bg-[#F2D0D3]/30 border border-[#F2D0D3]/50">
+              <p className="text-xs font-bold text-[#b46a7c] uppercase mb-1">Observaciones:</p>
+              <p className="text-sm text-[#594246]">{opp.notes || "Sin observaciones adicionales."}</p>
+            </div>
+
+            {/* Botones de Acción */}
+            <div className="mt-8 flex flex-wrap justify-end gap-4">
+			
+			{/* FASE 1: PRE-COMPRA (Solicitando y Comparando precios) */}
+			{(opp.status === 'SOLICITANDO' || opp.status === 'COMPARANDO') && (
+				<>
+				<button 
+					onClick={() => setIsQuotationModalOpen(true)}
+					className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors"
+				>
+					<Plus className="w-4 h-4" /> Registrar Cotización
+				</button>
+				
+				<button className="px-8 py-3 rounded-xl border border-[#594246] text-[#594246] font-bold text-sm hover:bg-gray-50 transition-colors">
+					Rechazar Orden
+				</button>
+
+				<button 
+					disabled={opp.quotes?.every((q: any) => q.total_amount === 0)}
+					onClick={() => setIsWinnerModalOpen(true)}
+					className="px-8 py-3 rounded-xl bg-[#F2778D] text-white font-bold text-sm disabled:opacity-50 hover:bg-[#d9667a] transition-shadow shadow-md shadow-rose-100"
+				>
+					Marcar como En Camino
+				</button>
+				</>
+			)}
+
+			{/* FASE 2: TRÁNSITO (La OC ya se generó y viene en camino) */}
+			{opp.status === 'CONVERTIDA' && (
+				<button 
+					disabled={!purchaseOrderId}
+					onClick={() => {
+					if (!purchaseOrderId) {
+						return console.error("Error: ID de OC no encontrado.");
+					}
+					// ✅ Pasamos el ID de la OC y el ID de la Pre-Orden (opp._id)
+					startInitalQualityCheck(purchaseOrderId, opp._id); 
+					}}
+					className={`px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
+					!purchaseOrderId ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#F2778D] text-white hover:bg-[#d9667a]'
+					}`}
+				>
+					<ClipboardCheck className="w-4 h-4" /> 
+					{purchaseOrderId ? 'Mercadería Recibida (Iniciar Control)' : 'OC no vinculada'}
+				</button>
+			)}
+
+			{/* FASE 3: INSPECCIÓN (Control de calidad y decisiones) */}
+			{opp.status === 'EN_REVISION' && (
+				<>
+				<button 
+					onClick={() => {
+					// Aquí abrirías el modal de prolongar fecha
+					console.log("Abrir modal prolongar fecha");
+					}}
+					className="px-8 py-3 rounded-xl border border-amber-500 text-amber-600 font-bold text-sm flex items-center gap-2 hover:bg-amber-50 transition-colors"
+				>
+					<CalendarClock className="w-4 h-4" /> Prolongar Fecha
+				</button>
+
+				<button 
+					onClick={() => {
+					// Aquí llamarías a la función de inventario y cerrar la OC
+					console.log("Aprobar e Ingresar al Kardex");
+					}}
+					className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047] transition-shadow shadow-md shadow-green-100"
+				>
+					<CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
+				</button>
+				</>
+			)}
+
+			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
+			<button className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors">
+				<Eye className="w-4 h-4" /> Ver Detalles Completos
+			</button>
+
+			</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+	  <QuotationModal 
+        isOpen={isQuotationModalOpen} 
+        onClose={() => setIsQuotationModalOpen(false)} 
+        opp={opp}
+        onSave={async (supplierId:any, items:any) => {
+			// 1. Mapeamos los items para asegurar que los tipos sean correctos
+			const sanitizedItems = items.map((it: any) => ({
+				// Nos aseguramos de enviar solo el ID, no el objeto completo
+				id_variant: it.id_variant?._id || it.id_variant, 
+				quantity: Number(it.quantity),
+				unit_cost: Number(it.unit_cost) // 🔥 Conversión explícita a número
+			}));
+
+			// 2. Construimos el payload con los nombres de campos exactos del DTO
+			const payload = {
+				id_supplier: supplierId,
+				items: sanitizedItems
+			};
+
+			// 3. Debug: Revisa esto en la consola del navegador
+			console.log("Payload que sale al backend:", payload);
+
+			await startUpdateSupplierQuote(opp._id, payload);
+			setIsQuotationModalOpen(false);
+			}}
+      />
+
+      {/* MODAL PARA ELEGIR PROVEEDOR GANADOR */}
+      <WinnerModal 
+		isOpen={isWinnerModalOpen} 
+		onClose={() => setIsWinnerModalOpen(false)} 
+		opp={opp}
+		// ✅ Agregamos 'deliveryDate' aquí
+		onConfirm={async (supplierId: any, deliveryDate: string) => {
+			// ✅ Ahora pasamos los 3 argumentos: ID de orden, ID de proveedor y la Fecha
+			await startSelectWinnerAndConvert(opp._id, supplierId, deliveryDate);
+			setIsWinnerModalOpen(false);
+		}}
+		/>
+    </article>
+  );
+}
+function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
+  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (selectedSupplier) {
+      const quote = opp.quotes.find((q: any) => q.id_supplier._id === selectedSupplier || q.id_supplier === selectedSupplier);
+      setItems(quote?.items.map((it: any) => ({ ...it })) || []);
+    }
+	console.log("Selected Supplier:", selectedSupplier);
+  }, [selectedSupplier, opp]);
+
+  return (
+    <Modal open={isOpen} onClose={onClose} title="Registrar Cotización Recibida">
+      <div className="space-y-6 p-2">
+        <label className="block space-y-2">
+          <span className="text-sm font-bold text-[#594246]">Seleccionar Proveedor</span>
+          <select 
+            className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none"
+            value={selectedSupplier}
+            onChange={(e) => setSelectedSupplier(e.target.value)}
+          >
+            <option value="">Elegir de la lista...</option>
+            {opp.quotes.map((q: any) => {
+				// Verificamos si id_supplier es objeto o solo ID
+				const supplier = q.id_supplier;
+				const name = (typeof supplier === 'object') 
+					? (supplier.name_company || supplier.name) 
+					: `Cargando ID: ${supplier.slice(-6)}...`;
+
+				return (
+					<option key={supplier._id || supplier} value={supplier._id || supplier}>
+					{name}
+					</option>
+				);
+				})}
+						</select>
+        </label>
+
+        {selectedSupplier && (
+          <div className="space-y-4">
+            <table className="w-full text-sm">
+              <thead><tr className="text-left text-[#9b8088]"><th>Variante</th><th>Cantidad</th><th>Costo Unitario</th></tr></thead>
+              <tbody>
+                {items.map((it, idx) => (
+                  <tr key={idx} className="border-b border-rose-50/50">
+                    <td className="py-3">{it.id_variant?.size} - {it.id_variant?.color}</td>
+                    <td className="py-3 font-bold">{it.quantity}</td>
+                    <td className="py-3">
+                      <input 
+                        type="number" 
+                        value={it.unit_cost} 
+                        onChange={(e) => {
+                          const newItems = [...items];
+                          newItems[idx].unit_cost = Number(e.target.value);
+                          setItems(newItems);
+                        }}
+                        className="w-24 h-9 border border-rose-200 rounded-lg px-2 outline-none focus:border-[#F2778D]"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button 
+              onClick={() => onSave(selectedSupplier, items)}
+              className="w-full py-4 bg-[#F2778D] text-white rounded-xl font-bold shadow-lg shadow-rose-100"
+            >
+              Guardar Precios Negociados
+            </button>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+}
+function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
+  const [winnerId, setWinnerId] = useState("");
+  // Estado para la fecha (por defecto hoy + 3 días)
+  const [deliveryDate, setDeliveryDate] = useState(
+    new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  );
+  
+  const sortedQuotes = useMemo(() => {
+    return [...opp.quotes]
+      .filter(q => q.total_amount > 0)
+      .sort((a, b) => b.ranking_score - a.ranking_score);
+  }, [opp.quotes]);
+  return (
+    <Modal open={isOpen} onClose={onClose} title="Seleccionar Proveedor y Generar OC">
+      <div className="space-y-6">
+        <p className="text-sm text-[#9b8088]">Compara las propuestas recibidas y elige al ganador para pasar la orden a estado <b>En Camino</b>.</p>
+        
+        <div className="space-y-3">
+          {sortedQuotes.map((q, idx) => (
+            <div 
+              key={q.id_supplier._id}
+              onClick={() => setWinnerId(q.id_supplier._id)}
+              className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                winnerId === q.id_supplier._id ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
+                  <Trophy className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-[#594246]">{q.id_supplier.name}</p>
+                  <p className="text-xs text-[#9b8088]">
+					Ranking Score: 
+					<span className="text-[#F2778D] font-bold">
+						{(q.ranking_score * 100).toFixed(0)}/100
+					</span>
+					</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
+                {winnerId === q.id_supplier._id && <Check className="inline w-5 h-5 text-[#F2778D]" />}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {winnerId && (
+          <div className="pt-4 border-t border-rose-100 space-y-4">
+            {/* NUEVO CAMPO DE FECHA */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-[#594246]">Fecha Estimada de Entrega</label>
+              <input 
+                type="date"
+                value={deliveryDate}
+                onChange={(e) => setDeliveryDate(e.target.value)}
+                className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D]"
+              />
+            </div>
+
+            <p className="text-xs text-center text-[#9b8088] italic">
+              Al confirmar, se creará la OC con fecha de llegada para el {formatDate(deliveryDate)}.
+            </p>
+            
+            <button 
+              onClick={() => onConfirm(winnerId, deliveryDate)} // Enviamos ambos datos
+              className="w-full py-4 bg-[#F2778D] text-white rounded-xl font-bold"
+            >
+              Confirmar Ganador y Generar OC
+            </button>
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
+function StepItem({ active, icon, label, sub }: { active: boolean; icon: any; label: string; sub: string }) {
+  return (
+    <div className="flex flex-col items-center text-center space-y-3">
+      {/* El círculo tiene bg sólido y border-white para ocultar la línea detrás de él */}
+      <div className={`flex h-13 w-13 items-center justify-center rounded-full border-[6px] border-white shadow-lg transition-all z-10 ${
+        active ? "bg-[#F2778D] text-white" : "bg-[#ede8e9] text-[#b79ca5]"
+      }`}>
+        {icon}
+      </div>
+      <div className="space-y-1">
+        <p className={`text-sm font-bold ${active ? "text-[#F2778D]" : "text-[#b79ca5]"}`}>{label}</p>
+        <p className="text-[11px] leading-tight text-[#9b8088] max-w-[140px] mx-auto">{sub}</p>
+      </div>
+    </div>
+  );
+}

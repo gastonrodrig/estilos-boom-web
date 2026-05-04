@@ -6,4 +6,9 @@ export interface Supplier {
   phone: string;
   ruc: string;
   status?: boolean;
+  category?: {
+    name: string;
+  };
+  last_price?: string | number;
+  description?: string;
 }

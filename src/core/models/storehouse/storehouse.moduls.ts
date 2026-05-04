@@ -12,6 +12,11 @@ export interface StorehouseSupplier {
 	rating: number;
 	total_orders: number;
 	on_time_delivery_rate: number;
+	category?: {
+    name: string;
+  };
+  last_price?: string | number;
+  description?: string;
 }
 
 export interface PurchaseOrderItem {
@@ -89,6 +94,8 @@ export interface RefreshStorehouseOrdersPayload {
 
 export interface StorehouseState {
 	purchaseOrders: PurchaseOrder[];
+	prePurchaseOrders: any[];
+	selectedPreOrder: any | null;
 	selectedOrder: PurchaseOrder | null;
 	suppliers: StorehouseSupplier[];
 	supplierRanking: StorehouseSupplier[];

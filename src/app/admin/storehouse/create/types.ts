@@ -2,14 +2,17 @@ export type SupplyDraftItem = {
   id_variant: string;
   quantity: number;
   unit_cost: number;
-  variant_label?: string;
-  product_name?: string;
-  product_image?: string;
-  product_id?: string;
-  stock?: number;
-  minimum?: number;
   size: string;
   color: string;
+  product_id: string;
+  product_name: string;
+  product_image?: string;
+  variant_label?: string;
+  stock?: number;
+  minimum?: number;
+  // --- AGREGA ESTOS DOS ---
+  isNew?: boolean; 
+  sku_variant?: string;
 };
 
 export type ConfirmationState = {

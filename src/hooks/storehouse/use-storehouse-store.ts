@@ -14,6 +14,9 @@ import {
   setStorehouseError,
   setPageStorehouse,
   setRowsPerPageStorehouse,
+  refreshStorehousePreOrders,
+  setSelectedStorehousePreOrder,
+  onUpdatePreOrder,
 } from "@store";
 import {
   CreatePurchaseOrderModelInput,
@@ -34,6 +37,7 @@ type SafeRequestConfig = Record<string, unknown>;
 export const useStorehouseStore = () => {
   const dispatch = useAppDispatch();
   const {
+    prePurchaseOrders,
     purchaseOrders,
     selectedOrder,
     suppliers,
@@ -73,6 +77,8 @@ export const useStorehouseStore = () => {
     },
     [getOptionalToken]
   );
+
+  
 
   // 🔥 AQUÍ ESTÁ LA MAGIA: El Wrapper que recicla la lógica repetida
   const executeRequest = useCallback(
@@ -231,8 +237,111 @@ export const useStorehouseStore = () => {
     });
   }, [purchaseOrders, searchTerm]);
 
+
+  const startLoadingPrePurchaseOrders = useCallback(async () => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.get("/pre-purchase-orders", config);
+      
+      // Aquí podrías usar un mapPrePurchaseOrder si lo tienes en tus models
+      dispatch(refreshStorehousePreOrders(data));
+      return true;
+    }, "No se pudieron cargar las pre-órdenes.");
+  }, [dispatch, executeRequest, getConfig]);
+
+  /**
+   * 2. Iniciar una nueva Pre-orden (Multi-proveedor)
+   * POST /pre-purchase-orders
+   */
+  const startCreatePrePurchaseOrder = useCallback(async (payload: any) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      await storehouseApi.post("/pre-purchase-orders", payload, config);
+      
+      await startLoadingPrePurchaseOrders();
+      toast.success("Solicitud de cotización iniciada.");
+      return true;
+    }, "No se pudo iniciar la pre-compra.");
+  }, [executeRequest, getConfig, startLoadingPrePurchaseOrders]);
+
+  /**
+   * 3. Ver detalle de una OPP (Incluye los Ranking Scores)
+   * GET /pre-purchase-orders/:id
+   */
+  const startLoadingPrePurchaseOrderById = useCallback(async (id: string) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.get(`/pre-purchase-orders/${id}`, config);
+      
+      dispatch(setSelectedStorehousePreOrder(data));
+      return data;
+    }, "No se pudo cargar el detalle de la pre-orden.");
+  }, [dispatch, executeRequest, getConfig]);
+
+  /**
+   * 4. Cargar Cotización de un Proveedor (Dispara el Ranking en Backend)
+   * PATCH /pre-purchase-orders/:id/quote
+   */
+  const startUpdateSupplierQuote = useCallback(async (id: string, payload: { id_supplier: string, items: any[] }) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.patch(`/pre-purchase-orders/${id}/quote`, payload, config);
+      
+      // Actualizamos el detalle para ver los nuevos ranking scores calculados
+      dispatch(setSelectedStorehousePreOrder(data));
+      dispatch(onUpdatePreOrder(data));
+      toast.success("Cotización registrada. Ranking actualizado.");
+      return true;
+    }, "No se pudo registrar la cotización.");
+  }, [dispatch, executeRequest, getConfig]);
+
+  /**
+   * 5. Seleccionar Ganador y Convertir a OC real
+   * POST /pre-purchase-orders/:id/convert
+   */
+  const startSelectWinnerAndConvert = useCallback(async (id: string, supplierId: string, estimatedDate: string) => {
+    return await executeRequest(async () => {
+        const config = await getConfig();
+        const payload = { 
+            id_supplier: supplierId, 
+            delivery_date_estimated: estimatedDate // <--- Agregado al payload
+        };
+        
+        const { data } = await storehouseApi.post(`/pre-purchase-orders/${id}/convert`, payload, config);
+
+        dispatch(onUpdatePreOrder(data));
+        toast.success("Orden de Compra generada exitosamente.");
+        return true;
+    }, "Error al convertir la orden.");
+}, [dispatch, executeRequest, getConfig]);
+
+  const startCreateVariantQuickly = useCallback(async (payload: any) => {
+  return await executeRequest(async () => {
+    const config = await getConfig();
+    const { data } = await storehouseApi.post("/products/variants", payload, config);
+    return data; // Retorna la variante creada con su _id real
+  }, "Error al registrar la nueva variante.");
+}, [executeRequest, getConfig]);
+
+const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preOrderId: string) => {
+  return await executeRequest(async () => {
+    const config = await getConfig();
+    
+    const { data } = await storehouseApi.patch(
+      `/purchase-orders/${purchaseOrderId}/start-quality-check`, 
+      { preOrderId }, // 👈 Enviamos el ID de la Pre-Orden aquí
+      config
+    );
+
+    dispatch(onUpdatePreOrder(data.prePurchaseOrder)); 
+    toast.success("Mercadería recibida. Iniciando control de calidad.");
+    return true;
+  }, "Error al iniciar el control de calidad.");
+}, [dispatch, executeRequest, getConfig]);
+
   return {
     purchaseOrders,
+    prePurchaseOrders,
     filteredOrders,
     selectedOrder,
     suppliers,
@@ -263,5 +372,12 @@ export const useStorehouseStore = () => {
     startUpdateOrderStatus,
     startConfirmOrder,
     startReceiveOrder,
+    startLoadingPrePurchaseOrders,
+    startCreatePrePurchaseOrder,
+    startLoadingPrePurchaseOrderById,
+    startUpdateSupplierQuote,
+    startSelectWinnerAndConvert,
+    startCreateVariantQuickly,
+    startInitalQualityCheck,
   };
 };
