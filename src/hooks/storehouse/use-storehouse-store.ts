@@ -368,19 +368,28 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
    * 7. Aprobar e Ingresar a Inventario (Fase Final)
    * PATCH /purchase-orders/:id/approve
    */
-  const approveInventory = useCallback(async (id: string, rating: number) => {
+ // En useStorehouseStore.ts
+const approveInventory = useCallback(async (id: string, rating: number) => {
   return await executeRequest(async () => {
     const config = await getConfig();
     
-    // Enviamos la calificación (1-5) para el RankingService
     const { data } = await storehouseApi.patch(
       `/purchase-orders/${id}/approve`, 
       { quality_rating: rating }, 
       config
     );
 
-    // Al recibir status 'COMPLETADA', el stepper se iluminará al 100%
-    dispatch(onUpdatePreOrder(data.prePurchaseOrder));
+    // ✅ DEBUG: Imprime qué está llegando realmente
+    console.log("Respuesta de approve:", data);
+
+    // ✅ VALIDACIÓN DEFENSIVA: Solo hacer dispatch si el objeto existe
+    if (data && data.prePurchaseOrder) {
+        dispatch(onUpdatePreOrder(data.prePurchaseOrder));
+    } else {
+        // Si el back no mandó la data, recargamos toda la lista como plan B
+        console.warn("Backend no devolvió prePurchaseOrder. Recargando la lista...");
+        await startLoadingPrePurchaseOrders();
+    }
     
     // Refrescamos los movimientos para ver la entrada en el Kardex
     await startLoadingInventoryMovements();
@@ -388,7 +397,7 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
     toast.success("¡Mercadería ingresada al inventario con éxito!");
     return true;
   }, "Error al procesar el ingreso de mercadería.");
-}, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements]);
+}, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements, startLoadingPrePurchaseOrders]);
 
   return {
     purchaseOrders,

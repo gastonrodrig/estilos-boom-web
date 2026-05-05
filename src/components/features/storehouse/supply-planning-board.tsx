@@ -33,7 +33,6 @@ type SupplySelection = {
   requestUnits: number;
 };
 
-const minimumForStock = (stock: number) => (stock <= 0 ? 10 : Math.max(5, stock + 8));
 
 const stockState = (stock: number, minimum: number, pendingTransit: number) => {
   if (pendingTransit > 0) return { label: `En camino`, tone: "text-blue-500", icon: <Truck className="h-3 w-3" /> };
@@ -49,17 +48,19 @@ const getProductImage = (product: Product) => product.images?.[0] ?? "";
 
 const getProductStockSummary = (variants: Product["variants"]) => {
   const total = variants?.reduce((acc, v) => acc + Number(v.stock ?? 0), 0) ?? 0;
-  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0)), 0) ?? 0;
+  // Usamos min_stock_alert con un fallback de 10 por seguridad
+  const minTotal = variants?.reduce((acc, v) => acc + Number(v.min_stock_alert ?? 10), 0) ?? 0;
   return { total, minTotal };
 };
 
 const getSupplySuggestion = (variants: Product["variants"]) => {
   const deficit = variants?.reduce((acc, v) => {
     const stock = Number(v.stock ?? 0);
-    const min = minimumForStock(stock);
+    const min = Number(v.min_stock_alert ?? 10); // 👈 Data real
     return acc + Math.max(0, min - stock);
   }, 0) ?? 0;
-  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0)), 0) ?? 1;
+  
+  const minTotal = variants?.reduce((acc, v) => acc + Number(v.min_stock_alert ?? 10), 0) ?? 1;
   const avgMonthlySales = Math.max(1, Math.round(minTotal / 2));
   return { deficit, avgMonthlySales };
 };
@@ -89,19 +90,41 @@ export const SupplyPlanningBoard = () => {
     return transit;
   }, [purchaseOrders]);
 
+
+  useEffect(() => {
+  if (products.length > 0) {
+    console.log("─── DEBUG DE INVENTARIO ───");
+    // Tomamos el primer producto que tenga variantes para inspeccionarlo
+    const productWithVariants = products.find(p => p.variants && p.variants.length > 0);
+    
+    if (productWithVariants) {
+      console.log(`Producto inspeccionado: ${productWithVariants.name}`);
+      console.table(productWithVariants.variants.map(v => ({
+        sku: v.sku_variant,
+        talla: v.size,
+        stock_real: v.stock,
+        min_alerta_recibido: v.min_stock_alert // 👈 Aquí verás si viene o es undefined
+      })));
+    } else {
+      console.warn("No se encontraron variantes en los productos cargados.");
+    }
+  }
+}, [products]);
+
   const alertProducts = useMemo(() => {
-    return products
-      .map((product) => {
-        const variants = product.variants ?? [];
-        const critical = variants.filter((v) => Number(v.stock ?? 0) <= 0).length;
-        const low = variants.filter((v) => {
-          const stock = Number(v.stock ?? 0);
-          return stock > 0 && stock < minimumForStock(stock);
-        }).length;
-        return { product, variants, critical, low };
-      })
-      .filter((item) => item.critical > 0 || item.low > 0);
-  }, [products]);
+  return products
+    .map((product) => {
+      const variants = product.variants ?? [];
+      const critical = variants.filter((v) => Number(v.stock ?? 0) <= 0).length;
+      const low = variants.filter((v) => {
+        const stock = Number(v.stock ?? 0);
+        const min = Number(v.min_stock_alert ?? 10); // 👈 Comparación real
+        return stock > 0 && stock < min;
+      }).length;
+      return { product, variants, critical, low };
+    })
+    .filter((item) => item.critical > 0 || item.low > 0);
+}, [products]);
 
   const filtered = useMemo(() => {
     if (!searchTerm.trim()) return alertProducts;
@@ -334,7 +357,10 @@ export const SupplyPlanningBoard = () => {
                           {variants.map((variant) => {
                             const stock = Number(variant.stock ?? 0);
                             const key = `${product.id_product}-${variant.id_variant}`;
-                            const minimum = selected[key]?.minimum ?? minimumForStock(stock);
+                            
+                            // ✅ VINCULACIÓN DIRECTA:
+                            const minimum = variant.min_stock_alert ?? 0; 
+                            
                             const pendingTransit = pendingTransitByVariant[variant.id_variant] || 0;
                             const status = stockState(stock, minimum, pendingTransit);
                             const percentage = Math.min(100, (stock / Math.max(minimum, 1)) * 100);
@@ -390,7 +416,7 @@ export const SupplyPlanningBoard = () => {
                                         variantId: variant.id_variant,
                                         label: variantLabel(product, variant.size, variant.color),
                                         stock,
-                                        minimum,
+                                        minimum: variant.min_stock_alert ?? 10,
                                         requestUnits: Math.max(1, minimum - stock),
                                       })}
                                       className={`flex w-full items-center justify-center gap-2 rounded-xl py-2 px-3 text-[10px] font-bold transition-all

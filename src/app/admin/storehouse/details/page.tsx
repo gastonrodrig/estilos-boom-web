@@ -125,19 +125,18 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
           </div>
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-2xl font-normal text-[#594246]">{firstItem?.name || "Producto sin nombre"}</h3>
-              <span className="rounded-md bg-[#F291A3]/80 px-3 py-1 text-[13px] font-normal text-white">
-                Pendiente
-              </span>
-				<span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
-					opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
-					}`}>
-					{opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
-					</span>
-              <span className="rounded-md bg-[#F2D0D3]/40 px-3 py-1 text-[13px] font-normal text-[#b46a7c]">
-                Contacto Inicial
-              </span>
-            </div>
+                <h3 className="text-2xl font-normal text-[#594246]">{firstItem?.name || "Producto sin nombre"}</h3>
+                
+                <span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
+                  opp.status === 'COMPLETADA' ? 'bg-blue-500' :
+                  opp.status === 'EN_REVISION' ? 'bg-amber-500' : 
+                  opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+                }`}>
+                  {opp.status === 'COMPLETADA' ? 'Finalizada' :
+                  opp.status === 'EN_REVISION' ? 'En Inspección' : 
+                  opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
+                </span>
+              </div>
             <p className="text-sm text-[#9b8088] font-medium">
               {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
             </p>

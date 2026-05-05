@@ -6,6 +6,7 @@ export interface ProductVariant {
   color: string;
   stock: number;
   sku_variant: string;
+  min_stock_alert?: number; // Nuevo campo para alerta de stock mínimo
 }
 
 // 2. Actualizamos la interfaz del Producto
@@ -35,6 +36,7 @@ export interface Product {
     name: string;
     default_size_guide_url?: string; // Para el fallback
   };
+  
   
   variants: ProductVariant[];
   created_at?: string;

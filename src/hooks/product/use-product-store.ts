@@ -30,6 +30,7 @@ const normalizeProduct = (p: ApiProduct): Product => {
     color: v.color || "",
     stock: Number(v.stock || 0),
     sku_variant: v.sku_variant || "",
+    min_stock_alert: Number(v.min_stock_alert ?? 10),
   }));
 
   // 3. Retorno del objeto Product COMPLETO
@@ -54,6 +55,7 @@ const normalizeProduct = (p: ApiProduct): Product => {
     highlights: Array.isArray(p.highlights) ? (p.highlights as string[]) : [],
     custom_size_guide_url: (p.custom_size_guide_url as string) ?? "",
     technical_details: (p.technical_details as any) ?? {},
+    
     // ----------------------------------------------------
 
     variants: normalizedVariants,

@@ -28,10 +28,10 @@ export default function AdminStorehouseCreatePage() {
     handleRemoveItem,
   } = useStorehouseCreate();
 
-  useEffect
-  (() => {
-    console.log("Prefill data:", filteredSuppliers);
-  }, [filteredSuppliers]);
+  useEffect(() => {
+  console.log("Datos del producto cargados:", productInfo);
+  console.log("Items en la lista (Variantes):", items);
+}, [productInfo, items]);
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6">
