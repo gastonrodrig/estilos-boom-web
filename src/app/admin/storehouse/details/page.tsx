@@ -54,18 +54,18 @@ export default function PrePurchaseOrderTracking() {
         />
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex flex-wrap gap-2 pb-2">
         {Object.entries(counts).map(([key, count]) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-8 py-3 text-[12px] font-bold transition-all ${
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold transition-all ${
               filter === key 
-                ? "bg-[#F2778D] text-white shadow-md shadow-rose-100" 
+                ? "bg-[#F2778D] text-white shadow-sm" 
                 : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
             }`}
           >
-            {key === "RECHAZADO" ? <XCircle className="w-4 h-4" /> : <Package className="w-4 h-4" />}
+            {key === "RECHAZADO" ? <XCircle className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
             {key.charAt(0) + key.slice(1).toLowerCase()} ({count})
           </button>
         ))}
@@ -85,7 +85,7 @@ function OPPCard({ opp }: { opp: any }) {
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const { startUpdateSupplierQuote, startSelectWinnerAndConvert,approveInventory, extendOCDate } = useStorehouseStore();
   const { startInitalQualityCheck } = useStorehouseStore();
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
@@ -112,10 +112,10 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const totalAmount = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')?.total_amount || 0;
 
   return (
-    <article className="rounded-[30px] border border-rose-100 bg-white p-8 shadow-sm transition-all">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="flex items-start gap-6">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
+    <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
+        <div className="flex items-start gap-4 sm:gap-6">
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
              <Image 
                 src={firstItem?.images?.[0] || "/placeholder.png"} 
                 alt="Product" 
@@ -123,82 +123,82 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
                 className="object-cover" 
              />
           </div>
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-2xl font-normal text-[#594246]">{firstItem?.name || "Producto sin nombre"}</h3>
-              <span className="rounded-md bg-[#F291A3]/80 px-3 py-1 text-[13px] font-normal text-white">
-                Pendiente
-              </span>
-				<span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
-					opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
-					}`}>
-					{opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
-					</span>
-              <span className="rounded-md bg-[#F2D0D3]/40 px-3 py-1 text-[13px] font-normal text-[#b46a7c]">
-                Contacto Inicial
-              </span>
+          <div className="space-y-1 sm:space-y-2 flex-1">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              <div className="flex flex-wrap gap-1.5">
+                <span className={`rounded-md px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-white ${
+                  opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+                  }`}>
+                  {opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
+                </span>
+                <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c]">
+                  Contacto Inicial
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-[#9b8088] font-medium">
-              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
+            <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
+              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} uds.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-between lg:justify-end gap-12">
-          <div className="text-right space-y-2">
-            <div className="flex items-center justify-end gap-3 text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
+        <div className="flex flex-wrap items-center justify-between xl:justify-end gap-4 sm:gap-8 lg:gap-12 pt-4 xl:pt-0 border-t xl:border-t-0 border-rose-50">
+          <div className="space-y-1 sm:space-y-2 min-w-[120px]">
+            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
               <span>Progreso</span>
               <span className="text-[#F2778D]">{getProgress()}%</span>
             </div>
-            <div className="h-2.5 w-40 overflow-hidden rounded-full bg-rose-50">
+            <div className="h-2 w-32 sm:w-40 overflow-hidden rounded-full bg-rose-50">
               <div className="h-full bg-[#F2778D] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
             </div>
-            <p className="text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
+            <p className="text-[10px] sm:text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
           </div>
           
-          <div className="text-[25px] text-[#F2778D] tracking-tighter">
-            {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 675.00"}
-          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-[20px] sm:text-[25px] text-[#F2778D] tracking-tighter font-medium">
+              {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
+            </div>
 
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
-          >
-            <ChevronDown className={`h-8 w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
-          </button>
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
+            >
+              <ChevronDown className={`h-6 w-6 sm:h-8 sm:w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* STEPPER DE 3 PASOS CON LÍNEA CENTRADA */}
-      <div className="mt-14 mb-6 px-16 relative">
-		<div className="absolute top-[26px] left-[17%] right-[17%] h-[8px] bg-[#868686] z-10" />
-		
-		<div className="grid grid-cols-3">
-			{/* Paso 1: Siempre activo si existe la orden */}
-			<StepItem 
-			active={true} 
-			icon={<Package className="h-6 w-6" />} 
-			label="Contacto Inicial" 
-			sub="Orden confirmada con proveedor" 
-			/>
-			
-			{/* Paso 2: Se activa cuando se convierte en OC y pasa a tránsito */}
-			<StepItem 
-				active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
-				icon={<Truck className="h-6 w-6" />} 
-				label="En Camino / Por Recoger" 
-				sub="Productos en tránsito" 
-				/>
+      {/* STEPPER DE 3 PASOS ADAPTADO */}
+      <div className="mt-10 sm:mt-14 mb-6 px-2 sm:px-16 relative overflow-x-auto sm:overflow-visible no-scrollbar">
+        <div className="min-w-[400px] sm:min-w-0 pb-2">
+          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[#868686]/20 z-0" />
+          
+          <div className="grid grid-cols-3 relative z-10">
+            <StepItem 
+              active={true} 
+              icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="Contacto Inicial" 
+              sub="Orden confirmada" 
+            />
+            
+            <StepItem 
+              active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
+              icon={<Truck className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="En Transito" 
+              sub="Productos en camino" 
+            />
 
-				{/* Paso 3: Activo si está EN_REVISION */}
-				<StepItem 
-				active={opp.status === "EN_REVISION"} 
-				icon={<ClipboardCheck className="h-6 w-6" />} 
-				label="Verificado / Control de Calidad" 
-				sub="Inspección en curso" 
-				/>
-		</div>
-		</div>
+            <StepItem 
+              active={opp.status === "EN_REVISION"} 
+              icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="Verificacion" 
+              sub="Control de calidad" 
+            />
+          </div>
+        </div>
+      </div>
     {/* ACORDEÓN DESPLEGABLE */}
       <AnimatePresence>
         {isOpen && (
