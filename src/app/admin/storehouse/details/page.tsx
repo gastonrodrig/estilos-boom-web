@@ -23,38 +23,86 @@ const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('
 export default function PrePurchaseOrderTracking() {
   const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     startLoadingPrePurchaseOrders();
 	console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
   }, [startLoadingPrePurchaseOrders]);
 
-  const counts = useMemo(() => ({
-    TODAS: prePurchaseOrders.length,
-    "CONTACTO INICIAL": prePurchaseOrders.filter(o => o.status === "SOLICITANDO").length,
-    "EN CAMINO": prePurchaseOrders.filter(o => o.status === "COMPARANDO").length,
-    "VERIFICADO": 0, 
-    "COMPLETADO": prePurchaseOrders.filter(o => o.status === "CONVERTIDA").length,
-    "RECHAZADO": 0,
-  }), [prePurchaseOrders]);
+  const isDeliveryToday = (opp: any) => {
+    const deliveryDate = opp.id_purchase_order?.delivery_date_estimated;
+    if (!deliveryDate) return false;
+    
+    const today = new Date();
+    const d = new Date(deliveryDate);
+    
+    return d.getDate() === today.getDate() &&
+           d.getMonth() === today.getMonth() &&
+           d.getFullYear() === today.getFullYear();
+  };
 
+  const activeOrders = useMemo(() => {
+    return prePurchaseOrders.filter(o => o.status !== "COMPLETADA");
+  }, [prePurchaseOrders]);
+
+
+  const counts = useMemo(() => ({
+    TODAS: activeOrders.length,
+    "ENTREGA HOY": activeOrders.filter(o => isDeliveryToday(o)).length,
+    "CONTACTO INICIAL": activeOrders.filter(o => o.status === "SOLICITANDO").length,
+    "EN CAMINO": activeOrders.filter(o => o.status === "COMPARANDO" || o.status === "CONVERTIDA").length,
+    "REVISIÓN": activeOrders.filter(o => o.status === "EN_REVISION").length,
+  }), [activeOrders]);
+
+  const filteredOrders = useMemo(() => {
+    let result = [...activeOrders];
+
+    // Filtro por Categoría/Fecha
+    if (filter === "ENTREGA HOY") {
+      result = result.filter(o => isDeliveryToday(o));
+    } else if (filter === "CONTACTO INICIAL") {
+      result = result.filter(o => o.status === "SOLICITANDO");
+    } else if (filter === "EN CAMINO") {
+      result = result.filter(o => o.status === "COMPARANDO" || o.status === "CONVERTIDA");
+    } else if (filter === "REVISIÓN") {
+      result = result.filter(o => o.status === "EN_REVISION");
+    }
+
+    // Filtro por búsqueda
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      result = result.filter(o => 
+        o.pre_order_number.toLowerCase().includes(q) || 
+        o.id_purchase_order?.order_number?.toLowerCase().includes(q)
+      );
+    }
+
+    return result;
+  }, [activeOrders, filter, searchTerm]);
+
+  
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc]">
       <header className="space-y-2">
-        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Órdenes de Compra</h1>
-        <p className="text-base text-[#9b8088]">{counts.TODAS} órdenes activas</p>
+        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Órdenes</h1>
+        <p className="text-base text-[#9b8088]">{counts.TODAS} procesos en curso</p>
       </header>
 
+      {/* Buscador */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#b79ca5]" />
         <input
           type="text"
-          placeholder="Buscar por N° de orden, producto o prenda..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Buscar por N° de orden o código..."
           className="h-16 w-full rounded-2xl border border-rose-100 bg-white pl-14 pr-4 text-base outline-none shadow-sm focus:ring-1 focus:ring-[#F2778D]"
         />
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      {/* Filtros */}
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {Object.entries(counts).map(([key, count]) => (
           <button
             key={key}
@@ -65,16 +113,24 @@ export default function PrePurchaseOrderTracking() {
                 : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
             }`}
           >
-            {key === "RECHAZADO" ? <XCircle className="w-4 h-4" /> : <Package className="w-4 h-4" />}
-            {key.charAt(0) + key.slice(1).toLowerCase()} ({count})
+            {key === "ENTREGA HOY" ? <CalendarClock className="w-4 h-4" /> : <Package className="w-4 h-4" />}
+            {key} ({count})
           </button>
         ))}
       </div>
 
+      {/* Listado */}
       <div className="space-y-8">
-        {prePurchaseOrders.map((opp: any) => (
-          <OPPCard key={opp._id} opp={opp} />
-        ))}
+        {filteredOrders.length > 0 ? (
+          filteredOrders.map((opp: any) => (
+            <OPPCard key={opp._id} opp={opp} />
+          ))
+        ) : (
+          <div className="py-20 text-center border-2 border-dashed border-rose-100 rounded-3xl">
+             <Package className="mx-auto h-12 w-12 text-rose-200 mb-4" />
+             <p className="text-[#9b8088]">No se encontraron órdenes en esta categoría.</p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -117,7 +173,7 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
         <div className="flex items-start gap-6">
           <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
              <Image 
-                src={firstItem?.images?.[0] || "/placeholder.png"} 
+                src={firstItem?.images?.[0]} 
                 alt="Product" 
                 fill 
                 className="object-cover" 
@@ -156,7 +212,7 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
           </div>
           
           <div className="text-[25px] text-[#F2778D] tracking-tighter">
-            {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 675.00"}
+            {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
           </div>
 
           <button 

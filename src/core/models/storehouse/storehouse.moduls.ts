@@ -1,4 +1,4 @@
-export type OrderStatus = "PENDIENTE" | "CONFIRMADO" | "RECIBIDO" | "CANCELADO";
+export type OrderStatus = "PENDIENTE" | "CONFIRMADO" | "RECIBIDO" | "CANCELADO"|"COMPLETADA";
 
 export interface StorehouseSupplier {
 	_id: string;
