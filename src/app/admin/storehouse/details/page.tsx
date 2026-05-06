@@ -8,7 +8,7 @@ import {
   Eye,
   Trophy,
   Check,
-  Plus,CalendarClock
+  Plus,CalendarClock, Star
 } from "lucide-react";
 import { useStorehouseStore } from "@/hooks";
 import { AnimatePresence, motion } from "framer-motion";
@@ -20,13 +20,31 @@ import { ExtendDateModal } from "@/components/features/storehouse/extended-date-
 const formatCurrency = (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
 const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
 
+const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating?: (r: number) => void; size?: number }) => {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          onClick={() => setRating?.(star)}
+          disabled={!setRating}
+          type="button"
+          className={`transition-all ${star <= rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} ${!setRating ? "cursor-default" : "hover:scale-110"}`}
+        >
+          <Star className={`w-${size} h-${size} ${star <= rating ? "fill-amber-400" : ""}`} />
+        </button>
+      ))}
+    </div>
+  );
+};
+
 export default function PrePurchaseOrderTracking() {
   const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    startLoadingPrePurchaseOrders();
+    startLoadingPrePurchaseOrders('ABASTECIMIENTO');
 	console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
   }, [startLoadingPrePurchaseOrders]);
 
@@ -193,6 +211,13 @@ function OPPCard({ opp }: { opp: any }) {
                   opp.status === 'EN_REVISION' ? 'En Inspección' : 
                   opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
                 </span>
+
+                {opp.status === 'COMPLETADA' && (
+                  <div className="flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-lg border border-rose-100">
+                    <span className="text-[11px] font-bold text-[#b79ca5] uppercase">Calificación:</span>
+                    <StarRating rating={opp.id_purchase_order?.quality_rating || 5} size={3} />
+                  </div>
+                )}
               </div>
             </div>
             <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
@@ -427,7 +452,7 @@ function OPPCard({ opp }: { opp: any }) {
 
 			// 2. Construimos el payload con los nombres de campos exactos del DTO
 			const payload = {
-				id_supplier: supplierId,
+				id_agent: supplierId,
 				items: sanitizedItems
 			};
 
@@ -456,6 +481,7 @@ function OPPCard({ opp }: { opp: any }) {
       onClose={() => setIsApproveModalOpen(false)}
       onConfirm={handleApprove}
       isLoading={false}
+      agentName={selectedQuote?.id_agent?.name_company || selectedQuote?.id_agent?.name}
     />
     
     <ExtendDateModal 
@@ -473,7 +499,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 
   useEffect(() => {
     if (selectedSupplier) {
-      const quote = opp.quotes.find((q: any) => q.id_supplier._id === selectedSupplier || q.id_supplier === selectedSupplier);
+      const quote = opp.quotes.find((q: any) => (q.id_agent?._id || q.id_agent) === selectedSupplier);
       setItems(quote?.items.map((it: any) => ({ ...it })) || []);
     }
 	console.log("Selected Supplier:", selectedSupplier);
@@ -491,11 +517,12 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
           >
             <option value="">Elegir de la lista...</option>
             {opp.quotes.map((q: any) => {
-				// Verificamos si id_supplier es objeto o solo ID
-				const supplier = q.id_supplier;
+				const supplier = q.id_agent;
+                if (!supplier) return null;
+
 				const name = (typeof supplier === 'object') 
 					? (supplier.name_company || supplier.name) 
-					: `Cargando ID: ${supplier.slice(-6)}...`;
+					: `Cargando ID: ${supplier.toString().slice(-6)}...`;
 
 				return (
 					<option key={supplier._id || supplier} value={supplier._id || supplier}>
@@ -561,34 +588,41 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
         <p className="text-sm text-[#9b8088]">Compara las propuestas recibidas y elige al ganador para pasar la orden a estado <b>En Camino</b>.</p>
         
         <div className="space-y-3">
-          {sortedQuotes.map((q, idx) => (
-            <div 
-              key={q.id_supplier._id}
-              onClick={() => setWinnerId(q.id_supplier._id)}
-              className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-                winnerId === q.id_supplier._id ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
-                  <Trophy className="w-5 h-5" />
+          {sortedQuotes.map((q, idx) => {
+            const agentId = q.id_agent?._id || q.id_agent;
+            const agentName = q.id_agent?.name_company || q.id_agent?.name || "Cargando...";
+
+            return (
+              <div 
+                key={agentId}
+                onClick={() => setWinnerId(agentId)}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                  winnerId === agentId ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
+                    <Trophy className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#594246]">{agentName}</p>
+                    <p className="text-xs text-[#9b8088] flex items-center gap-2">
+                      Ranking Score: 
+                      <span className="text-[#F2778D] font-bold">
+                        {(q.ranking_score * 100).toFixed(0)}/100
+                      </span>
+                      <span className="text-[#ede8e9]">|</span>
+                      <StarRating rating={q.id_agent?.rating || 5} size={3} />
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-[#594246]">{q.id_supplier.name}</p>
-                  <p className="text-xs text-[#9b8088]">
-					Ranking Score: 
-					<span className="text-[#F2778D] font-bold">
-						{(q.ranking_score * 100).toFixed(0)}/100
-					</span>
-					</p>
+                <div className="text-right">
+                  <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
+                  {winnerId === agentId && <Check className="inline w-5 h-5 text-[#F2778D]" />}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
-                {winnerId === q.id_supplier._id && <Check className="inline w-5 h-5 text-[#F2778D]" />}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {winnerId && (

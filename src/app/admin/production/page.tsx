@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { Star } from "lucide-react"; // Importar Star
 
 import { useStorehouseStore } from "@/hooks";
 import { Modal, CTA } from "@components";
@@ -19,22 +20,43 @@ import { Modal, CTA } from "@components";
 const formatCurrency = (val: number) => val === 0 ? "Sin registrar" : `S/ ${(val || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
 const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
 
+const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating?: (r: number) => void; size?: number }) => {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          onClick={() => setRating?.(star)}
+          disabled={!setRating}
+          type="button"
+          className={`transition-all ${star <= rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} ${!setRating ? "cursor-default" : "hover:scale-110"}`}
+        >
+          <Star className={`w-${size} h-${size} ${star <= rating ? "fill-amber-400" : ""}`} />
+        </button>
+      ))}
+    </div>
+  );
+};
+
 export default function ProductionOrderTracking() {
   const { 
     startLoadingPrePurchaseOrders, 
     prePurchaseOrders, 
     startUpdatePreOrderStatus,
     startUpdateSupplierQuote,
-    extendOCDate 
+    extendOCDate,
+    approveInventory
   } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkshop, setSelectedWorkshop] = useState("Todos los Talleres");
   const [selectedMonth, setSelectedMonth] = useState("Todos los Meses");
   const [localOrders, setLocalOrders] = useState<any[]>([]);
+  const [qualityRating, setQualityRating] = useState(5); // Estado para las estrellitas
+
 
   useEffect(() => {
-    startLoadingPrePurchaseOrders();
+    startLoadingPrePurchaseOrders('PRODUCCION');
   }, [startLoadingPrePurchaseOrders]);
 
   useEffect(() => {
@@ -73,8 +95,8 @@ export default function ProductionOrderTracking() {
           }
         ],
         quotes: [
-          { quote_status: 'SELECCIONADO', id_supplier: { name_company: "Textiles del Sur" } },
-          { quote_status: 'COTIZADO', id_supplier: { name_company: "Confecciones Lima" } }
+          { quote_status: 'SELECCIONADO', id_agent: { name_company: "Textiles del Sur" } },
+          { quote_status: 'COTIZADO', id_agent: { name_company: "Confecciones Lima" } }
         ]
       },
       {
@@ -98,8 +120,8 @@ export default function ProductionOrderTracking() {
           }
         ],
         quotes: [
-          { quote_status: 'SELECCIONADO', id_supplier: { name_company: "Taller Los Hermanos" } },
-          { quote_status: 'COTIZADO', id_supplier: { name_company: "Creaciones Textiles" } }
+          { quote_status: 'SELECCIONADO', id_agent: { name_company: "Taller Los Hermanos" } },
+          { quote_status: 'COTIZADO', id_agent: { name_company: "Creaciones Textiles" } }
         ]
       }
     ];
@@ -132,8 +154,8 @@ export default function ProductionOrderTracking() {
     localOrders.forEach(o => {
       const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
       selectedQuotes.forEach((q: any) => {
-        if (q?.id_supplier?.name_company) names.add(q.id_supplier.name_company);
-        else if (q?.id_supplier?.name) names.add(q.id_supplier.name);
+        if (q?.id_agent?.name_company) names.add(q.id_agent.name_company);
+        else if (q?.id_agent?.name) names.add(q.id_agent.name);
       });
     });
     return ["Todos los Talleres", ...Array.from(names)];
@@ -150,8 +172,8 @@ export default function ProductionOrderTracking() {
   }, [localOrders]);
 
   const counts = useMemo(() => ({
-    TODAS: localOrders.filter(o => o.status !== "CONVERTIDA").length,
-    "ENTREGAS DE HOY": localOrders.filter(o => {
+    TODAS: localOrders.filter(o => o.status !== "COMPLETADA").length,
+    "ENTREGAS HOY": localOrders.filter(o => {
       const today = new Date().toISOString().split('T')[0];
       const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
       if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
@@ -161,14 +183,14 @@ export default function ProductionOrderTracking() {
     "CORTE / HABILITADO": localOrders.filter(o => o.status === "COMPARANDO").length,
     "EN TALLER": localOrders.filter(o => o.status === "EN_REVISION").length,
     "CONTROL CALIDAD": localOrders.filter(o => o.status === "CONVERTIDA").length,
-    "RECHAZADO": 0,
+    "RECHAZADOS": 0,
   }), [localOrders]);
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc] relative">
       <header className="space-y-2">
-        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Ordenes de Produccion</h1>
-        <p className="text-base text-[#9b8088]">{counts.TODAS} ordenes en curso</p>
+        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Producción</h1>
+        <p className="text-base text-[#9b8088]">{counts.TODAS} procesos en curso</p>
       </header>
 
       <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -207,65 +229,85 @@ export default function ProductionOrderTracking() {
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold transition-all ${
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold transition-all uppercase tracking-wider ${
               filter === key 
                 ? "bg-[#F2778D] text-white shadow-sm" 
                 : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
             }`}
           >
-            {key === "RECHAZADO" ? <XCircle className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
-            {key.charAt(0) + key.slice(1).toLowerCase()} ({count})
+            {key === "RECHAZADOS" ? <XCircle className="w-3.5 h-3.5" /> : key === "ENTREGAS HOY" ? <CalendarClock className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
+            {key} ({count})
           </button>
         ))}
       </div>
 
       <div className="space-y-8">
-        {localOrders
-          .filter(o => {
-            const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
-            if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
+        {(() => {
+          const filtered = localOrders
+            .filter(o => {
+              const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
+              if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
 
-            const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
-            const workshopNames = selectedQuotes.map((q: any) => q.id_supplier?.name_company || q.id_supplier?.name).filter(Boolean);
-            const workshopDisplayName = workshopNames.length > 0 ? workshopNames.join(", ") : "Taller no asignado";
-            const productName = o.base_items?.[0]?.id_variant?.id_product?.name || "";
+              const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+              const workshopNames = selectedQuotes.map((q: any) => q.id_agent?.name_company || q.id_agent?.name).filter(Boolean);
+              const workshopDisplayName = workshopNames.length > 0 ? workshopNames.join(", ") : "Taller no asignado";
+              const productName = o.base_items?.[0]?.id_variant?.id_product?.name || "";
 
-            // Filtro de Búsqueda
-            const matchesSearch = searchTerm === "" || 
-              o.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              workshopDisplayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              productName.toLowerCase().includes(searchTerm.toLowerCase());
-            if (!matchesSearch) return false;
+              // Filtro de Búsqueda
+              const matchesSearch = searchTerm === "" || 
+                o.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                workshopDisplayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                productName.toLowerCase().includes(searchTerm.toLowerCase());
+              if (!matchesSearch) return false;
 
-            // Filtro de Taller
-            if (selectedWorkshop !== "Todos los Talleres" && !workshopNames.includes(selectedWorkshop)) return false;
+              // Filtro de Taller
+              if (selectedWorkshop !== "Todos los Talleres" && !workshopNames.includes(selectedWorkshop)) return false;
 
-            // Filtro de Mes
-            const orderMonthRaw = new Date(o.created_at).toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
-            const orderMonth = orderMonthRaw.charAt(0).toUpperCase() + orderMonthRaw.slice(1);
-            if (selectedMonth !== "Todos los Meses" && orderMonth !== selectedMonth) return false;
+              // Filtro de Mes
+              const orderMonthRaw = new Date(o.created_at).toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
+              const orderMonth = orderMonthRaw.charAt(0).toUpperCase() + orderMonthRaw.slice(1);
+              if (selectedMonth !== "Todos los Meses" && orderMonth !== selectedMonth) return false;
 
-            // Filtro de Etapa
-            if (filter === "TODAS") return o.status !== "CONVERTIDA";
-            if (filter === "ENTREGAS DE HOY") {
-              const today = new Date().toISOString().split('T')[0];
-              return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
-            }
-            if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO";
-            if (filter === "CORTE / HABILITADO") return o.status === "COMPARANDO";
-            if (filter === "EN TALLER") return o.status === "EN_REVISION";
-            if (filter === "CONTROL CALIDAD") return o.status === "CONVERTIDA";
-            return true;
-          })
-          .map((order: any) => (
+              // Filtro de Etapa
+              if (filter === "TODAS") return o.status !== "CONVERTIDA";
+              if (filter === "ENTREGAS HOY") {
+                const today = new Date().toISOString().split('T')[0];
+                return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
+              }
+              if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO";
+              if (filter === "CORTE / HABILITADO") return o.status === "COMPARANDO";
+              if (filter === "EN TALLER") return o.status === "EN_REVISION";
+              if (filter === "CONTROL CALIDAD") return o.status === "CONVERTIDA";
+              return true;
+            });
+
+          if (filtered.length === 0) {
+            return (
+              <div className="py-24 text-center border-2 border-dashed border-rose-100 rounded-[40px] bg-white/50 backdrop-blur-sm space-y-4">
+                <div className="bg-rose-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Package className="h-10 w-10 text-rose-200" />
+                </div>
+                <h3 className="text-xl font-bold text-[#594246]">No se encontraron órdenes</h3>
+                <p className="text-[#9b8088] max-w-xs mx-auto text-sm leading-relaxed">
+                  No hay procesos de producción en la etapa <span className="text-[#F2778D] font-bold">"{filter}"</span> que coincidan con tu búsqueda.
+                </p>
+              </div>
+            );
+          }
+
+          return filtered.map((order: any) => (
             <ProductionCard 
               key={order._id} 
               order={order} 
               onUpdateStatus={updateOrderStatus} 
               startUpdateSupplierQuote={startUpdateSupplierQuote}
               extendOCDate={extendOCDate}
+              approveInventory={approveInventory}
+              qualityRating={qualityRating}
+              setQualityRating={setQualityRating}
             />
-          ))}
+          ));
+        })()}
       </div>
     </section>
   );
@@ -275,12 +317,18 @@ function ProductionCard({
   order, 
   onUpdateStatus, 
   startUpdateSupplierQuote,
-  extendOCDate 
+  extendOCDate,
+  approveInventory,
+  qualityRating,
+  setQualityRating
 }: { 
   order: any; 
   onUpdateStatus: (id: string, status: string) => Promise<void>; 
   startUpdateSupplierQuote: (id: string, payload: any) => Promise<boolean | null>;
   extendOCDate: (id: string, newDate: string, reason: string) => Promise<boolean | null>;
+  approveInventory: (id: string, rating: number) => Promise<boolean | null>;
+  qualityRating: number;
+  setQualityRating: (r: number) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | null>(null);
@@ -307,7 +355,7 @@ function ProductionCard({
   const selectedQuotes = order.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
   const workshopName = selectedQuotes.length > 1 
     ? `${selectedQuotes.length} Talleres Seleccionados` 
-    : (selectedQuotes[0]?.id_supplier?.name_company || selectedQuotes[0]?.id_supplier?.name || "Taller no asignado");
+    : (selectedQuotes[0]?.id_agent?.name_company || selectedQuotes[0]?.id_agent?.name || "Taller no asignado");
   const totalAmount = selectedQuotes.reduce((acc: number, q: any) => acc + (q.total_amount || 0), 0);
   
   const actualTotal = order.base_items?.reduce((acc: number, item: any) => {
@@ -338,7 +386,7 @@ function ProductionCard({
         }));
         
         await startUpdateSupplierQuote(order._id, {
-          id_supplier: selectedQuote.id_supplier?._id || selectedQuote.id_supplier,
+          id_agent: selectedQuote.id_agent?._id || selectedQuote.id_agent,
           items: updatedItems
         });
       }
@@ -390,8 +438,13 @@ function ProductionCard({
                   }`}>
                   {order.status === 'CONVERTIDA' ? 'Control Calidad' : 'En Proceso'}
                 </span>
-                <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c]">
+                <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c] flex items-center gap-2">
                   {workshopName}
+                  {order.status === 'COMPLETADA' && (
+                    <div className="flex gap-0.5 ml-1 border-l border-rose-200 pl-2">
+                       <StarRating rating={order.id_purchase_order?.quality_rating || 5} size={3} />
+                    </div>
+                  )}
                 </span>
                 {(() => {
                   const today = new Date().toISOString().split('T')[0];
@@ -641,17 +694,31 @@ function ProductionCard({
               next = "Finalizar Orden (Almacén)";
             }
 
+            const isFinalizing = order.status === "CONVERTIDA";
+
             return (
-              <div className="flex items-center justify-center gap-4 bg-rose-50/30 p-4 rounded-2xl border border-rose-50">
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-[#b79ca5] uppercase">Fase Actual</span>
-                  <p className="text-sm font-bold text-[#594246]">{current}</p>
+              <div className="space-y-8">
+                <div className="flex items-center justify-center gap-4 bg-rose-50/30 p-4 rounded-2xl border border-rose-50">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-[#b79ca5] uppercase">Fase Actual</span>
+                    <p className="text-sm font-bold text-[#594246]">{current}</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#F2778D]" />
+                  <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-[#F2778D] uppercase">Siguiente Fase</span>
+                    <p className="text-sm font-bold text-[#594246]">{next}</p>
+                  </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-[#F2778D]" />
-                <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-bold text-[#F2778D] uppercase">Siguiente Fase</span>
-                  <p className="text-sm font-bold text-[#594246]">{next}</p>
-                </div>
+
+                {isFinalizing && (
+                  <div className="bg-rose-50/20 p-6 rounded-2xl border border-rose-100 flex flex-col items-center gap-4">
+                    <p className="text-sm font-bold text-[#594246] text-center">
+                      ¿Cómo calificarías el trabajo de este taller?
+                    </p>
+                    <StarRating rating={qualityRating} setRating={setQualityRating} size={8} />
+                    <p className="text-[10px] text-[#9b8088] font-medium uppercase tracking-widest mt-2">Calidad de Confección</p>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -681,7 +748,16 @@ function ProductionCard({
             <CTA onClick={() => setActiveModal(null)} className="flex-1 !bg-white border border-rose-100 !text-[#9b8088]">Volver</CTA>
             <CTA 
               className="flex-1 shadow-lg shadow-rose-100"
-              onClick={handleConfirm}
+              onClick={async () => {
+                if (order.status === "CONVERTIDA") {
+                  // Si estamos finalizando, usamos la lógica de ingreso a inventario con rating
+                  const purchaseOrderId = order.id_purchase_order?._id || order.id_purchase_order;
+                  await approveInventory(purchaseOrderId, qualityRating); 
+                  setActiveModal(null);
+                } else {
+                  handleConfirm();
+                }
+              }}
             >
               Confirmar Avance
             </CTA>
@@ -732,7 +808,7 @@ function ProductionCard({
                   <div key={qIdx} className="space-y-3">
                     <div className="px-1 border-l-2 border-[#F2778D] pl-3">
                       <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-widest mb-0.5">
-                        Taller: {quote.id_supplier?.name_company || quote.id_supplier?.name || "Taller Asignado"}
+                        Taller: {quote.id_agent?.name_company || quote.id_agent?.name || "Taller Asignado"}
                       </p>
                       <h5 className="text-sm font-bold text-[#594246]">{productName}</h5>
                     </div>
