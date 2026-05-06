@@ -364,6 +364,8 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
   }, "No se pudo extender la fecha de entrega.");
 }, [dispatch, executeRequest, getConfig]);
 
+
+
   /**
    * 7. Aprobar e Ingresar a Inventario (Fase Final)
    * PATCH /purchase-orders/:id/approve
@@ -398,6 +400,10 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     return true;
   }, "Error al procesar el ingreso de mercadería.");
 }, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements, startLoadingPrePurchaseOrders]);
+
+    const completedOrders = useMemo(() => {
+      return purchaseOrders.filter(order => order.status === 'COMPLETADA');
+    }, [purchaseOrders]);
 
   return {
     purchaseOrders,
