@@ -123,22 +123,24 @@ function OPPCard({ opp }: { opp: any }) {
                 className="object-cover" 
              />
           </div>
-          <div className="space-y-1 sm:space-y-2 flex-1">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="space-y-2 flex-1">
+            <div className="flex flex-wrap items-center gap-3">
               <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              
               <div className="flex flex-wrap gap-1.5">
-                <span className={`rounded-md px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-white ${
+                <span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
+                  opp.status === 'COMPLETADA' ? 'bg-blue-500' :
+                  opp.status === 'EN_REVISION' ? 'bg-amber-500' : 
                   opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
-                  }`}>
-                  {opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
-                </span>
-                <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c]">
-                  Contacto Inicial
+                }`}>
+                  {opp.status === 'COMPLETADA' ? 'Finalizada' :
+                  opp.status === 'EN_REVISION' ? 'En Inspección' : 
+                  opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
                 </span>
               </div>
             </div>
             <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
-              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} uds.
+              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
             </p>
           </div>
         </div>
