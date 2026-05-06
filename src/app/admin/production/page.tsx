@@ -10,6 +10,7 @@ import {
   Pause, Clock
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 import { useStorehouseStore } from "@/hooks";
 import { Modal, CTA } from "@components";
@@ -19,36 +20,186 @@ const formatCurrency = (val: number) => val === 0 ? "Sin registrar" : `S/ ${(val
 const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
 
 export default function ProductionOrderTracking() {
-  const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
+  const { 
+    startLoadingPrePurchaseOrders, 
+    prePurchaseOrders, 
+    startUpdatePreOrderStatus,
+    startUpdateSupplierQuote,
+    extendOCDate 
+  } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedWorkshop, setSelectedWorkshop] = useState("Todos los Talleres");
+  const [selectedMonth, setSelectedMonth] = useState("Todos los Meses");
+  const [localOrders, setLocalOrders] = useState<any[]>([]);
 
   useEffect(() => {
     startLoadingPrePurchaseOrders();
   }, [startLoadingPrePurchaseOrders]);
 
+  useEffect(() => {
+    /*
+    const MOCK_TEST_ORDERS = [
+      {
+        _id: "test-multi-1",
+        order_number: "OPP-M-2026",
+        status: "SOLICITANDO",
+        created_at: new Date().toISOString(),
+        estimated_delivery_date: new Date(Date.now() + 86400000 * 5).toISOString(),
+        base_items: [
+          { 
+            quantity: 12, 
+            id_variant: { 
+              size: "M", 
+              color: "Rojo Pasión", 
+              id_product: { 
+                name: "Vestido Gala Premium",
+                image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400",
+                images: ["https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400"]
+              } 
+            } 
+          },
+          { 
+            quantity: 8, 
+            id_variant: { 
+              size: "L", 
+              color: "Rojo Pasión", 
+              id_product: { 
+                name: "Vestido Gala Premium",
+                image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400",
+                images: ["https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400"]
+              } 
+            } 
+          }
+        ],
+        quotes: [
+          { quote_status: 'SELECCIONADO', id_supplier: { name_company: "Textiles del Sur" } },
+          { quote_status: 'COTIZADO', id_supplier: { name_company: "Confecciones Lima" } }
+        ]
+      },
+      {
+        _id: "test-single-2",
+        order_number: "OPP-S-2026",
+        status: "SOLICITANDO",
+        created_at: new Date().toISOString(),
+        estimated_delivery_date: new Date().toISOString(), // Entrega hoy
+        base_items: [
+          { 
+            quantity: 50, 
+            id_variant: { 
+              size: "30", 
+              color: "Denim", 
+              id_product: { 
+                name: "Pantalón Urban Style",
+                image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400",
+                images: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=400"]
+              } 
+            } 
+          }
+        ],
+        quotes: [
+          { quote_status: 'SELECCIONADO', id_supplier: { name_company: "Taller Los Hermanos" } },
+          { quote_status: 'COTIZADO', id_supplier: { name_company: "Creaciones Textiles" } }
+        ]
+      }
+    ];
+    */
+
+    setLocalOrders(prePurchaseOrders);
+  }, [prePurchaseOrders]);
+
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    await startUpdatePreOrderStatus(orderId, newStatus);
+    
+    toast.success("Estado de producción actualizado", {
+      position: "top-center",
+      style: {
+        borderRadius: '20px',
+        background: '#fbcfe8',
+        color: '#594246',
+        fontSize: '14px',
+        padding: '12px 24px',
+      },
+      iconTheme: {
+        primary: '#22c55e',
+        secondary: '#fff',
+      },
+    });
+  };
+
+  const workshops = useMemo(() => {
+    const names = new Set<string>();
+    localOrders.forEach(o => {
+      const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+      selectedQuotes.forEach((q: any) => {
+        if (q?.id_supplier?.name_company) names.add(q.id_supplier.name_company);
+        else if (q?.id_supplier?.name) names.add(q.id_supplier.name);
+      });
+    });
+    return ["Todos los Talleres", ...Array.from(names)];
+  }, [localOrders]);
+
+  const months = useMemo(() => {
+    const m = new Set<string>();
+    localOrders.forEach(o => {
+      const date = new Date(o.created_at);
+      const label = date.toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
+      m.add(label.charAt(0).toUpperCase() + label.slice(1));
+    });
+    return ["Todos los Meses", ...Array.from(m)];
+  }, [localOrders]);
+
   const counts = useMemo(() => ({
-    TODAS: prePurchaseOrders.filter(o => o.status !== "CONVERTIDA").length,
-    "CONTACTO INICIAL": prePurchaseOrders.filter(o => o.status === "SOLICITANDO").length,
-    "CORTE / HABILITADO": 0,
-    "EN TALLER": prePurchaseOrders.filter(o => o.status === "COMPARANDO").length,
-    "CONTROL CALIDAD": prePurchaseOrders.filter(o => o.status === "EN_REVISION").length,
+    TODAS: localOrders.filter(o => o.status !== "CONVERTIDA").length,
+    "ENTREGAS DE HOY": localOrders.filter(o => {
+      const today = new Date().toISOString().split('T')[0];
+      const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
+      if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
+      return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
+    }).length,
+    "CONTACTO INICIAL": localOrders.filter(o => o.status === "SOLICITANDO").length,
+    "CORTE / HABILITADO": localOrders.filter(o => o.status === "COMPARANDO").length,
+    "EN TALLER": localOrders.filter(o => o.status === "EN_REVISION").length,
+    "CONTROL CALIDAD": localOrders.filter(o => o.status === "CONVERTIDA").length,
     "RECHAZADO": 0,
-  }), [prePurchaseOrders]);
+  }), [localOrders]);
 
   return (
-    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc]">
+    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc] relative">
       <header className="space-y-2">
         <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Ordenes de Produccion</h1>
         <p className="text-base text-[#9b8088]">{counts.TODAS} ordenes en curso</p>
       </header>
 
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#b79ca5]" />
-        <input
-          type="text"
-          placeholder="Buscar por taller, producto o N° de orden..."
-          className="h-16 w-full rounded-2xl border border-rose-100 bg-white pl-14 pr-4 text-base outline-none shadow-sm focus:ring-1 focus:ring-[#F2778D]"
-        />
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#b79ca5]" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por taller, producto o N° de orden..."
+            className="h-16 w-full rounded-2xl border border-rose-100 bg-white pl-14 pr-4 text-base outline-none shadow-sm focus:ring-1 focus:ring-[#F2778D]"
+          />
+        </div>
+
+        <div className="flex gap-2 w-full md:w-auto">
+          <select 
+            value={selectedWorkshop}
+            onChange={(e) => setSelectedWorkshop(e.target.value)}
+            className="h-16 px-6 rounded-2xl border border-rose-100 bg-white text-sm font-medium text-[#594246] outline-none shadow-sm cursor-pointer appearance-none min-w-[180px]"
+          >
+            {workshops.map(w => <option key={w} value={w}>{w}</option>)}
+          </select>
+
+          <select 
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="h-16 px-6 rounded-2xl border border-rose-100 bg-white text-sm font-medium text-[#594246] outline-none shadow-sm cursor-pointer appearance-none min-w-[160px]"
+          >
+            {months.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 pb-2">
@@ -69,49 +220,165 @@ export default function ProductionOrderTracking() {
       </div>
 
       <div className="space-y-8">
-        {prePurchaseOrders.map((order: any) => (
-          <ProductionCard key={order._id} order={order} />
-        ))}
+        {localOrders
+          .filter(o => {
+            const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
+            if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
+
+            const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+            const workshopNames = selectedQuotes.map((q: any) => q.id_supplier?.name_company || q.id_supplier?.name).filter(Boolean);
+            const workshopDisplayName = workshopNames.length > 0 ? workshopNames.join(", ") : "Taller no asignado";
+            const productName = o.base_items?.[0]?.id_variant?.id_product?.name || "";
+
+            // Filtro de Búsqueda
+            const matchesSearch = searchTerm === "" || 
+              o.order_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              workshopDisplayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              productName.toLowerCase().includes(searchTerm.toLowerCase());
+            if (!matchesSearch) return false;
+
+            // Filtro de Taller
+            if (selectedWorkshop !== "Todos los Talleres" && !workshopNames.includes(selectedWorkshop)) return false;
+
+            // Filtro de Mes
+            const orderMonthRaw = new Date(o.created_at).toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
+            const orderMonth = orderMonthRaw.charAt(0).toUpperCase() + orderMonthRaw.slice(1);
+            if (selectedMonth !== "Todos los Meses" && orderMonth !== selectedMonth) return false;
+
+            // Filtro de Etapa
+            if (filter === "TODAS") return o.status !== "CONVERTIDA";
+            if (filter === "ENTREGAS DE HOY") {
+              const today = new Date().toISOString().split('T')[0];
+              return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
+            }
+            if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO";
+            if (filter === "CORTE / HABILITADO") return o.status === "COMPARANDO";
+            if (filter === "EN TALLER") return o.status === "EN_REVISION";
+            if (filter === "CONTROL CALIDAD") return o.status === "CONVERTIDA";
+            return true;
+          })
+          .map((order: any) => (
+            <ProductionCard 
+              key={order._id} 
+              order={order} 
+              onUpdateStatus={updateOrderStatus} 
+              startUpdateSupplierQuote={startUpdateSupplierQuote}
+              extendOCDate={extendOCDate}
+            />
+          ))}
       </div>
     </section>
   );
 }
 
-function ProductionCard({ order }: { order: any }) {
+function ProductionCard({ 
+  order, 
+  onUpdateStatus, 
+  startUpdateSupplierQuote,
+  extendOCDate 
+}: { 
+  order: any; 
+  onUpdateStatus: (id: string, status: string) => Promise<void>; 
+  startUpdateSupplierQuote: (id: string, payload: any) => Promise<boolean | null>;
+  extendOCDate: (id: string, newDate: string, reason: string) => Promise<boolean | null>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "OBS" | "COST" | null>(null);
+  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | null>(null);
   const [now, setNow] = useState(new Date());
-  const [statusAction, setStatusAction] = useState<"NEXT" | "PAUSE">("NEXT");
-  const [pauseReason, setPauseReason] = useState("");
+  const [tempCosts, setTempCosts] = useState<Record<string, number>>({});
+  const [newDate, setNewDate] = useState("");
+  const [extendReason, setExtendReason] = useState("");
 
   useEffect(() => {
-    if (activeModal === "OBS" || activeModal === "STATUS") {
+    if (activeModal === "STATUS") {
       setNow(new Date());
     }
   }, [activeModal]);
   
   const getProgress = () => {
-    if (order.status === "EN_REVISION") return 100;
-    if (order.status === "CONVERTIDA") return 75;
+    if (totalAmount === 0) return 25;
+    if (order.status === "CONVERTIDA") return 100;
+    if (order.status === "EN_REVISION") return 75;
     if (order.status === "COMPARANDO") return 50;
     return 25;
   };
 
   const firstItem = order.base_items?.[0]?.id_variant?.id_product;
-  const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-  const workshopName = selectedQuote?.id_supplier?.name_company || selectedQuote?.id_supplier?.name || "Taller no asignado";
-  const totalAmount = selectedQuote?.total_amount || 0;
+  const selectedQuotes = order.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+  const workshopName = selectedQuotes.length > 1 
+    ? `${selectedQuotes.length} Talleres Seleccionados` 
+    : (selectedQuotes[0]?.id_supplier?.name_company || selectedQuotes[0]?.id_supplier?.name || "Taller no asignado");
+  const totalAmount = selectedQuotes.reduce((acc: number, q: any) => acc + (q.total_amount || 0), 0);
+  
+  const actualTotal = order.base_items?.reduce((acc: number, item: any) => {
+    const unitPrice = item.unit_cost || (totalAmount / (order.base_items?.length || 1));
+    return acc + (item.quantity * unitPrice);
+  }, 0) || 0;
+
+  const getStepDate = (stepIdx: number) => {
+    const date = new Date(order.created_at);
+    date.setHours(date.getHours() + (stepIdx * 5));
+    return date.toISOString();
+  };
+
+  const handleConfirm = async () => {
+    if (activeModal === "STATUS") {
+      let nextStatus = "COMPARANDO";
+      if (order.status === "COMPARANDO") nextStatus = "EN_REVISION";
+      if (order.status === "EN_REVISION") nextStatus = "CONVERTIDA";
+      
+      await onUpdateStatus(order._id, nextStatus);
+    } else if (activeModal === "COST") {
+      // Registrar costos en el backend
+      const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
+      if (selectedQuote) {
+        const updatedItems = order.base_items.map((item: any) => ({
+          ...item,
+          unit_cost: tempCosts[item.id_variant?._id] || 0
+        }));
+        
+        await startUpdateSupplierQuote(order._id, {
+          id_supplier: selectedQuote.id_supplier?._id || selectedQuote.id_supplier,
+          items: updatedItems
+        });
+      }
+    }
+    setActiveModal(null);
+  };
+
+  const CostItem = ({ item }: { item: any }) => (
+    <div className="flex items-center justify-between p-3 bg-white border border-rose-50/50 hover:border-rose-100 rounded-xl transition-all shadow-sm mb-2 last:mb-0">
+        <div>
+          <p className="text-sm font-bold text-[#594246]">{item.id_variant?.size} · {item.id_variant?.color}</p>
+          <p className="text-[10px] text-[#9b8088] uppercase">{item.quantity} unidades</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-bold text-[#b79ca5]">S/</span>
+          <input 
+            type="number" 
+            min="0" 
+            step="0.01"
+            placeholder="0.00" 
+            value={tempCosts[item.id_variant?._id] || ""}
+            onChange={(e) => setTempCosts(prev => ({ ...prev, [item.id_variant?._id]: parseFloat(e.target.value) || 0 }))}
+            onKeyDown={(e) => {
+              if (e.key === '-' || e.key === 'e') e.preventDefault();
+            }}
+            className="w-24 h-10 rounded-lg border border-rose-100 px-3 text-right outline-none focus:ring-1 focus:ring-[#F2778D] font-bold text-[#594246]" 
+          />
+        </div>
+    </div>
+  );
 
   return (
-    <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden">
+    <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden relative">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
-             <Image 
-                src={firstItem?.images?.[0] || "/placeholder.png"} 
-                alt="Product" 
-                fill 
-                className="object-cover" 
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100 shadow-inner">
+             <img 
+                src={firstItem?.images?.[0] || firstItem?.image || "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=400"} 
+                alt={firstItem?.name || "Product"} 
+                className="h-full w-full object-cover transition-transform hover:scale-110 duration-500" 
              />
           </div>
           <div className="space-y-1 sm:space-y-2 flex-1">
@@ -119,13 +386,25 @@ function ProductionCard({ order }: { order: any }) {
               <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               <div className="flex flex-wrap gap-1.5">
                 <span className={`rounded-md px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-white ${
-                  order.status === 'EN_REVISION' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+                  order.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
                   }`}>
-                  {order.status === 'EN_REVISION' ? 'Control Calidad' : 'En Proceso'}
+                  {order.status === 'CONVERTIDA' ? 'Control Calidad' : 'En Proceso'}
                 </span>
                 <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c]">
                   {workshopName}
                 </span>
+                {(() => {
+                  const today = new Date().toISOString().split('T')[0];
+                  if (order.estimated_delivery_date?.startsWith(today)) {
+                    return (
+                      <span className="rounded-md bg-rose-100 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-bold text-[#F2778D] flex items-center gap-1.5 border border-rose-200">
+                        <Clock className="w-3 h-3" />
+                        ENTREGA HOY
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
             <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
@@ -148,7 +427,7 @@ function ProductionCard({ order }: { order: any }) {
           
           <div className="flex items-center gap-4">
             <div className="text-[20px] sm:text-[25px] text-[#F2778D] tracking-tighter font-medium">
-              {formatCurrency(totalAmount)}
+              {formatCurrency(actualTotal)}
             </div>
 
             <button 
@@ -172,27 +451,31 @@ function ProductionCard({ order }: { order: any }) {
               icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Contacto Inicial" 
               sub="Orden confirmada" 
+              date={order.created_at}
             />
 
             <StepItem 
-              active={order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA"} 
+              active={totalAmount > 0 && (order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA")} 
               icon={<Scissors className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Corte / Habilitado" 
               sub="Preparacion de telas" 
+              date={(totalAmount > 0 && (order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA")) ? getStepDate(1) : undefined}
             />
             
             <StepItem 
-              active={order.status === "EN_REVISION" || order.status === "CONVERTIDA"} 
+              active={totalAmount > 0 && (order.status === "EN_REVISION" || order.status === "CONVERTIDA")} 
               icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Confeccion" 
               sub="Trabajo en taller" 
+              date={(totalAmount > 0 && (order.status === "EN_REVISION" || order.status === "CONVERTIDA")) ? getStepDate(2) : undefined}
             />
 
             <StepItem 
-              active={order.status === "CONVERTIDA"} 
+              active={totalAmount > 0 && order.status === "CONVERTIDA"} 
               icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Control Calidad" 
               sub="Revision y acabados" 
+              date={(totalAmount > 0 && order.status === "CONVERTIDA") ? getStepDate(3) : undefined}
             />
           </div>
         </div>
@@ -213,7 +496,7 @@ function ProductionCard({ order }: { order: any }) {
                 className="!py-2 !px-4 !text-xs !bg-white border border-[#f2b6c1] !text-[#594246]"
                 icon={CalendarClock}
               >
-                Prolongar fecha de abastecimiento
+                Prolongar fecha de producción
               </CTA>
             </div>
             
@@ -250,14 +533,7 @@ function ProductionCard({ order }: { order: any }) {
               </table>
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-end gap-4">
-              <CTA 
-                onClick={() => setActiveModal("OBS")}
-                className="!bg-white border border-[#f2b6c1] !text-[#594246] !py-3 !px-6"
-                icon={FileText}
-              >
-                Ver Observaciones
-              </CTA>
+              <div className="mt-8 flex flex-wrap justify-end gap-4">
               <CTA 
                 onClick={() => setActiveModal("TECH")}
                 className="!bg-white border border-[#F2778D] !text-[#F2778D] !py-3 !px-6"
@@ -294,27 +570,48 @@ function ProductionCard({ order }: { order: any }) {
         open={activeModal === "DATE"} 
         onClose={() => setActiveModal(null)}
         panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-md p-8"
-        title="Prolongar Abastecimiento"
+        title="Prolongar Fecha de Entrega"
         titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
       >
         <div className="space-y-6 pt-2">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-[#b79ca5] uppercase tracking-wider">Nueva Fecha Estimada</label>
-            <input type="date" className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D] text-[#594246]" />
+            <label className="text-xs font-bold text-[#b79ca5] uppercase tracking-wider">Nueva Fecha de Producción</label>
+            <input 
+              type="date" 
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D] text-[#594246]" 
+            />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-bold text-[#b79ca5] uppercase tracking-wider">Razón de la prórroga</label>
-            <select className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D] text-[#594246] appearance-none bg-white">
+            <select 
+              value={extendReason}
+              onChange={(e) => setExtendReason(e.target.value)}
+              className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D] text-[#594246] appearance-none bg-white"
+            >
               <option value="">Selecciona una razón...</option>
-              <option value="productos-mal-estado">Productos en mal estado</option>
               <option value="retraso-taller">Retraso en el taller</option>
               <option value="falta-insumos">Falta de insumos / avíos</option>
-              <option value="otro">Otro (especificar en observaciones)</option>
+              <option value="otro">Otro</option>
             </select>
           </div>
           <div className="flex gap-4 pt-4">
             <CTA onClick={() => setActiveModal(null)} className="flex-1 !bg-white border border-rose-100 !text-[#9b8088]">Cancelar</CTA>
-            <CTA className="flex-1 shadow-lg shadow-rose-100">Confirmar</CTA>
+            <CTA 
+              onClick={async () => {
+                const poId = order.id_purchase_order?._id || order.id_purchase_order;
+                if (newDate && poId) {
+                  await extendOCDate(poId, newDate, extendReason);
+                  setActiveModal(null);
+                } else if (!poId) {
+                  toast.error("Esta orden aún no tiene una OC generada.");
+                }
+              }}
+              className="flex-1 shadow-lg shadow-rose-100"
+            >
+              Confirmar
+            </CTA>
           </div>
         </div>
       </Modal>
@@ -328,68 +625,49 @@ function ProductionCard({ order }: { order: any }) {
         titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
       >
         <div className="space-y-8 pt-6">
-          {/* Indicador de Flujo */}
-          <div className="flex items-center justify-center gap-4 bg-rose-50/30 p-4 rounded-2xl border border-rose-50">
-            <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-[#b79ca5] uppercase">Fase Actual</span>
-              <p className="text-sm font-bold text-[#594246]">Corte / Habilitado</p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-[#F2778D]" />
-            <div className="flex flex-col items-center">
-              <span className="text-[10px] font-bold text-[#F2778D] uppercase">Siguiente Fase</span>
-              <p className="text-sm font-bold text-[#594246]">Confección / Costura</p>
-            </div>
-          </div>
+          {/* Indicador de Flujo Dinámico */}
+          {(() => {
+            let current = "Contacto Inicial";
+            let next = "Corte / Habilitado";
+            
+            if (order.status === "COMPARANDO") {
+              current = "Corte / Habilitado";
+              next = "Confección / Costura";
+            } else if (order.status === "EN_REVISION") {
+              current = "Confección / Costura";
+              next = "Control Calidad";
+            } else if (order.status === "CONVERTIDA") {
+              current = "Control Calidad";
+              next = "Finalizar Orden (Almacén)";
+            }
+
+            return (
+              <div className="flex items-center justify-center gap-4 bg-rose-50/30 p-4 rounded-2xl border border-rose-50">
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-bold text-[#b79ca5] uppercase">Fase Actual</span>
+                  <p className="text-sm font-bold text-[#594246]">{current}</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-[#F2778D]" />
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-bold text-[#F2778D] uppercase">Siguiente Fase</span>
+                  <p className="text-sm font-bold text-[#594246]">{next}</p>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Selector de Acción */}
-          <div className="grid grid-cols-2 gap-4">
-            <button 
-              onClick={() => setStatusAction("NEXT")}
-              className={`p-5 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 ${
-                statusAction === "NEXT" 
-                  ? "border-[#F2778D] bg-rose-50/20 ring-4 ring-rose-50/30" 
-                  : "border-rose-50 bg-white hover:border-rose-100"
-              }`}
-            >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${statusAction === "NEXT" ? "bg-[#F2778D] text-white" : "bg-rose-50 text-[#F2778D]"}`}>
-                <CheckCircle2 className="w-6 h-6" />
+          <div className="flex flex-col gap-4">
+            <div className="p-6 rounded-2xl border-2 border-[#F2778D] bg-rose-50/20 ring-4 ring-rose-50/30 text-left flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#F2778D] text-white">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <p className="text-sm font-bold text-[#594246]">Avanzar Fase</p>
-                <p className="text-[10px] text-[#9b8088] leading-tight">Continuar con el flujo normal de producción.</p>
+                <p className="text-base font-bold text-[#594246]">Avanzar Fase de Producción</p>
+                <p className="text-xs text-[#9b8088] leading-tight">Esta acción registrará el avance a la siguiente etapa.</p>
               </div>
-            </button>
-
-            <button 
-              onClick={() => setStatusAction("PAUSE")}
-              className={`p-5 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 ${
-                statusAction === "PAUSE" 
-                  ? "border-amber-400 bg-amber-50/20 ring-4 ring-amber-50/30" 
-                  : "border-rose-50 bg-white hover:border-rose-100"
-              }`}
-            >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${statusAction === "PAUSE" ? "bg-amber-400 text-white" : "bg-amber-50 text-amber-500"}`}>
-                <Pause className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-[#594246]">Pausar Orden</p>
-                <p className="text-[10px] text-[#9b8088] leading-tight">Detener temporalmente por algún incidente.</p>
-              </div>
-            </button>
-          </div>
-
-          {/* Campo Condicional para Pausa */}
-          {statusAction === "PAUSE" && (
-            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="text-[10px] font-bold text-[#594246] uppercase tracking-widest ml-1">Motivo de la detención</label>
-              <textarea 
-                value={pauseReason}
-                onChange={(e) => setPauseReason(e.target.value)}
-                placeholder="Escribe aquí por qué se detiene la orden (ej: Falta de insumos)..."
-                className="w-full h-24 p-4 rounded-xl border border-rose-100 bg-white text-sm text-[#594246] outline-none focus:ring-2 focus:ring-amber-200 resize-none transition-all"
-              />
             </div>
-          )}
+          </div>
 
           {/* Timestamp de Registro */}
           <div className="flex items-center justify-center gap-2 py-2 border-t border-rose-50 pt-6">
@@ -402,81 +680,81 @@ function ProductionCard({ order }: { order: any }) {
           <div className="flex gap-4">
             <CTA onClick={() => setActiveModal(null)} className="flex-1 !bg-white border border-rose-100 !text-[#9b8088]">Volver</CTA>
             <CTA 
-              className={`flex-1 shadow-lg ${statusAction === "PAUSE" ? "!bg-amber-400 shadow-amber-100" : "shadow-rose-100"}`}
-              disabled={statusAction === "PAUSE" && !pauseReason.trim()}
+              className="flex-1 shadow-lg shadow-rose-100"
+              onClick={handleConfirm}
             >
-              Confirmar Cambio
+              Confirmar Avance
             </CTA>
           </div>
         </div>
       </Modal>
 
-      {/* 3. Modal Observaciones */}
-      <Modal 
-        open={activeModal === "OBS"} 
-        onClose={() => setActiveModal(null)}
-        panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-lg p-8"
-        title="Bitácora de Seguimiento"
-        titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
-      >
-        <div className="space-y-6 pt-2">
-          <div className="max-h-60 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-             <div className="p-4 bg-rose-50/20 rounded-xl border border-rose-50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-bold text-[#F2778D] uppercase">04 May 2026 · Admin</span>
-                </div>
-                <p className="text-sm text-[#594246] leading-relaxed">Se enviaron 10 cierres adicionales para la variante L por requerimiento del taller.</p>
-             </div>
-             <div className="p-4 bg-rose-50/20 rounded-xl border border-rose-50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-bold text-emerald-500 uppercase">05 May 2026 · Taller</span>
-                </div>
-                <p className="text-sm text-[#594246] leading-relaxed">Telas recibidas en buen estado. Iniciando corte hoy mismo.</p>
-             </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-[10px] font-bold text-[#b79ca5] uppercase tracking-wider">Agregar nueva nota</label>
-              <span className="text-[10px] font-bold text-[#F2778D] uppercase tracking-wider">
-                {now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '')} · {now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true })}
-              </span>
-            </div>
-            <textarea className="w-full h-24 rounded-xl border border-rose-100 p-4 outline-none focus:ring-1 focus:ring-[#F2778D] resize-none text-sm text-[#594246]" placeholder="Escribe aquí cualquier detalle..." />
-          </div>
-          <CTA className="w-full shadow-lg shadow-rose-100" icon={Plus}>Añadir Observación</CTA>
-        </div>
-      </Modal>
+
 
       {/* 4. Modal Registrar Costos */}
       <Modal 
         open={activeModal === "COST"} 
         onClose={() => setActiveModal(null)}
         panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-lg p-8"
-        title="Registro de Costos"
+        title="Registro de Costos de Taller"
         titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
       >
         <div className="space-y-6 pt-2">
-          <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100 flex items-start gap-3">
-             <AlertCircle className="w-5 h-5 text-[#F2778D] shrink-0" />
-             <p className="text-xs text-[#9b8088] leading-tight">Ingresa el costo de mano de obra acordado con el taller para desbloquear el inicio de producción.</p>
-          </div>
-          <div className="space-y-2">
-             {order.base_items?.map((item: any, idx: number) => (
-                <div key={idx} className="flex items-center justify-between p-3 hover:bg-rose-50/30 rounded-lg transition-colors">
-                   <div>
-                      <p className="text-sm font-bold text-[#594246]">{item.id_variant?.size} · {item.id_variant?.color}</p>
-                      <p className="text-[10px] text-[#9b8088] uppercase">{item.quantity} unidades</p>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[#b79ca5]">S/</span>
-                      <input type="number" placeholder="0.00" className="w-24 h-10 rounded-lg border border-rose-100 px-3 text-right outline-none focus:ring-1 focus:ring-[#F2778D] font-bold text-[#594246]" />
-                   </div>
-                </div>
-             ))}
-          </div>
-          <CTA className="w-full h-14 !text-lg shadow-xl shadow-rose-100">Confirmar Costos</CTA>
+           <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-[#F2778D] shrink-0" />
+              <p className="text-xs text-[#9b8088] leading-tight text-pretty">
+                Registra el costo de mano de obra pactado. Si la orden se divide en varios talleres, asegúrate de asignar el costo a cada variante correspondiente.
+              </p>
+           </div>
+
+            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+              {(() => {
+                const selectedQuotes = order.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+                const productName = order.base_items?.[0]?.id_variant?.id_product?.name || "Producto sin nombre";
+                
+                if (selectedQuotes.length === 0) {
+                  return (
+                    <div className="space-y-3">
+                      <div className="px-1">
+                        <p className="text-[10px] font-bold text-[#b79ca5] uppercase tracking-widest mb-1">Taller General (Pendiente)</p>
+                        <h5 className="text-sm font-bold text-[#594246]">{productName}</h5>
+                      </div>
+                      <div className="space-y-2">
+                        {order.base_items?.map((item: any, idx: number) => (
+                          <CostItem key={idx} item={item} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return selectedQuotes.map((quote: any, qIdx: number) => (
+                  <div key={qIdx} className="space-y-3">
+                    <div className="px-1 border-l-2 border-[#F2778D] pl-3">
+                      <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-widest mb-0.5">
+                        Taller: {quote.id_supplier?.name_company || quote.id_supplier?.name || "Taller Asignado"}
+                      </p>
+                      <h5 className="text-sm font-bold text-[#594246]">{productName}</h5>
+                    </div>
+                    <div className="space-y-2">
+                      {order.base_items?.map((item: any, idx: number) => (
+                        <CostItem key={idx} item={item} />
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+           
+           <CTA 
+            onClick={handleConfirm}
+            className="w-full h-14 !text-lg shadow-xl shadow-rose-100"
+           >
+            Confirmar Registro de Costos
+           </CTA>
         </div>
       </Modal>
+
       {/* 5. Modal Ficha Técnica */}
       <Modal 
         open={activeModal === "TECH"} 
@@ -533,7 +811,7 @@ function ProductionCard({ order }: { order: any }) {
   );
 }
 
-function StepItem({ active, icon, label, sub }: { active: boolean; icon: any; label: string; sub: string }) {
+function StepItem({ active, icon, label, sub, date }: { active: boolean; icon: any; label: string; sub: string; date?: string }) {
   return (
     <div className="flex flex-col items-center text-center space-y-3">
       <div className={`flex h-13 w-13 items-center justify-center rounded-full border-[6px] border-white shadow-lg transition-all z-10 ${
@@ -544,6 +822,11 @@ function StepItem({ active, icon, label, sub }: { active: boolean; icon: any; la
       <div className="space-y-1">
         <p className={`text-sm font-bold ${active ? "text-[#F2778D]" : "text-[#b79ca5]"}`}>{label}</p>
         <p className="text-[11px] leading-tight text-[#9b8088] max-w-[140px] mx-auto">{sub}</p>
+        {active && date && (
+          <p className="text-[10px] font-bold text-[#F2778D] mt-1 animate-pulse-slow">
+            {new Date(date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} · {new Date(date).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
       </div>
     </div>
   );

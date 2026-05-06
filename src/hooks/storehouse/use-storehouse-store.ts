@@ -401,9 +401,20 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
   }, "Error al procesar el ingreso de mercadería.");
 }, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements, startLoadingPrePurchaseOrders]);
 
-    const completedOrders = useMemo(() => {
-      return purchaseOrders.filter(order => order.status === 'COMPLETADA');
-    }, [purchaseOrders]);
+  const completedOrders = useMemo(() => {
+    return purchaseOrders.filter(order => order.status === 'COMPLETADA');
+  }, [purchaseOrders]);
+
+  const startUpdatePreOrderStatus = useCallback(async (id: string, status: string) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.patch(`/pre-purchase-orders/${id}/status`, { status }, config);
+      
+      dispatch(onUpdatePreOrder(data));
+      toast.success("Estado de producción actualizado.");
+      return true;
+    }, "No se pudo actualizar el estado de producción.");
+  }, [dispatch, executeRequest, getConfig]);
 
   return {
     purchaseOrders,
@@ -421,6 +432,7 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     searchTerm,
     orderBy,
     order,
+    completedOrders,
 
     setSearchTerm,
     setOrderBy,
@@ -447,5 +459,6 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     startSelectWinnerAndConvert,
     startCreateVariantQuickly,
     startInitalQualityCheck,
+    startUpdatePreOrderStatus,
   };
 };
