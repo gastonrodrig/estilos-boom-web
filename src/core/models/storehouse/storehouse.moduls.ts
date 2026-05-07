@@ -41,7 +41,7 @@ export interface PurchaseOrderWorkerRef {
 export interface PurchaseOrder {
 	_id: string;
 	order_number: string;
-	id_supplier: string | PurchaseOrderSupplierRef;
+	id_supplier: PurchaseOrderSupplierRef;
 	id_worker: string | PurchaseOrderWorkerRef;
 	items: PurchaseOrderItem[];
 	total_amount: number;

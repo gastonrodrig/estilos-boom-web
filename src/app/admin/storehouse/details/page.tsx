@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Modal } from "@/components";
 import { ApproveInventoryModal } from "@/components/features/storehouse/aprove-order-modal";
 import { ExtendDateModal } from "@/components/features/storehouse/extended-date-modal";
+import { OrderDetailsModal } from "@/components/features/storehouse/order-detail-modal";
 
 // --- HELPERS ---
 const formatCurrency = (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
@@ -141,7 +142,8 @@ function OPPCard({ opp }: { opp: any }) {
   const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { startUpdateSupplierQuote, startSelectWinnerAndConvert,approveInventory, extendOCDate } = useStorehouseStore();
   const { startInitalQualityCheck } = useStorehouseStore();
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
@@ -401,9 +403,12 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
     )}
 
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
-			<button className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors">
-				<Eye className="w-4 h-4" /> Ver Detalles Completos
-			</button>
+			<button 
+        onClick={() => setIsDetailsModalOpen(true)}
+        className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors"
+      >
+        <Eye className="w-4 h-4" /> Ver Detalles Completos
+      </button>
 
 			</div>
           </motion.div>
@@ -460,6 +465,12 @@ const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
       onClose={() => setIsExtendModalOpen(false)}
       onConfirm={handleExtend}
       isLoading={false}
+    />
+
+    <OrderDetailsModal 
+      isOpen={isDetailsModalOpen} 
+      onClose={() => setIsDetailsModalOpen(false)} 
+      opp={opp} 
     />
     </article>
   );
@@ -633,4 +644,5 @@ function StepItem({ active, icon, label, sub }: { active: boolean; icon: any; la
       </div>
     </div>
   );
+
 }
