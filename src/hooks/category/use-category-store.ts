@@ -1,6 +1,6 @@
 "use client";
 
-import { clientApi } from "@api";
+import { categoryApi } from "@api";
 import { 
   useAppDispatch, 
   useAppSelector, 
@@ -15,6 +15,7 @@ import {
 import { getAuthConfig } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
 import toast from "react-hot-toast";
+import { useCallback } from "react";
 
 export const useCategoryStore = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +32,7 @@ export const useCategoryStore = () => {
     try {
       const payload = createCategoryToApi(category);
       const token = await getFirebaseAuthToken();
-      await clientApi.post("/categories", payload, getAuthConfig({ token }));
+      await categoryApi.post("/", payload, getAuthConfig({ token }));
       await startLoadingCategories();
       toast.success("Categoría creada exitosamente.");
       return true;
@@ -44,10 +45,10 @@ export const useCategoryStore = () => {
     }
   };
 
-  const startLoadingCategories = async () => {
+  const startLoadingCategories = useCallback(async () => {
     dispatch(setLoadingCategory(true));
     try {
-      const { data } = await clientApi.get("/categories");
+      const { data } = await categoryApi.get("/"); // Revisa si la ruta correcta es /categories o /client/categories
       
       dispatch(refreshCategories({
         items: data,
@@ -61,7 +62,7 @@ export const useCategoryStore = () => {
     } finally {
       dispatch(setLoadingCategory(false));
     }
-  };
+  }, [dispatch]);
 
   return {
     categories,

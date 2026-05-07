@@ -22,7 +22,7 @@ export const adminModules: SidebarModule[] = [
   {
     label: "Gestionar Productos",
     icon: "package",
-    requiredPermission: "products:view", // El padre necesita permiso para verse
+     // El padre necesita permiso para verse
     children: [
       {
         label: "Categorías",
@@ -32,7 +32,7 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Productos",
         href: "/admin/products",
-        requiredPermission: "products:manage",
+        requiredPermission: "products:view",
       },
     ],
   },

@@ -25,6 +25,7 @@ const normalizeProduct = (p: ApiProduct): Product => {
   // 2. Mapeo profundo de Variantes (_id -> id_variant)
   const rawVariants = Array.isArray(p.variants) ? p.variants : [];
   const normalizedVariants = rawVariants.map((v: any) => ({
+    _id: v._id || v.id_variant || "",
     id_variant: v.id_variant || v._id || "",
     size: v.size || "",
     color: v.color || "",
@@ -32,7 +33,8 @@ const normalizeProduct = (p: ApiProduct): Product => {
     sku_variant: v.sku_variant || "",
     min_stock_alert: Number(v.min_stock_alert ?? 10),
   }));
-
+const categoryData = typeof p.id_category === 'object' ? (p.id_category as any) : null;
+const idCategory = categoryData ? categoryData._id : (p.id_category as string ?? "");
   // 3. Retorno del objeto Product COMPLETO
   return {
     id_product: idProduct,
@@ -44,8 +46,11 @@ const normalizeProduct = (p: ApiProduct): Product => {
     is_best_seller: Boolean(p.is_best_seller),
     is_new_in: Boolean(p.is_new_in),
     images: Array.isArray(p.images) ? (p.images as string[]) : [],
-    id_category: (p.id_category as string) ?? "",
-    category: (p.category as any),
+    id_category: idCategory,
+    category: categoryData ? {
+    name: categoryData.name,
+    default_size_guide_url: categoryData.default_size_guide_url
+  } : (p.category as any),
 
     // --- NUEVOS CAMPOS (Evita el error de TypeScript) ---
     gender: (p.gender as any) ?? "MUJER",
@@ -148,6 +153,47 @@ export const useProductStore = () => {
     [dispatch],
   );
 
+  const createProduct = useCallback(async (formData: FormData) => {
+  dispatch(setLoadingProduct(true));
+  try {
+    const token = await getFirebaseAuthToken();
+    const { data } = await productApi.post("/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    toast.success("¡Producto creado con éxito!");
+    return normalizeProduct(data);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "Error al crear el producto";
+    toast.error(msg);
+    return null;
+  } finally {
+    dispatch(setLoadingProduct(false));
+  }
+}, [dispatch]);
+
+  const updateProduct = useCallback(async (id: string, formData: FormData) => {
+  dispatch(setLoadingProduct(true));
+  try {
+    const token = await getFirebaseAuthToken();
+    const { data } = await productApi.patch(`/${id}`, formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}` 
+      }
+    });
+    toast.success("Producto actualizado");
+    return normalizeProduct(data);
+  } catch (error) {
+    toast.error("Error al actualizar");
+    return null;
+  } finally {
+    dispatch(setLoadingProduct(false));
+  }
+}, [dispatch])
+
   return {
     products,
     loading,
@@ -155,5 +201,6 @@ export const useProductStore = () => {
     setSearchTerm,
     startLoadingProducts,
     getProductById,
+    createProduct,
   };
 };
