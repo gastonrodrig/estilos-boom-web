@@ -3,53 +3,55 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye, Users, ShieldCheck } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/hooks";
 
 interface SidebarItem {
-	label: string;
-	href?: string;
-	icon?: string;
-	requiredPermission?: string;
-	children?: SidebarItem[];
+    label: string;
+    href?: string;
+    icon?: string;
+    requiredPermission?: string;
+    children?: SidebarItem[];
 }
 
 interface SidebarProps {
-	items: SidebarItem[];
-	hasTopBar?: boolean;
+    items: SidebarItem[];
+    hasTopBar?: boolean;
 }
 
 const iconMap = {
-	dashboard: LayoutDashboard,
-	package: Package,
-	store: Store,
-	"shopping-bag": ShoppingBag,
-	booktext: BookText,
-	banknote: Banknote,
-	contact: Contact,
-	eye: Eye,
-	users: Users,
-	permissions: ShieldCheck,
+    dashboard: LayoutDashboard,
+    package: Package,
+    store: Store,
+    "shopping-bag": ShoppingBag,
+    booktext: BookText,
+    banknote: Banknote,
+    contact: Contact,
+    eye: Eye,
+    users: Users,
+    permissions: ShieldCheck,
+    "clipboard-list": ClipboardList,
+    factory: Factory,
 } as const;
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
-	const pathname = usePathname();
-	const { permissions } = useAuthStore();
-	const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-	const [showSidebar, setShowSidebar] = useState(() => {
-		if (typeof window === "undefined") return false;
-		return window.matchMedia("(min-width: 1138px)").matches;
-	});
+    const pathname = usePathname();
+    const { permissions } = useAuthStore();
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+    const [showSidebar, setShowSidebar] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return window.matchMedia("(min-width: 1024px)").matches;
+    });
 
-	const sidebarTopClass = hasTopBar ? "top-[100px]" : "top-16";
-	const sidebarHeightClass = hasTopBar ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-64px)]";
+    const sidebarTopClass = hasTopBar ? "top-[100px]" : "top-16";
+    const sidebarHeightClass = hasTopBar ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-64px)]";
 
-	const isPathActive = (href: string) => {
+    const isPathActive = (href: string) => {
         return pathname === href;
     };
 
-	const checkActiveRecursive = (item: SidebarItem): boolean => {
+    const checkActiveRecursive = (item: SidebarItem): boolean => {
         if (item.href && isPathActive(item.href)) return true;
         if (item.children) {
             return item.children.some(child => checkActiveRecursive(child));
@@ -57,31 +59,31 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
         return false;
     };
 
-	const handleToggleSection = (label: string) => {
-		setOpenSections((prev) => ({
-			...prev,
-			[label]: !prev[label],
-		}));
-	};
+    const handleToggleSection = (label: string) => {
+        setOpenSections((prev) => ({
+            ...prev,
+            [label]: !prev[label],
+        }));
+    };
 
-	useEffect(() => {
-		const mediaQuery = window.matchMedia("(min-width: 1138px)");
-		const handleChange = (event: MediaQueryListEvent) => setShowSidebar(event.matches);
-		mediaQuery.addEventListener("change", handleChange);
-		return () => mediaQuery.removeEventListener("change", handleChange);
-	}, []);
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(min-width: 1024px)");
+        const handleChange = (event: MediaQueryListEvent) => setShowSidebar(event.matches);
+        mediaQuery.addEventListener("change", handleChange);
+        return () => mediaQuery.removeEventListener("change", handleChange);
+    }, []);
 
-	const renderItem = (item: SidebarItem, depth = 0) => {
+    const renderItem = (item: SidebarItem, depth = 0) => {
         if (item.requiredPermission && !permissions.includes(item.requiredPermission)) {
             return null;
         }
 
         const ItemIcon = item.icon && item.icon in iconMap ? iconMap[item.icon as keyof typeof iconMap] : null;
-        
+
         // Determina si el item actual o alguno de sus hijos está activo
         const isItemActive = item.href ? isPathActive(item.href) : false;
         const hasActiveChild = item.children ? item.children.some(child => checkActiveRecursive(child)) : false;
-        
+
         // Si tiene hijos activos, la sección debe estar abierta por defecto
         const isOpen = openSections[item.label] ?? hasActiveChild;
 
@@ -100,7 +102,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                     >
                         <span className={`flex items-center gap-2.5 ${depth === 0 ? "text-[15px]" : "text-[14px]"} ${ItemIcon || depth > 0 ? "" : "pl-7"}`}>
                             {ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
-                            <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal break-words leading-tight"}>
+                            <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
                                 {item.label}
                             </span>
                         </span>
@@ -138,28 +140,28 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                     hover:bg-white hover:shadow-sm hover:text-[#5B283A]`}
             >
                 {ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
-                <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal break-words leading-tight"}>
+                <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
                     {item.label}
                 </span>
             </Link>
         );
     };
 
-	return (
-		<AnimatePresence>
-			{showSidebar && (
-				<motion.aside
-					initial={{ x: -24, opacity: 0 }}
-					animate={{ x: 0, opacity: 1 }}
-					exit={{ x: -24, opacity: 0 }}
-					transition={{ duration: 0.2, ease: "easeOut" }}
-					className={`w-64 bg-[#F6F7F9] p-3 sticky ${sidebarTopClass} ${sidebarHeightClass} rounded-r-2xl border-r border-white/70 overflow-y-auto custom-scrollbar`}
-				>
-					<nav className="space-y-1">
-						{items.map(item => renderItem(item))}
-					</nav>
-				</motion.aside>
-			)}
-		</AnimatePresence>
-	);
+    return (
+        <AnimatePresence>
+            {showSidebar && (
+                <motion.aside
+                    initial={{ x: -24, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -24, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className={`w-72 bg-[#F6F7F9] p-3 sticky ${sidebarTopClass} ${sidebarHeightClass} rounded-r-2xl border-r border-white/70 overflow-y-auto custom-scrollbar`}
+                >
+                    <nav className="space-y-1">
+                        {items.map(item => renderItem(item))}
+                    </nav>
+                </motion.aside>
+            )}
+        </AnimatePresence>
+    );
 }

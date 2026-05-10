@@ -8,7 +8,7 @@ import {
   Eye,
   Trophy,
   Check,
-  Plus,CalendarClock
+  Plus,CalendarClock, Star
 } from "lucide-react";
 import { useStorehouseStore } from "@/hooks";
 import { AnimatePresence, motion } from "framer-motion";
@@ -21,13 +21,31 @@ import { OrderDetailsModal } from "@/components/features/storehouse/order-detail
 const formatCurrency = (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
 const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
 
+const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating?: (r: number) => void; size?: number }) => {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          onClick={() => setRating?.(star)}
+          disabled={!setRating}
+          type="button"
+          className={`transition-all ${star <= rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} ${!setRating ? "cursor-default" : "hover:scale-110"}`}
+        >
+          <Star className={`w-${size} h-${size} ${star <= rating ? "fill-amber-400" : ""}`} />
+        </button>
+      ))}
+    </div>
+  );
+};
+
 export default function PrePurchaseOrderTracking() {
   const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    startLoadingPrePurchaseOrders();
+    startLoadingPrePurchaseOrders('ABASTECIMIENTO');
 	console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
   }, [startLoadingPrePurchaseOrders]);
 
@@ -103,14 +121,14 @@ export default function PrePurchaseOrderTracking() {
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
         {Object.entries(counts).map(([key, count]) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-8 py-3 text-[12px] font-bold transition-all ${
+            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold transition-all ${
               filter === key 
-                ? "bg-[#F2778D] text-white shadow-md shadow-rose-100" 
+                ? "bg-[#F2778D] text-white shadow-sm" 
                 : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
             }`}
           >
@@ -144,6 +162,7 @@ function OPPCard({ opp }: { opp: any }) {
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  
   const { startUpdateSupplierQuote, startSelectWinnerAndConvert,approveInventory, extendOCDate } = useStorehouseStore();
   const { startInitalQualityCheck } = useStorehouseStore();
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
@@ -170,10 +189,10 @@ function OPPCard({ opp }: { opp: any }) {
   const totalAmount = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')?.total_amount || 0;
 
   return (
-    <article className="rounded-[30px] border border-rose-100 bg-white p-8 shadow-sm transition-all">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="flex items-start gap-6">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
+    <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
+        <div className="flex items-start gap-4 sm:gap-6">
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
              <Image 
                 src={firstItem?.images?.[0]} 
                 alt="Product" 
@@ -181,10 +200,11 @@ function OPPCard({ opp }: { opp: any }) {
                 className="object-cover" 
              />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-                <h3 className="text-2xl font-normal text-[#594246]">{firstItem?.name || "Producto sin nombre"}</h3>
-                
+              <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              
+              <div className="flex flex-wrap gap-1.5">
                 <span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
                   opp.status === 'COMPLETADA' ? 'bg-blue-500' :
                   opp.status === 'EN_REVISION' ? 'bg-amber-500' : 
@@ -194,68 +214,77 @@ function OPPCard({ opp }: { opp: any }) {
                   opp.status === 'EN_REVISION' ? 'En Inspección' : 
                   opp.status === 'CONVERTIDA' ? 'Orden Generada' : 'Pendiente'}
                 </span>
+
+                {opp.status === 'COMPLETADA' && (
+                  <div className="flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-lg border border-rose-100">
+                    <span className="text-[11px] font-bold text-[#b79ca5] uppercase">Calificación:</span>
+                    <StarRating rating={opp.id_purchase_order?.quality_rating || 5} size={3} />
+                  </div>
+                )}
               </div>
-            <p className="text-sm text-[#9b8088] font-medium">
+            </div>
+            <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
               {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-between lg:justify-end gap-12">
-          <div className="text-right space-y-2">
-            <div className="flex items-center justify-end gap-3 text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
+        <div className="flex flex-wrap items-center justify-between xl:justify-end gap-4 sm:gap-8 lg:gap-12 pt-4 xl:pt-0 border-t xl:border-t-0 border-rose-50">
+          <div className="space-y-1 sm:space-y-2 min-w-[120px]">
+            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
               <span>Progreso</span>
               <span className="text-[#F2778D]">{getProgress()}%</span>
             </div>
-            <div className="h-2.5 w-40 overflow-hidden rounded-full bg-rose-50">
+            <div className="h-2 w-32 sm:w-40 overflow-hidden rounded-full bg-rose-50">
               <div className="h-full bg-[#F2778D] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
             </div>
-            <p className="text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
+            <p className="text-[10px] sm:text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
           </div>
           
-          <div className="text-[25px] text-[#F2778D] tracking-tighter">
-            {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
-          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-[20px] sm:text-[25px] text-[#F2778D] tracking-tighter font-medium">
+              {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
+            </div>
 
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
-          >
-            <ChevronDown className={`h-8 w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
-          </button>
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
+            >
+              <ChevronDown className={`h-6 w-6 sm:h-8 sm:w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* STEPPER DE 3 PASOS CON LÍNEA CENTRADA */}
-      <div className="mt-14 mb-6 px-16 relative">
-		<div className="absolute top-[26px] left-[17%] right-[17%] h-[8px] bg-[#868686] z-10" />
-		
-		<div className="grid grid-cols-3">
-			{/* Paso 1: Siempre activo si existe la orden */}
-			<StepItem 
-			active={true} 
-			icon={<Package className="h-6 w-6" />} 
-			label="Contacto Inicial" 
-			sub="Orden confirmada con proveedor" 
-			/>
-			
-			{/* Paso 2: Se activa cuando se convierte en OC y pasa a tránsito */}
-			<StepItem 
-				active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
-				icon={<Truck className="h-6 w-6" />} 
-				label="En Camino / Por Recoger" 
-				sub="Productos en tránsito" 
-				/>
+      {/* STEPPER DE 3 PASOS ADAPTADO */}
+      <div className="mt-10 sm:mt-14 mb-6 px-2 sm:px-16 relative overflow-x-auto sm:overflow-visible no-scrollbar">
+        <div className="min-w-[400px] sm:min-w-0 pb-2">
+          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[#868686]/20 z-0" />
+          
+          <div className="grid grid-cols-3 relative z-10">
+            <StepItem 
+              active={true} 
+              icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="Contacto Inicial" 
+              sub="Orden confirmada" 
+            />
+            
+            <StepItem 
+              active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
+              icon={<Truck className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="En Transito" 
+              sub="Productos en camino" 
+            />
 
-				{/* Paso 3: Activo si está EN_REVISION */}
-				<StepItem 
-				active={opp.status === "EN_REVISION"} 
-				icon={<ClipboardCheck className="h-6 w-6" />} 
-				label="Verificado / Control de Calidad" 
-				sub="Inspección en curso" 
-				/>
-		</div>
-		</div>
+            <StepItem 
+              active={opp.status === "EN_REVISION"} 
+              icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
+              label="Verificacion" 
+              sub="Control de calidad" 
+            />
+          </div>
+        </div>
+      </div>
     {/* ACORDEÓN DESPLEGABLE */}
       <AnimatePresence>
         {isOpen && (
@@ -429,7 +458,7 @@ function OPPCard({ opp }: { opp: any }) {
 
 			// 2. Construimos el payload con los nombres de campos exactos del DTO
 			const payload = {
-				id_supplier: supplierId,
+				id_agent: supplierId,
 				items: sanitizedItems
 			};
 
@@ -458,6 +487,7 @@ function OPPCard({ opp }: { opp: any }) {
       onClose={() => setIsApproveModalOpen(false)}
       onConfirm={handleApprove}
       isLoading={false}
+      agentName={selectedQuote?.id_agent?.name_company || selectedQuote?.id_agent?.name}
     />
     
     <ExtendDateModal 
@@ -481,7 +511,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 
   useEffect(() => {
     if (selectedSupplier) {
-      const quote = opp.quotes.find((q: any) => q.id_supplier._id === selectedSupplier || q.id_supplier === selectedSupplier);
+      const quote = opp.quotes.find((q: any) => (q.id_agent?._id || q.id_agent) === selectedSupplier);
       setItems(quote?.items.map((it: any) => ({ ...it })) || []);
     }
 	console.log("Selected Supplier:", selectedSupplier);
@@ -499,11 +529,12 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
           >
             <option value="">Elegir de la lista...</option>
             {opp.quotes.map((q: any) => {
-				// Verificamos si id_supplier es objeto o solo ID
-				const supplier = q.id_supplier;
+				const supplier = q.id_agent;
+                if (!supplier) return null;
+
 				const name = (typeof supplier === 'object') 
 					? (supplier.name_company || supplier.name) 
-					: `Cargando ID: ${supplier.slice(-6)}...`;
+					: `Cargando ID: ${supplier.toString().slice(-6)}...`;
 
 				return (
 					<option key={supplier._id || supplier} value={supplier._id || supplier}>
@@ -569,34 +600,41 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
         <p className="text-sm text-[#9b8088]">Compara las propuestas recibidas y elige al ganador para pasar la orden a estado <b>En Camino</b>.</p>
         
         <div className="space-y-3">
-          {sortedQuotes.map((q, idx) => (
-            <div 
-              key={q.id_supplier._id}
-              onClick={() => setWinnerId(q.id_supplier._id)}
-              className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-                winnerId === q.id_supplier._id ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
-                  <Trophy className="w-5 h-5" />
+          {sortedQuotes.map((q, idx) => {
+            const agentId = q.id_agent?._id || q.id_agent;
+            const agentName = q.id_agent?.name_company || q.id_agent?.name || "Cargando...";
+
+            return (
+              <div 
+                key={agentId}
+                onClick={() => setWinnerId(agentId)}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                  winnerId === agentId ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
+                    <Trophy className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#594246]">{agentName}</p>
+                    <p className="text-xs text-[#9b8088] flex items-center gap-2">
+                      Ranking Score: 
+                      <span className="text-[#F2778D] font-bold">
+                        {(q.ranking_score * 100).toFixed(0)}/100
+                      </span>
+                      <span className="text-[#ede8e9]">|</span>
+                      <StarRating rating={q.id_agent?.rating || 5} size={3} />
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-[#594246]">{q.id_supplier.name}</p>
-                  <p className="text-xs text-[#9b8088]">
-					Ranking Score: 
-					<span className="text-[#F2778D] font-bold">
-						{(q.ranking_score * 100).toFixed(0)}/100
-					</span>
-					</p>
+                <div className="text-right">
+                  <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
+                  {winnerId === agentId && <Check className="inline w-5 h-5 text-[#F2778D]" />}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
-                {winnerId === q.id_supplier._id && <Check className="inline w-5 h-5 text-[#F2778D]" />}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {winnerId && (

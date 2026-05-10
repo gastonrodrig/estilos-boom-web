@@ -102,9 +102,9 @@ export const useAuthStore = () => {
 
         companyData: user.client?.client_company
           ? {
-              companyName: user.client.client_company.company_name,
-              contactName: user.client.client_company.contact_name,
-            }
+            companyName: user.client.client_company.company_name,
+            contactName: user.client.client_company.contact_name,
+          }
           : null,
 
         photoURL: user.client?.profile_picture ?? photoURLFallback ?? null,
@@ -129,7 +129,7 @@ export const useAuthStore = () => {
       return true;
     } catch (error: unknown) {
       const err = error as FirebaseError;
-      if (err.code === "auth/error-code:-47") {
+      if (err.code === "auth/account-exists-with-different-credential") {
         toast.error("Este correo ya está registrado con otro método de autenticación.");
       } else {
         toast.error("Error al iniciar sesión.");
@@ -162,9 +162,18 @@ export const useAuthStore = () => {
       toast.success("Inicio de sesión exitoso.");
       return !needsPassword;
     } catch (error: unknown) {
-      const err = error as HttpError;
+      const err = error as any;
+
+      let message = "Error al iniciar sesión.";
+
+      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        message = "Correo o contraseña incorrectos.";
+      } else if (err.response?.data?.message) {
+        message = err.response.data.message;
+      }
+
       dispatch(logout());
-      toast.error(err.response?.data?.message ?? "Error al iniciar sesión.");
+      toast.error(message);
       return false;
     }
   };
@@ -191,8 +200,13 @@ export const useAuthStore = () => {
       return true;
     } catch (error: unknown) {
       const err = error as FirebaseError;
-      if (err.code === "auth/error-code:-47") {
-        toast.error("Este correo ya está registrado con otro método de autenticación.");
+
+      if (err.code === "auth/email-already-in-use") {
+        toast.error("El correo ya está en uso. Intenta iniciar sesión.");
+      } else if (err.code === "auth/invalid-email") {
+        toast.error("El correo no es válido.");
+      } else if (err.code === "auth/weak-password") {
+        toast.error("La contraseña es muy débil.");
       } else {
         toast.error("Error al crear cuenta.");
       }

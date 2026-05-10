@@ -6,9 +6,10 @@ interface Props {
   onClose: () => void;
   onConfirm: (rating: number) => void;
   isLoading: boolean;
+  agentName?: string;
 }
 
-export const ApproveInventoryModal = ({ isOpen, onClose, onConfirm, isLoading }: Props) => {
+export const ApproveInventoryModal = ({ isOpen, onClose, onConfirm, isLoading, agentName }: Props) => {
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
 
@@ -25,7 +26,7 @@ export const ApproveInventoryModal = ({ isOpen, onClose, onConfirm, isLoading }:
         </div>
 
         <p className="text-[#9b8088] mb-8 text-center">
-          ¿Cómo calificarías la calidad de la mercadería recibida y el cumplimiento del proveedor?
+          ¿Cómo calificarías la calidad del trabajo de <span className="text-[#F2778D] font-bold">{agentName || 'este agente'}</span>?
         </p>
 
         {/* Estrellas Interactivas */}

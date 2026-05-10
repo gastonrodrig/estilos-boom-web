@@ -240,12 +240,12 @@ export const useStorehouseStore = () => {
   }, [purchaseOrders, searchTerm]);
 
 
-  const startLoadingPrePurchaseOrders = useCallback(async () => {
+  const startLoadingPrePurchaseOrders = useCallback(async (type?: string) => {
     return await executeRequest(async () => {
       const config = await getConfig();
-      const { data } = await storehouseApi.get("/pre-purchase-orders", config);
+      const url = type ? `/pre-purchase-orders?type=${type}` : "/pre-purchase-orders";
+      const { data } = await storehouseApi.get(url, config);
       
-      // Aquí podrías usar un mapPrePurchaseOrder si lo tienes en tus models
       dispatch(refreshStorehousePreOrders(data));
       return true;
     }, "No se pudieron cargar las pre-órdenes.");
@@ -284,7 +284,7 @@ export const useStorehouseStore = () => {
    * 4. Cargar Cotización de un Proveedor (Dispara el Ranking en Backend)
    * PATCH /pre-purchase-orders/:id/quote
    */
-  const startUpdateSupplierQuote = useCallback(async (id: string, payload: { id_supplier: string, items: any[] }) => {
+  const startUpdateSupplierQuote = useCallback(async (id: string, payload: { id_agent: string, items: any[] }) => {
     return await executeRequest(async () => {
       const config = await getConfig();
       const { data } = await storehouseApi.patch(`/pre-purchase-orders/${id}/quote`, payload, config);
@@ -301,11 +301,11 @@ export const useStorehouseStore = () => {
    * 5. Seleccionar Ganador y Convertir a OC real
    * POST /pre-purchase-orders/:id/convert
    */
-  const startSelectWinnerAndConvert = useCallback(async (id: string, supplierId: string, estimatedDate: string) => {
+  const startSelectWinnerAndConvert = useCallback(async (id: string, agentId: string, estimatedDate: string) => {
     return await executeRequest(async () => {
         const config = await getConfig();
         const payload = { 
-            id_supplier: supplierId, 
+            id_agent: agentId, 
             delivery_date_estimated: estimatedDate // <--- Agregado al payload
         };
         
@@ -416,6 +416,17 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
   }
 }, []);
 
+  const startUpdatePreOrderStatus = useCallback(async (id: string, status: string) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.patch(`/pre-purchase-orders/${id}/status`, { status }, config);
+      
+      dispatch(onUpdatePreOrder(data));
+      toast.success("Estado de producción actualizado.");
+      return true;
+    }, "No se pudo actualizar el estado de producción.");
+  }, [dispatch, executeRequest, getConfig]);
+
   return {
     purchaseOrders,
     prePurchaseOrders,
@@ -432,6 +443,7 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     searchTerm,
     orderBy,
     order,
+    completedOrders,
 
     setSearchTerm,
     setOrderBy,

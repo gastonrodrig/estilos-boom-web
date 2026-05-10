@@ -37,6 +37,27 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
+    label: "Produccion",
+    icon: "factory",
+    children: [
+      {
+        label: "Crear Orden de Pre-Produccion",
+        href: "/admin/pre-production",
+        requiredPermission: "orders:view",
+      },
+      {
+        label: "Seguimiento de Ordenes",
+        href: "/admin/production",
+        requiredPermission: "orders:view",
+      },
+      {
+        label: "Ordenes Completadas",
+        href: "/admin/production/completed",
+        requiredPermission: "orders:view",
+      },
+    ],
+  },
+  {
     label: "Abastecimiento",
     icon: "store",
     children: [
@@ -110,6 +131,11 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Proveedores",
         href: "/admin/suppliers",
+        requiredPermission: "clients:view",
+      },
+      {
+        label: "Talleres",
+        href: "/admin/workshops",
         requiredPermission: "clients:view",
       },
     ],
