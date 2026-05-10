@@ -1,11 +1,14 @@
 // Modelos Category (SLICE)
 
 export interface Category {
+  _id: string;
   id_category: string;
   name: string;
   description?: string;
-  is_active: boolean;
+  status?: boolean;     // ✅ En tu log salía 'status', no 'is_active'
   created_at?: string;
+  updated_at?: string;  // ✅ Agregamos este que también venía en el log
+  __v?: number;
 }
 
 export interface RefreshCategoriesPayload {

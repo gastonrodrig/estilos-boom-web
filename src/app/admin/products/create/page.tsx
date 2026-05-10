@@ -1,13 +1,14 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useProductStore,useCategoryStore } from '@/hooks';
-import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler, Link } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/dist/client/components/navigation';
 
 
 export default function CreateProductPage() {
-  const { createProduct } = useProductStore();
+  const { createProduct,loading: loadingProducts } = useProductStore();
   const { categories,startLoadingCategories,loading: loadingCategories } = useCategoryStore(); // Asumiendo que existe
   const router = useRouter();
   
@@ -17,6 +18,11 @@ export default function CreateProductPage() {
       setSelectedImages((prev) => [...prev, ...filesArray]);
     }
   };
+  useEffect(() => {
+  if (categories.length > 0) {
+    console.log("Estructura de la primera categoría:", categories[0]);
+  }
+}, [categories]);
 
   const removeImage = (index: number) => {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
@@ -41,39 +47,42 @@ export default function CreateProductPage() {
   const [variants, setVariants] = useState<any[]>([]);
 
   // Lógica para generar combinaciones de variantes automáticamente
-  const generateVariants = (sizes: string[], colors: string[]) => {
-    const newVariants = [];
-    for (const size of sizes) {
-      for (const color of colors) {
-        newVariants.push({
-          size,
-          color,
-          stock: 0,
-          sku_variant: `${formData.sku}-${size}-${color.substring(0,3)}`.toUpperCase(),
-          min_stock_alert: 10
-        });
-      }
-    }
-    setVariants(newVariants);
-  };
+  const generateVariants = useCallback((sizes: string[], colors: string[]) => {
+  // Si no hay tallas O no hay colores, no podemos crear combinaciones
+  if (sizes.length === 0 || colors.length === 0) {
+    setVariants([]);
+    return;
+  }
+
+  const newVariants = sizes.flatMap(size => 
+    colors.map(color => ({
+      size,
+      color,
+      stock: 0,
+      sku_variant: `${formData.sku || 'SKU'}-${size}-${color.substring(0,3)}`.toUpperCase(),
+      min_stock_alert: 10
+    }))
+  );
+
+  console.log("🛠️ Variantes generadas localmente:", newVariants);
+  setVariants(newVariants);
+}, [formData.sku]);
+
+
   useEffect(() => {
     startLoadingCategories(); // Carga categorías para el dropdown
     console.log("Categorías cargadas:", categories);
 }, [startLoadingCategories]);
+
+
   useEffect(() => {
-    
-    generateVariants(selectedSizes, selectedColors);
-}, [selectedSizes, selectedColors, formData.sku]);
+  generateVariants(selectedSizes, selectedColors);
+}, [selectedSizes, selectedColors, generateVariants]);
 
   const toggleSize = (size: string) => {
-  const newSizes = selectedSizes.includes(size)
-    ? selectedSizes.filter((s) => s !== size) // La quita si ya está
-    : [...selectedSizes, size]; // La agrega si no está
-
-  setSelectedSizes(newSizes);
-  
-  // Opcional: Generar variantes automáticamente al cambiar tallas
-  generateVariants(newSizes, selectedColors);
+  setSelectedSizes(prev => 
+    prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+  );
 };
 
 const handleSubmit = async () => {
@@ -84,6 +93,12 @@ const handleSubmit = async () => {
     if (selectedImages.length === 0) {
       return toast.error("Debes subir al menos una imagen");
     }
+    console.log("📦 Datos listos para enviar:", {
+    sku: formData.sku,
+    sizes: selectedSizes,
+    colors: selectedColors,
+    variantsCount: variants.length
+  });
 
     const data = new FormData();
     
@@ -104,9 +119,20 @@ const handleSubmit = async () => {
       data.append("files", file);
     });
 
+    
+
     const result = await createProduct(data);
     if (result) router.push("/admin/products");
   };
+
+  const addColor = (colorName: string) => {
+  if (!colorName.trim()) return;
+  if (selectedColors.includes(colorName)) return; // No duplicar
+
+  const newColors = [...selectedColors, colorName];
+  setSelectedColors(newColors);
+  // generateVariants se disparará solo gracias al useEffect que pusimos antes
+};
   return (
     <div className="min-h-screen bg-[#FAF9F6] p-8 text-[#594246]">
       {/* Header */}
@@ -115,9 +141,11 @@ const handleSubmit = async () => {
           <ArrowLeft size={16} /> Volver a Productos
         </Link>
         <div className="flex gap-3">
-          <button onClick={handleSubmit} className="px-6 py-2 bg-[#F2778D] text-white rounded-md flex items-center gap-2">
-            <Save size={18} /> Guardar producto
-          </button>
+          <button 
+          disabled={loadingProducts} // Usa el loading de tu useProductStore
+          onClick={handleSubmit} className="px-6 py-2 bg-[#F2778D] text-white rounded-md flex items-center gap-2">
+                    {loadingProducts ? 'Guardando...' : <><Save size={18} /> Guardar producto</>}
+        </button>
         </div>
       </div>
  
@@ -215,9 +243,9 @@ const handleSubmit = async () => {
                 <option value="">Selecciona una categoría</option>
                 {categories.map(cat => (
                     // IMPORTANTE: El value DEBE ser cat._id, NO cat.name ni cat.id_category
-                    <option key={cat.id_category} value={cat.id_category}>
+                    <option key={cat._id} value={cat._id}>
                     {cat.name}
-                    </option>
+                  </option>
                 ))}
                 </select>
             </div>
@@ -242,6 +270,20 @@ const handleSubmit = async () => {
                 onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
             />
             </div>
+            <div>
+            <label className="text-xs font-bold uppercase opacity-50">Temporada</label>
+            <select 
+              className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none"
+              value={formData.season}
+              onChange={(e) => setFormData({...formData, season: e.target.value})}
+            >
+              <option value="">Selecciona temporada</option>
+              <option value="PRIMAVERA 2026">Primavera 2026</option>
+              <option value="VERANO 2026">Verano 2026</option>
+              <option value="OTOÑO / INVIERNO">Otoño / Invierno</option>
+              <option value="TODO EL AÑO">Todo el año</option>
+            </select>
+          </div>
             </div>
 
           {/* Género (Sustituye a Tipo de Prenda) */}
@@ -262,36 +304,120 @@ const handleSubmit = async () => {
 
           {/* Variantes: Tallas y Colores */}
           <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm space-y-6">
-            <div>
-              <h3 className="font-bold mb-4 flex items-center gap-2"><Ruler size={18}/> Tallas</h3>
-              <div className="flex flex-wrap gap-2">
-                {['XS', 'S', 'M', 'L', 'XL'].map((size) => {
-                    const isSelected = selectedSizes.includes(size);
-                    
-                    return (
+          {/* SECCIÓN TALLAS */}
+          <div>
+            <h3 className="font-bold mb-4 flex items-center gap-2">
+              <Ruler size={18} /> Tallas
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {['XS', 'S', 'M', 'L', 'XL'].map((size) => {
+                const isSelected = selectedSizes.includes(size);
+                return (
                   <button
                     key={size}
-                    type="button" // Evita que el formulario se envíe por error
+                    type="button"
                     onClick={() => toggleSize(size)}
                     className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center text-xs font-bold 
-                        ${isSelected 
+                      ${isSelected 
                         ? 'bg-[#F2778D] text-white border-[#F2778D] shadow-md' 
                         : 'border-[#EBEAE8] hover:bg-[#F2D0D3] text-[#594246]'
-                        }`}
-                    >
+                      }`}
+                  >
                     {size}
-                    </button>
-                )})}
-                <button className="text-[#F2778D] text-sm font-bold ml-2">+ Agregar talla</button>
-              </div>
+                  </button>
+                );
+              })}
+              <button className="text-[#F2778D] text-sm font-bold ml-2 hover:underline">
+                + Agregar talla
+              </button>
             </div>
+          </div>
 
-            <div>
-              <h3 className="font-bold mb-4 flex items-center gap-2"><Palette size={18}/> Colores</h3>
-              <div className="relative">
-                <input type="text" className="w-full p-3 bg-[#FAF9F6] border-none rounded-md pl-10 text-sm" placeholder="Buscar color... Ej: Palo Rosa" />
+          {/* SECCIÓN COLORES */}
+          <div>
+              <h3 className="font-bold mb-4 flex items-center gap-2">
+                <Palette size={18} /> Colores
+              </h3>
+              
+              <div className="relative mb-4">
+                <input
+                  type="text"
+                  className="w-full p-3 bg-[#FAF9F6] border-none rounded-md pl-10 text-sm outline-none focus:ring-1 focus:ring-[#F2778D]"
+                  placeholder="Escribe un color (ej: Rojo) y presiona Enter"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault(); // Evita que se envíe el formulario
+                      const valor = e.currentTarget.value.trim();
+                      if (valor) {
+                        addColor(valor); // Llama a la función que creamos
+                        e.currentTarget.value = ''; // Limpia la caja de texto
+                      }
+                    }
+                  }}
+                />
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F2B6C1]"></div>
               </div>
+
+              {/* Visualización de Colores Seleccionados */}
+              <div className="flex flex-wrap gap-2">
+                {selectedColors.map((color) => (
+                  <div 
+                    key={color} 
+                    className="flex items-center gap-2 px-3 py-1 bg-[#F2D0D3] text-[#594246] rounded-full text-xs font-bold border border-[#F2B6C1]"
+                  >
+                    {color}
+                    <X 
+                      size={14} 
+                      className="cursor-pointer hover:text-[#F2778D]" 
+                      onClick={() => setSelectedColors(selectedColors.filter(c => c !== color))}
+                    />
+                  </div>
+                ))}
+                {selectedColors.length === 0 && (
+                  <p className="text-xs opacity-40 italic">No hay colores seleccionados</p>
+                )}
+              </div>
+              {variants.length > 0 && (
+                <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm animate-in fade-in duration-500">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <Plus size={18} className="text-[#F2778D]" /> Variantes a crear ({variants.length})
+                  </h3>
+                  <div className="max-h-60 overflow-y-auto border rounded-lg border-[#FAF9F6]">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-[#FAF9F6] sticky top-0">
+                        <tr>
+                          <th className="p-3">Talla</th>
+                          <th className="p-3">Color</th>
+                          <th className="p-3">SKU Variante</th>
+                          <th className="p-3 text-right">Stock Inicial</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#FAF9F6]">
+                        {variants.map((v, i) => (
+                          <tr key={i} className="hover:bg-[#FAF9F6]/50">
+                            <td className="p-3 font-bold">{v.size}</td>
+                            <td className="p-3">{v.color}</td>
+                            <td className="p-3 text-xs opacity-60">{v.sku_variant}</td>
+                            <td className="p-3 text-right">
+                              <input 
+                                type="number"
+                                className="w-16 p-1 text-right bg-transparent border-b border-[#EBEAE8] focus:border-[#F2778D] outline-none"
+                                value={v.stock}
+                                onChange={(e) => {
+                                  const updated = [...variants];
+                                  updated[i].stock = Number(e.target.value);
+                                  setVariants(updated);
+                                }}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
 

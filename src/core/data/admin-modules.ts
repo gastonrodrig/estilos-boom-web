@@ -55,11 +55,7 @@ export const adminModules: SidebarModule[] = [
         href: "/admin/storehouse/complete",
         requiredPermission: "orders:view",
       },
-      {
-        label: "Pago Ordenes",
-        href: "/admin/storehouse/payments",
-        requiredPermission: "orders:view",
-      },
+      
     ],
   },
   {

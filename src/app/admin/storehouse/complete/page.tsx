@@ -4,7 +4,8 @@ import { useMemo, useEffect } from "react";
 import { 
   History,
   Calendar, 
-  Eye
+  Eye,
+  FileText,
 } from "lucide-react";
 import { useStorehouseStore } from "@/hooks";
 
@@ -117,10 +118,27 @@ export default function CompletedOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <button className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#9b8088] hover:bg-[#F2778D] hover:text-white transition-all">
+                    <div className="flex justify-end gap-2">
+                      {/* Botón para ver el detalle de la OC (el que ya tenías) */}
+                      <button 
+                        title="Ver Detalle"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#9b8088] hover:bg-[#594246] hover:text-white transition-all"
+                      >
                         <Eye className="h-4 w-4" />
                       </button>
-                    </td>
+
+                      {/* ✅ NUEVO: Botón para ver Factura */}
+                      <button 
+                        // 🔗 Vinculamos con la ruta dinámica que creamos
+                        onClick={() => window.open(`/admin/storehouse/invoice/${oc._id}`, '_blank')}
+                        
+                        title="Ver Factura / Comprobante"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#F2778D] hover:bg-[#F2778D] hover:text-white transition-all shadow-sm"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
                   </tr>
                 );
               })}

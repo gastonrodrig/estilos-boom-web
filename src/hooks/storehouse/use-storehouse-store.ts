@@ -405,6 +405,17 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
       return purchaseOrders.filter(order => order.status === 'COMPLETADA');
     }, [purchaseOrders]);
 
+    const getPurchaseOrderById = useCallback(async (id: string) => {
+  try {
+    // ⚠️ Asegúrate de que la ruta coincida con el @Controller del Back
+    const { data } = await storehouseApi.get(`/purchase-orders/${id}`); 
+    return data;
+  } catch (error) {
+    toast.error("No se pudo cargar la orden");
+    return null;
+  }
+}, []);
+
   return {
     purchaseOrders,
     prePurchaseOrders,
@@ -447,5 +458,6 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     startSelectWinnerAndConvert,
     startCreateVariantQuickly,
     startInitalQualityCheck,
+    getPurchaseOrderById,
   };
 };

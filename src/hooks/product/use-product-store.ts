@@ -155,6 +155,28 @@ export const useProductStore = () => {
 
   const createProduct = useCallback(async (formData: FormData) => {
   dispatch(setLoadingProduct(true));
+
+  // 🕵️‍♂️ LOG DE DEPURACIÓN (Submit Inspector)
+  console.group("🚀 Enviando Producto al Servidor");
+  const entries: any = {};
+  formData.forEach((value, key) => {
+    // Si es el campo de variantes, intentamos parsearlo para que se vea bonito en la consola
+    if (key === 'variants') {
+      try {
+        entries[key] = JSON.parse(value as string);
+      } catch {
+        entries[key] = value;
+      }
+    } else if (value instanceof File) {
+      entries[key] = `Archivo: ${value.name} (${value.size} bytes)`;
+    } else {
+      entries[key] = value;
+    }
+  });
+  console.table(entries); // Muestra una tabla limpia de los campos
+  console.log("Variantes crudas:", entries.variants);
+  console.groupEnd();
+
   try {
     const token = await getFirebaseAuthToken();
     const { data } = await productApi.post("/", formData, {
@@ -166,6 +188,7 @@ export const useProductStore = () => {
     toast.success("¡Producto creado con éxito!");
     return normalizeProduct(data);
   } catch (error: any) {
+    console.error("❌ Error en el servidor:", error.response?.data);
     const msg = error.response?.data?.message || "Error al crear el producto";
     toast.error(msg);
     return null;

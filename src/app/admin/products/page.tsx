@@ -116,11 +116,19 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         </div>
 
         <div className="mt-4 flex gap-2">
-          <button className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#594246] rounded-md hover:bg-[#594246] hover:text-white transition-all text-sm font-medium">
+          {/* ✅ VINCULACIÓN AQUÍ: Cambiamos button por Link */}
+          <Link 
+            href={`/admin/products/${product.id_product}`}
+            className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#594246] rounded-md hover:bg-[#594246] hover:text-white transition-all text-sm font-medium"
+          >
             <Eye size={16} />
             Ver / Editar
-          </button>
-          <button className="px-3 py-2 border border-[#EBEAE8] rounded-md hover:bg-red-50 text-red-400 transition-colors">
+          </Link>
+
+          <button 
+            type="button"
+            className="px-3 py-2 border border-[#EBEAE8] rounded-md hover:bg-red-50 text-red-400 transition-colors"
+          >
             <Power size={16} />
           </button>
         </div>
