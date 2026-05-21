@@ -37,6 +37,12 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
+      label: "Gestionar Insumos",
+      icon: "scissors", // ✂️ Evoca confección, telas e hilados
+      href: "/admin/supplies",
+      requiredPermission: "products:view",
+    },
+  {
     label: "Produccion",
     icon: "factory",
     children: [
