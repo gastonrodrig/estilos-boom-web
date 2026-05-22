@@ -427,6 +427,82 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     }, "No se pudo actualizar el estado de producción.");
   }, [dispatch, executeRequest, getConfig]);
 
+
+  /**
+   * Carga la lista de almacenes activos (Almacén Central, Tienda, etc.)
+   * GET /inventory/warehouses
+   */
+  const startLoadingWarehouses = useCallback(async () => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.get("/inventory/warehouses", config);
+      // Puedes despachar a Redux si creas un reductor, o manejarlo directo en la promesa
+      return data;
+    }, "No se pudieron cargar los almacenes.");
+  }, [executeRequest, getConfig]);
+
+  /**
+   * Consulta las existencias físicas de una variante segmentada por almacén
+   * GET /inventory/stock/:variantId
+   */
+  const startLoadingStockByVariant = useCallback(async (variantId: string) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.get(`/inventory/stock/${variantId}`, config);
+      return data;
+    }, "No se pudo recuperar la distribución de stock.");
+  }, [executeRequest, getConfig]);
+
+  /**
+   * Carga el historial completo de transferencias internas (Guías de Remisión)
+   * GET /inventory/transfers
+   */
+  const startLoadingTransfers = useCallback(async () => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const { data } = await storehouseApi.get("/inventory/transfers", config);
+      return data;
+    }, "No se pudieron cargar las transferencias internas.");
+  }, [executeRequest, getConfig]);
+
+  /**
+   * Registra una nueva guía de traslado entre almacenes (PENDIENTE)
+   * POST /inventory/transfers
+   */
+  const startCreateTransfer = useCallback(async (payload: {
+    code: string;
+    id_source_warehouse: string;
+    id_target_warehouse: string;
+    id_sender_worker: string;
+    items: { id_variant: string; quantity: number }[];
+  }) => {
+    const result = await executeRequest(async () => {
+      const config = await getConfig();
+      await storehouseApi.post("/inventory/transfers", payload, config);
+      toast.success("Guía de transferencia emitida correctamente.");
+      return true;
+    }, "No se pudo registrar la transferencia.");
+    return result ?? false;
+  }, [executeRequest, getConfig]);
+
+  /**
+   * Aprueba y consolida el traspaso, descontando del origen e inyectando stock en tienda
+   * PATCH /inventory/transfers/:id/complete
+   */
+  const startCompleteTransfer = useCallback(async (id: string, idWorkerReceiver: string) => {
+    const result = await executeRequest(async () => {
+      const config = await getConfig();
+      await storehouseApi.patch(`/inventory/transfers/${id}/complete`, { id_worker_receiver: idWorkerReceiver }, config);
+      
+      // Refrescamos los movimientos generales del inventario tras el traspaso masivo
+      await startLoadingInventoryMovements();
+      
+      toast.success("¡Mercadería ingresada a Tienda con éxito!");
+      return true;
+    }, "Error al procesar la recepción en tienda.");
+    return result ?? false;
+  }, [executeRequest, getConfig, startLoadingInventoryMovements]);
+
   return {
     purchaseOrders,
     prePurchaseOrders,
@@ -471,5 +547,12 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
     startCreateVariantQuickly,
     startInitalQualityCheck,
     getPurchaseOrderById,
+
+
+    startLoadingWarehouses,
+    startLoadingStockByVariant,
+    startLoadingTransfers,
+    startCreateTransfer,
+    startCompleteTransfer
   };
 };

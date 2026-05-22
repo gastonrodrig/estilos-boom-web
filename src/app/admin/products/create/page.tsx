@@ -1,26 +1,16 @@
 'use client';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { useProductStore, useCategoryStore } from '@/hooks';
+import { useProductStore, useCategoryStore, useSupplyStore } from '@/hooks'; // 🚀 Inyectamos useSupplyStore
 import Link from 'next/link';
 import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler, Layers, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CSS_COLORS_PALETTE, ColorObject } from '@/core/constants';
 
-// Insumos cargados para la Ficha Técnica
-const INSUMOS_MOCK = [
-  { name: 'Botón metálico 12mm', unit: 'unidades' },
-  { name: 'Cierre invisible 20cm', unit: 'unidades' },
-  { name: 'Hilo poliéster', unit: 'metros' },
-  { name: 'Etiqueta tejida', unit: 'unidades' },
-  { name: 'Entretela fusionable', unit: 'metros' },
-  { name: 'Elástico 2cm', unit: 'metros' },
-  { name: 'Broche magnético', unit: 'unidades' },
-  { name: 'Forro satinado', unit: 'metros' }
-];
-
-interface SupplyItem {
-  name: string;
+// Estructura de la Ficha Técnica alineada al Backend de Mongoose
+interface SupplyItemInput {
+  id_supply: string;  // 🔗 Cambiado de text a ID de MongoDB
+  name: string;       // Mantener para visualización ágil en la tabla del Front
   quantity: number;
   unit: string;
 }
@@ -28,6 +18,10 @@ interface SupplyItem {
 export default function CreateProductPage() {
   const { createProduct, loading: loadingProducts } = useProductStore();
   const { categories, startLoadingCategories } = useCategoryStore();
+  
+  // 🚀 Cargamos la infraestructura de insumos reales de la base de datos
+  const { supplies, startLoadingSupplies } = useSupplyStore();
+  
   const router = useRouter();
 
   // 1. Estado del Formulario
@@ -56,9 +50,9 @@ export default function CreateProductPage() {
   const [customColorName, setCustomColorName] = useState('');
   const [customColorHex, setCustomColorHex] = useState('#F2778D');
 
-  // 🧵 Estados de la Ficha Técnica (Insumos)
-  const [technicalSheet, setTechnicalSheet] = useState<SupplyItem[]>([]);
-  const [selectedInsumoIndex, setSelectedInsumoIndex] = useState<number | string>('');
+  // 🧵 Estados de la Ficha Técnica Conectada a la Base de Datos
+  const [technicalSheet, setTechnicalSheet] = useState<SupplyItemInput[]>([]);
+  const [selectedInsumoId, setSelectedInsumoId] = useState<string>(''); // 👈 Almacena el _id seleccionado
   const [insumoQuantity, setInsumoQuantity] = useState<number>(1);
 
   // Estado de la tabla de variantes
@@ -75,7 +69,7 @@ export default function CreateProductPage() {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // 🔄 Generador automático adaptado para el nuevo Color estructurado (Objeto)
+  // 🔄 Generador automático de variantes
   const generateVariants = useCallback((sizes: string[], colors: ColorObject[]) => {
     if (sizes.length === 0 || colors.length === 0) {
       setVariants([]);
@@ -85,7 +79,7 @@ export default function CreateProductPage() {
     const newVariants = sizes.flatMap(size => 
       colors.map(color => ({
         size,
-        color, // Se pasa el objeto { name, hex } completo
+        color, 
         stock: 0,
         sku_variant: `${formData.sku || 'SKU'}-${size}-${color.name.substring(0,3).toUpperCase().replace(/\s+/g, '')}`,
         min_stock_alert: 10
@@ -95,9 +89,11 @@ export default function CreateProductPage() {
     setVariants(newVariants);
   }, [formData.sku]);
 
+  // Carga inicial de datos desde la API
   useEffect(() => {
     startLoadingCategories();
-  }, [startLoadingCategories]);
+    startLoadingSupplies(); // 🚀 Trae los insumos activos registrados en el sistema
+  }, [startLoadingCategories, startLoadingSupplies]);
 
   useEffect(() => {
     generateVariants(selectedSizes, selectedColors);
@@ -109,7 +105,6 @@ export default function CreateProductPage() {
     );
   };
 
-  // Manejo de Selección de Color desde el Dropdown
   const handleSelectColor = (color: ColorObject) => {
     if (selectedColors.some(c => c.name.toLowerCase() === color.name.toLowerCase())) {
       return toast.error("Este color ya fue seleccionado.");
@@ -119,7 +114,6 @@ export default function CreateProductPage() {
     setShowColorDropdown(false);
   };
 
-  // Manejo de creación de Color Personalizado
   const handleAddCustomColor = () => {
     if (!customColorName.trim()) return toast.error("Escribe el nombre del color.");
     setSelectedColors([...selectedColors, { name: customColorName.trim(), hex: customColorHex }]);
@@ -127,17 +121,30 @@ export default function CreateProductPage() {
     setIsCreatingCustomColor(false);
   };
 
-  // Gestión de Ficha Técnica
+  // 🧵 Gestión de Ficha Técnica vinculando IDs reales de MongoDB
   const handleAddInsumo = () => {
-    if (selectedInsumoIndex === '') return toast.error("Selecciona un insumo válido.");
-    const template = INSUMOS_MOCK[Number(selectedInsumoIndex)];
+    if (!selectedInsumoId) return toast.error("Selecciona un insumo válido.");
+    
+    // Buscamos el insumo real dentro del store de Redux para capturar su unidad y nombre
+    const realSupply = supplies.find(s => (s._id || s.id) === selectedInsumoId);
+    if (!realSupply) return toast.error("El insumo seleccionado no es válido.");
 
-    if (technicalSheet.some(item => item.name === template.name)) {
-      return toast.error("Este insumo ya está agregado.");
+    const idInsumoString = (realSupply._id || realSupply.id) as string;
+
+    if (technicalSheet.some(item => item.id_supply === idInsumoString)) {
+      return toast.error("Este insumo ya está agregado a la ficha técnica.");
     }
 
-    setTechnicalSheet([...technicalSheet, { name: template.name, quantity: insumoQuantity, unit: template.unit }]);
-    setSelectedInsumoIndex('');
+    setTechnicalSheet([
+      ...technicalSheet, 
+      { 
+        id_supply: idInsumoString, 
+        name: realSupply.name, 
+        quantity: insumoQuantity, 
+        unit: realSupply.unit 
+      }
+    ]);
+    setSelectedInsumoId('');
     setInsumoQuantity(1);
   };
 
@@ -154,7 +161,6 @@ export default function CreateProductPage() {
 
     const filterColorsLocally = () => {
       setLoadingColors(true);
-      
       const translations: Record<string, string> = {
         azul: 'blue', celeste: 'skyblue', rojo: 'red', verde: 'green',
         rosado: 'pink', rosa: 'pink', amarillo: 'yellow', gris: 'gray',
@@ -181,11 +187,10 @@ export default function CreateProductPage() {
     return () => clearTimeout(delayDebounceFn);
   }, [colorSearch]);
 
-  // Cambiar origen y limpiar estados dependientes para evitar inconsistencias de datos
   const handleOriginChange = (type: 'RETAIL' | 'PRODUCCION') => {
     setFormData({ ...formData, origin_type: type });
     if (type === 'RETAIL') {
-      setTechnicalSheet([]); // Si vuelve a Retail, la ficha técnica se vacía por completo
+      setTechnicalSheet([]); 
     }
   };
 
@@ -210,13 +215,16 @@ export default function CreateProductPage() {
     data.append("id_category", formData.id_category);
     data.append("season", formData.season);
     data.append("origin_type", formData.origin_type);
-    
-    // Matriz de variantes stringizada con el nuevo formato de color objeto {name, hex}
     data.append("variants", JSON.stringify(variants));
 
-    // Si es producción propia, inyectamos la ficha técnica armada al FormData
+    // Si es producción propia, limpiamos el objeto antes de enviarlo
+    // Enviamos solo id_supply y quantity para que calce con tu esquema estricto de Mongoose
     if (formData.origin_type === 'PRODUCCION') {
-      data.append("technical_sheet", JSON.stringify(technicalSheet));
+      const cleanSheet = technicalSheet.map(item => ({
+        id_supply: item.id_supply,
+        quantity: item.quantity
+      }));
+      data.append("technical_sheet", JSON.stringify(cleanSheet));
     }
 
     selectedImages.forEach((file) => data.append("files", file));
@@ -352,7 +360,7 @@ export default function CreateProductPage() {
             </div>
           </div>
 
-          {/* 🧵 FICHA TÉCNICA DE INSUMOS (Aparece únicamente si origin_type === 'PRODUCCION') */}
+          {/* 🧵 FICHA TÉCNICA DE INSUMOS DINÁMICA CONECTADA A TU BASE DE DATOS */}
           {formData.origin_type === 'PRODUCCION' && (
             <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
               <h3 className="font-bold text-lg border-b border-[#FAF9F6] pb-2 flex items-center gap-2">
@@ -360,15 +368,18 @@ export default function CreateProductPage() {
               </h3>
               <div className="flex items-end gap-3 bg-[#FAF9F6] p-4 rounded-xl">
                 <div className="flex-1">
-                  <label className="text-[10px] font-bold uppercase opacity-50">Seleccionar Insumo</label>
+                  <label className="text-[10px] font-bold uppercase opacity-50">Seleccionar Insumo Real</label>
                   <select 
-                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm outline-none"
-                    value={selectedInsumoIndex}
-                    onChange={(e) => setSelectedInsumoIndex(e.target.value)}
+                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm outline-none font-medium"
+                    value={selectedInsumoId}
+                    onChange={(e) => setSelectedInsumoId(e.target.value)}
                   >
-                    <option value="">Seleccionar insumo</option>
-                    {INSUMOS_MOCK.map((ins, idx) => (
-                      <option key={idx} value={idx}>{ins.name}</option>
+                    <option value="">Selecciona materia prima del catálogo...</option>
+                    {/* Filtramos para renderizar solo los insumos que estén ACTIVOS */}
+                    {supplies.filter(s => s.is_active).map((ins) => (
+                      <option key={ins._id || ins.id} value={ins._id || ins.id}>
+                        {ins.name} ({ins.unit})
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -377,7 +388,7 @@ export default function CreateProductPage() {
                   <input 
                     type="number" 
                     min={1} 
-                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm text-center outline-none"
+                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm text-center outline-none font-bold"
                     value={insumoQuantity}
                     onChange={(e) => setInsumoQuantity(Math.max(1, Number(e.target.value)))}
                   />
@@ -405,9 +416,9 @@ export default function CreateProductPage() {
                     <tbody className="divide-y divide-[#FAF9F6]">
                       {technicalSheet.map((item, index) => (
                         <tr key={index} className="hover:bg-[#FAF9F6]/30">
-                          <td className="p-3 font-medium">{item.name}</td>
-                          <td className="p-3 text-xs opacity-60">{item.unit}</td>
-                          <td className="p-3 font-bold">{item.quantity}</td>
+                          <td className="p-3 font-medium text-gray-800">{item.name}</td>
+                          <td className="p-3 text-xs opacity-60 uppercase">{item.unit}</td>
+                          <td className="p-3 font-bold text-[#F2778D]">{item.quantity}</td>
                           <td className="p-3 text-center">
                             <button type="button" onClick={() => handleRemoveInsumo(index)} className="text-gray-400 hover:text-red-500 transition-colors">
                               <Trash2 size={16} />
@@ -420,7 +431,7 @@ export default function CreateProductPage() {
                 </div>
               ) : (
                 <div className="text-center py-8 bg-[#FAF9F6]/40 rounded-xl border border-dashed border-[#EBEAE8]">
-                  <p className="text-xs opacity-50 italic">Aún no has agregado insumos</p>
+                  <p className="text-xs opacity-50 italic">Aún no has agregado insumos del catálogo</p>
                 </div>
               )}
             </div>

@@ -38,7 +38,7 @@ export const adminModules: SidebarModule[] = [
   },
   {
       label: "Gestionar Insumos",
-      icon: "scissors", // ✂️ Evoca confección, telas e hilados
+      icon: "spool", // ✂️ Evoca confección, telas e hilados
       href: "/admin/supplies",
       requiredPermission: "products:view",
     },
@@ -118,6 +118,35 @@ export const adminModules: SidebarModule[] = [
     href: "/admin/payments",
     icon: "banknote",
     requiredPermission: "payments:view",
+  },
+  {
+      label: "Gestionar Facturas",
+      icon: "notepad-text", // ✂️ Evoca confección, telas e hilados
+      href: "/admin/invoice",
+      requiredPermission: "products:view",
+  },
+  {
+      label: "Gestionar Inventario",
+      icon: "notepad-text", // ✂️ Evoca confección, telas e hilados
+      requiredPermission: "products:view",
+      children: [
+      {
+        label: "Stock Actual",
+        href: "/admin/movements",
+        requiredPermission: "orders:view",
+      },
+      {
+        label: "Movimientos",
+        href: "/admin/invoice", 
+        requiredPermission: "orders:view",
+      },
+      {
+        label: "Historial de movimientos",
+        href: "/admin/invoice", 
+        requiredPermission: "orders:view",
+      }
+    
+    ],
   },
   {
     label: "Gestionar Clientes",

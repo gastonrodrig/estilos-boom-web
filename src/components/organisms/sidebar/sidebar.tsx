@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, Package, Store, ShoppingBag, BookText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store,Spool, ShoppingBag, BookText,NotepadText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/hooks";
 
@@ -33,6 +33,8 @@ const iconMap = {
     permissions: ShieldCheck,
     "clipboard-list": ClipboardList,
     factory: Factory,
+    spool: Spool,
+    "notepad-text": NotepadText,
 } as const;
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
