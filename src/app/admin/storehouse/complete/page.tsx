@@ -22,17 +22,42 @@ const formatDate = (date?: string | Date | null) => {
 export default function CompletedOrdersPage() {
   const { purchaseOrders, loading } = useStorehouseStore();
 
+  const MOCK_COMPLETED_ORDERS = [
+    {
+      _id: "mock-retail-complete-1",
+      order_number: "OC-2026-003",
+      updated_at: new Date(Date.now() - 86400000 * 2).toISOString(), // hace 2 días
+      delivery_date_actual: new Date(Date.now() - 86400000 * 2).toISOString(),
+      id_supplier: { name_company: "Textiles del Sur S.A." },
+      items: [{}, {}, {}], // 3 items
+      total_amount: 12500,
+      quality_rating: 4.5
+    },
+    {
+      _id: "mock-retail-complete-2",
+      order_number: "OC-2026-004",
+      updated_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+      delivery_date_actual: new Date(Date.now() - 86400000 * 5).toISOString(),
+      id_supplier: { name_company: "Confecciones Moda SAC" },
+      items: [{}, {}], // 2 items
+      total_amount: 8300,
+      quality_rating: 5
+    }
+  ];
+
   // Filtramos por estado COMPLETADA
   const completedOCs = useMemo(() => {
-    if (!purchaseOrders) return [];
+    if (!purchaseOrders) return MOCK_COMPLETED_ORDERS;
     
-    return purchaseOrders
+    const fromApi = purchaseOrders
       .filter((oc) => (oc.status as string) === 'COMPLETADA') // Solo traerá las que digan COMPLETADA
       .sort((a, b) => {
         const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
         const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
         return dateB - dateA;
       });
+      
+    return fromApi.length > 0 ? fromApi : MOCK_COMPLETED_ORDERS;
   }, [purchaseOrders]);
 
   const totalInvestment = useMemo(() => 

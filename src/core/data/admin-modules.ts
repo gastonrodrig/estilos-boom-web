@@ -47,18 +47,18 @@ export const adminModules: SidebarModule[] = [
     icon: "factory",
     children: [
       {
-        label: "Crear Orden de Pre-Produccion",
-        href: "/admin/pre-production",
+        label: "Crear Orden de Produccion",
+        href: "/admin/production/plan",
         requiredPermission: "orders:view",
       },
       {
         label: "Seguimiento de Ordenes",
-        href: "/admin/production",
+        href: "/admin/production/details",
         requiredPermission: "orders:view",
       },
       {
         label: "Ordenes Completadas",
-        href: "/admin/production/completed",
+        href: "/admin/production/complete",
         requiredPermission: "orders:view",
       },
     ],

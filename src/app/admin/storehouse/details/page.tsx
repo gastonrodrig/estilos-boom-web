@@ -61,8 +61,59 @@ export default function PrePurchaseOrderTracking() {
            d.getFullYear() === today.getFullYear();
   };
 
+  const MOCK_TEST_ORDERS = [
+    {
+      _id: "test-retail-1",
+      pre_order_number: "OPP-M-2026",
+      status: "COMPARANDO",
+      created_at: new Date().toISOString(),
+      estimated_delivery_date: new Date(Date.now() + 86400000 * 5).toISOString(),
+      base_items: [
+        { 
+          quantity: 120, 
+          id_variant: { 
+            size: "M", 
+            color: "Azul Marino", 
+            id_product: { 
+              name: "Pantalón Denim Clásico",
+              images: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=400"]
+            } 
+          } 
+        }
+      ],
+      quotes: [
+        { quote_status: 'COTIZADO', id_agent: { name_company: "Textiles del Sur S.A." }, total_amount: 15000, ranking_score: 0.95 },
+        { quote_status: 'COTIZADO', id_agent: { name_company: "Confecciones Lima S.A.C" }, total_amount: 16500, ranking_score: 0.88 }
+      ]
+    },
+    {
+      _id: "test-retail-2",
+      pre_order_number: "OPP-S-2026",
+      status: "CONVERTIDA",
+      created_at: new Date().toISOString(),
+      id_purchase_order: { _id: "po-1", delivery_date_estimated: new Date().toISOString(), order_number: "OC-2026-001" }, // Entrega hoy
+      base_items: [
+        { 
+          quantity: 50, 
+          id_variant: { 
+            size: "L", 
+            color: "Negro", 
+            id_product: { 
+              name: "Casaca de Cuero Sintético",
+              images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400"]
+            } 
+          } 
+        }
+      ],
+      quotes: [
+        { quote_status: 'SELECCIONADO', id_agent: { name_company: "Moda Rápida E.I.R.L" }, total_amount: 4500, ranking_score: 0.90 }
+      ]
+    }
+  ];
+
   const activeOrders = useMemo(() => {
-    return prePurchaseOrders.filter(o => o.status !== "COMPLETADA");
+    const fromApi = prePurchaseOrders.filter(o => o.status !== "COMPLETADA");
+    return fromApi.length > 0 ? fromApi : MOCK_TEST_ORDERS;
   }, [prePurchaseOrders]);
 
 
