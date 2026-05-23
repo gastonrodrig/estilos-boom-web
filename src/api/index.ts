@@ -7,3 +7,4 @@ export * from "./supplier";
 export * from "./category";
 export * from "./workshop";
 export * from "./supplie";
+export * from "./production";

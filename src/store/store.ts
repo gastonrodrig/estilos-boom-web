@@ -13,6 +13,7 @@ import { storehouseSlice } from "./storehouse";
 import { supplySlice } from "./supplie";
 import checkoutReducer from "./extra/checkout-slice";
 import mockCartReducer from "./extra/mock-cart-slice";
+import { productionSlice } from "./production/production-slice";
 
 // Configuración del store
 export const store = configureStore({
@@ -33,6 +34,7 @@ export const store = configureStore({
     mockCart: mockCartReducer,
     management: managementSlice.reducer,
     supply: supplySlice.reducer,
+    production: productionSlice.reducer,
   },
 });
 
