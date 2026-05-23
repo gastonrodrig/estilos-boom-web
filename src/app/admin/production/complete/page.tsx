@@ -100,6 +100,21 @@ export default function CompletedProductionOrders() {
   }, [startLoadingPrePurchaseOrders]);
 
   const completedOrders = useMemo(() => {
+    if (typeof window !== "undefined") {
+      const createdStr = localStorage.getItem("mocked_created_orders");
+      if (createdStr) {
+        try {
+          const parsed = JSON.parse(createdStr);
+          const finished = parsed.filter((o: any) => {
+            if (o.status !== "CONVERTIDA" && o.status !== "COMPLETADA") return false;
+            const sq = o.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
+            if (!sq?.total_amount) return false; // Hide buggy orders without registered costs
+            return true;
+          });
+          return [...finished, ...MOCK_COMPLETED_ORDERS];
+        } catch (e) {}
+      }
+    }
     return MOCK_COMPLETED_ORDERS;
   }, []);
 
@@ -131,7 +146,7 @@ export default function CompletedProductionOrders() {
 
   const selectedFirstItem = selectedOrder?.base_items?.[0]?.id_variant?.id_product;
   const selectedQuoteObj = selectedOrder?.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-  const selectedWorkshopName = selectedQuoteObj?.id_supplier?.name_company || selectedQuoteObj?.id_supplier?.name || "Taller finalizado";
+  const selectedWorkshopName = selectedQuoteObj?.id_agent?.name_company || selectedQuoteObj?.id_supplier?.name_company || selectedQuoteObj?.id_agent?.name || selectedQuoteObj?.id_supplier?.name || "Taller finalizado";
   const selectedTotalAmount = selectedQuoteObj?.total_amount || 0;
   const selectedTotalUnits = selectedOrder?.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 
@@ -144,7 +159,18 @@ export default function CompletedProductionOrders() {
             <History className="h-5 w-5" />
             <span className="text-sm font-bold uppercase tracking-widest">Producción</span>
           </div>
-          <h1 className="text-4xl text-[#594246] mt-2 font-serif font-(--font-vidaloka)">Órdenes Finalizadas</h1>
+          <div className="flex items-center gap-4 mt-2">
+            <h1 className="text-4xl text-[#594246] font-serif font-(--font-vidaloka)">Órdenes Finalizadas</h1>
+            <button 
+              onClick={() => {
+                localStorage.removeItem("mocked_created_orders");
+                window.location.reload();
+              }}
+              className="text-xs text-rose-400 hover:text-rose-600 underline"
+            >
+              Limpiar simulador
+            </button>
+          </div>
           <p className="text-[#9b8088] mt-1">Historial de prendas producidas ingresadas al inventario.</p>
         </div>
 
@@ -211,17 +237,17 @@ export default function CompletedProductionOrders() {
               <div className="absolute top-[26px] left-[10%] right-[10%] h-[4px] bg-rose-100/50 rounded-full z-0" />
               
               <div className="grid grid-cols-3 relative z-10">
-                {/* Paso 1: Inicio */}
+                {/* Paso 1: Contacto Inicial */}
                 <div className="flex flex-col items-center text-center group">
                   <div className="w-14 h-14 rounded-2xl bg-white border-2 border-rose-100 flex items-center justify-center text-[#b79ca5] shadow-sm group-hover:border-[#F2778D] group-hover:text-[#F2778D] transition-all duration-300">
-                    <Scissors className="w-6 h-6" />
+                    <Package className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-bold text-[#594246]">Corte e Insumos</p>
-                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">7 días antes</p>
-                    <p className="text-[11px] text-[#9b8088] font-medium leading-tight">24 de abril de 2026</p>
+                    <p className="text-sm font-bold text-[#594246]">Contacto Inicial</p>
+                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">Negociación</p>
+                    <p className="text-[11px] text-[#9b8088] font-medium leading-tight">{formatDate(selectedOrder.created_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
-                      <p className="text-[10px] text-[#b79ca5] leading-none">Telas habilitadas e insumos entregados.</p>
+                      <p className="text-[10px] text-[#b79ca5] leading-none">Acuerdo de costos y asignación de taller.</p>
                     </div>
                   </div>
                 </div>
@@ -232,11 +258,10 @@ export default function CompletedProductionOrders() {
                     <Factory className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-bold text-[#594246]">Confección</p>
-                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">2 días antes</p>
-                    <p className="text-[11px] text-[#9b8088] font-medium leading-tight">29 de abril de 2026</p>
-                    <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
-                      <p className="text-[10px] text-[#b79ca5] leading-none">Costura y acabados finalizados en taller.</p>
+                    <p className="text-sm font-bold text-[#594246]">En Producción</p>
+                    <div className="flex flex-col gap-1 mt-2 bg-rose-50/50 p-2 rounded-lg border border-rose-100/50">
+                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Corte:</span> <span className="text-[#9b8088]">{new Date(new Date(selectedOrder.created_at).getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</span></p>
+                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Confección:</span> <span className="text-[#9b8088]">{new Date(new Date(selectedOrder.created_at).getTime() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</span></p>
                     </div>
                   </div>
                 </div>
@@ -248,10 +273,10 @@ export default function CompletedProductionOrders() {
                   </div>
                   <div className="mt-4 space-y-1 px-2">
                     <p className="text-sm font-bold text-[#594246]">Finalizado</p>
-                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">Entregado</p>
+                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">Entregado y Validado</p>
                     <p className="text-[11px] text-[#9b8088] font-medium leading-tight">{formatDate(selectedOrder.updated_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
-                      <p className="text-[10px] text-[#b79ca5] leading-none">Ingresado a almacén con éxito.</p>
+                      <p className="text-[10px] text-[#b79ca5] leading-none">Control de calidad aprobado y registrado en inventario.</p>
                     </div>
                   </div>
                 </div>
@@ -350,7 +375,7 @@ export default function CompletedProductionOrders() {
 
 function CompletedOrderRow({ order, onOpenTech, onOpenObs }: { order: any; onOpenTech: () => void; onOpenObs: () => void; }) {
   const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-  const workshopName = selectedQuote?.id_supplier?.name_company || selectedQuote?.id_supplier?.name || "Taller finalizado";
+  const workshopName = selectedQuote?.id_agent?.name_company || selectedQuote?.id_supplier?.name_company || selectedQuote?.id_agent?.name || selectedQuote?.id_supplier?.name || "Taller finalizado";
   const totalAmount = selectedQuote?.total_amount || 0;
   const totalUnits = order.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 

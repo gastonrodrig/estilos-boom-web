@@ -87,7 +87,7 @@ export default function AdminPreProductionCreatePage() {
   }), []);
 
   useEffect(() => {
-    const stored = localStorage.getItem("pre_produccion_prefill");
+    const stored = localStorage.getItem("produccion_prefill");
     if (stored) {
       const parsed = JSON.parse(stored);
       setPrefillData(parsed);
@@ -129,7 +129,7 @@ export default function AdminPreProductionCreatePage() {
           name: item.name,
           unitConsumption: item.unitConsumption,
           theoreticalQuantity: theoretical,
-          totalQuantity: theoretical, 
+          totalQuantity: theoretical,
           unit: item.unit
         };
       }));
@@ -169,17 +169,58 @@ export default function AdminPreProductionCreatePage() {
 
   const submitOrder = () => {
     setShowConfirmModal(false);
-    
+
     // Pequeño delay para dejar que el primer modal cierre bien
     setTimeout(() => {
       setIsProcessing(true);
-      
+
       // Simulación de procesamiento e inteligencia de stock
       setTimeout(() => {
         setIsProcessing(false);
+
+        // Crear orden mockeada para flujo local
+        const product = prefillData?.items?.[0];
+        const baseItems = variants.map(v => ({
+          id_variant: {
+            size: v.size,
+            color: v.color,
+            id_product: {
+              name: product?.product_name || "Nuevo Producto",
+              images: [product?.product_image || ""]
+            }
+          },
+          quantity: v.quantity
+        }));
+
+        const mockOrder = {
+          _id: "mock-" + Date.now(),
+          pre_order_number: "OPP-M-2026-" + Math.floor(Math.random() * 1000),
+          status: "SOLICITANDO",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          estimated_delivery_date: requiredDate ? new Date(requiredDate).toISOString() : new Date().toISOString(),
+          base_items: baseItems,
+          quotes: selectedWorkshopIds.map(id => {
+            const taller = workshops.find(w => w._id === id);
+            return {
+              id_agent: {
+                _id: id,
+                name_company: taller?.name_company || "Taller Seleccionado"
+              },
+              quote_status: "COTIZADO",
+              total_amount: null
+            };
+          })
+        };
+
+        const existingStr = localStorage.getItem("mocked_created_orders");
+        const existing = existingStr ? JSON.parse(existingStr) : [];
+        existing.push(mockOrder);
+        localStorage.setItem("mocked_created_orders", JSON.stringify(existing));
+
         setShowSuccessResult(true);
         toast.success(`Orden de producción registrada correctamente.`);
-        localStorage.removeItem("pre_produccion_prefill");
+        localStorage.removeItem("produccion_prefill");
       }, 2500);
     }, 150);
   };
@@ -453,7 +494,7 @@ export default function AdminPreProductionCreatePage() {
         <div className="px-8 pt-8 pb-6 border-b border-rose-50 flex items-center justify-between">
           <div>
             <h3 className="text-2xl font-bold text-[#594246] font-(--font-vidaloka)">
-              Confirmar con {selectedWorkshopIds.length > 1 ? "Talleres" : "Taller"}
+              Contactar con {selectedWorkshopIds.length > 1 ? "Talleres" : "Taller"}
             </h3>
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <span className="text-sm font-semibold text-[#9b8088]">{product?.product_name}</span>
@@ -541,9 +582,9 @@ export default function AdminPreProductionCreatePage() {
       </Modal>
 
       {/* MODAL DE PROCESAMIENTO */}
-      <Modal 
-        open={isProcessing} 
-        onClose={() => {}} 
+      <Modal
+        open={isProcessing}
+        onClose={() => { }}
         panelClassName="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm p-12 flex flex-col items-center text-center space-y-6"
       >
         <div className="relative h-20 w-20">
@@ -619,7 +660,7 @@ export default function AdminPreProductionCreatePage() {
 
           <div className="space-y-4">
             <h4 className="text-xs font-bold text-[#594246] uppercase tracking-wider">Resumen de Stock</h4>
-            
+
             <div className="bg-white border border-rose-50 rounded-xl p-4 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-[#9b8088]">Stock actual</span>
@@ -633,7 +674,7 @@ export default function AdminPreProductionCreatePage() {
                 <span className="text-[#F2778D] font-medium">Cantidad solicitada</span>
                 <span className="font-bold text-[#F2778D]">{totalQuantity} unidades</span>
               </div>
-              
+
               <div className="pt-3 border-t border-rose-100 flex justify-between items-center">
                 <span className="text-sm font-bold text-[#594246]">Diferencia faltante</span>
                 <span className="text-lg font-bold text-rose-500">
@@ -656,13 +697,13 @@ export default function AdminPreProductionCreatePage() {
         <div className="flex flex-col gap-3 pt-2">
           {(product?.minimum || 0) > ((product?.stock || 0) + totalQuantity) ? (
             <>
-              <CTA 
+              <CTA
                 onClick={handleReorderRemaining}
                 className="w-full !bg-white border border-[#f2b6c1] !text-[#594246]"
               >
                 Cubrir faltantes
               </CTA>
-              <CTA 
+              <CTA
                 onClick={() => router.push("/admin/production")}
                 className="w-full"
               >
@@ -670,7 +711,7 @@ export default function AdminPreProductionCreatePage() {
               </CTA>
             </>
           ) : (
-            <CTA 
+            <CTA
               onClick={() => router.push("/admin/production")}
               className="w-full"
             >
