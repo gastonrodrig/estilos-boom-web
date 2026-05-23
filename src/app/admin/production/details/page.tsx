@@ -5,7 +5,7 @@ import Image from "next/image";
 import { 
   Search, ChevronDown, Package, Scissors, 
   Factory, ClipboardCheck, CheckCircle2, 
-  XCircle, Eye, CalendarClock, Check,
+  XCircle, Eye, CalendarClock, Check, X,
   FileText, Plus, AlertCircle, ArrowRight,
   Pause, Clock, Activity
 } from "lucide-react";
@@ -72,7 +72,7 @@ const MOCK_TEST_ORDERS = [
       }
     ],
     quotes: [
-      { quote_status: 'SELECCIONADO', id_agent: { name_company: "Textiles del Sur" }, total_amount: 1500.00 },
+      { quote_status: 'COTIZADO', id_agent: { name_company: "Textiles del Sur" }, total_amount: 1500.00 },
       { quote_status: 'COTIZADO', id_agent: { name_company: "Confecciones Lima" } }
     ]
   },
@@ -97,7 +97,7 @@ const MOCK_TEST_ORDERS = [
       }
     ],
     quotes: [
-      { quote_status: 'SELECCIONADO', id_agent: { name_company: "Taller Los Hermanos" } },
+      { quote_status: 'COTIZADO', id_agent: { name_company: "Taller Los Hermanos" } },
       { quote_status: 'COTIZADO', id_agent: { name_company: "Creaciones Textiles" } }
     ]
   }
@@ -120,26 +120,107 @@ export default function ProductionOrderTracking() {
 
   useEffect(() => {
     startLoadingPrePurchaseOrders('PRODUCCION');
+    if (typeof window !== "undefined") {
+      const createdStr = localStorage.getItem("mocked_created_orders");
+      if (createdStr) {
+        try {
+          const createdOrders = JSON.parse(createdStr);
+          setLocalOrders(prev => {
+            const currentIds = new Set(prev.map(p => p._id));
+            const newOrders = createdOrders.filter((o: any) => !currentIds.has(o._id));
+            return [...newOrders, ...prev]; // Put new ones at the top
+          });
+        } catch (e) {}
+      }
+    }
   }, [startLoadingPrePurchaseOrders]);
 
+  const updateOrderStatus = async (orderId: string, newStatus: string, winnerId?: string) => {
+    setLocalOrders(prev => {
+      const next = prev.map(o => {
+        if (o._id !== orderId) return o;
+        
+        let newQuotes = o.quotes;
+        if (winnerId && o.quotes) {
+          newQuotes = o.quotes.map((q: any, idx: number) => {
+            const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
+            return {
+              ...q,
+              quote_status: agentId === winnerId ? "SELECCIONADO" : "RECHAZADO"
+            };
+          });
+        }
+        
+        return { ...o, status: newStatus, quotes: newQuotes };
+      });
+      
+      // Persist status change to mocked orders to allow testing the flow locally
+      if (typeof window !== "undefined") {
+        const createdStr = localStorage.getItem("mocked_created_orders");
+        if (createdStr) {
+          try {
+            const createdOrders = JSON.parse(createdStr);
+            const updatedMocked = createdOrders.map((co: any) => {
+              if (co._id !== orderId) return co;
+              let newQuotes = co.quotes;
+              if (winnerId && co.quotes) {
+                newQuotes = co.quotes.map((q: any, idx: number) => {
+                  const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
+                  return {
+                    ...q,
+                    quote_status: agentId === winnerId ? "SELECCIONADO" : "RECHAZADO"
+                  };
+                });
+              }
+              return { ...co, status: newStatus, quotes: newQuotes };
+            });
+            localStorage.setItem("mocked_created_orders", JSON.stringify(updatedMocked));
+          } catch(e) {}
+        }
+      }
+      return next;
+    });
+  };
 
-
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    setLocalOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
-    
-    toast.success("Estado de producción actualizado", {
-      position: "top-center",
-      style: {
-        borderRadius: '20px',
-        background: '#fbcfe8',
-        color: '#594246',
-        fontSize: '14px',
-        padding: '12px 24px',
-      },
-      iconTheme: {
-        primary: '#22c55e',
-        secondary: '#fff',
-      },
+  const updateOrderCosts = async (orderId: string, costs: Record<string, number>) => {
+    setLocalOrders(prev => {
+      const next = prev.map(o => {
+        if (o._id !== orderId) return o;
+        const newQuotes = o.quotes?.map((q: any, idx: number) => {
+          const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
+          let quoteTotal = 0;
+          o.base_items?.forEach((item: any, iIdx: number) => {
+            const costKey = `${agentId}_${item.id_variant?._id || iIdx}`;
+            if (costs[costKey]) quoteTotal += costs[costKey] * item.quantity;
+          });
+          return { ...q, total_amount: quoteTotal > 0 ? quoteTotal : q.total_amount };
+        });
+        return { ...o, quotes: newQuotes };
+      });
+      
+      if (typeof window !== "undefined") {
+        const createdStr = localStorage.getItem("mocked_created_orders");
+        if (createdStr) {
+          try {
+            const createdOrders = JSON.parse(createdStr);
+            const updatedMocked = createdOrders.map((co: any) => {
+              if (co._id !== orderId) return co;
+              const newQuotes = co.quotes?.map((q: any, idx: number) => {
+                const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
+                let quoteTotal = 0;
+                co.base_items?.forEach((item: any, iIdx: number) => {
+                  const costKey = `${agentId}_${item.id_variant?._id || iIdx}`;
+                  if (costs[costKey]) quoteTotal += costs[costKey] * item.quantity;
+                });
+                return { ...q, total_amount: quoteTotal > 0 ? quoteTotal : q.total_amount };
+              });
+              return { ...co, quotes: newQuotes };
+            });
+            localStorage.setItem("mocked_created_orders", JSON.stringify(updatedMocked));
+          } catch(e) {}
+        }
+      }
+      return next;
     });
   };
 
@@ -167,23 +248,27 @@ export default function ProductionOrderTracking() {
 
   const counts = useMemo(() => ({
     TODAS: localOrders.filter(o => o.status !== "COMPLETADA").length,
-    "ENTREGAS HOY": localOrders.filter(o => {
-      const today = new Date().toISOString().split('T')[0];
-      const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
-      if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
-      return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
-    }).length,
-    "CONTACTO INICIAL": localOrders.filter(o => o.status === "SOLICITANDO").length,
-    "CORTE / HABILITADO": localOrders.filter(o => o.status === "COMPARANDO").length,
-    "EN TALLER": localOrders.filter(o => o.status === "EN_REVISION").length,
+    "CONTACTO INICIAL": localOrders.filter(o => o.status === "SOLICITANDO" || o.status === "COMPARANDO").length,
+    "EN PRODUCCIÓN": localOrders.filter(o => o.status === "EN_REVISION").length,
     "CONTROL CALIDAD": localOrders.filter(o => o.status === "CONVERTIDA").length,
-    "RECHAZADOS": 0,
+    "RECHAZADAS": localOrders.filter(o => o.status === "RECHAZADA").length,
   }), [localOrders]);
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc] relative">
       <header className="space-y-2">
-        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Producción</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Producción</h1>
+          <button 
+            onClick={() => {
+              localStorage.removeItem("mocked_created_orders");
+              window.location.reload();
+            }}
+            className="text-xs text-rose-400 hover:text-rose-600 underline"
+          >
+            Limpiar simulador
+          </button>
+        </div>
         <p className="text-base text-[#9b8088]">{counts.TODAS} procesos en curso</p>
       </header>
 
@@ -229,7 +314,7 @@ export default function ProductionOrderTracking() {
                 : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
             }`}
           >
-            {key === "RECHAZADOS" ? <XCircle className="w-3.5 h-3.5" /> : key === "ENTREGAS HOY" ? <CalendarClock className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
+            {key === "CONTROL CALIDAD" ? <ClipboardCheck className="w-3.5 h-3.5" /> : key === "EN PRODUCCIÓN" ? <Factory className="w-3.5 h-3.5" /> : key === "RECHAZADAS" ? <XCircle className="w-3.5 h-3.5" /> : <Package className="w-3.5 h-3.5" />}
             {key} ({count})
           </button>
         ))}
@@ -239,9 +324,6 @@ export default function ProductionOrderTracking() {
         {(() => {
           const filtered = localOrders
             .filter(o => {
-              const hasWorkshop = o.quotes?.some((q: any) => q.quote_status === 'SELECCIONADO');
-              if (!hasWorkshop && o.status !== "SOLICITANDO") return false;
-
               const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
               const workshopNames = selectedQuotes.map((q: any) => q.id_agent?.name_company || q.id_agent?.name).filter(Boolean);
               const workshopDisplayName = workshopNames.length > 0 ? workshopNames.join(", ") : "Taller no asignado";
@@ -262,16 +344,12 @@ export default function ProductionOrderTracking() {
               const orderMonth = orderMonthRaw.charAt(0).toUpperCase() + orderMonthRaw.slice(1);
               if (selectedMonth !== "Todos los Meses" && orderMonth !== selectedMonth) return false;
 
-              // Filtro de Etapa
-              if (filter === "TODAS") return o.status !== "CONVERTIDA";
-              if (filter === "ENTREGAS HOY") {
-                const today = new Date().toISOString().split('T')[0];
-                return o.estimated_delivery_date?.startsWith(today) || o.status === "SOLICITANDO";
-              }
-              if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO";
-              if (filter === "CORTE / HABILITADO") return o.status === "COMPARANDO";
-              if (filter === "EN TALLER") return o.status === "EN_REVISION";
+              if (filter === "TODAS") return o.status !== "COMPLETADA" && o.status !== "RECHAZADA";
+              if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO" || o.status === "COMPARANDO";
+              if (filter === "EN PRODUCCIÓN") return o.status === "EN_REVISION";
               if (filter === "CONTROL CALIDAD") return o.status === "CONVERTIDA";
+              if (filter === "RECHAZADAS") return o.status === "RECHAZADA";
+              if (filter === "TODAS") return o.status !== "COMPLETADA";
               return true;
             });
 
@@ -294,6 +372,7 @@ export default function ProductionOrderTracking() {
               key={order._id} 
               order={order} 
               onUpdateStatus={updateOrderStatus} 
+              onUpdateCosts={updateOrderCosts}
               startUpdateSupplierQuote={startUpdateSupplierQuote}
               extendOCDate={extendOCDate}
               approveInventory={approveInventory}
@@ -310,6 +389,7 @@ export default function ProductionOrderTracking() {
 function ProductionCard({ 
   order, 
   onUpdateStatus, 
+  onUpdateCosts,
   startUpdateSupplierQuote,
   extendOCDate,
   approveInventory,
@@ -317,7 +397,8 @@ function ProductionCard({
   setQualityRating
 }: { 
   order: any; 
-  onUpdateStatus: (id: string, status: string) => Promise<void>; 
+  onUpdateStatus: (id: string, status: string, winnerId?: string) => Promise<void>; 
+  onUpdateCosts?: (id: string, costs: Record<string, number>) => Promise<void>;
   startUpdateSupplierQuote: (id: string, payload: any) => Promise<boolean | null>;
   extendOCDate: (id: string, newDate: string, reason: string) => Promise<boolean | null>;
   approveInventory: (id: string, rating: number) => Promise<boolean | null>;
@@ -325,19 +406,36 @@ function ProductionCard({
   setQualityRating: (r: number) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | "PROD_SUB" | null>(null);
+  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | "PROD_SUB" | "WINNER" | null>(null);
   const [now, setNow] = useState(new Date());
   const [tempCosts, setTempCosts] = useState<Record<string, number>>({});
   const [newDate, setNewDate] = useState("");
   const [extendReason, setExtendReason] = useState("");
   const [prodSubState, setProdSubState] = useState<"CORTE" | "CONFECCION" | "AVANCE" | "ENTREGA">("CORTE");
   const [subStateTimes, setSubStateTimes] = useState<Record<string, string>>({});
+  const [localTotal, setLocalTotal] = useState(0);
+  const [confirmedCosts, setConfirmedCosts] = useState<Record<string, number>>({});
+  const [selectedWinnerId, setSelectedWinnerId] = useState<string | null>(null);
+  const [localEstimatedDate, setLocalEstimatedDate] = useState(order.estimated_delivery_date);
 
   useEffect(() => {
     if (activeModal === "STATUS") {
       setNow(new Date());
+    } else if (activeModal === "WINNER") {
+      const selectedQuoteIdx = order.quotes?.findIndex((q: any) => q.quote_status === "SELECCIONADO");
+      if (selectedQuoteIdx !== -1 && order.quotes?.[selectedQuoteIdx]) {
+        const q = order.quotes[selectedQuoteIdx];
+        const id = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${selectedQuoteIdx}`);
+        setSelectedWinnerId(id);
+      } else {
+        const first = order.quotes?.[0];
+        if (first) {
+          const id = typeof first.id_agent === 'string' ? first.id_agent : (first.id_agent?._id || first.id_agent?.name_company || `agent-0`);
+          setSelectedWinnerId(id);
+        }
+      }
     }
-  }, [activeModal]);
+  }, [activeModal, order.quotes]);
   
   const getProgress = () => {
     if (totalAmount === 0) return 25;
@@ -351,13 +449,15 @@ function ProductionCard({
   const selectedQuotes = order.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
   const workshopName = selectedQuotes.length > 1 
     ? `${selectedQuotes.length} Talleres Seleccionados` 
-    : (selectedQuotes[0]?.id_agent?.name_company || selectedQuotes[0]?.id_agent?.name || "Taller no asignado");
+    : (selectedQuotes[0]?.id_agent?.name_company || selectedQuotes[0]?.id_supplier?.name_company || selectedQuotes[0]?.id_agent?.name || selectedQuotes[0]?.id_supplier?.name || "Taller no asignado");
   const totalAmount = selectedQuotes.reduce((acc: number, q: any) => acc + (q.total_amount || 0), 0);
+  const displayTotal = totalAmount > 0 ? totalAmount : localTotal;
   
-  const actualTotal = order.base_items?.reduce((acc: number, item: any) => {
-    const unitPrice = item.unit_cost || (totalAmount / (order.base_items?.length || 1));
+  const actualTotal = displayTotal > 0 ? displayTotal : (order.base_items?.reduce((acc: number, item: any, idx: number) => {
+    const anyKey = Object.keys(confirmedCosts).find(k => k.endsWith(`_${item.id_variant?._id || idx}`));
+    let unitPrice = anyKey ? confirmedCosts[anyKey] : (item.unit_cost || 0);
     return acc + (item.quantity * unitPrice);
-  }, 0) || 0;
+  }, 0) || 0);
 
   const getStepDate = (stepIdx: number) => {
     const date = new Date(order.created_at);
@@ -373,39 +473,31 @@ function ProductionCard({
       
       await onUpdateStatus(order._id, nextStatus);
     } else if (activeModal === "COST") {
-      // Registrar costos (Local MOCK)
-      const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-      if (selectedQuote) {
-        toast.success("Costos registrados (MOCK)");
-        // Update local order mock if necessary...
+      let sum = 0;
+      
+      // Calculate sum by picking the first available cost per item, or summing them?
+      // Since it's a mock, we just take the first workshop's cost as the localTotal for simplicity,
+      // or we just save all to confirmedCosts.
+      order.base_items?.forEach((item: any, idx: number) => {
+        const anyKey = Object.keys(tempCosts).find(k => k.endsWith(`_${item.id_variant?._id || idx}`));
+        if (anyKey) {
+          sum += (tempCosts[anyKey] || 0) * item.quantity;
+        } else if (tempCosts[item.id_variant?._id || idx]) {
+          sum += (tempCosts[item.id_variant?._id || idx] || 0) * item.quantity;
+        }
+      });
+      
+      setLocalTotal(sum);
+      setConfirmedCosts({...tempCosts});
+      if (onUpdateCosts) {
+        await onUpdateCosts(order._id, tempCosts);
       }
+      toast.success("Costos registrados");
     }
     setActiveModal(null);
   };
 
-  const CostItem = ({ item }: { item: any }) => (
-    <div className="flex items-center justify-between p-3 bg-white border border-rose-50/50 hover:border-rose-100 rounded-xl transition-all shadow-sm mb-2 last:mb-0">
-        <div>
-          <p className="text-sm font-bold text-[#594246]">{item.id_variant?.size} · {item.id_variant?.color}</p>
-          <p className="text-[10px] text-[#9b8088] uppercase">{item.quantity} unidades</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-[#b79ca5]">S/</span>
-          <input 
-            type="number" 
-            min="0" 
-            step="0.01"
-            placeholder="0.00" 
-            value={tempCosts[item.id_variant?._id] || ""}
-            onChange={(e) => setTempCosts(prev => ({ ...prev, [item.id_variant?._id]: parseFloat(e.target.value) || 0 }))}
-            onKeyDown={(e) => {
-              if (e.key === '-' || e.key === 'e') e.preventDefault();
-            }}
-            className="w-24 h-10 rounded-lg border border-rose-100 px-3 text-right outline-none focus:ring-1 focus:ring-[#F2778D] font-bold text-[#594246]" 
-          />
-        </div>
-    </div>
-  );
+
 
   return (
     <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden relative">
@@ -437,7 +529,7 @@ function ProductionCard({
                 </span>
                 {(() => {
                   const today = new Date().toISOString().split('T')[0];
-                  if (order.estimated_delivery_date?.startsWith(today)) {
+                  if (localEstimatedDate?.startsWith(today)) {
                     return (
                       <span className="rounded-md bg-rose-100 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-bold text-[#F2778D] flex items-center gap-1.5 border border-rose-200">
                         <Clock className="w-3 h-3" />
@@ -452,6 +544,19 @@ function ProductionCard({
             <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
               {order.pre_order_number} · <span className="text-[#594246]">{order.base_items?.length || 0} Variantes</span> · {order.base_items?.reduce((acc:any, i:any) => acc + i.quantity, 0)} uds.
             </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium flex items-center gap-1.5">
+                <CalendarClock className="w-3.5 h-3.5" />
+                Entrega estimada: <span className="text-[#594246] font-bold">{formatDate(localEstimatedDate)}</span>
+              </p>
+              <button 
+                onClick={() => setActiveModal("DATE")} 
+                className="flex items-center gap-1 text-[10px] sm:text-xs text-[#F2778D] font-bold border border-[#f2b6c1] px-2 py-1 rounded-md hover:bg-[#F2778D] hover:text-white transition-colors"
+              >
+                <Plus className="w-3 h-3" />
+                Prolongar
+              </button>
+            </div>
           </div>
         </div>
 
@@ -497,21 +602,23 @@ function ProductionCard({
             />
 
             <StepItem 
-              active={totalAmount > 0 && (order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA")} 
+              active={order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA"} 
               icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />} 
-              label="En Producción" 
+              label="En Preparación" 
               sub="Corte y Confección" 
-              date={(totalAmount > 0 && (order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA")) ? getStepDate(1) : undefined}
-              interactive={true}
-              onClick={() => setActiveModal("PROD_SUB")}
+              date={(order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA") ? getStepDate(1) : undefined}
+              interactive={order.status === "EN_REVISION"}
+              onClick={() => {
+                if (order.status === "EN_REVISION") setActiveModal("PROD_SUB");
+              }}
             />
 
             <StepItem 
-              active={totalAmount > 0 && order.status === "CONVERTIDA"} 
+              active={order.status === "CONVERTIDA"} 
               icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Control Calidad" 
               sub="Revision y acabados" 
-              date={(totalAmount > 0 && order.status === "CONVERTIDA") ? getStepDate(2) : undefined}
+              date={order.status === "CONVERTIDA" ? getStepDate(2) : undefined}
             />
           </div>
         </div>
@@ -525,49 +632,81 @@ function ProductionCard({
             exit={{ height: 0, opacity: 0 }}
             className="mt-8 pt-8 border-t border-rose-50"
           >
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <h4 className="text-lg font-medium text-[#594246]">Detalle de Produccion</h4>
-              <CTA 
-                onClick={() => setActiveModal("DATE")}
-                className="!py-2 !px-4 !text-xs !bg-white border border-[#f2b6c1] !text-[#594246]"
-                icon={CalendarClock}
-              >
-                Prolongar fecha de producción
-              </CTA>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="text-[#9b8088] font-medium border-b border-rose-50">
-                    <th className="py-3 px-2">Talla</th>
-                    <th className="py-3 px-2">Color</th>
-                    <th className="py-3 px-2 text-center">Cantidad</th>
-                    <th className="py-3 px-2 text-center">Costo Unit.</th>
-                    <th className="py-3 px-2 text-right">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[#594246]">
-                  {order.base_items?.map((item: any, idx: number) => (
-                    <tr key={idx} className="border-b border-rose-50/50 hover:bg-rose-50/30 transition-colors">
-                      <td className="py-4 px-2">{item.id_variant?.size}</td>
-                      <td className="py-4 px-2">{item.id_variant?.color}</td>
-                      <td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
-                      <td className="py-4 px-2 text-center text-[#9b8088]">
-                        {totalAmount === 0 ? (
-                          <span className="text-rose-400 font-bold italic">Pendiente</span>
-                        ) : (
-                          `S/ ${(item.unit_cost || (totalAmount / order.base_items.length)).toFixed(2)}`
-                        )}
-                      </td>
-                      <td className="py-4 px-2 text-right font-bold text-[#F2778D]">
-                        S/ {(item.quantity * (item.unit_cost || (totalAmount / order.base_items.length))).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {(() => {
+              const quotesToDisplay = order.quotes?.filter((q: any) => q.quote_status !== 'RECHAZADO') || [];
+              const confirmedQuote = quotesToDisplay.find((q: any) => q.quote_status === 'SELECCIONADO');
+              const workshopsToRender = confirmedQuote ? [confirmedQuote] : (quotesToDisplay.length > 0 ? quotesToDisplay : [null]);
+
+              return workshopsToRender.map((quote: any, wIdx: number) => {
+                const agentName = quote ? (quote.id_agent?.name_company || quote.id_agent?.name || "Taller") : "General";
+                const agentId = quote ? (typeof quote.id_agent === 'string' ? quote.id_agent : (quote.id_agent?._id || quote.id_agent?.name_company || `agent-${wIdx}`)) : null;
+                const quoteTotal = quote?.total_amount || 0;
+                const isPending = quoteTotal === 0 && localTotal === 0;
+
+                return (
+                  <div key={wIdx} className="mb-8 last:mb-0">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                      <h4 className="text-lg font-medium text-[#594246]">
+                        Detalle de Producción {workshopsToRender.length > 1 && <span className="text-[#F2778D]">· {agentName}</span>}
+                      </h4>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead>
+                          <tr className="text-[#9b8088] font-medium border-b border-rose-50">
+                            <th className="py-3 px-2">Talla</th>
+                            <th className="py-3 px-2">Color</th>
+                            <th className="py-3 px-2 text-center">Cantidad</th>
+                            <th className="py-3 px-2 text-center">Costo Unit.</th>
+                            <th className="py-3 px-2 text-right">Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-[#594246]">
+                          {order.base_items?.map((item: any, idx: number) => {
+                            const costKey = agentId ? `${agentId}_${item.id_variant?._id || idx}` : `${item.id_variant?._id || idx}`;
+                            let unitCost = item.unit_cost;
+                            if (unitCost === undefined && confirmedCosts[costKey] !== undefined) {
+                              unitCost = confirmedCosts[costKey];
+                            }
+                            if (unitCost === undefined) {
+                              // Intentar buscar sin prefijo
+                              const anyKey = Object.keys(confirmedCosts).find(k => k.endsWith(`_${item.id_variant?._id || idx}`));
+                              if (anyKey) unitCost = confirmedCosts[anyKey];
+                            }
+                            if (unitCost === undefined) {
+                              unitCost = 0; 
+                            }
+
+                            return (
+                              <tr key={idx} className="border-b border-rose-50/50 hover:bg-rose-50/30 transition-colors">
+                                <td className="py-4 px-2">{item.id_variant?.size}</td>
+                                <td className="py-4 px-2">{item.id_variant?.color}</td>
+                                <td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
+                                <td className="py-4 px-2 text-center text-[#9b8088]">
+                                  {isPending && unitCost === 0 ? (
+                                    <span className="text-rose-400 font-bold italic">Pendiente</span>
+                                  ) : (
+                                    `S/ ${unitCost.toFixed(2)}`
+                                  )}
+                                </td>
+                                <td className="py-4 px-2 text-right font-bold text-[#F2778D]">
+                                  {isPending && unitCost === 0 ? (
+                                    <span className="text-rose-400 font-bold italic">S/ 0.00</span>
+                                  ) : (
+                                    `S/ ${(item.quantity * unitCost).toFixed(2)}`
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
 
               <div className="mt-8 flex flex-wrap justify-end gap-4">
               <CTA 
@@ -575,29 +714,79 @@ function ProductionCard({
                 className="!bg-white border border-[#F2778D] !text-[#F2778D] !py-3 !px-6"
                 icon={Eye}
               >
-                Ficha Tecnica
+                Ficha Técnica
               </CTA>
               
-              {totalAmount === 0 ? (
+              {(order.status === "SOLICITANDO" || order.status === "COMPARANDO") && (
+                <>
+                  <CTA 
+                    onClick={() => setActiveModal("COST")}
+                    className="!bg-white border border-[#594246] !text-[#594246] !py-3 !px-8 shadow-sm"
+                    icon={FileText}
+                  >
+                    Registrar Costos de Taller
+                  </CTA>
+                  <CTA 
+                    onClick={() => {
+                      onUpdateStatus(order._id, "RECHAZADA");
+                      toast.success("Orden rechazada exitosamente.");
+                    }}
+                    className="!bg-white border border-[#594246] !text-[#594246] !py-3 !px-8 shadow-sm"
+                    icon={XCircle}
+                  >
+                    Rechazar Orden
+                  </CTA>
+                  {displayTotal > 0 && (
+                    <CTA 
+                      onClick={() => setActiveModal("WINNER")}
+                      className="!py-3 !px-8 shadow-lg shadow-rose-100"
+                      icon={CheckCircle2}
+                    >
+                      Confirmar Taller
+                    </CTA>
+                  )}
+                </>
+              )}
+
+              {order.status === "RECHAZADA" && (
+                <div className="flex w-full items-center justify-between mt-2 border-t border-rose-50 pt-4">
+                  <div className="flex items-center gap-2 text-rose-500 font-bold text-sm bg-rose-50 px-4 py-2 rounded-xl">
+                     <Clock className="w-4 h-4" />
+                     Se eliminará en 3 días
+                  </div>
+                  <CTA 
+                    onClick={() => {
+                      onUpdateStatus(order._id, "SOLICITANDO");
+                      toast.success("Orden reanudada. Puedes continuar con la asignación.");
+                    }}
+                    className="!bg-white border border-[#10b981] !text-[#10b981] !py-3 !px-8 shadow-sm hover:!bg-[#10b981] hover:!text-white transition-all"
+                    icon={ArrowRight}
+                  >
+                    Continuar Orden
+                  </CTA>
+                </div>
+              )}
+
+              {order.status === "EN_REVISION" && (
                 <CTA 
-                  onClick={() => setActiveModal("COST")}
+                  onClick={() => setActiveModal("PROD_SUB")}
                   className="!py-3 !px-8 shadow-lg shadow-rose-100"
-                  icon={Check}
+                  icon={Factory}
                 >
-                  Registrar Costos de Taller
+                  Ir a Producción
                 </CTA>
-              ) : (
+              )}
+
+              {order.status === "CONVERTIDA" && (
                 <CTA 
                   onClick={() => {
-                    if (order.status === "COMPARANDO" || order.status === "EN_REVISION") {
-                      setActiveModal("PROD_SUB");
-                    } else {
-                      setActiveModal("STATUS");
-                    }
+                    onUpdateStatus(order._id, "COMPLETADA");
+                    toast.success("Orden completada e ingresada a inventario.");
                   }}
                   className="!py-3 !px-8 shadow-lg shadow-rose-100"
+                  icon={CheckCircle2}
                 >
-                  Actualizar Estado
+                  Completar Orden
                 </CTA>
               )}
             </div>
@@ -643,7 +832,8 @@ function ProductionCard({
             <CTA 
               onClick={async () => {
                 if (newDate) {
-                  toast.success("Fecha prolongada (MOCK)");
+                  setLocalEstimatedDate(new Date(newDate).toISOString());
+                  toast.success("Fecha prolongada");
                   setActiveModal(null);
                 } else {
                   toast.error("Seleccione una fecha.");
@@ -657,20 +847,28 @@ function ProductionCard({
         </div>
       </Modal>
 
-      {/* 2. Modal Actualizar Estado - Rediseñado */}
       <Modal 
         open={activeModal === "PROD_SUB"} 
         onClose={() => setActiveModal(null)}
-        panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-lg p-8"
+        panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl p-8"
         title="Avance en Taller"
         titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
       >
-        <div className="space-y-8 pt-6">
-          <p className="text-sm text-[#9b8088] text-center">
+        <button 
+          onClick={() => setActiveModal(null)} 
+          className="absolute top-6 right-6 text-[#b79ca5] hover:text-[#594246] hover:bg-rose-50 p-2 rounded-full transition-colors z-50"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <div className="pt-6 relative">
+          <p className="text-sm text-[#9b8088] mb-8">
             Registra el avance consecutivo de la producción en el taller.
           </p>
 
-          <div className="relative pl-6 ml-2 space-y-8">
+          <div className="flex flex-col md:flex-row gap-10">
+            {/* Columna Izquierda: Pasos y Acciones */}
+            <div className="flex-[3] flex flex-col justify-between">
+              <div className="relative pl-6 ml-2 space-y-8">
             {/* Línea vertical de fondo */}
             <div className="absolute left-[15px] top-[16px] bottom-[16px] w-[2px] bg-rose-100/50 z-0" />
             
@@ -710,16 +908,33 @@ function ProductionCard({
                 </div>
               );
             })}
+              </div>
+            </div>
+
+            {/* Columna Derecha: Tarjeta de Información */}
+            <div className="flex-[2]">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col gap-4 sticky top-0">
+                <div className="bg-amber-100 p-2.5 rounded-lg w-fit">
+                   <AlertCircle className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-amber-900 flex flex-wrap items-center gap-2">
+                     Registro Manual 
+                     <span className="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full uppercase tracking-wider">Temporal</span>
+                  </p>
+                  <p className="text-sm text-amber-700 leading-relaxed mt-2">
+                     La automatización de avance en taller está <span className="font-bold">en construcción</span>. Por favor, realiza el seguimiento manualmente por ahora para mantener el registro actualizado.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="pt-6 border-t border-rose-50 flex gap-4">
-            <CTA onClick={() => setActiveModal(null)} className="flex-1 !bg-white border border-rose-100 !text-[#9b8088]">
-              Cerrar
-            </CTA>
+          <div className="pt-8 mt-8 border-t border-rose-50 flex gap-4">
             
             {prodSubState !== "ENTREGA" && (
               <CTA 
-                className={`flex-[2] shadow-lg ${
+                className={`flex-1 shadow-lg ${
                   prodSubState === "AVANCE" 
                     ? "!bg-[#10b981] hover:!bg-[#059669] shadow-emerald-100/50" 
                     : "shadow-rose-100"
@@ -869,10 +1084,10 @@ function ProductionCard({
 
             <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {(() => {
-                const selectedQuotes = order.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
+                const activeQuotes = order.quotes?.filter((q: any) => q.quote_status !== 'RECHAZADO') || [];
                 const productName = order.base_items?.[0]?.id_variant?.id_product?.name || "Producto sin nombre";
                 
-                if (selectedQuotes.length === 0) {
+                if (activeQuotes.length === 0) {
                   return (
                     <div className="space-y-3">
                       <div className="px-1">
@@ -881,14 +1096,34 @@ function ProductionCard({
                       </div>
                       <div className="space-y-2">
                         {order.base_items?.map((item: any, idx: number) => (
-                          <CostItem key={idx} item={item} />
+                          <div key={idx} className="flex items-center justify-between p-3 bg-white border border-rose-50/50 hover:border-rose-100 rounded-xl transition-all shadow-sm mb-2 last:mb-0">
+                              <div>
+                                <p className="text-sm font-bold text-[#594246]">{item.id_variant?.size} · {item.id_variant?.color}</p>
+                                <p className="text-[10px] text-[#9b8088] uppercase">{item.quantity} unidades</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-[#b79ca5]">S/</span>
+                                <input 
+                                  type="number" 
+                                  min="0" 
+                                  step="0.01"
+                                  placeholder="0.00" 
+                                  value={tempCosts[item.id_variant?._id || idx] || ""}
+                                  onChange={(e) => setTempCosts(prev => ({ ...prev, [item.id_variant?._id || idx]: parseFloat(e.target.value) || 0 }))}
+                                  onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e') e.preventDefault();
+                                  }}
+                                  className="w-24 h-10 rounded-lg border border-rose-100 px-3 text-right outline-none focus:ring-1 focus:ring-[#F2778D] font-bold text-[#594246] appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
+                                />
+                              </div>
+                          </div>
                         ))}
                       </div>
                     </div>
                   );
                 }
 
-                return selectedQuotes.map((quote: any, qIdx: number) => (
+                return activeQuotes.map((quote: any, qIdx: number) => (
                   <div key={qIdx} className="space-y-3">
                     <div className="px-1 border-l-2 border-[#F2778D] pl-3">
                       <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-widest mb-0.5">
@@ -897,9 +1132,34 @@ function ProductionCard({
                       <h5 className="text-sm font-bold text-[#594246]">{productName}</h5>
                     </div>
                     <div className="space-y-2">
-                      {order.base_items?.map((item: any, idx: number) => (
-                        <CostItem key={idx} item={item} />
-                      ))}
+                      {order.base_items?.map((item: any, idx: number) => {
+                        const agentId = typeof quote.id_agent === 'string' ? quote.id_agent : (quote.id_agent?._id || quote.id_agent?.name_company || `agent-${qIdx}`);
+                        const costKey = `${agentId}_${item.id_variant?._id || idx}`;
+                        
+                        return (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white border border-rose-50/50 hover:border-rose-100 rounded-xl transition-all shadow-sm mb-2 last:mb-0">
+                            <div>
+                              <p className="text-sm font-bold text-[#594246]">{item.id_variant?.size} · {item.id_variant?.color}</p>
+                              <p className="text-[10px] text-[#9b8088] uppercase">{item.quantity} unidades</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold text-[#b79ca5]">S/</span>
+                              <input 
+                                type="number" 
+                                min="0" 
+                                step="0.01"
+                                placeholder="0.00" 
+                                value={tempCosts[costKey] || ""}
+                                onChange={(e) => setTempCosts(prev => ({ ...prev, [costKey]: parseFloat(e.target.value) || 0 }))}
+                                onKeyDown={(e) => {
+                                  if (e.key === '-' || e.key === 'e') e.preventDefault();
+                                }}
+                                className="w-24 h-10 rounded-lg border border-rose-100 px-3 text-right outline-none focus:ring-1 focus:ring-[#F2778D] font-bold text-[#594246] appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
+                              />
+                            </div>
+                        </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ));
@@ -965,6 +1225,61 @@ function ProductionCard({
               </div>
            </div>
            <CTA className="w-full !bg-white border border-rose-100 !text-[#9b8088]" onClick={() => setActiveModal(null)}>Cerrar Ficha</CTA>
+        </div>
+      </Modal>
+
+      {/* 6. Modal Confirmar Taller (WINNER) */}
+      <Modal 
+        open={activeModal === "WINNER"} 
+        onClose={() => setActiveModal(null)}
+        panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-lg p-8"
+        title="Confirmar Taller"
+        titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
+      >
+        <div className="space-y-6 pt-2">
+          <p className="text-sm text-[#9b8088]">Confirma el taller que ejecutará esta orden para avanzar a la etapa de Producción.</p>
+          <div className="space-y-3">
+            {order.quotes?.filter((q: any) => q.quote_status !== 'RECHAZADO').map((q: any, idx: number) => {
+              const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
+              const agentName = q.id_agent?.name_company || q.id_agent?.name || "Cargando...";
+              const isSelected = selectedWinnerId === agentId;
+              const amount = q.total_amount || displayTotal;
+
+              return (
+                <div 
+                  key={agentId}
+                  onClick={() => setSelectedWinnerId(agentId)}
+                  className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between cursor-pointer ${
+                    isSelected ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white hover:border-[#f2b6c1]"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center">
+                      <Factory className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-[#594246]">{agentName}</p>
+                      <p className="text-xs text-[#9b8088] mb-1">{firstItem?.name}</p>
+                      <p className="text-xs text-[#9b8088]">Costo total registrado: <span className="font-bold text-[#F2778D]">{formatCurrency(amount)}</span></p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="pt-4 border-t border-rose-100">
+            <CTA 
+              onClick={async () => {
+                if (!selectedWinnerId) return toast.error("Seleccione un taller primero.");
+                await onUpdateStatus(order._id, "EN_REVISION", selectedWinnerId);
+                toast.success("Taller confirmado. La orden ha pasado a Producción.");
+                setActiveModal(null);
+              }}
+              className="w-full py-4 shadow-lg shadow-rose-100"
+            >
+              Confirmar y Enviar a Producción
+            </CTA>
+          </div>
         </div>
       </Modal>
     </article>
