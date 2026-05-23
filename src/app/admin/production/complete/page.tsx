@@ -7,7 +7,7 @@ import {
   Eye, FileText, Download, Calendar, History,
   Factory, Scissors
 } from "lucide-react";
-import { useStorehouseStore } from "@/hooks";
+import { useProductionStore } from "@/hooks/production";
 
 // --- HELPERS ---
 const formatCurrency = (val: number) => val === 0 ? "Sin registrar" : `S/ ${(val || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
@@ -17,7 +17,7 @@ const MOCK_COMPLETED_ORDERS = [
   {
     _id: "mock-1",
     pre_order_number: "OP-2026-001",
-    status: "CONVERTIDA",
+    status: "COMPLETADA",
     updated_at: "2026-05-01T10:00:00Z",
     base_items: [
       {
@@ -41,7 +41,7 @@ const MOCK_COMPLETED_ORDERS = [
   {
     _id: "mock-2",
     pre_order_number: "OP-2026-005",
-    status: "CONVERTIDA",
+    status: "COMPLETADA",
     updated_at: "2026-04-28T15:30:00Z",
     base_items: [
       {
@@ -65,7 +65,7 @@ const MOCK_COMPLETED_ORDERS = [
   {
     _id: "mock-3",
     pre_order_number: "OP-2026-012",
-    status: "CONVERTIDA",
+    status: "COMPLETADA",
     updated_at: "2026-05-04T09:15:00Z",
     base_items: [
       {
@@ -92,43 +92,29 @@ const MOCK_COMPLETED_ORDERS = [
 import { Modal, CTA } from "@components";
 
 export default function CompletedProductionOrders() {
-  const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
+  const { startLoadingProductionOrders, orders } = useProductionStore();
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    startLoadingPrePurchaseOrders();
-  }, [startLoadingPrePurchaseOrders]);
+    startLoadingProductionOrders();
+  }, [startLoadingProductionOrders]);
 
   const completedOrders = useMemo(() => {
-    if (typeof window !== "undefined") {
-      const createdStr = localStorage.getItem("mocked_created_orders");
-      if (createdStr) {
-        try {
-          const parsed = JSON.parse(createdStr);
-          const finished = parsed.filter((o: any) => {
-            if (o.status !== "CONVERTIDA" && o.status !== "COMPLETADA") return false;
-            const sq = o.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-            if (!sq?.total_amount) return false; // Hide buggy orders without registered costs
-            return true;
-          });
-          return [...finished, ...MOCK_COMPLETED_ORDERS];
-        } catch (e) {}
-      }
-    }
-    return MOCK_COMPLETED_ORDERS;
-  }, []);
+    return (orders || []).filter((o: any) => {
+      if (o.status !== "COMPLETADA" && o.status !== "CONTROL_CALIDAD") return false;
+      const sq = o.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
+      return true;
+    });
+  }, [orders]);
 
-  const filteredOrders = completedOrders.filter(order => {
+  const filteredOrders = completedOrders.filter((order: any) => {
     const firstItem = order.base_items?.[0]?.id_variant?.id_product?.name || "";
     return firstItem.toLowerCase().includes(search.toLowerCase()) || 
            order.pre_order_number.toLowerCase().includes(search.toLowerCase());
   });
 
   const totalInvestment = useMemo(() => 
-    completedOrders.reduce((acc, oc) => {
-      const q = oc.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-      return acc + (q?.total_amount || 0);
-    }, 0)
+    completedOrders.reduce((acc, oc) => acc + (oc.total_amount || 0), 0)
   , [completedOrders]);
 
   const [activeModal, setActiveModal] = useState<"TECH" | "OBS" | null>(null);
@@ -147,7 +133,7 @@ export default function CompletedProductionOrders() {
   const selectedFirstItem = selectedOrder?.base_items?.[0]?.id_variant?.id_product;
   const selectedQuoteObj = selectedOrder?.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
   const selectedWorkshopName = selectedQuoteObj?.id_agent?.name_company || selectedQuoteObj?.id_supplier?.name_company || selectedQuoteObj?.id_agent?.name || selectedQuoteObj?.id_supplier?.name || "Taller finalizado";
-  const selectedTotalAmount = selectedQuoteObj?.total_amount || 0;
+  const selectedTotalAmount = selectedOrder?.total_amount || 0;
   const selectedTotalUnits = selectedOrder?.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 
   return (
@@ -260,8 +246,18 @@ export default function CompletedProductionOrders() {
                   <div className="mt-4 space-y-1 px-2">
                     <p className="text-sm font-bold text-[#594246]">En Producción</p>
                     <div className="flex flex-col gap-1 mt-2 bg-rose-50/50 p-2 rounded-lg border border-rose-100/50">
-                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Corte:</span> <span className="text-[#9b8088]">{new Date(new Date(selectedOrder.created_at).getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</span></p>
-                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Confección:</span> <span className="text-[#9b8088]">{new Date(new Date(selectedOrder.created_at).getTime() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}</span></p>
+                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Corte:</span> <span className="text-[#9b8088]">
+                         {(() => {
+                            const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CORTE');
+                            return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
+                         })()}
+                       </span></p>
+                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Confección:</span> <span className="text-[#9b8088]">
+                         {(() => {
+                            const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CONFECCION');
+                            return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
+                         })()}
+                       </span></p>
                     </div>
                   </div>
                 </div>

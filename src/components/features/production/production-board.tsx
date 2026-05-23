@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Product } from "@/core/models";
-import { useProductStore, useStorehouseStore } from "@/hooks";
+import { useProductStore, useProductionStore } from "@/hooks";
 
 type SupplySelection = {
   key: string;
@@ -68,27 +68,30 @@ const getSupplySuggestion = (variants: Product["variants"]) => {
 export const ProductionBoard = () => {
   const router = useRouter();
   const { products, loading: productsLoading, searchTerm, startLoadingProducts } = useProductStore();
-  const { purchaseOrders, startLoadingPurchaseOrders, loading: ordersLoading } = useStorehouseStore();
+  const { orders, startLoadingProductionOrders, loading: ordersLoading } = useProductionStore();
 
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selected, setSelected] = useState<Record<string, SupplySelection>>({});
 
   useEffect(() => {
     void startLoadingProducts({ limit: 100 });
-    void startLoadingPurchaseOrders();
-  }, [startLoadingProducts, startLoadingPurchaseOrders]);
+    void startLoadingProductionOrders();
+  }, [startLoadingProducts, startLoadingProductionOrders]);
 
   const pendingTransitByVariant = useMemo(() => {
     const transit: Record<string, number> = {};
-    const activeOrders = purchaseOrders.filter((order) => order.status === "PENDIENTE");
+    const activeOrders = orders.filter((order) => order.status !== "COMPLETADA" && order.status !== "RECHAZADA");
     activeOrders.forEach((order) => {
-      order.items.forEach((item) => {
-        if (!transit[item.id_variant]) transit[item.id_variant] = 0;
-        transit[item.id_variant] += item.quantity;
+      order.base_items?.forEach((item: any) => {
+        const varId = typeof item.id_variant === 'string' ? item.id_variant : item.id_variant?._id;
+        if (varId) {
+          if (!transit[varId]) transit[varId] = 0;
+          transit[varId] += item.quantity;
+        }
       });
     });
     return transit;
-  }, [purchaseOrders]);
+  }, [orders]);
 
   const alertProducts = useMemo(() => {
     return products

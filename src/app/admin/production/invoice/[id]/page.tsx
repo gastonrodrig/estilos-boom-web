@@ -2,114 +2,23 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Printer } from "lucide-react";
-
-const MOCK_COMPLETED_ORDERS = [
-  {
-    _id: "mock-1",
-    pre_order_number: "OP-2026-001",
-    status: "CONVERTIDA",
-    updated_at: "2026-05-01T10:00:00Z",
-    base_items: [
-      {
-        id_variant: {
-          id_product: {
-            name: "Vestido Gala Velvet",
-            sku: "VST-001"
-          },
-          size: "M",
-          color: "Rojo"
-        },
-        quantity: 45
-      }
-    ],
-    quotes: [
-      {
-        quote_status: "SELECCIONADO",
-        id_supplier: { name_company: "Taller Creaciones Rosa", contact_name: "Rosa Perez", ruc: "20123456789" },
-        total_amount: 2850.50
-      }
-    ]
-  },
-  {
-    _id: "mock-2",
-    pre_order_number: "OP-2026-005",
-    status: "CONVERTIDA",
-    updated_at: "2026-04-28T15:30:00Z",
-    base_items: [
-      {
-        id_variant: {
-          id_product: {
-            name: "Blusa Seda Ivory",
-            sku: "BLS-002"
-          },
-          size: "S",
-          color: "Blanco"
-        },
-        quantity: 120
-      }
-    ],
-    quotes: [
-      {
-        quote_status: "SELECCIONADO",
-        id_supplier: { name_company: "Textiles del Sur S.A.C.", contact_name: "Juan Lira", ruc: "20987654321" },
-        total_amount: 4200.00
-      }
-    ]
-  },
-  {
-    _id: "mock-3",
-    pre_order_number: "OP-2026-012",
-    status: "CONVERTIDA",
-    updated_at: "2026-05-04T09:15:00Z",
-    base_items: [
-      {
-        id_variant: {
-          id_product: {
-            name: "Pantalón Sastrero Negro",
-            sku: "PNT-003"
-          },
-          size: "L",
-          color: "Negro"
-        },
-        quantity: 60
-      }
-    ],
-    quotes: [
-      {
-        quote_status: "SELECCIONADO",
-        id_supplier: { name_company: "Taller Moda Elite", contact_name: "Carlos Sanchez", ruc: "20444555666" },
-        total_amount: 3150.00
-      }
-    ]
-  }
-];
+import { useProductionStore } from "@/hooks/production";
 
 export default function ProductionInvoicePDFPage() {
   const { id } = useParams();
-  const [order, setOrder] = useState<any>(null);
+  const { startLoadProductionOrder, selectedOrder } = useProductionStore();
+  const order = selectedOrder;
 
   useEffect(() => {
-    // Buscar en local storage primero
-    let found = null;
-    const createdStr = localStorage.getItem("mocked_created_orders");
-    if (createdStr) {
-      try {
-        const parsed = JSON.parse(createdStr);
-        found = parsed.find((o: any) => o._id === id);
-      } catch (e) {}
+    if (id) {
+      startLoadProductionOrder(id as string);
     }
-    
-    if (!found) {
-      found = MOCK_COMPLETED_ORDERS.find(o => o._id === id) || MOCK_COMPLETED_ORDERS[0];
-    }
-    
-    setOrder(found);
-  }, [id]);
+  }, [id, startLoadProductionOrder]);
 
   if (!order) return <div className="p-10 text-center">Generando comprobante OP...</div>;
 
   const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
-  const totalAmount = selectedQuote?.total_amount || 0;
+  const totalAmount = order.total_amount || selectedQuote?.total_amount || 0;
   const subtotal = totalAmount / 1.18;
   const igv = totalAmount - subtotal;
   const supplier = selectedQuote?.id_agent || selectedQuote?.id_supplier || {};
@@ -190,11 +99,14 @@ export default function ProductionInvoicePDFPage() {
                 {order.base_items?.map((item: any, i: number) => {
                     const productName = item.id_variant?.id_product?.name || "Producto sin nombre";
                     const productSku = item.id_variant?.id_product?.sku || "S/N";
-                    const variantDetail = `${item.id_variant?.size || 'M'} - ${item.id_variant?.color || 'N/A'}`;
+                    const variantDetail = `${item.id_variant?.size || 'M'} - ${item.id_variant?.color?.name || item.id_variant?.color || 'N/A'}`;
                     
                     const qty = Number(item.quantity || 0);
-                    // Approximate unit cost
-                    const price = qty > 0 ? (totalAmount / qty) : 0; 
+                    const varIdStr = typeof item.id_variant === 'string' ? item.id_variant : item.id_variant?._id;
+                    const quoteItem = selectedQuote?.items?.find((i: any) => 
+                        (typeof i.id_variant === 'string' ? i.id_variant : i.id_variant?._id) === varIdStr
+                    );
+                    const price = quoteItem?.unit_cost || 0; 
 
                     return (
                     <tr key={i} className="text-sm text-[#594246]">
