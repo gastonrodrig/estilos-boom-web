@@ -41,8 +41,10 @@ const stockState = (stock: number, minimum: number, pendingTransit: number) => {
   return { label: "✓ OK", tone: "text-emerald-500", icon: null };
 };
 
-const variantLabel = (product: Product, size: string, color: string) =>
-  `${size || "Sin talla"} / ${color || product.gender || "Sin color"}`;
+const variantLabel = (product: Product, size: string, color: any) => {
+  const colorName = typeof color === 'object' ? color?.name : color;
+  return `${size || "Sin talla"} / ${colorName || product.gender || "Sin color"}`;
+};
 
 const getProductImage = (product: Product) => product.images?.[0] ?? "";
 
@@ -110,7 +112,7 @@ export const ProductionBoard = () => {
         product.name,
         product.sku,
         product.category?.name ?? "",
-        ...variants.map((v) => `${v.size} ${v.color}`),
+        ...variants.map((v) => `${v.size} ${typeof v.color === 'object' ? (v.color as any)?.name : v.color}`),
       ]
         .join(" ")
         .toLowerCase();
@@ -342,7 +344,7 @@ export const ProductionBoard = () => {
                                   {variant.size || "-"}
                                 </td>
                                 <td className="px-4 py-4 text-sm text-[#9b8088]">
-                                  {variant.color || "-"}
+                                  {typeof variant.color === 'object' ? (variant.color as any)?.name : variant.color || "-"}
                                 </td>
                                 <td className={`px-4 py-4 text-base font-bold ${stock < minimum ? 'text-[#F2778D]' : 'text-[#594246]'}`}>
                                   {stock}
