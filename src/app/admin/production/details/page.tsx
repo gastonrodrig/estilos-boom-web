@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import { Star } from "lucide-react"; // Importar Star
 
-import { useStorehouseStore } from "@/hooks";
+import { useProductionStore } from "@/hooks/production";
 import { Modal, CTA } from "@components";
 
 // --- HELPERS ---
@@ -104,22 +104,17 @@ const MOCK_TEST_ORDERS = [
 ];
 
 export default function ProductionOrderTracking() {
-  const { 
-    startLoadingPrePurchaseOrders, 
-    prePurchaseOrders, 
-    startUpdateSupplierQuote,
-    extendOCDate,
-    approveInventory
-  } = useStorehouseStore();
+  const { orders, loading, error, startLoadingProductionOrders, startUpdateProductionStatus, startConfirmWorkshop, startUpdateWorkshopQuote, startUpdateSubState } = useProductionStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkshop, setSelectedWorkshop] = useState("Todos los Talleres");
   const [selectedMonth, setSelectedMonth] = useState("Todos los Meses");
-  const [localOrders, setLocalOrders] = useState<any[]>(MOCK_TEST_ORDERS);
   const [qualityRating, setQualityRating] = useState(5); // Estado para las estrellitas
 
   useEffect(() => {
-    startLoadingPrePurchaseOrders('PRODUCCION');
+    startLoadingProductionOrders();
+    /*
+    // LOGICA MOCK COMENTADA
     if (typeof window !== "undefined") {
       const createdStr = localStorage.getItem("mocked_created_orders");
       if (createdStr) {
@@ -128,14 +123,22 @@ export default function ProductionOrderTracking() {
           setLocalOrders(prev => {
             const currentIds = new Set(prev.map(p => p._id));
             const newOrders = createdOrders.filter((o: any) => !currentIds.has(o._id));
-            return [...newOrders, ...prev]; // Put new ones at the top
+            return [...newOrders, ...prev];
           });
         } catch (e) {}
       }
     }
-  }, [startLoadingPrePurchaseOrders]);
+    */
+  }, [startLoadingProductionOrders]);
 
   const updateOrderStatus = async (orderId: string, newStatus: string, winnerId?: string) => {
+    if (newStatus === "EN_PRODUCCION" && winnerId) {
+      await startConfirmWorkshop(orderId, winnerId);
+    } else {
+      await startUpdateProductionStatus(orderId, newStatus);
+    }
+    /*
+    // MOCK
     setLocalOrders(prev => {
       const next = prev.map(o => {
         if (o._id !== orderId) return o;
@@ -150,83 +153,47 @@ export default function ProductionOrderTracking() {
             };
           });
         }
-        
         return { ...o, status: newStatus, quotes: newQuotes };
       });
-      
-      // Persist status change to mocked orders to allow testing the flow locally
-      if (typeof window !== "undefined") {
-        const createdStr = localStorage.getItem("mocked_created_orders");
-        if (createdStr) {
-          try {
-            const createdOrders = JSON.parse(createdStr);
-            const updatedMocked = createdOrders.map((co: any) => {
-              if (co._id !== orderId) return co;
-              let newQuotes = co.quotes;
-              if (winnerId && co.quotes) {
-                newQuotes = co.quotes.map((q: any, idx: number) => {
-                  const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
-                  return {
-                    ...q,
-                    quote_status: agentId === winnerId ? "SELECCIONADO" : "RECHAZADO"
-                  };
-                });
-              }
-              return { ...co, status: newStatus, quotes: newQuotes };
-            });
-            localStorage.setItem("mocked_created_orders", JSON.stringify(updatedMocked));
-          } catch(e) {}
-        }
-      }
+      localStorage.setItem("mocked_created_orders", JSON.stringify(next.filter(o => !o._id.startsWith("test-"))));
       return next;
     });
+    */
+    // toast.success(`Orden movida a ${newStatus.replace('_', ' ')}`); // removed double toast
   };
 
   const updateOrderCosts = async (orderId: string, costs: Record<string, number>) => {
-    setLocalOrders(prev => {
-      const next = prev.map(o => {
-        if (o._id !== orderId) return o;
-        const newQuotes = o.quotes?.map((q: any, idx: number) => {
-          const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
-          let quoteTotal = 0;
-          o.base_items?.forEach((item: any, iIdx: number) => {
-            const costKey = `${agentId}_${item.id_variant?._id || iIdx}`;
-            if (costs[costKey]) quoteTotal += costs[costKey] * item.quantity;
-          });
-          return { ...q, total_amount: quoteTotal > 0 ? quoteTotal : q.total_amount };
+    const order = orders.find((o: any) => o._id === orderId);
+    if (!order) return;
+
+    // Group costs by workshopId
+    const workshopCosts: Record<string, any[]> = {};
+    Object.keys(costs).forEach(key => {
+      const [workshopId, varId] = key.split('_');
+      if (!workshopId || !varId) return;
+      if (!workshopCosts[workshopId]) workshopCosts[workshopId] = [];
+      const item = order.base_items?.find((i: any) => 
+        (typeof i.id_variant === 'string' ? i.id_variant : i.id_variant?._id) === varId
+      );
+      if (item) {
+        workshopCosts[workshopId].push({
+          id_variant: varId,
+          quantity: item.quantity,
+          unit_cost: costs[key]
         });
-        return { ...o, quotes: newQuotes };
-      });
-      
-      if (typeof window !== "undefined") {
-        const createdStr = localStorage.getItem("mocked_created_orders");
-        if (createdStr) {
-          try {
-            const createdOrders = JSON.parse(createdStr);
-            const updatedMocked = createdOrders.map((co: any) => {
-              if (co._id !== orderId) return co;
-              const newQuotes = co.quotes?.map((q: any, idx: number) => {
-                const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || q.id_agent?.name_company || `agent-${idx}`);
-                let quoteTotal = 0;
-                co.base_items?.forEach((item: any, iIdx: number) => {
-                  const costKey = `${agentId}_${item.id_variant?._id || iIdx}`;
-                  if (costs[costKey]) quoteTotal += costs[costKey] * item.quantity;
-                });
-                return { ...q, total_amount: quoteTotal > 0 ? quoteTotal : q.total_amount };
-              });
-              return { ...co, quotes: newQuotes };
-            });
-            localStorage.setItem("mocked_created_orders", JSON.stringify(updatedMocked));
-          } catch(e) {}
-        }
       }
-      return next;
     });
+
+    for (const [wId, items] of Object.entries(workshopCosts)) {
+      if (items.length > 0) {
+        await startUpdateWorkshopQuote(orderId, { id_workshop: wId, items });
+      }
+    }
   };
 
   const workshops = useMemo(() => {
     const names = new Set<string>();
-    localOrders.forEach(o => {
+    (orders || []).forEach((o: any) => {
       const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
       selectedQuotes.forEach((q: any) => {
         if (q?.id_agent?.name_company) names.add(q.id_agent.name_company);
@@ -234,25 +201,25 @@ export default function ProductionOrderTracking() {
       });
     });
     return ["Todos los Talleres", ...Array.from(names)];
-  }, [localOrders]);
+  }, [orders]);
 
   const months = useMemo(() => {
     const m = new Set<string>();
-    localOrders.forEach(o => {
+    (orders || []).forEach((o: any) => {
       const date = new Date(o.created_at);
       const label = date.toLocaleDateString('es-PE', { month: 'long', year: 'numeric' });
       m.add(label.charAt(0).toUpperCase() + label.slice(1));
     });
     return ["Todos los Meses", ...Array.from(m)];
-  }, [localOrders]);
+  }, [orders]);
 
   const counts = useMemo(() => ({
-    TODAS: localOrders.filter(o => o.status !== "COMPLETADA").length,
-    "CONTACTO INICIAL": localOrders.filter(o => o.status === "SOLICITANDO" || o.status === "COMPARANDO").length,
-    "EN PRODUCCIÓN": localOrders.filter(o => o.status === "EN_REVISION").length,
-    "CONTROL CALIDAD": localOrders.filter(o => o.status === "CONVERTIDA").length,
-    "RECHAZADAS": localOrders.filter(o => o.status === "RECHAZADA").length,
-  }), [localOrders]);
+    TODAS: (orders || []).filter((o: any) => o.status !== "COMPLETADA").length,
+    "CONTACTO INICIAL": (orders || []).filter((o: any) => o.status === "CONTACTO_INICIAL" || o.status === "COMPARANDO").length,
+    "EN PRODUCCIÓN": (orders || []).filter((o: any) => o.status === "EN_PRODUCCION").length,
+    "CONTROL CALIDAD": (orders || []).filter((o: any) => o.status === "CONTROL_CALIDAD").length,
+    "RECHAZADAS": (orders || []).filter((o: any) => o.status === "RECHAZADA").length,
+  }), [orders]);
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc] relative">
@@ -322,8 +289,8 @@ export default function ProductionOrderTracking() {
 
       <div className="space-y-8">
         {(() => {
-          const filtered = localOrders
-            .filter(o => {
+          const filtered = (orders || [])
+            .filter((o: any) => {
               const selectedQuotes = o.quotes?.filter((q: any) => q.quote_status === 'SELECCIONADO') || [];
               const workshopNames = selectedQuotes.map((q: any) => q.id_agent?.name_company || q.id_agent?.name).filter(Boolean);
               const workshopDisplayName = workshopNames.length > 0 ? workshopNames.join(", ") : "Taller no asignado";
@@ -345,11 +312,10 @@ export default function ProductionOrderTracking() {
               if (selectedMonth !== "Todos los Meses" && orderMonth !== selectedMonth) return false;
 
               if (filter === "TODAS") return o.status !== "COMPLETADA" && o.status !== "RECHAZADA";
-              if (filter === "CONTACTO INICIAL") return o.status === "SOLICITANDO" || o.status === "COMPARANDO";
-              if (filter === "EN PRODUCCIÓN") return o.status === "EN_REVISION";
-              if (filter === "CONTROL CALIDAD") return o.status === "CONVERTIDA";
+              if (filter === "CONTACTO INICIAL") return o.status === "CONTACTO_INICIAL" || o.status === "COMPARANDO";
+              if (filter === "EN PRODUCCIÓN") return o.status === "EN_PRODUCCION";
+              if (filter === "CONTROL CALIDAD") return o.status === "CONTROL_CALIDAD";
               if (filter === "RECHAZADAS") return o.status === "RECHAZADA";
-              if (filter === "TODAS") return o.status !== "COMPLETADA";
               return true;
             });
 
@@ -373,9 +339,8 @@ export default function ProductionOrderTracking() {
               order={order} 
               onUpdateStatus={updateOrderStatus} 
               onUpdateCosts={updateOrderCosts}
-              startUpdateSupplierQuote={startUpdateSupplierQuote}
-              extendOCDate={extendOCDate}
-              approveInventory={approveInventory}
+              startUpdateWorkshopQuote={startUpdateWorkshopQuote}
+              startUpdateSubState={startUpdateSubState}
               qualityRating={qualityRating}
               setQualityRating={setQualityRating}
             />
@@ -390,18 +355,16 @@ function ProductionCard({
   order, 
   onUpdateStatus, 
   onUpdateCosts,
-  startUpdateSupplierQuote,
-  extendOCDate,
-  approveInventory,
+  startUpdateWorkshopQuote,
+  startUpdateSubState,
   qualityRating,
   setQualityRating
 }: { 
   order: any; 
   onUpdateStatus: (id: string, status: string, winnerId?: string) => Promise<void>; 
   onUpdateCosts?: (id: string, costs: Record<string, number>) => Promise<void>;
-  startUpdateSupplierQuote: (id: string, payload: any) => Promise<boolean | null>;
-  extendOCDate: (id: string, newDate: string, reason: string) => Promise<boolean | null>;
-  approveInventory: (id: string, rating: number) => Promise<boolean | null>;
+  startUpdateWorkshopQuote: (id: string, payload: any) => Promise<any>;
+  startUpdateSubState: (id: string, step: string) => Promise<any>;
   qualityRating: number;
   setQualityRating: (r: number) => void;
 }) {
@@ -411,13 +374,15 @@ function ProductionCard({
   const [tempCosts, setTempCosts] = useState<Record<string, number>>({});
   const [newDate, setNewDate] = useState("");
   const [extendReason, setExtendReason] = useState("");
-  const [prodSubState, setProdSubState] = useState<"CORTE" | "CONFECCION" | "AVANCE" | "ENTREGA">("CORTE");
-  const [subStateTimes, setSubStateTimes] = useState<Record<string, string>>({});
+  const lastSubState = order.sub_states?.[order.sub_states.length - 1]?.step;
+  const prodSubState = lastSubState === "CORTE" ? "CONFECCION" : 
+                       lastSubState === "CONFECCION" ? "AVANCE" : 
+                       lastSubState === "AVANCE" ? "ENTREGA" : 
+                       lastSubState === "ENTREGA" ? "ENTREGA" : "CORTE";
   const [localTotal, setLocalTotal] = useState(0);
   const [confirmedCosts, setConfirmedCosts] = useState<Record<string, number>>({});
   const [selectedWinnerId, setSelectedWinnerId] = useState<string | null>(null);
-  const [localEstimatedDate, setLocalEstimatedDate] = useState(order.estimated_delivery_date);
-
+  const [localEstimatedDate, setLocalEstimatedDate] = useState(order.delivery_date_estimated);
   useEffect(() => {
     if (activeModal === "STATUS") {
       setNow(new Date());
@@ -439,8 +404,8 @@ function ProductionCard({
   
   const getProgress = () => {
     if (totalAmount === 0) return 25;
-    if (order.status === "CONVERTIDA") return 100;
-    if (order.status === "EN_REVISION") return 75;
+    if (order.status === "CONTROL_CALIDAD") return 100;
+    if (order.status === "EN_PRODUCCION") return 75;
     if (order.status === "COMPARANDO") return 50;
     return 25;
   };
@@ -459,17 +424,21 @@ function ProductionCard({
     return acc + (item.quantity * unitPrice);
   }, 0) || 0);
 
-  const getStepDate = (stepIdx: number) => {
-    const date = new Date(order.created_at);
-    date.setHours(date.getHours() + (stepIdx * 5));
-    return date.toISOString();
+  const getStepDate = (status: string) => {
+    const historyItem = order.history?.find((h: any) => h.status === status);
+    return historyItem ? new Date(historyItem.date).toISOString() : null;
+  };
+
+  const getSubStateDate = (step: string) => {
+    const subItem = order.sub_states?.find((s: any) => s.step === step);
+    return subItem ? new Date(subItem.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }).toUpperCase() : null;
   };
 
   const handleConfirm = async () => {
     if (activeModal === "STATUS") {
       let nextStatus = "COMPARANDO";
-      if (order.status === "COMPARANDO") nextStatus = "EN_REVISION";
-      if (order.status === "EN_REVISION") nextStatus = "CONVERTIDA";
+      if (order.status === "COMPARANDO") nextStatus = "EN_PRODUCCION";
+      if (order.status === "EN_PRODUCCION") nextStatus = "CONTROL_CALIDAD";
       
       await onUpdateStatus(order._id, nextStatus);
     } else if (activeModal === "COST") {
@@ -515,9 +484,9 @@ function ProductionCard({
               <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               <div className="flex flex-wrap gap-1.5">
                 <span className={`rounded-md px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-white ${
-                  order.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+                  order.status === 'CONTROL_CALIDAD' ? 'bg-green-500' : 'bg-[#F291A3]/80'
                   }`}>
-                  {order.status === 'CONVERTIDA' ? 'Control Calidad' : 'En Proceso'}
+                  {order.status === 'CONTROL_CALIDAD' ? 'Control Calidad' : 'En Proceso'}
                 </span>
                 <span className="rounded-md bg-[#F2D0D3]/40 px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-[13px] font-normal text-[#b46a7c] flex items-center gap-2">
                   {workshopName}
@@ -602,23 +571,23 @@ function ProductionCard({
             />
 
             <StepItem 
-              active={order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA"} 
+              active={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"} 
               icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="En Preparación" 
               sub="Corte y Confección" 
-              date={(order.status === "COMPARANDO" || order.status === "EN_REVISION" || order.status === "CONVERTIDA") ? getStepDate(1) : undefined}
-              interactive={order.status === "EN_REVISION"}
+              date={(order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD") ? (getStepDate("EN_PRODUCCION") || undefined) : undefined}
+              interactive={order.status === "EN_PRODUCCION"}
               onClick={() => {
-                if (order.status === "EN_REVISION") setActiveModal("PROD_SUB");
+                if (order.status === "EN_PRODUCCION") setActiveModal("PROD_SUB");
               }}
             />
 
             <StepItem 
-              active={order.status === "CONVERTIDA"} 
+              active={order.status === "CONTROL_CALIDAD"} 
               icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Control Calidad" 
               sub="Revision y acabados" 
-              date={order.status === "CONVERTIDA" ? getStepDate(2) : undefined}
+              date={order.status === "CONTROL_CALIDAD" ? (getStepDate("CONTROL_CALIDAD") || undefined) : undefined}
             />
           </div>
         </div>
@@ -664,24 +633,28 @@ function ProductionCard({
                         </thead>
                         <tbody className="text-[#594246]">
                           {order.base_items?.map((item: any, idx: number) => {
-                            const costKey = agentId ? `${agentId}_${item.id_variant?._id || idx}` : `${item.id_variant?._id || idx}`;
-                            let unitCost = item.unit_cost;
-                            if (unitCost === undefined && confirmedCosts[costKey] !== undefined) {
-                              unitCost = confirmedCosts[costKey];
-                            }
-                            if (unitCost === undefined) {
-                              // Intentar buscar sin prefijo
-                              const anyKey = Object.keys(confirmedCosts).find(k => k.endsWith(`_${item.id_variant?._id || idx}`));
-                              if (anyKey) unitCost = confirmedCosts[anyKey];
-                            }
-                            if (unitCost === undefined) {
-                              unitCost = 0; 
+                            const varIdStr = typeof item.id_variant === 'string' ? item.id_variant : item.id_variant?._id;
+                            let unitCost = 0;
+                            const quoteItem = quote?.items?.find((i: any) => 
+                              (typeof i.id_variant === 'string' ? i.id_variant : i.id_variant?._id) === varIdStr
+                            );
+                            
+                            if (quoteItem && quoteItem.unit_cost > 0) {
+                              unitCost = quoteItem.unit_cost;
+                            } else {
+                              const costKey = agentId ? `${agentId}_${varIdStr || idx}` : `${varIdStr || idx}`;
+                              if (confirmedCosts[costKey] !== undefined) {
+                                unitCost = confirmedCosts[costKey];
+                              } else {
+                                const anyKey = Object.keys(confirmedCosts).find(k => k.endsWith(`_${varIdStr || idx}`));
+                                if (anyKey) unitCost = confirmedCosts[anyKey];
+                              }
                             }
 
                             return (
                               <tr key={idx} className="border-b border-rose-50/50 hover:bg-rose-50/30 transition-colors">
                                 <td className="py-4 px-2">{item.id_variant?.size}</td>
-                                <td className="py-4 px-2">{item.id_variant?.color}</td>
+                                <td className="py-4 px-2">{item.id_variant?.color?.name || item.id_variant?.color}</td>
                                 <td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
                                 <td className="py-4 px-2 text-center text-[#9b8088]">
                                   {isPending && unitCost === 0 ? (
@@ -717,7 +690,7 @@ function ProductionCard({
                 Ficha Técnica
               </CTA>
               
-              {(order.status === "SOLICITANDO" || order.status === "COMPARANDO") && (
+              {(order.status === "CONTACTO_INICIAL" || order.status === "COMPARANDO") && (
                 <>
                   <CTA 
                     onClick={() => setActiveModal("COST")}
@@ -756,7 +729,7 @@ function ProductionCard({
                   </div>
                   <CTA 
                     onClick={() => {
-                      onUpdateStatus(order._id, "SOLICITANDO");
+                      onUpdateStatus(order._id, "CONTACTO_INICIAL");
                       toast.success("Orden reanudada. Puedes continuar con la asignación.");
                     }}
                     className="!bg-white border border-[#10b981] !text-[#10b981] !py-3 !px-8 shadow-sm hover:!bg-[#10b981] hover:!text-white transition-all"
@@ -767,7 +740,7 @@ function ProductionCard({
                 </div>
               )}
 
-              {order.status === "EN_REVISION" && (
+              {order.status === "EN_PRODUCCION" && (
                 <CTA 
                   onClick={() => setActiveModal("PROD_SUB")}
                   className="!py-3 !px-8 shadow-lg shadow-rose-100"
@@ -777,7 +750,7 @@ function ProductionCard({
                 </CTA>
               )}
 
-              {order.status === "CONVERTIDA" && (
+              {order.status === "CONTROL_CALIDAD" && (
                 <CTA 
                   onClick={() => {
                     onUpdateStatus(order._id, "COMPLETADA");
@@ -897,13 +870,19 @@ function ProductionCard({
                   <div className="pt-1 flex-1">
                     <p className={`text-sm font-bold ${isActive || isCompleted ? "text-[#594246]" : "text-[#b79ca5]"}`}>{step.label}</p>
                     <p className="text-[11px] text-[#9b8088] leading-tight mt-0.5">{step.desc}</p>
-                    
-                    {subStateTimes[step.id] && (
-                      <div className="flex items-center gap-1 mt-1.5 text-[10px] font-bold text-emerald-600">
-                        <Clock className="w-3 h-3" />
-                        {new Date(subStateTimes[step.id]).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} · {new Date(subStateTimes[step.id]).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    )}
+                    {(() => {
+                      const subItem = order.sub_states?.find((s: any) => s.step === step.id);
+                      if (subItem) {
+                        const d = new Date(subItem.date);
+                        return (
+                          <div className="flex items-center gap-1 mt-1.5 text-[10px] font-bold text-emerald-600">
+                            <Clock className="w-3 h-3" />
+                            {d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} · {d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                 </div>
               );
@@ -941,19 +920,15 @@ function ProductionCard({
                 }`}
                 icon={prodSubState === "AVANCE" ? ClipboardCheck : ArrowRight}
                 onClick={async () => {
-                  const nowStr = new Date().toISOString();
                   if (prodSubState === "CORTE") {
-                    setSubStateTimes(prev => ({ ...prev, CORTE: nowStr }));
-                    setProdSubState("CONFECCION");
+                    await startUpdateSubState(order._id, "CORTE");
                     toast.success("Corte registrado. Pasando a Confección.");
                   } else if (prodSubState === "CONFECCION") {
-                    setSubStateTimes(prev => ({ ...prev, CONFECCION: nowStr }));
-                    setProdSubState("AVANCE");
+                    await startUpdateSubState(order._id, "CONFECCION");
                     toast.success("Confección registrada. Pasando a Avance Parcial.");
                   } else if (prodSubState === "AVANCE") {
-                    setSubStateTimes(prev => ({ ...prev, AVANCE: nowStr }));
-                    setProdSubState("ENTREGA");
-                    await onUpdateStatus(order._id, "CONVERTIDA");
+                    await startUpdateSubState(order._id, "AVANCE");
+                    await startUpdateSubState(order._id, "ENTREGA");
                     toast.success("¡Producción entregada! Pasando a Control de Calidad.");
                     setActiveModal(null);
                   }
@@ -985,15 +960,15 @@ function ProductionCard({
             if (order.status === "COMPARANDO") {
               current = "Corte / Habilitado";
               next = "Confección / Costura";
-            } else if (order.status === "EN_REVISION") {
+            } else if (order.status === "EN_PRODUCCION") {
               current = "Confección / Costura";
-              next = "Control Calidad";
-            } else if (order.status === "CONVERTIDA") {
-              current = "Control Calidad";
-              next = "Finalizar Orden (Almacén)";
+              next = "Avance Parcial";
+            } else if (order.status === "CONTROL_CALIDAD") {
+              current = "Control de Calidad";
+              next = "Finalizado / Completada";
             }
 
-            const isFinalizing = order.status === "CONVERTIDA";
+            const isFinalizing = order.status === "CONTROL_CALIDAD";
 
             return (
               <div className="space-y-8">
@@ -1048,10 +1023,10 @@ function ProductionCard({
             <CTA 
               className="flex-1 shadow-lg shadow-rose-100"
               onClick={async () => {
-                if (order.status === "CONVERTIDA") {
-                  // Finalizar (MOCK)
+                if (order.status === "CONTROL_CALIDAD") {
+                  // Finalizar
                   await onUpdateStatus(order._id, "COMPLETADA");
-                  toast.success("Orden completada e ingresada al inventario (MOCK)");
+                  toast.success("Orden Completada.");
                   setActiveModal(null);
                 } else {
                   handleConfirm();
@@ -1271,7 +1246,7 @@ function ProductionCard({
             <CTA 
               onClick={async () => {
                 if (!selectedWinnerId) return toast.error("Seleccione un taller primero.");
-                await onUpdateStatus(order._id, "EN_REVISION", selectedWinnerId);
+                await onUpdateStatus(order._id, "EN_PRODUCCION", selectedWinnerId);
                 toast.success("Taller confirmado. La orden ha pasado a Producción.");
                 setActiveModal(null);
               }}

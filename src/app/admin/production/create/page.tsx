@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProductionStore } from "@/hooks/production";
 import { workshopApi } from "@api";
 import { Modal, CTA } from "@/components/atoms";
 import { Workshop } from "@/components/organisms/modals/workshop-modal/workshop-modal.types";
@@ -51,6 +52,8 @@ export default function AdminPreProductionCreatePage() {
   const [showSuccessResult, setShowSuccessResult] = useState(false);
   const [requiredDate, setRequiredDate] = useState("");
   const [observations, setObservations] = useState("");
+
+  const { startCreateProductionOrder } = useProductionStore();
 
   const totalQuantity = useMemo(() => variants.reduce((acc, v) => acc + v.quantity, 0), [variants]);
 
@@ -167,19 +170,45 @@ export default function AdminPreProductionCreatePage() {
     setShowConfirmModal(true);
   };
 
-  const submitOrder = () => {
+  const submitOrder = async () => {
     setShowConfirmModal(false);
 
     // Pequeño delay para dejar que el primer modal cierre bien
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsProcessing(true);
 
+      const product = prefillData?.items?.[0];
+      const payload = {
+        workshop_ids: selectedWorkshopIds,
+        id_worker: "665f1c2a8f1b2c0012345678", // Default temporal hasta integrar auth
+        base_items: variants.map(v => ({
+          id_variant: v.id, // Aquí el ID de variante real. Como es un mock por ahora, pasamos un ID dummy o de la DB.
+          quantity: v.quantity
+        })),
+        supplies: supplies,
+        observations: observations,
+        delivery_date_estimated: requiredDate ? new Date(requiredDate).toISOString() : new Date().toISOString()
+      };
+
+      const result = await startCreateProductionOrder(payload);
+
+      setIsProcessing(false);
+
+      if (result.ok) {
+        setShowSuccessResult(true);
+        toast.success(`Orden de producción registrada correctamente.`);
+        localStorage.removeItem("produccion_prefill");
+      } else {
+        toast.error(result.message || "Hubo un error al crear la orden.");
+      }
+
+      /* 
+      // === LOGICA MOCK COMENTADA A PETICION ===
       // Simulación de procesamiento e inteligencia de stock
       setTimeout(() => {
         setIsProcessing(false);
 
         // Crear orden mockeada para flujo local
-        const product = prefillData?.items?.[0];
         const baseItems = variants.map(v => ({
           id_variant: {
             size: v.size,
@@ -222,6 +251,7 @@ export default function AdminPreProductionCreatePage() {
         toast.success(`Orden de producción registrada correctamente.`);
         localStorage.removeItem("produccion_prefill");
       }, 2500);
+      */
     }, 150);
   };
 
