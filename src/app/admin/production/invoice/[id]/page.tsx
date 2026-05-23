@@ -89,8 +89,20 @@ export default function ProductionInvoicePDFPage() {
   const [order, setOrder] = useState<any>(null);
 
   useEffect(() => {
-    // Simulamos la carga desde BD, aquí solo usamos los Mocks
-    const found = MOCK_COMPLETED_ORDERS.find(o => o._id === id) || MOCK_COMPLETED_ORDERS[0];
+    // Buscar en local storage primero
+    let found = null;
+    const createdStr = localStorage.getItem("mocked_created_orders");
+    if (createdStr) {
+      try {
+        const parsed = JSON.parse(createdStr);
+        found = parsed.find((o: any) => o._id === id);
+      } catch (e) {}
+    }
+    
+    if (!found) {
+      found = MOCK_COMPLETED_ORDERS.find(o => o._id === id) || MOCK_COMPLETED_ORDERS[0];
+    }
+    
     setOrder(found);
   }, [id]);
 
@@ -100,7 +112,7 @@ export default function ProductionInvoicePDFPage() {
   const totalAmount = selectedQuote?.total_amount || 0;
   const subtotal = totalAmount / 1.18;
   const igv = totalAmount - subtotal;
-  const supplier = selectedQuote?.id_supplier || {};
+  const supplier = selectedQuote?.id_agent || selectedQuote?.id_supplier || {};
 
   return (
     <>

@@ -588,7 +588,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 					: `Cargando ID: ${supplier.toString().slice(-6)}...`;
 
 				return (
-					<option key={supplier._id || supplier} value={supplier._id || supplier}>
+					<option key={typeof supplier === 'string' ? supplier : (supplier._id || Math.random().toString())} value={typeof supplier === 'string' ? supplier : (supplier._id || Math.random().toString())}>
 					{name}
 					</option>
 				);
@@ -652,7 +652,7 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
         
         <div className="space-y-3">
           {sortedQuotes.map((q, idx) => {
-            const agentId = q.id_agent?._id || q.id_agent;
+            const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || Math.random().toString());
             const agentName = q.id_agent?.name_company || q.id_agent?.name || "Cargando...";
 
             return (
