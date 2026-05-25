@@ -6,84 +6,65 @@ import { ClientPerson } from '@models';
 import { useClientPersonStore } from '@hooks';
 import { Pencil } from 'lucide-react';
 
-
-interface WorkerData {
-  id_worker: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  document_type: string;
-  document_number: string;
-  status: string; 
-}
-
 export default function TrabajadoresPage() {
   const [isOpenModal, setIsModalOpen] = useState(false);
 
- 
-  const columns: DataTableColumn<WorkerData>[] = [
+  const {
+    clientsPerson,
+    loading,
+    total,
+    currentPage,
+    rowsPerPage,
+    orderBy,
+    order,
+    searchTerm,
+    setSearchTerm,
+    setOrderBy,
+    setOrder,
+    setPageGlobal,
+    setRowsPerPageGlobal,
+    setSelectedClientPerson,
+    startLoadingClientsPersonPaginated,
+  } = useClientPersonStore();
+
+  useEffect(() => {
+    void startLoadingClientsPersonPaginated();
+  }, [startLoadingClientsPersonPaginated]);
+
+  const columns: DataTableColumn<ClientPerson>[] = [
     { id: 'first_name', label: 'Nombre', sortable: true, width: '140px', truncate: true },
     { id: 'last_name', label: 'Apellido', sortable: true, width: '140px', truncate: true },
     { id: 'email', label: 'Correo', sortable: true, width: '140px', truncate: true },
-    { id: 'phone', label: '# Telefono', sortable: true, width: '140px', truncate: true },
+    { id: 'phone', label: '# Teléfono', sortable: true, width: '140px', truncate: true },
     { id: 'document_type', label: 'Tipo Doc', sortable: true, width: '120px', truncate: true },
     { id: 'document_number', label: '# Documento', sortable: true, width: '140px', truncate: true },
-    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true }, // 👈 Usa 'status'
+    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true },
   ];
 
-
-  const actions: DataTableAction<WorkerData>[] = [
+  const actions: DataTableAction<ClientPerson>[] = [
     {
-      label: "Editar",
+      label: 'Editar',
       icon: <Pencil className="h-4 w-4" />,
-      onClick: (row: WorkerData) => {
-
+      onClick: (row: ClientPerson) => {
+        setSelectedClientPerson(row);
         setIsModalOpen(true);
-        alert(`Abriendo edición para: ${row.first_name}`);
       },
     },
   ];
 
- 
-  const [datosDePrueba] = useState<WorkerData[]>([
-    { 
-      id_worker: 'WRK-001',
-      first_name: 'Juan',
-      last_name: 'Pérez',
-      email: 'juan.perez@gmail.com',
-      phone: '987654321',
-      document_type: 'DNI',
-      document_number: '76543210',
-      status: 'Activo',
-    },
-    { 
-      id_worker: 'WRK-002',
-      first_name: 'María',
-      last_name: 'Gómez',
-      email: 'maria.gomez@gmail.com',
-      phone: '912345678',
-      document_type: 'CE',
-      document_number: '001122334',
-      status: 'Inactivo', 
-    },
-  ]);
-
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [orderBy, setOrderBy] = useState("");
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const handleAddClient = () => {
+    setSelectedClientPerson(null);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
       <DataTable
-        rows={refreshClientsPerson}
+        rows={clientsPerson}
         loading={loading}
         title="Clientes - Persona"
         description="Gestiona clientes persona, filtra por cualquier campo y aplica acciones rápidas."
-        onAddClick={() => setIsModalOpen(true)}
+        onAddClick={handleAddClient}
         globalFilter={searchTerm}
         onGlobalFilterChange={setSearchTerm}
         columns={columns}
