@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ITooltipProps {
   children: ReactNode;
@@ -28,47 +29,27 @@ export const Tooltip: React.FC<ITooltipProps> = ({
   contentClassName,
   showArrow = false,
   arrowClassName,
-}: ITooltipProps) => {
+}) => {
   const [internalVisible, setInternalVisible] = useState(false);
   const isControlled = typeof open === 'boolean';
   const visible = isControlled ? open : internalVisible;
 
+  // Clases de posicionamiento estándar
   const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
-  };
-
-  const arrowPositionClasses = {
-    top: 'left-1/2 top-full -translate-x-1/2 -translate-y-1/2 border-r border-b',
-    bottom: 'left-1/2 bottom-full -translate-x-1/2 translate-y-1/2 border-l border-t',
-    left: 'left-full top-1/2 -translate-x-1/2 -translate-y-1/2 border-r border-t',
-    right: 'right-full top-1/2 translate-x-1/2 -translate-y-1/2 border-l border-b',
+    top: 'bottom-full right-0 mb-3', // Lo alineamos a la derecha para que crezca hacia la izquierda (centro de la modal)
+    bottom: 'top-full right-0 mt-3',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-3',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-3',
   };
 
   const handleMouseEnter = () => {
-    if (isControlled || trigger !== 'hover') {
-      return;
-    }
-
+    if (isControlled || trigger !== 'hover') return;
     setInternalVisible(true);
   };
 
   const handleMouseLeave = () => {
-    if (isControlled || trigger !== 'hover') {
-      return;
-    }
-
+    if (isControlled || trigger !== 'hover') return;
     setInternalVisible(false);
-  };
-
-  const handleClick = () => {
-    if (isControlled || trigger !== 'click') {
-      return;
-    }
-
-    setInternalVisible((prev) => !prev);
   };
 
   return (
@@ -76,39 +57,26 @@ export const Tooltip: React.FC<ITooltipProps> = ({
       className={wrapperClassName ?? 'relative inline-block'}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
     >
       {children}
 
-      {visible && (
-        <div
-          className={`
-            absolute z-10
-            ${positionClasses[position]}
-            ${contentClassName ?? ''}
-          `}
-        >
-          {showArrow && (
-            <div
-              className={
-                arrowClassName ??
-                `absolute h-3 w-3 rotate-45 border border-pink-900 bg-pink-900 ${arrowPositionClasses[position]}`
-              }
-            />
-          )}
-
-          {content ?? (
-            <div className="min-w-72 rounded bg-pink-900 px-3 py-2 text-sm text-white shadow-lg">
-              {title && (
-                <h4 className="mb-1 text-sm font-semibold">
-                  {title}
-                </h4>
-              )}
-              {text ? <p className="leading-snug">{text}</p> : null}
-            </div>
-          )}
-        </div>
-      )}
+      <AnimatePresence>
+        {visible && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className={`absolute z-[9999] ${positionClasses[position]} ${contentClassName ?? ''}`}
+          >
+            {content ?? (
+              <div className="w-64 rounded-xl bg-pink-950 px-4 py-3 text-[11px] text-white shadow-2xl border border-white/10">
+                {title && <h4 className="mb-1 font-bold">{title}</h4>}
+                {text && <p className="leading-relaxed opacity-90">{text}</p>}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

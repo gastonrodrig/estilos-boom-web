@@ -3,4 +3,5 @@ export * from "./benefits";
 export * from "./navbar-menu";
 export * from "./admin-modules";
 export * from "./client-modules";
+export * from "./storekeeper-modules";
 export * from "./user-menu-items";

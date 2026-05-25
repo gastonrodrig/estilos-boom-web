@@ -15,8 +15,15 @@ export default function PublicLayout({
     <>
       <Navbar isHome={isHome} />
 
-      <div className="relative">
-        <main>{children}</main>
+      {/* Añadimos pt-[140px] para que el contenido empiece 
+          justo debajo del Navbar. 
+          En el Home (isHome) no lo ponemos para que la imagen 
+          de portada sí se meta debajo del menú transparente.
+      */}
+      <div className={`relative ${!isHome ? "pt-[80px] md:pt-[100px]" : ""}`}>
+        <main className="min-h-[70vh]">
+          {children}
+        </main>
         <Footer />
       </div>
     </>

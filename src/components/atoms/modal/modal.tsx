@@ -9,6 +9,7 @@ type ModalProps = {
   children: React.ReactNode;
   panelClassName?: string;
   title?: React.ReactNode;
+  titleClassName?: string;
   description?: React.ReactNode;
 };
 
@@ -18,6 +19,7 @@ export const Modal = ({
   children,
   panelClassName = "relative bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4",
   title,
+  titleClassName = "text-lg font-semibold",
   description,
 }: ModalProps) => {
   return (
@@ -46,7 +48,11 @@ export const Modal = ({
             leaveTo="opacity-0 scale-95"
           >
             <Dialog.Panel className={panelClassName}>
-              {title && <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>}
+              {title && (
+                <Dialog.Title as={typeof title === "string" ? "h2" : "div"} className={titleClassName}>
+                  {title}
+                </Dialog.Title>
+              )}
               {description && (
                 <Dialog.Description className="text-sm text-neutral-600">{description}</Dialog.Description>
               )}

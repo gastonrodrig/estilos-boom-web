@@ -13,14 +13,16 @@ import {
   Package,
   LogOut,
 } from "lucide-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/atoms";
-import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules } from "@data";
+import { navbarMenu, getUserMenuItems, UserMenuRole, adminModules, clientModules, storekeeperModules } from "@data";
 import { useAuthStore } from "@hooks";
 import { usePathname } from "next/navigation";
 import { SearchDrawer } from "../search-drawer";
 import { NavDrawer, NavDrawerItem } from "../nav-drawer";
+import { CheckoutDrawer } from "../checkout-drawer";
+import { useCartStore } from "@/hooks/cart/use-cart-store";
 
 interface NavbarProps {
   isHome?: boolean;
@@ -38,6 +40,7 @@ export const Navbar = ({
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileGuestMenuOpen, setMobileGuestMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -53,10 +56,17 @@ export const Navbar = ({
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
   const isClientRoute = pathname.startsWith("/client");
+  const isStorekeeperRoute = pathname.startsWith("/storekeeper");
+  const isBackofficeRoute = isAdminRoute || isStorekeeperRoute;
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { status, role, onLogout } = useAuthStore();
+  const { status, role, onLogout, permissions } = useAuthStore();
+  const { loadCart, items } = useCartStore();
+  const cartItemsCount = useMemo(
+    () => items.reduce((acc, item) => acc + item.quantity, 0),
+    [items],
+  );
 
-  const centerMenu = isAdminRoute
+  const centerMenu = isBackofficeRoute
     ? []
     : isClientRoute
     ? showClientCenterMenu
@@ -67,15 +77,19 @@ export const Navbar = ({
   const isAuthenticated = status === "authenticated";
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
+  const isStorekeeper = role === "Almacenero";
+  const isBackofficeRole = isAdmin || isStorekeeper;
   const hasSession =
     isAuthenticated || status === "first-login-password" || !!role;
   const isClientPanelNavbar = showClientCenterMenu;
-  const isPublicNavbar = !isAdminRoute && !isClientPanelNavbar;
-  const isPanelNavbar = isAdminRoute || isClientPanelNavbar;
+  const isPublicNavbar = !isAdminRoute && !isClientPanelNavbar && !isStorekeeperRoute;
+  const isPanelNavbar = isAdminRoute || isClientPanelNavbar || isStorekeeperRoute;
   const currentUserMenuRole: UserMenuRole | null = isAdmin
     ? "admin"
     : isClient
     ? "client"
+    : isStorekeeper
+    ? "storekeeper"
     : null;
 
   const userMenuItems = getUserMenuItems(currentUserMenuRole);
@@ -120,27 +134,53 @@ export const Navbar = ({
     }`;
 
   const drawerItems: NavDrawerItem[] = isAdminRoute
-    ? adminModules.map((item) => ({
+  ? adminModules
+      // 1. Filtramos los módulos principales
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
         label: item.label,
         href: item.href,
-        children: item.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-        })),
+        // 2. Filtramos también los hijos de cada módulo
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
       }))
-    : isClientRoute
-    ? clientModules.map((item) => ({
+
+  : isStorekeeperRoute
+  ? storekeeperModules
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
         label: item.label,
         href: item.href,
-        children: item.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-        })),
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
       }))
-    : centerMenu.map(({ label, href }) => ({
-        label,
-        href,
-      }));
+
+  : isClientRoute
+  ? clientModules
+      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .map((item) => ({
+        label: item.label,
+        href: item.href,
+        children: item.children
+          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+          })),
+      }))
+
+  : centerMenu.map(({ label, href }) => ({
+      label,
+      href,
+    }));
 
   const isAuthenticatedOutsidePanels = isPublicNavbar && hasSession;
   const useHomeAuthenticatedLogo = isHome && isPublicNavbar && hasSession;
@@ -165,6 +205,11 @@ export const Navbar = ({
 
     setSearchOpen(true);
   };
+
+  useEffect(() => {
+    if (isBackofficeRole) return;
+    void loadCart();
+  }, [isBackofficeRole, loadCart]);
 
   useEffect(() => {
     if (!isHome) return;
@@ -258,7 +303,7 @@ export const Navbar = ({
 
             {/* Icons */}
             <div className={`flex items-center gap-2 ${textClass}`}>
-              {!isAdmin && (
+              {!isBackofficeRole && (
                 <button
                   aria-label="Buscar"
                   onClick={handleSearchOpen}
@@ -273,10 +318,10 @@ export const Navbar = ({
                   <button
                     aria-label="Abrir menú de usuario"
                     onClick={() => setUserMenuOpen((prev) => !prev)}
-                    className={iconButtonClass}
+                    className={isBackofficeRoute ? adminUserButtonClass : iconButtonClass}
                   >
                     <div className="flex items-center">
-                      <User className={iconClass} />
+                      <User className={isBackofficeRoute ? adminUserIconClass : iconClass} />
                       <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
                     </div>
                   </button>
@@ -284,11 +329,11 @@ export const Navbar = ({
                   <div className="relative flex items-center h-full justify-center">
                     <button
                       aria-label="Abrir menú de usuario"
-                      className={isAdmin ? adminUserButtonClass : iconButtonClass}
+                      className={isBackofficeRoute ? adminUserButtonClass : iconButtonClass}
                       onClick={() => setIsOpen((prev) => !prev)}
                     >
                       <div className="flex items-center">
-                        <User className={isAdmin ? adminUserIconClass : iconClass} />
+                        <User className={isBackofficeRoute ? adminUserIconClass : iconClass} />
                         <ChevronDown className="-ml-1 w-3.5 h-3.5 text-current" />
                       </div>
                     </button>
@@ -323,7 +368,9 @@ export const Navbar = ({
                       className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl text-[#364152] md:mt-3 md:w-60 md:rounded-2xl"
                     >
                       <div className="py-1.5 md:py-2">
-                        {userMenuItems.map(({ label, href, icon }) => {
+                        {userMenuItems.map(({ label, href, icon, requiredPermission }) => {
+                          // VALIDACIÓN NUEVA:
+                          if (requiredPermission && !permissions.includes(requiredPermission)) return null;
                           const ItemIcon = userMenuIconMap[icon];
 
                           return (
@@ -357,16 +404,25 @@ export const Navbar = ({
                 </AnimatePresence>
               </div>
 
-              {!isAdmin && (
+              {!isBackofficeRole && (
                 <Link href="/wishlist" className={iconButtonClass}>
                   <Heart className={iconClass} />
                 </Link>
               )}
 
-              {!isAdmin && (
-                <Link href="/cart" className={iconButtonClass}>
+              {!isBackofficeRole && (
+                <button
+                  aria-label="Abrir carrito"
+                  onClick={() => setCartDrawerOpen(true)}
+                  className={`${iconButtonClass} relative`}
+                >
                   <ShoppingBag className={iconClass} />
-                </Link>
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-black px-1 text-[10px] font-semibold leading-none text-white">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </button>
               )}
 
               {showRightMenuButton && (
@@ -452,7 +508,7 @@ export const Navbar = ({
             open={mobileDrawerOpen}
             onClose={() => setMobileDrawerOpen(false)}
             items={drawerItems}
-            title={isAdminRoute ? "Panel Admin" : "Panel Cliente"}
+            title={isAdminRoute ? "Panel Admin" : isStorekeeperRoute ? "Panel Almacén" : "Panel Cliente"}
             widthClass="max-w-[320px]"
             side="left"
           />
@@ -460,6 +516,11 @@ export const Navbar = ({
           {!onSearchOpen && (
             <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
           )}
+
+          <CheckoutDrawer
+            open={cartDrawerOpen}
+            onClose={() => setCartDrawerOpen(false)}
+          />
         </motion.div>
       </header>
     </>

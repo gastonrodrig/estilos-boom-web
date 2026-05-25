@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 type DrawerProps = {
   open: boolean;
@@ -21,7 +22,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   );
 
   useEffect(() => {
@@ -41,29 +42,45 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   if (!mounted) return null;
 
-  const positionClass = side === "left" ? "left-0" : "right-0";
-  const closedTransformClass = side === "left" ? "-translate-x-full" : "translate-x-full";
+  const isLeft = side === "left";
+  const panelSideClass = isLeft ? "left-0" : "right-0";
+  const hiddenX = isLeft ? "-100%" : "100%";
 
   return createPortal(
-    <div
-      aria-hidden={!open}
-      className={`fixed inset-0 z-100 ${open ? "" : "pointer-events-none"}`}
-    >
-      <div
-        onClick={onClose}
-        className={`absolute inset-0 bg-black/50 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
-      />
+    <AnimatePresence initial={false}>
+      {open && (
+        <motion.div
+          aria-hidden={!open}
+          className="fixed inset-0 z-[100]"
+          initial={{ pointerEvents: "none" }}
+          animate={{ pointerEvents: "auto" }}
+          exit={{ pointerEvents: "none" }}
+        >
+          <motion.button
+            type="button"
+            aria-label="Cerrar drawer"
+            onClick={onClose}
+            className="absolute inset-0 bg-black/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+          />
 
-      <div
-        role="dialog"
-        aria-modal="true"
-        className={`absolute ${positionClass} top-0 h-full w-full ${widthClass}
-          bg-white shadow-2xl transition-transform duration-300
-          ${open ? "translate-x-0" : closedTransformClass}`}
-      >
-        {children}
-      </div>
-    </div>,
-    document.body
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            className={`absolute top-0 h-full w-full ${widthClass} ${panelSideClass} bg-white shadow-2xl`}
+            initial={{ x: hiddenX }}
+            animate={{ x: "0%" }}
+            exit={{ x: hiddenX }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
   );
 };

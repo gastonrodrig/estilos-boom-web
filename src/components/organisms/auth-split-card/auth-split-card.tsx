@@ -12,7 +12,7 @@ export const AuthSplitCard = ({
   children,
 }: AuthSplitCardProps) => {
   return (
-    <div className="min-h-[calc(100vh-96px)] pt-24 bg-[#f5f5f5]">
+    <div className="min-h-[calc(100vh-96px)] bg-[#f5f5f5]">
       <div className="grid min-h-[calc(100vh-96px)] grid-cols-1 md:grid-cols-2 bg-white">
         {/* Columna Izquierda */}
         <div className="relative hidden md:block">

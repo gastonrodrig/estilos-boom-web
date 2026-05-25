@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
-import { DataTable, DataTableColumn, DataTableAction } from '@/components/organisms';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableAction, DataTableColumn, ClientPersonModal } from '@/components/organisms';
+import { ClientPerson } from '@models';
+import { useClientPersonStore } from '@hooks';
 import { Pencil } from 'lucide-react';
 
 
@@ -75,39 +77,38 @@ export default function TrabajadoresPage() {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
   return (
-    <div className="p-6">
+    <>
       <DataTable
-        rows={datosDePrueba}
-        loading={false}
-        title="Gestión de Trabajadores"
-        description="Administra el personal, filtra por cualquier campo y aplica acciones rápidas."
+        rows={refreshClientsPerson}
+        loading={loading}
+        title="Clientes - Persona"
+        description="Gestiona clientes persona, filtra por cualquier campo y aplica acciones rápidas."
         onAddClick={() => setIsModalOpen(true)}
-        
-      
         globalFilter={searchTerm}
         onGlobalFilterChange={setSearchTerm}
-     
         columns={columns}
-        order={order}
+        order={order as "asc" | "desc"}
         orderBy={orderBy}
         onRequestSort={(prop) => {
           const isAsc = orderBy === prop && order === 'asc';
           setOrder(isAsc ? 'desc' : 'asc');
           setOrderBy(prop);
         }}
-        
         page={currentPage}
         rowsPerPage={rowsPerPage}
-        total={datosDePrueba.length}
-        onPageChange={(_, newPage) => setCurrentPage(newPage)}
+        total={total}
+        onPageChange={(_, newPage) => setPageGlobal(newPage)}
         onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setCurrentPage(0);
+          setRowsPerPageGlobal(parseInt(e.target.value, 10));
+          setPageGlobal(0);
         }}
-        
         actions={actions}
         hasActions
       />
-    </div>
+      <ClientPersonModal
+        open={isOpenModal}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }

@@ -3,6 +3,7 @@ export type PasswordChecks = {
   hasUppercase: boolean;
   hasNumber: boolean;
   hasSpecial: boolean;
+  hasMinLength: boolean;
   passedCount: number;
 };
 
@@ -11,12 +12,14 @@ export const getPasswordChecks = (value: string): PasswordChecks => {
   const hasUppercase = /[A-Z]/.test(value);
   const hasNumber = /\d/.test(value);
   const hasSpecial = /[^A-Za-z0-9]/.test(value);
+  const hasMinLength = value.length >= 6;
 
   const passedCount = [
     hasLowercase,
     hasUppercase,
     hasNumber,
     hasSpecial,
+    hasMinLength,
   ].filter(Boolean).length;
 
   return {
@@ -24,6 +27,7 @@ export const getPasswordChecks = (value: string): PasswordChecks => {
     hasUppercase,
     hasNumber,
     hasSpecial,
+    hasMinLength,
     passedCount,
   };
 };
@@ -31,13 +35,17 @@ export const getPasswordChecks = (value: string): PasswordChecks => {
 export const hasMinimumPasswordRequirements = (value: string) => {
   const checks = getPasswordChecks(value);
 
-  return checks.passedCount == 4;
+  return checks.passedCount == 5;
 };
 
 export const getPasswordRequirementErrors = (value: string) => {
   const checks = getPasswordChecks(value);
 
   const errors: string[] = [];
+
+  if (!checks.hasMinLength) {
+    errors.push("Al menos 6 caracteres");
+  }
 
   if (!checks.hasLowercase) {
     errors.push("Letras minúsculas (a-z)");

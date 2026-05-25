@@ -111,7 +111,7 @@ function ActionMenu<T>({
   };
 
   const handleToggleMenu = () => {
-    const menuEstimatedHeight = 220;
+    const menuEstimatedHeight = actions.length * 40 + 8;
     const menuWidth = 192;
     const viewportPadding = 8;
     const triggerRect = ref.current?.getBoundingClientRect();
@@ -124,9 +124,9 @@ function ActionMenu<T>({
       const top = shouldOpenUp
         ? Math.max(viewportPadding, triggerRect.top - menuEstimatedHeight - 8)
         : Math.min(
-            window.innerHeight - menuEstimatedHeight - viewportPadding,
-            triggerRect.bottom + 8
-          );
+          window.innerHeight - menuEstimatedHeight - viewportPadding,
+          triggerRect.bottom + 8
+        );
 
       const left = Math.max(
         viewportPadding,
@@ -167,9 +167,8 @@ function ActionMenu<T>({
                 key={`${action.label}-${index}`}
                 type="button"
                 onClick={() => handleAction(action)}
-                className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition hover:cursor-pointer hover:bg-gray-50 ${
-                  action.label === "Eliminar" ? "text-red-600" : "text-gray-700"
-                }`}
+                className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition hover:cursor-pointer hover:bg-gray-50 ${action.label === "Eliminar" ? "text-red-600" : "text-gray-700"
+                  }`}
               >
                 {action.icon ?? getDefaultIcon(action.label)}
                 <span>{action.label}</span>
@@ -426,7 +425,7 @@ export function DataTable<T extends object>({
 
   return (
     <div className="w-full rounded-2xl bg-white shadow-sm max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!">
-      
+
       {(title || description || onAddClick || onGlobalFilterChange) && (
         <div className="flex flex-col gap-3 px-6 pt-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -462,95 +461,94 @@ export function DataTable<T extends object>({
 
       {useCardsLayout ? (
         <div
-          className={`mt-4 grid gap-4 px-6 pb-2 ${
-            isMd ? "grid-cols-2" : "grid-cols-1"
-          } ${shouldEnableMobileCardsScroll ? "overflow-y-auto" : "overflow-y-visible"}`}
+          className={`mt-4 grid gap-4 px-6 pb-2 ${isMd ? "grid-cols-2" : "grid-cols-1"
+            } ${shouldEnableMobileCardsScroll ? "overflow-y-auto" : "overflow-y-visible"}`}
           style={{ maxHeight: shouldEnableMobileCardsScroll ? "550px" : undefined }}
         >
           {loading
             ? Array.from({ length: mobileLoadingCardsCount }, (_, index) => (
-                <div
-                  key={`mobile-skeleton-${index}`}
-                  className="rounded-2xl border border-pink-100 bg-[#fffcfd] p-5 shadow-sm"
-                >
-                  <div className="mb-3 flex items-start justify-between">
-                    <Skeleton width="84px" height="14px" borderRadius="8px" />
-                    <Skeleton width="60px" height="24px" borderRadius="9999px" />
-                  </div>
-
-                  <Skeleton width="55%" height="22px" borderRadius="10px" className="mb-4" />
-
-                  <div className="flex flex-col gap-2.5">
-                    {columnsArr.map((column) => (
-                      <div key={`mobile-skeleton-${String(column.id)}-${index}`} className="flex items-center">
-                        <Skeleton width="96px" height="14px" borderRadius="8px" className="mr-2" />
-                        <Skeleton width="100%" height="14px" borderRadius="8px" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            : hasNoData ? (
-                <div className="col-span-full rounded-2xl border border-gray-200 bg-[#fffcfd] p-8 text-center text-sm text-gray-500">
-                  No hay registros disponibles.
-                </div>
-              )
-            : paginatedRows.map((row, rowIndex) => {
-            const visibleActions = getVisibleActions(row);
-            const rowKey = String(
-              getRowValue(row, "_id") ?? getRowValue(row, "id") ?? rowIndex
-            );
-
-            return (
               <div
-                key={rowKey}
+                key={`mobile-skeleton-${index}`}
                 className="rounded-2xl border border-pink-100 bg-[#fffcfd] p-5 shadow-sm"
               >
-                <div className="mb-1 flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">
-                      ID: {mobileIdKey
-                        ? String(getRowValue(row, mobileIdKey) ?? "")
-                        : String(
-                            getRowValue(row, "_id") ?? getRowValue(row, "id") ?? ""
-                          )}
-                    </span>
-                    {renderStatusBadge(
-                      mobileStatusKey
-                        ? getRowValue(row, mobileStatusKey)
-                        : getRowValue(row, "estado") ?? getRowValue(row, "status")
-                    )}
-                  </div>
-
-                  {canShowActions(row) && (
-                    <ActionMenu row={row} actions={visibleActions} />
-                  )}
+                <div className="mb-3 flex items-start justify-between">
+                  <Skeleton width="84px" height="14px" borderRadius="8px" />
+                  <Skeleton width="60px" height="24px" borderRadius="9999px" />
                 </div>
 
-                <h3 className="mb-4 text-xl font-normal text-gray-800">
-                  {mobileTitleKey
-                    ? String(getRowValue(row, mobileTitleKey) ?? "")
-                    : String(getRowValue(row, "nombre") ?? getRowValue(row, "name") ?? "")}
-                </h3>
+                <Skeleton width="55%" height="22px" borderRadius="10px" className="mb-4" />
 
                 <div className="flex flex-col gap-2.5">
                   {columnsArr.map((column) => (
-                    <div
-                      key={`${String(column.id)}-${rowKey}`}
-                      className="flex items-center"
-                    >
-                      <span className="w-24 shrink-0 text-sm text-gray-500">
-                        {column.label}:
-                      </span>
-                      <div className="min-w-0 overflow-hidden w-full text-sm text-gray-700">
-                        {renderCellContent(row, column, rowKey)}
-                      </div>
+                    <div key={`mobile-skeleton-${String(column.id)}-${index}`} className="flex items-center">
+                      <Skeleton width="96px" height="14px" borderRadius="8px" className="mr-2" />
+                      <Skeleton width="100%" height="14px" borderRadius="8px" />
                     </div>
                   ))}
                 </div>
               </div>
-            );
-          })}
+            ))
+            : hasNoData ? (
+              <div className="col-span-full rounded-2xl border border-gray-200 bg-[#fffcfd] p-8 text-center text-sm text-gray-500">
+                No hay registros disponibles.
+              </div>
+            )
+              : paginatedRows.map((row, rowIndex) => {
+                const visibleActions = getVisibleActions(row);
+                const rowKey = String(
+                  getRowValue(row, "_id") ?? getRowValue(row, "id") ?? rowIndex
+                );
+
+                return (
+                  <div
+                    key={rowKey}
+                    className="rounded-2xl border border-pink-100 bg-[#fffcfd] p-5 shadow-sm"
+                  >
+                    <div className="mb-1 flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">
+                          ID: {mobileIdKey
+                            ? String(getRowValue(row, mobileIdKey) ?? "")
+                            : String(
+                              getRowValue(row, "_id") ?? getRowValue(row, "id") ?? ""
+                            )}
+                        </span>
+                        {renderStatusBadge(
+                          mobileStatusKey
+                            ? getRowValue(row, mobileStatusKey)
+                            : getRowValue(row, "estado") ?? getRowValue(row, "status")
+                        )}
+                      </div>
+
+                      {canShowActions(row) && (
+                        <ActionMenu row={row} actions={visibleActions} />
+                      )}
+                    </div>
+
+                    <h3 className="mb-4 text-xl font-normal text-gray-800">
+                      {mobileTitleKey
+                        ? String(getRowValue(row, mobileTitleKey) ?? "")
+                        : String(getRowValue(row, "nombre") ?? getRowValue(row, "name") ?? "")}
+                    </h3>
+
+                    <div className="flex flex-col gap-2.5">
+                      {columnsArr.map((column) => (
+                        <div
+                          key={`${String(column.id)}-${rowKey}`}
+                          className="flex items-center"
+                        >
+                          <span className="w-24 shrink-0 text-sm text-gray-500">
+                            {column.label}:
+                          </span>
+                          <div className="min-w-0 overflow-hidden w-full text-sm text-gray-700">
+                            {renderCellContent(row, column, rowKey)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
         </div>
       ) : (
         <div className="mt-4 overflow-x-auto px-6">
@@ -558,72 +556,69 @@ export function DataTable<T extends object>({
             className={shouldEnableRowsScroll ? "max-h-95 overflow-y-auto rounded-t-2xl" : "overflow-y-visible rounded-t-2xl"}
           >
             <table className="min-w-full border-separate border-spacing-0">
-            <thead
-              className={shouldEnableRowsScroll ? "sticky top-0 z-20 bg-[#dfa6b6]" : ""}
-            >
-              <tr className="bg-[#dfa6b6] text-xs font-semibold uppercase text-white">
-                {columnsArr.map((column, index) => (
-                  <th
-                    key={String(column.id)}
-                    className={`group bg-[#dfa6b6] px-6 py-3 text-left hover:cursor-pointer ${
-                      index === 0 && !shouldEnableRowsScroll ? "rounded-tl-2xl" : ""
-                    } ${
-                      index === columnsArr.length - 1 && !hasActions
-                        ? !shouldEnableRowsScroll
-                          ? "rounded-tr-2xl"
+              <thead
+                className={shouldEnableRowsScroll ? "sticky top-0 z-20 bg-[#dfa6b6]" : ""}
+              >
+                <tr className="bg-[#dfa6b6] text-xs font-semibold uppercase text-white">
+                  {columnsArr.map((column, index) => (
+                    <th
+                      key={String(column.id)}
+                      className={`group bg-[#dfa6b6] px-6 py-3 text-left hover:cursor-pointer ${index === 0 && !shouldEnableRowsScroll ? "rounded-tl-2xl" : ""
+                        } ${index === columnsArr.length - 1 && !hasActions
+                          ? !shouldEnableRowsScroll
+                            ? "rounded-tr-2xl"
+                            : ""
                           : ""
-                        : ""
-                    }`}
-                    style={{
-                      maxWidth: column.width || "auto",
-                    }}
-                  >
-                    {column.sortable ? (
-                      (() => {
-                        const isActiveSort = orderBy === String(column.id);
-                        const SortIcon =
-                          isActiveSort && order === "asc"
-                            ? ArrowUp
-                            : ArrowDown;
+                        }`}
+                      style={{
+                        maxWidth: column.width || "auto",
+                      }}
+                    >
+                      {column.sortable ? (
+                        (() => {
+                          const isActiveSort = orderBy === String(column.id);
+                          const SortIcon =
+                            isActiveSort && order === "asc"
+                              ? ArrowUp
+                              : ArrowDown;
 
-                        return (
-                          <button
-                            type="button"
-                            onClick={() => onRequestSort?.(String(column.id))}
-                            className="inline-flex w-full items-center justify-start gap-2 cursor-pointer text-white transition-colors duration-200 hover:cursor-pointer"
-                          >
-                            <span className="transition-all duration-200 group-hover:font-bold">
-                              {column.label}
-                            </span>
-                            <SortIcon
-                              className="h-4 w-4 stroke-2 text-white transition-all duration-200 group-hover:scale-110"
-                            />
-                          </button>
-                        );
-                      })()
-                    ) : (
-                      <span className="text-white transition-all duration-200 group-hover:font-bold">
-                        {column.label}
-                      </span>
-                    )}
-                  </th>
-                ))}
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => onRequestSort?.(String(column.id))}
+                              className="inline-flex w-full items-center justify-start gap-2 cursor-pointer text-white transition-colors duration-200 hover:cursor-pointer"
+                            >
+                              <span className="transition-all duration-200 group-hover:font-bold">
+                                {column.label}
+                              </span>
+                              <SortIcon
+                                className="h-4 w-4 stroke-2 text-white transition-all duration-200 group-hover:scale-110"
+                              />
+                            </button>
+                          );
+                        })()
+                      ) : (
+                        <span className="text-white transition-all duration-200 group-hover:font-bold">
+                          {column.label}
+                        </span>
+                      )}
+                    </th>
+                  ))}
 
-                {hasActions && (
-                  <th
-                    className={`bg-[#dfa6b6] px-6 py-3 text-right ${
-                      !shouldEnableRowsScroll ? "rounded-tr-2xl" : ""
-                    }`}
-                  >
-                    Acción
-                  </th>
-                )}
-              </tr>
-            </thead>
+                  {hasActions && (
+                    <th
+                      className={`bg-[#dfa6b6] px-6 py-3 text-right ${!shouldEnableRowsScroll ? "rounded-tr-2xl" : ""
+                        }`}
+                    >
+                      Acción
+                    </th>
+                  )}
+                </tr>
+              </thead>
 
-            <tbody>
-              {loading
-                ? Array.from({ length: loadingRowsCount }, (_, rowIndex) => (
+              <tbody>
+                {loading
+                  ? Array.from({ length: loadingRowsCount }, (_, rowIndex) => (
                     <tr
                       key={`desktop-skeleton-${rowIndex}`}
                       className={`${rowIndex % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"}`}
@@ -646,7 +641,7 @@ export function DataTable<T extends object>({
                       )}
                     </tr>
                   ))
-                : hasNoData ? (
+                  : hasNoData ? (
                     <tr>
                       <td
                         colSpan={columnsArr.length + (hasActions ? 1 : 0)}
@@ -656,46 +651,44 @@ export function DataTable<T extends object>({
                       </td>
                     </tr>
                   )
-                : paginatedRows.map((row, rowIndex) => {
-                const visibleActions = getVisibleActions(row);
-                const rowKey = String(
-                  getRowValue(row, "_id") ?? getRowValue(row, "id") ?? rowIndex
-                );
+                    : paginatedRows.map((row, rowIndex) => {
+                      const visibleActions = getVisibleActions(row);
+                      const rowKey = String(
+                        getRowValue(row, "_id") ?? getRowValue(row, "id") ?? rowIndex
+                      );
 
-                return (
-                  <tr
-                    key={rowKey}
-                    className={`transition-colors hover:bg-[#f7f1f4] ${
-                      rowIndex % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"
-                    }`}
-                  >
-                    {columnsArr.map((column) => (
-                      <td
-                        key={`${String(column.id)}-${rowKey}`}
-                        className={`px-6 py-4 text-sm text-gray-900 ${
-                          column.truncate && !isCopyableColumn(String(column.id))
-                            ? "max-w-55 truncate"
-                            : ""
-                        }`}
-                        style={{ maxWidth: column.width || "auto" }}
-                      >
-                        {renderCellContent(row, column, rowKey)}
-                      </td>
-                    ))}
+                      return (
+                        <tr
+                          key={rowKey}
+                          className={`transition-colors hover:bg-[#f7f1f4] ${rowIndex % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"
+                            }`}
+                        >
+                          {columnsArr.map((column) => (
+                            <td
+                              key={`${String(column.id)}-${rowKey}`}
+                              className={`px-6 py-4 text-sm text-gray-900 ${column.truncate && !isCopyableColumn(String(column.id))
+                                  ? "max-w-55 truncate"
+                                  : ""
+                                }`}
+                              style={{ maxWidth: column.width || "auto" }}
+                            >
+                              {renderCellContent(row, column, rowKey)}
+                            </td>
+                          ))}
 
-                    {hasActions && (
-                      <td className="px-6 py-4 text-right">
-                        {canShowActions(row) && (
-                          <div className="flex justify-end">
-                            <ActionMenu row={row} actions={visibleActions} />
-                          </div>
-                        )}
-                      </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
+                          {hasActions && (
+                            <td className="px-6 py-4 text-right">
+                              {canShowActions(row) && (
+                                <div className="flex justify-end">
+                                  <ActionMenu row={row} actions={visibleActions} />
+                                </div>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
+              </tbody>
             </table>
           </div>
         </div>

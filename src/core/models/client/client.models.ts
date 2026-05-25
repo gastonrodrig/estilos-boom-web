@@ -1,16 +1,17 @@
 import { ClientType, DocumentType, UserStatus } from "@enums";
 
-// Modelos Client Company (SLICE)
-
 export interface ClientCompany {
+  _id?: string;
+  id_user?: string;
   email: string;
-  companyName: string;
-  contactName: string;
+  company_name: string;
+  contact_name: string;
   phone: string;
-  clientType: ClientType.COMPANY;
-  documentType: DocumentType.RUC;
-  documentNumber: string;
+  client_type: ClientType.COMPANY;
+  document_type: DocumentType.RUC;
+  document_number: string;
   status?: UserStatus;
+  addresses: AddressInput[];
 }
 
 export interface RefreshClientsCompanyPayload {
@@ -28,17 +29,18 @@ export interface ClientCompanyState {
   loading: boolean;
 }
 
-// Modelos Client Person (SLICE)
-
 export interface ClientPerson {
+  _id?: string;
+  id_user?: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   phone: string;
-  clientType: ClientType.PERSON;
-  documentType: DocumentType;
-  documentNumber: string;
+  client_type: ClientType.PERSON;
+  document_type: DocumentType;
+  document_number: string;
   status?: UserStatus;
+  addresses: AddressInput[];
 }
 
 export interface RefreshClientsPersonPayload {
@@ -56,13 +58,18 @@ export interface ClientPersonState {
   loading: boolean;
 }
 
-// Modelo Client Profile (SLICE)
-
 export interface ClientProfileState {
   loadingClientProfile: boolean;
 }
 
-// Values Client (HOOK & COMPONENT)
+export interface AddressInput {
+  address_line: string;
+  reference?: string;
+  department?: string;
+  province?: string;
+  district?: string;
+  is_default: boolean;
+}
 
 export type ExtraInformationValues = {
   firstName: string;
@@ -73,9 +80,8 @@ export type ExtraInformationValues = {
   documentType: string;
   documentNumber: string;
   clientType: ClientType;
+  addresses: AddressInput[];
 }
-
-// Modelos Mappers de Client (HOOK)
 
 export interface UpdateClientDataModelInput {
   client_type: ClientType;
@@ -86,4 +92,5 @@ export interface UpdateClientDataModelInput {
   phone: string;
   document_type: DocumentType;
   document_number: string;
+  addresses?: AddressInput[];
 }

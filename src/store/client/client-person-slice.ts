@@ -29,7 +29,7 @@ export const clientPersonSlice = createSlice({
       state.loading = false;
     },
 
-    selectedClientPerson: (state, action: PayloadAction<ClientPerson>) => {
+    selectedClientPerson: (state, action: PayloadAction<ClientPerson | null>) => {
       state.selected = action.payload;
     },
 

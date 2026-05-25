@@ -1,10 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "./auth";
-import { 
-  clientCompanySlice, 
-  clientPersonSlice, 
-  clientProfileSlice 
+import {
+  clientCompanySlice,
+  clientPersonSlice,
+  clientProfileSlice
 } from "./client";
+import { productSlice } from "./product";
+import { categorySlice } from "./category";
+import { cartSlice } from "./cart";
+import { managementSlice } from "./management/management-slice";
+import { storehouseSlice } from "./storehouse";
+import { supplySlice } from "./supplie";
+import checkoutReducer from "./extra/checkout-slice";
+import mockCartReducer from "./extra/mock-cart-slice";
+import { productionSlice } from "./production/production-slice";
 
 // Configuración del store
 export const store = configureStore({
@@ -16,6 +25,16 @@ export const store = configureStore({
     clientCompany: clientCompanySlice.reducer,
     clientPerson: clientPersonSlice.reducer,
     clientProfile: clientProfileSlice.reducer,
+
+    product: productSlice.reducer,
+    category: categorySlice.reducer,
+    cart: cartSlice.reducer,
+    storehouse: storehouseSlice.reducer,
+    checkout: checkoutReducer,
+    mockCart: mockCartReducer,
+    management: managementSlice.reducer,
+    supply: supplySlice.reducer,
+    production: productionSlice.reducer,
   },
 });
 
