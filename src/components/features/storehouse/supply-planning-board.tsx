@@ -41,8 +41,8 @@ const stockState = (stock: number, minimum: number, pendingTransit: number) => {
   return { label: "✓ OK", tone: "text-emerald-500", icon: null };
 };
 
-const variantLabel = (product: Product, size: string, color: string) =>
-  `${size || "Sin talla"} / ${color || product.gender || "Sin color"}`;
+const variantLabel = (product: Product, size: string, colorObj: any) =>
+  `${size || "Sin talla"} / ${colorObj?.name || product.gender || "Sin color"}`;
 
 const getProductImage = (product: Product) => product.images?.[0] ?? "";
 
@@ -126,7 +126,7 @@ export const SupplyPlanningBoard = () => {
     .filter((item) => item.critical > 0 || item.low > 0);
 }, [products]);
 
-  const filtered = useMemo(() => {
+  const filtered = useMemo(() => { 
     if (!searchTerm.trim()) return alertProducts;
     const q = searchTerm.toLowerCase().trim();
     return alertProducts.filter(({ product, variants }) => {
@@ -134,7 +134,7 @@ export const SupplyPlanningBoard = () => {
         product.name,
         product.sku,
         product.category?.name ?? "",
-        ...variants.map((v) => `${v.size} ${v.color}`),
+        ...variants.map((v) => `${v.size} ${v.color?.name || ""}`), // 👈 Mapeo de subpropiedad corregido
       ]
         .join(" ")
         .toLowerCase();
@@ -371,8 +371,11 @@ export const SupplyPlanningBoard = () => {
                                 <td className="rounded-l-xl px-4 py-4 text-sm font-semibold text-[#594246]">
                                   {variant.size || "-"}
                                 </td>
-                                <td className="px-4 py-4 text-sm text-[#9b8088]">
-                                  {variant.color || "-"}
+                                <td className="px-4 py-4 text-sm text-[#9b8088] flex items-center gap-2">
+                                  {variant.color?.hex && (
+                                    <div className="w-3 h-3 rounded-full border border-black/5" style={{ backgroundColor: variant.color.hex }} />
+                                  )}
+                                  <span>{variant.color?.name || "-"}</span>
                                 </td>
                                 <td className={`px-4 py-4 text-base font-bold ${stock < minimum ? 'text-[#F2778D]' : 'text-[#594246]'}`}>
                                   {stock}

@@ -3,10 +3,15 @@
 export interface ProductVariant {
   id_variant: string;
   size: string;
-  color: string;
+  color: ProductVariantColor;
   stock: number;
   sku_variant: string;
   min_stock_alert?: number; // Nuevo campo para alerta de stock mínimo
+}
+
+export interface ProductVariantColor {
+  name: string;
+  hex: string;
 }
 
 // 2. Actualizamos la interfaz del Producto
