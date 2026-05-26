@@ -485,22 +485,18 @@ function OPPCard({ opp }: { opp: any }) {
 			
 
       {opp.status === 'EN_REVISION' && (
-      <>
-        <button 
-          onClick={() => setIsExtendModalOpen(true)}
-          className="px-8 py-3 rounded-xl border border-amber-500 text-amber-600 font-bold text-sm flex items-center gap-2 hover:bg-amber-50"
-        >
-          <CalendarClock className="w-4 h-4" /> Prolongar Fecha
-        </button>
-
-        <button 
-          onClick={() => setIsApproveModalOpen(true)}
-          className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047]"
-        >
-          <CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
-        </button>
-      </>
-    )}
+        <>
+          {/* ✅ CORRECCIÓN DE TESIS: Se elimina el botón 'Prolongar Fecha' de esta etapa.
+            La mercadería ya se encuentra físicamente en el establecimiento anexo para control de calidad.
+          */}
+          <button 
+            onClick={() => setIsApproveModalOpen(true)}
+            className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047] transition-all shadow-md shadow-green-100"
+          >
+            <CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
+          </button>
+        </>
+      )}
 
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
 			<button 

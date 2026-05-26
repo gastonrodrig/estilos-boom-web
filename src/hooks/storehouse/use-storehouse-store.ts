@@ -160,10 +160,13 @@ export const useStorehouseStore = () => {
       const items = Array.isArray(data) ? data.map((row) => mapInventoryMovement(row as Record<string, unknown>)) : [];
       
       dispatch(refreshStorehouseMovements(items));
-      return true;
+      
+      // ✅ CORRECCIÓN: Retornamos los items reales procesados de la base de datos
+      return items; 
     }, "No se pudieron cargar los movimientos de inventario.");
 
-    return result ?? false;
+    // ✅ CORRECCIÓN: Si falla o es null, retornamos un array vacío [] para que la tabla no rompa
+    return result ?? []; 
   }, [dispatch, executeRequest, getConfig]);
 
   const startCreatePurchaseOrder = useCallback(async (payload: CreatePurchaseOrderModelInput) => {

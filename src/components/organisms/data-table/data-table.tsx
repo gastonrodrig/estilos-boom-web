@@ -205,7 +205,7 @@ export function DataTable<T extends object>({
   onRowsPerPageChange,
   actions = [],
   hasActions = false,
-
+  
   title,
   description,
   onAddClick,
@@ -274,10 +274,15 @@ export function DataTable<T extends object>({
   const safeRowsPerPage =
     Number.isFinite(rowsPerPage) && rowsPerPage > 0 ? rowsPerPage : 5;
   const loadingRowsCount = Math.max(1, Math.min(safeRowsPerPage, 5));
-  const safeTotal = Number.isFinite(total) && total >= 0 ? total : 0;
+  
+  // ✅ CORRECCIÓN: Si el total viene en 0, que adopte el tamaño real de las filas inyectadas
+  const safeTotal = total > 0 ? total : filteredRows.length;
+  
   const totalPages = Math.max(1, Math.ceil(safeTotal / safeRowsPerPage));
   const safePage = Math.min(Number.isFinite(page) ? page : 0, totalPages - 1);
-  const isServerPaginated = safeTotal > rowsArr.length;
+  
+  // ✅ CORRECCIÓN: Si no hay manejador externo de página (onPageChange), es paginación cliente
+  const isServerPaginated = !!onPageChange && safeTotal > rowsArr.length;
 
   const paginatedRows = useMemo(() => {
     if (isServerPaginated) return sortedRows;
