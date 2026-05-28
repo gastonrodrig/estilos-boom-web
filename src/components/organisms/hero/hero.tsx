@@ -16,7 +16,7 @@ export const Hero = () => {
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
         <Image
-          src="/assets/hero-img.png"
+          src="/assets/chicaRosa.png"
           alt="Nueva colección Estilos Boom"
           fill
           priority
@@ -43,7 +43,7 @@ export const Hero = () => {
             animate={{ opacity: 0.9, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            New Arrivals
+            NUEVA COLECCIÓN
           </motion.p>
 
           {/* Title */}
@@ -53,7 +53,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            Fashion Daily
+            Elegancia Cómoda
           </motion.h1>
 
           {/* Description */}
@@ -73,8 +73,8 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
           >
-            <CTA href="/new-in">
-              SHOP NOW
+            <CTA href="/catalogue">
+              VER CATÁLOGO
             </CTA>
           </motion.div>
         </div>

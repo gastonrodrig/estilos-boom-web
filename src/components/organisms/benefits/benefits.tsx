@@ -5,10 +5,10 @@ import { Carousel } from "@/components/molecules";
 
 export const Benefits = () => {
   return (
-    <section className="pb-28 pt-12 px-4 bg-gradient-to-b from-white to-pink-50/30">
+    <section className="pb-28 pt-12 px-4">
       {/* Desktop - Grid */}
       <motion.div
-        className="max-w-7xl mx-auto hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="max-w-7xl mx-auto hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#EBEAE8]"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}

@@ -243,13 +243,19 @@ function OPPCard({ opp }: { opp: any }) {
     <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100">
-             <Image 
-                src={firstItem?.images?.[0]} 
-                alt="Product" 
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100 flex items-center justify-center">
+            {/* ✅ SOLUCIÓN: Validamos estrictamente que exista la URL antes de renderizar */}
+            {firstItem?.images?.[0] && firstItem.images[0].trim() !== "" ? (
+              <Image 
+                src={firstItem.images[0]} 
+                alt={firstItem?.name || "Product"} 
                 fill 
                 className="object-cover" 
-             />
+              />
+            ) : (
+              /* 📦 Fallback elegante: Si no hay foto en BD, muestra un ícono con la misma estética de Estilos Boom */
+              <Package className="h-8 w-8 text-rose-300 opacity-60" />
+            )}
           </div>
           <div className="space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-3">
@@ -274,9 +280,13 @@ function OPPCard({ opp }: { opp: any }) {
                 )}
               </div>
             </div>
-            <p className="text-[12px] sm:text-sm text-[#9b8088] font-medium">
-              {opp.pre_order_number} · <span className="text-[#594246]">{opp.quotes?.length || 0} Proveedores</span> · {opp.base_items?.length || 0} unidades
-            </p>
+            <div className="text-[12px] sm:text-sm text-[#9b8088] font-medium flex flex-wrap items-center gap-1">
+              <span>{opp.pre_order_number}</span>
+              <span className="mx-1 opacity-40">·</span>
+              <span className="text-[#594246] font-semibold">{opp.quotes?.length || 0} Proveedores</span>
+              <span className="mx-1 opacity-40">·</span>
+              <span>{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0) || 0} unidades</span>
+            </div>
           </div>
         </div>
 
@@ -376,7 +386,17 @@ function OPPCard({ opp }: { opp: any }) {
 						return (
 						<tr key={idx} className="border-b border-rose-50/50">
 							<td className="py-4 px-2">{item.id_variant?.size || item.size}</td>
-							<td className="py-4 px-2">{item.id_variant?.color || item.color}</td>
+							<td className="py-4 px-2 flex items-center gap-2">
+                {item.id_variant?.color?.hex && (
+                  <div 
+                    className="w-3 h-3 rounded-full border border-black/5 shrink-0" 
+                    style={{ backgroundColor: item.id_variant.color.hex }} 
+                  />
+                )}
+                <span>
+                  {item.id_variant?.color?.name || item.id_variant?.color || item.color || "-"}
+                </span>
+              </td>
 							<td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
 							
 							{/* Mostramos el costo unitario real solo si ya hay OC */}
@@ -603,7 +623,19 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
               <tbody>
                 {items.map((it, idx) => (
                   <tr key={idx} className="border-b border-rose-50/50">
-                    <td className="py-3">{it.id_variant?.size} - {it.id_variant?.color}</td>
+                    <td className="py-3 flex items-center gap-2">
+                      <span className="font-bold">{it.id_variant?.size}</span>
+                      <span className="text-gray-300">|</span>
+                      {it.id_variant?.color?.hex && (
+                        <div 
+                          className="w-3 h-3 rounded-full border border-black/5 shrink-0" 
+                          style={{ backgroundColor: it.id_variant.color.hex }} 
+                        />
+                      )}
+                      <span className="text-[#9b8088]">
+                        {it.id_variant?.color?.name || it.id_variant?.color || "-"}
+                      </span>
+                    </td>
                     <td className="py-3 font-bold">{it.quantity}</td>
                     <td className="py-3">
                       <input 
@@ -718,8 +750,7 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
   );
 }
 
-function StepItem({ active, icon, label, sub }: { active: boolean; icon: any; label: string; sub: string }) {
-  return (
+function StepItem({ active, icon, label, sub }: { active: boolean; icon: React.ReactNode; label: string; sub: string }) {  return (
     <div className="flex flex-col items-center text-center space-y-3">
       {/* El círculo tiene bg sólido y border-white para ocultar la línea detrás de él */}
       <div className={`flex h-13 w-13 items-center justify-center rounded-full border-[6px] border-white shadow-lg transition-all z-10 ${

@@ -102,15 +102,15 @@ export const Navbar = ({
 
   const bgClass = isHome
     ? scrolled
-      ? "bg-[#f2b6c1]"
+      ? "bg-[#FAF9F6]/95"
       : "bg-transparent"
-    : "bg-[#f2b6c1]";
+    : "bg-[#FAF9F6]/95";
 
   const textClass = isHome
     ? scrolled
-      ? "text-black"
+      ? "text-[#594246]"
       : "text-white"
-    : "text-black";
+    : "text-[#594246]";
 
   const isActive = (href: string) => pathname === href;
 
@@ -239,22 +239,6 @@ export const Navbar = ({
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Top bar */}
-        {showTopBar &&
-          (isHome ? (
-            <motion.div
-              className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-            </motion.div>
-          ) : (
-            <div className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide">
-              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-            </div>
-          ))}
 
         {/* Navbar */}
         <motion.div

@@ -84,6 +84,22 @@ export const storehouseSlice = createSlice({
     },
 });
 
+export interface TransferItemCart {
+  id_product: string;
+  product_name: string;
+  category_name: string;
+  image: string;
+  variants: {
+    id_variant: string;
+    size: string;
+    color_name: string;
+    color_hex: string;
+    sku_variant: string;
+    max_available: number; // Stock disponible real en Almacén Central
+    quantity_to_move: number; // Lo que el usuario digita para trasladar
+  }[];
+}
+
 // IMPORTANTE: Exportar las nuevas acciones aquí para que "@store" las reconozca
 export const {
     refreshStorehouseOrders,

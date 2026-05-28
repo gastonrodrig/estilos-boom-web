@@ -6,41 +6,36 @@ import { ClientPerson } from '@models';
 import { useClientPersonStore } from '@hooks';
 import { Pencil } from 'lucide-react';
 
-export default function AdminClientPersonsPage() {
-  const {
-    clientsPerson,
-    total,
-    loading,
-    searchTerm,
-    rowsPerPage,
-    currentPage,
-    orderBy,
-    order,
-    setSearchTerm,
-    setRowsPerPageGlobal,
-    setPageGlobal,
-    setOrderBy,
-    setOrder,
-    startLoadingClientsPersonPaginated,
-    setSelectedClientPerson,
-  } = useClientPersonStore();
-
+export default function TrabajadoresPage() {
   const [isOpenModal, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    startLoadingClientsPersonPaginated();
-  }, [startLoadingClientsPersonPaginated]);
+  const {
+    clientsPerson,
+    loading,
+    total,
+    currentPage,
+    rowsPerPage,
+    orderBy,
+    order,
+    searchTerm,
+    setSearchTerm,
+    setOrderBy,
+    setOrder,
+    setPageGlobal,
+    setRowsPerPageGlobal,
+    setSelectedClientPerson,
+    startLoadingClientsPersonPaginated,
+  } = useClientPersonStore();
 
-  const openModal = (payload: ClientPerson) => {
-    setSelectedClientPerson(payload);
-    setIsModalOpen(true);
-  };
+  useEffect(() => {
+    void startLoadingClientsPersonPaginated();
+  }, [startLoadingClientsPersonPaginated]);
 
   const columns: DataTableColumn<ClientPerson>[] = [
     { id: 'first_name', label: 'Nombre', sortable: true, width: '140px', truncate: true },
     { id: 'last_name', label: 'Apellido', sortable: true, width: '140px', truncate: true },
     { id: 'email', label: 'Correo', sortable: true, width: '140px', truncate: true },
-    { id: 'phone', label: '# Telefono', sortable: true, width: '140px', truncate: true },
+    { id: 'phone', label: '# Teléfono', sortable: true, width: '140px', truncate: true },
     { id: 'document_type', label: 'Tipo Doc', sortable: true, width: '120px', truncate: true },
     { id: 'document_number', label: '# Documento', sortable: true, width: '140px', truncate: true },
     { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true },
@@ -48,11 +43,19 @@ export default function AdminClientPersonsPage() {
 
   const actions: DataTableAction<ClientPerson>[] = [
     {
-      label: "Editar",
+      label: 'Editar',
       icon: <Pencil className="h-4 w-4" />,
-      onClick: (row: ClientPerson) => openModal(row),
+      onClick: (row: ClientPerson) => {
+        setSelectedClientPerson(row);
+        setIsModalOpen(true);
+      },
     },
   ];
+
+  const handleAddClient = () => {
+    setSelectedClientPerson(null);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
@@ -61,7 +64,7 @@ export default function AdminClientPersonsPage() {
         loading={loading}
         title="Clientes - Persona"
         description="Gestiona clientes persona, filtra por cualquier campo y aplica acciones rápidas."
-        onAddClick={() => setIsModalOpen(true)}
+        onAddClick={handleAddClient}
         globalFilter={searchTerm}
         onGlobalFilterChange={setSearchTerm}
         columns={columns}

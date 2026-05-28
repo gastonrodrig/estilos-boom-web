@@ -132,7 +132,7 @@ export const adminModules: SidebarModule[] = [
       children: [
       {
         label: "Stock Actual",
-        href: "/admin/movements",
+        href: "/admin/movements/stock",
         requiredPermission: "orders:view",
       },
       {
@@ -142,7 +142,7 @@ export const adminModules: SidebarModule[] = [
       },
       {
         label: "Historial de movimientos",
-        href: "/admin/invoice", 
+        href: "/admin/movements", 
         requiredPermission: "orders:view",
       }
     
@@ -172,6 +172,20 @@ export const adminModules: SidebarModule[] = [
         label: "Talleres",
         href: "/admin/workshops",
         requiredPermission: "clients:view",
+      },
+    ],
+  },
+  {
+    label: "Gestionar Trabajadores",
+    icon: "briefcase", 
+    children: [
+      {
+        label: "Trabajadores",
+        href: "/admin/workers/worker",
+      },
+      {
+        label: "Roles / Tipos",
+        href: "/admin/workers/WorkerType",
       },
     ],
   },

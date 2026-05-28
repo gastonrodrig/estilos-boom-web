@@ -460,9 +460,12 @@ const approveInventory = useCallback(async (id: string, rating: number) => {
   const startLoadingTransfers = useCallback(async () => {
     return await executeRequest(async () => {
       const config = await getConfig();
+      // Le pega a tu Get('transfers') que acabamos de actualizar con los populates
       const { data } = await storehouseApi.get("/inventory/transfers", config);
-      return data;
-    }, "No se pudieron cargar las transferencias internas.");
+      
+      // Retornamos el array directamente para tu useState local del componente
+      return Array.isArray(data) ? data : [];
+    }, "No se pudieron cargar las guías de transferencia.");
   }, [executeRequest, getConfig]);
 
   /**
