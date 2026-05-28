@@ -53,7 +53,7 @@ export const mapPurchaseOrder = (raw: Record<string, unknown>): PurchaseOrder =>
 					_id: asString((raw.id_supplier as Record<string, unknown>)._id),
 					name_company: asString((raw.id_supplier as Record<string, unknown>).name_company) || undefined,
 				}
-			: asString(raw.id_supplier),
+			: { _id: asString(raw.id_supplier) },
 	id_worker:
 		typeof raw.id_worker === "object" && raw.id_worker !== null
 			? {

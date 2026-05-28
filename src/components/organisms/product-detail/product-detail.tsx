@@ -31,7 +31,7 @@ export const ProductDetail = ({ product }: Props) => {
         ? product.variants.map((v) => ({
             id_variant: v.id_variant ?? "",
             size: v.size ?? "",
-            color: v.color ?? "",
+            color: typeof v.color === 'string' ? v.color : (v.color?.name ?? ""),
             stock: Number(v.stock ?? 0),
             sku_variant: v.sku_variant ?? "",
           }))

@@ -139,13 +139,13 @@ export const Navbar = ({
       .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         // 2. Filtramos también los hijos de cada módulo
         children: item.children
           ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 
@@ -154,12 +154,12 @@ export const Navbar = ({
       .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         children: item.children
           ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 
@@ -168,12 +168,12 @@ export const Navbar = ({
       .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         children: item.children
           ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 

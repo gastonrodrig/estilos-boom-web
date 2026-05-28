@@ -20,7 +20,9 @@ export const ProductCardCatalogue = ({ product }: Props) => {
     textDark: "#594246",
   };
 
-  const uniqueColors = Array.from(new Set(product.variants.map((v) => v.color))).slice(0, 3);
+  const uniqueColors = Array.from(
+    new Set(product.variants.map((v) => typeof v.color === 'string' ? v.color : (v.color?.name || "")))
+  ).filter(Boolean).slice(0, 3);
 
   const getColorHex = (colorName: string) => {
     const colorMap: Record<string, string> = {

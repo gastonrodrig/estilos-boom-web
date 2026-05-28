@@ -42,6 +42,7 @@ export interface PaymentFormValues {
   securityCode?: string;
   billingSameAsShipping: boolean;
   billingAddress?: BillingAddress;
+  operationNumber?: string;
 }
 
 export interface CheckoutFormValues extends ShippingFormValues, PaymentFormValues {

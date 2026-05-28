@@ -18,7 +18,9 @@ type LoginFormValues = {
   password: string;
 };
 
-export default function LoginPage() {
+import { Suspense } from "react";
+
+function LoginContent() {
   const { 
     status,
     startLogin, 
@@ -103,5 +105,13 @@ export default function LoginPage() {
         </p>
       </form>
     </AuthSplitCard>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
