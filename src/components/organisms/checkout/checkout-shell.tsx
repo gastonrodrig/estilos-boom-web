@@ -26,14 +26,14 @@ const CheckoutShell: React.FC = () => {
         <CheckoutStepper currentStep={stepMap[currentStep]} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 lg:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
         {/* Columna izquierda: Formularios dinámicos */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-7">
           <CheckoutStepRenderer currentStep={currentStep} />
         </div>
 
         {/* Columna derecha: Resumen (Este se queda fijo) */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-5">
           <CheckoutSummaryCard />
         </div>
       </div>

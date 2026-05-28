@@ -1,0 +1,1331 @@
+﻿diff --git a/src/app/(public)/auth/login/page.tsx b/src/app/(public)/auth/login/page.tsx
+index ac37aa4..2e4a5e7 100644
+--- a/src/app/(public)/auth/login/page.tsx
++++ b/src/app/(public)/auth/login/page.tsx
+@@ -53,7 +53,7 @@ export default function LoginPage() {
+           {...register("email", {
+             required: "El correo es obligatorio",
+           })}
+-          containerClassName="mb-8"
++          containerClassName="mb-5"
+         />
+ 
+         <PasswordInput
+@@ -64,13 +64,13 @@ export default function LoginPage() {
+           {...register("password", {
+             required: "La contrase├▒a es obligatoria",
+           })}
+-          containerClassName="mb-2"
++          containerClassName="mb-1"
+         />
+ 
+-        <div className="text-right mb-6 sm:mb-8">
++        <div className="text-right mb-5 sm:mb-6">
+           <Link
+             href="/forgot-password"
+-            className="text-xs sm:text-sm text-neutral-500 hover:text-[#f2b6c1] transition"
++            className="text-xs sm:text-sm font-medium text-[#594246]/70 hover:text-[#632034] transition-colors"
+           >
+             ┬┐Olvidaste tu contrase├▒a?
+           </Link>
+@@ -92,11 +92,11 @@ export default function LoginPage() {
+           Continuar con Google
+         </GoogleButton>
+ 
+-        <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-neutral-500">
++        <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-[#594246]/80 font-medium tracking-wide">
+           ┬┐A├║n no tienes una cuenta?{" "}
+           <Link
+             href="/auth/register"
+-            className="font-medium text-neutral-700 hover:text-[#f2b6c1] transition"
++            className="font-bold text-[#632034] hover:text-[#D9A2A8] transition-colors"
+           >
+             Crear Cuenta
+           </Link>
+diff --git a/src/app/(public)/layout.tsx b/src/app/(public)/layout.tsx
+index 90d7a22..95d636a 100644
+--- a/src/app/(public)/layout.tsx
++++ b/src/app/(public)/layout.tsx
+@@ -10,17 +10,19 @@ export default function PublicLayout({
+ }) {
+   const pathname = usePathname();
+   const isHome = pathname === "/" || pathname === "/home";
++  const isCatalogue = pathname.startsWith("/catalogue");
++  const removePadding = isHome || isCatalogue;
+ 
+   return (
+     <>
+       <Navbar isHome={isHome} />
+ 
+-      {/* A├▒adimos pt-[140px] para que el contenido empiece 
+-          justo debajo del Navbar. 
+-          En el Home (isHome) no lo ponemos para que la imagen 
+-          de portada s├¡ se meta debajo del men├║ transparente.
++      {/* A├▒adimos pt-[64px] para que el contenido empiece 
++          exactamente debajo del Navbar (cuyo alto es 64px). 
++          En el Home o Cat├ílogo no lo ponemos para que las portadas 
++          s├¡ se metan debajo del men├║ y no dejen l├¡neas en blanco.
+       */}
+-      <div className={`relative ${!isHome ? "pt-[80px] md:pt-[100px]" : ""}`}>
++      <div className={`relative ${!removePadding ? "pt-[64px]" : ""}`}>
+         <main className="min-h-[70vh]">
+           {children}
+         </main>
+diff --git a/src/components/atoms/button/cta-button.tsx b/src/components/atoms/button/cta-button.tsx
+index 4fd7c80..cd28ecc 100644
+--- a/src/components/atoms/button/cta-button.tsx
++++ b/src/components/atoms/button/cta-button.tsx
+@@ -20,10 +20,10 @@ type CTAProps =
+     }
+ 
+ const baseClasses =`
+-  inline-flex items-center justify-center gap-2 rounded-full 
+-  px-8 py-[14px] text-sm font-medium tracking-wide transition bg-[#f2b6c1] 
+-  text-black hover:opacity-90 active:scale-95 hover:cursor-pointer
+-  py-2.5 sm:py-3 text-sm sm:text-base
++  inline-flex items-center justify-center gap-2 rounded-sm 
++  px-8 py-[14px] text-sm font-semibold tracking-widest uppercase transition-all duration-300
++  bg-[#632034] text-white shadow-sm hover:bg-[#4a1827] hover:shadow-lg active:scale-[0.98]
++  hover:cursor-pointer
+ `
+ 
+ const MotionLink = motion.create(Link)
+diff --git a/src/components/atoms/button/google-button.tsx b/src/components/atoms/button/google-button.tsx
+index 591ceb6..c32361a 100644
+--- a/src/components/atoms/button/google-button.tsx
++++ b/src/components/atoms/button/google-button.tsx
+@@ -10,11 +10,11 @@ type GoogleButtonProps = {
+ }
+ 
+ const baseGoogleClasses = `
+-  inline-flex items-center justify-center gap-3 rounded-full
+-  px-8 py-[14px] text-sm font-medium tracking-wide transition
+-  bg-gray-200 text-black hover:bg-gray-300 active:scale-95 
+-  hover:cursor-pointer mt-3 sm:mt-4 py-2.5 sm:py-3 text-sm 
+-  sm:text-base
++  mt-3 sm:mt-4 flex w-full items-center justify-center gap-3 rounded-sm 
++  border border-gray-200 bg-white px-8 py-[14px]
++  text-sm sm:text-[15px] font-semibold tracking-wide text-gray-700 shadow-sm
++  transition-all duration-300 hover:bg-gray-50 hover:shadow-md hover:border-gray-300
++  hover:cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+ `
+ 
+ export const GoogleButton: React.FC<GoogleButtonProps> = ({
+diff --git a/src/components/molecules/checkout-stepper/checkout-stepper.tsx b/src/components/molecules/checkout-stepper/checkout-stepper.tsx
+index 279cdd8..9badbb0 100644
+--- a/src/components/molecules/checkout-stepper/checkout-stepper.tsx
++++ b/src/components/molecules/checkout-stepper/checkout-stepper.tsx
+@@ -8,10 +8,9 @@ interface CheckoutStepperProps {
+ 
+ const steps = [
+   "Carrito",
+-  "Identificacion",
+-  "Entrega",
++  "Env├¡o",
+   "Pago",
+-  "Confirmacion",
++  "Confirmaci├│n",
+ ];
+ 
+ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep }) => {
+diff --git a/src/components/organisms/auth-split-card/auth-split-card.tsx b/src/components/organisms/auth-split-card/auth-split-card.tsx
+index 45b1625..2f6e3dc 100644
+--- a/src/components/organisms/auth-split-card/auth-split-card.tsx
++++ b/src/components/organisms/auth-split-card/auth-split-card.tsx
+@@ -12,48 +12,58 @@ export const AuthSplitCard = ({
+   children,
+ }: AuthSplitCardProps) => {
+   return (
+-    <div className="min-h-[calc(100vh-96px)] bg-[#f5f5f5]">
+-      <div className="grid min-h-[calc(100vh-96px)] grid-cols-1 md:grid-cols-2 bg-white">
+-        {/* Columna Izquierda */}
+-        <div className="relative hidden md:block">
+-          <Image
+-            src="/assets/auth-split-card-img.png"
+-            alt="Auth visual"
+-            fill
+-            priority
+-            className="object-cover object-top"
+-          />
+-        </div>
++    <div className="flex min-h-[calc(100vh-64px)] w-full bg-[#FAF9F6]">
++      {/* Columna Izquierda (Gigante, borde a borde) */}
++      <div className="relative hidden md:block md:w-1/2 lg:w-[55%]">
++        <Image
++          src="/assets/auth-split-card-img.png"
++          alt="Auth visual"
++          fill
++          priority
++          className="object-cover object-top"
++        />
++        {/* Subtle elegant overlay */}
++        <div className="absolute inset-0 bg-gradient-to-t from-[#632034]/60 via-transparent to-transparent mix-blend-multiply" />
++      </div>
+ 
+-        {/* Columna Derecha */}
+-        <div
+-          className="
+-            flex flex-col items-center justify-center text-center
+-            px-4 sm:px-6 md:px-16
+-          "
+-        >
+-        <div className="flex items-center justify-center gap-2 sm:gap-3">
+-          <div className="relative w-8 sm:w-10 h-6 sm:h-8">
+-            <Image
+-              src="/assets/auth-icon.png"
+-              alt="Logo"
+-              fill
+-              className="object-contain"
+-            />
+-          </div>
++      {/* Columna Derecha (Contenedor del formulario) */}
++      <div className="w-full md:w-1/2 lg:w-[45%] flex items-center justify-center p-6 md:p-12 relative">
++        {/* Patr├│n de fondo sutil en la zona derecha */}
++        <div 
++          className="absolute inset-0 z-0 opacity-60 pointer-events-none"
++          style={{
++            backgroundImage: 'radial-gradient(#E5B3B8 1.5px, transparent 1.5px)',
++            backgroundSize: '24px 24px',
++            backgroundPosition: '0 0, 12px 12px'
++          }}
++        />
+ 
+-          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold">
+-            {title}
+-          </h1>
+-        </div>
++        {/* Cuadro de Inicio de Sesi├│n flotante */}
++        <div className="w-full max-w-[540px] bg-white px-8 py-8 md:px-14 md:py-10 rounded-2xl shadow-2xl shadow-[#632034]/5 border border-[#E5B3B8]/30 relative z-10 flex flex-col items-center">
++          <div className="flex flex-col items-center justify-center gap-3 w-full">
++            <div className="relative w-10 sm:w-12 h-10 sm:h-12 mb-1">
++              <Image
++                src="/assets/auth-icon.png"
++                alt="Logo"
++                fill
++                className="object-contain"
++              />
++            </div>
++
++            <h1 className="text-3xl sm:text-4xl font-serif text-[#632034] text-center">
++              {title}
++            </h1>
++          </div>
+ 
+           {subtitle && (
+-            <p className="mt-2 text-sm sm:text-base font-light text-neutral-500">
++            <p className="mt-2 text-sm sm:text-[15px] font-medium tracking-wide text-[#594246]/70 text-center">
+               {subtitle}
+             </p>
+           )}
+ 
+-          <div className="mt-6 w-full max-w-sm sm:max-w-md mx-auto">{children}</div>
++          <div className="mt-6 w-full">
++            {children}
++          </div>
+         </div>
+       </div>
+     </div>
+diff --git a/src/components/organisms/checkout/checkout-delivery-method-form.tsx b/src/components/organisms/checkout/checkout-delivery-method-form.tsx
+deleted file mode 100644
+index 7b88f24..0000000
+--- a/src/components/organisms/checkout/checkout-delivery-method-form.tsx
++++ /dev/null
+@@ -1,138 +0,0 @@
+-'use client';
+-
+-import React, { useEffect, useState } from 'react';
+-import { useFormContext, Controller } from 'react-hook-form';
+-import { useCheckoutStore } from '@/hooks/extra';
+-import { useClientPersonStore } from '@/hooks'; // ­ƒæê Importamos el store
+-import { CheckoutFormValues, DeliveryMethod } from '@/core/models/checkout';
+-import { useAppSelector } from '@/store';
+-import { AddressInput } from '@models';
+-import { Loader2 } from 'lucide-react';
+-
+-const CheckoutDeliveryMethodForm: React.FC = () => {
+-  const { handleGoToPayment, handleGoToShipping } = useCheckoutStore();
+-  const { startLoadingMyAddresses } = useClientPersonStore(); // ­ƒæê Usamos la funci├│n
+-
+-  const { status } = useAppSelector((state) => state.auth);
+-  const isAuthenticated = status === 'authenticated';
+-
+-  const { control, watch, formState: { isSubmitting } } = useFormContext<CheckoutFormValues>();
+-
+-  const [savedAddresses, setSavedAddresses] = useState<AddressInput[]>([]);
+-  const [isLoading, setIsLoading] = useState(false);
+-
+-  const formValues = watch() as any;
+-  const selectedDeliveryMethod = formValues.selectedDeliveryMethod;
+-  const selectedAddressId = formValues.selectedAddressId;
+-
+-  // ­ƒÜÇ FETCH LIMPIO
+-  useEffect(() => {
+-    if (isAuthenticated) {
+-      const fetchAddresses = async () => {
+-        setIsLoading(true);
+-        const data = await startLoadingMyAddresses(); // Ô£¿ Magia
+-        setSavedAddresses(data);
+-        setIsLoading(false);
+-      };
+-      fetchAddresses();
+-    }
+-  }, [isAuthenticated]);
+-
+-  // L├│gica de visualizaci├│n
+-  let displayAddress = "Selecciona una direcci├│n";
+-
+-  if (isAuthenticated && savedAddresses.length > 0 && selectedAddressId !== undefined) {
+-    const activeAddr = savedAddresses[Number(selectedAddressId)];
+-    if (activeAddr) {
+-      displayAddress = `${activeAddr.address_line}, ${activeAddr.district}, ${activeAddr.department}`;
+-    }
+-  } else if (formValues.address) {
+-    displayAddress = `${formValues.address}, ${formValues.district}, ${formValues.department}`;
+-  }
+-
+-  const deliveryMethods: DeliveryMethod[] = [
+-    { id: 'store', name: 'Recojo en Tienda', description: 'Tienda f├¡sica', price: 0, estimatedDays: 0 },
+-    { id: 'point', name: 'Punto de Encuentro', description: 'Estaciones del tren', price: 3, estimatedDays: 2 },
+-    { id: 'motorized', name: 'Total Motorizado', description: 'Entrega a domicilio', price: 10, estimatedDays: 1 },
+-    { id: 'province', name: 'Provincia - Shalom', description: 'Env├¡o a todo el Per├║', price: 15, estimatedDays: 3 },
+-  ];
+-
+-  const handleNext = () => {
+-    if (selectedDeliveryMethod) handleGoToPayment();
+-  };
+-
+-  return (
+-    <div className="rounded-sm p-8 border border-[#594246]/30 space-y-6">
+-      {/* ... (El resto del JSX se mantiene exactamente igual que en la respuesta anterior) ... */}
+-      <div>
+-        <h2 className="text-[25px] font-semibold mb-2 text-[#594246]">M├®todo de Entrega</h2>
+-        <p className="text-sm text-[#827D7D]">Selecciona c├│mo deseas recibir tu pedido</p>
+-      </div>
+-
+-      <button
+-        type="button"
+-        onClick={handleGoToShipping}
+-        className="w-full border-2 rounded-sm p-4 text-left transition-all bg-[#F2D0D3]/30 border-[#F2B6C1] hover:opacity-80"
+-      >
+-        <div className="flex justify-between items-center">
+-          <div className="flex-1 min-w-0">
+-            <p className="font-semibold text-[15px] text-[#594246]">Direcci├│n de Entrega</p>
+-            {isLoading ? (
+-              <div className="flex items-center gap-2 mt-1">
+-                <Loader2 size={12} className="animate-spin" />
+-                <span className="text-xs text-gray-400">Cargando detalles...</span>
+-              </div>
+-            ) : (
+-              <p className="text-sm mt-1 truncate capitalize text-[#827D7D]">
+-                {displayAddress.toLowerCase()}
+-              </p>
+-            )}
+-          </div>
+-          <svg className="w-5 h-5 text-[#F2778D] shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+-          </svg>
+-        </div>
+-      </button>
+-
+-      <div className="space-y-3">
+-        <label className="block text-sm font-medium text-[#594246] mb-2">Opciones de Entrega*</label>
+-        <Controller
+-          name="selectedDeliveryMethod"
+-          control={control}
+-          rules={{ required: true }}
+-          render={({ field: { value, onChange } }) => (
+-            <div className="space-y-3">
+-              {deliveryMethods.map((method) => (
+-                <div
+-                  key={method.id}
+-                  onClick={() => onChange(method)}
+-                  className={`border-2 rounded-sm p-4 cursor-pointer transition-all ${
+-                    value?.id === method.id ? "border-[#F2B6C1] bg-[#F2D0D3]/30" : "border-[#594246]/10 bg-white"
+-                  }`}
+-                >
+-                  <div className="flex items-start gap-4">
+-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${value?.id === method.id ? "border-[#F2778D] bg-[#F2778D]" : "border-gray-200"}`}>
+-                      {value?.id === method.id && <div className="w-2 h-2 bg-white rounded-full" />}
+-                    </div>
+-                    <div className="flex-1">
+-                      <p className="font-semibold text-[#594246]">{method.name}</p>
+-                      <p className="text-sm text-[#827D7D]">{method.description}</p>
+-                    </div>
+-                    <p className="font-bold text-[#594246]">{method.price === 0 ? 'GRATIS' : `S/ ${method.price.toFixed(2)}`}</p>
+-                  </div>
+-                </div>
+-              ))}
+-            </div>
+-          )}
+-        />
+-      </div>
+-
+-      <div className="flex gap-4 pt-4">
+-        <button type="button" onClick={handleGoToShipping} className="flex-1 border bg-[#FAF9F6] font-semibold py-3 rounded-full text-[#594246]">Atr├ís</button>
+-        <button type="button" onClick={handleNext} disabled={!selectedDeliveryMethod || isSubmitting} className="flex-1 bg-[#F2B6C1] text-black font-semibold py-3 rounded-full disabled:opacity-50">Siguiente: Pago</button>
+-      </div>
+-    </div>
+-  );
+-};
+-
+-export default CheckoutDeliveryMethodForm;
+\ No newline at end of file
+diff --git a/src/components/organisms/checkout/checkout-shell.tsx b/src/components/organisms/checkout/checkout-shell.tsx
+index 721abf9..2931d43 100644
+--- a/src/components/organisms/checkout/checkout-shell.tsx
++++ b/src/components/organisms/checkout/checkout-shell.tsx
+@@ -12,10 +12,9 @@ const CheckoutShell: React.FC = () => {
+   const { currentStep } = useCheckoutStore();
+ 
+   const stepMap: Record<string, number> = {
+-    'shipping': 1, // Identificaci├│n / Env├¡o
+-    'delivery': 2, // Entrega
+-    'payment': 3,  // Pago
+-    'review': 4    // Confirmaci├│n
++    'shipping': 1, // Env├¡o
++    'payment': 2,  // Pago
++    'review': 3    // Confirmaci├│n
+   };
+ 
+   return (
+diff --git a/src/components/organisms/checkout/checkout-shipping-form.tsx b/src/components/organisms/checkout/checkout-shipping-form.tsx
+index 95adab4..95aba20 100644
+--- a/src/components/organisms/checkout/checkout-shipping-form.tsx
++++ b/src/components/organisms/checkout/checkout-shipping-form.tsx
+@@ -3,16 +3,32 @@
+ import React, { useEffect, useState } from 'react';
+ import { useFormContext, Controller } from 'react-hook-form';
+ import { useCheckoutStore } from '@/hooks/extra';
+-import { useClientPersonStore } from '@/hooks'; // ­ƒæê Aseg├║rate de usar la ruta correcta
+-import { CheckoutFormValues } from '@/core/models/checkout';
++import { useClientPersonStore } from '@/hooks';
++import { CheckoutFormValues, DeliveryMethod } from '@/core/models/checkout';
+ import { useAppSelector } from '@/store';
+ import { AddAddressModal } from '@/components/organisms/direction-modal';
+-import { MapPin, Plus, Loader2 } from 'lucide-react';
++import { MapPin, Plus, Loader2, Store, Train, Bike, Truck } from 'lucide-react';
+ import { AddressInput } from '@models';
+ 
++const TRAIN_STATIONS = [
++  "Villa El Salvador", "Parque Industrial", "Pumacahua", "Villa Mar├¡a", 
++  "Mar├¡a Auxiliadora", "San Juan", "Atocongo", "Jorge Ch├ívez", "Ayacucho", 
++  "Cabitos", "Angamos", "San Borja Sur", "La Cultura", "Arriola", "Gamarra", 
++  "Miguel Grau", "El ├üngel", "Presb├¡tero Maestro", "Caja de Agua", 
++  "Pir├ímide del Sol", "Los Jardines", "Los Postes", "San Carlos", 
++  "San Mart├¡n", "Santa Rosa", "Bay├│var"
++];
++
++const deliveryMethods: DeliveryMethod[] = [
++  { id: 'store', name: 'Recojo en Tienda', description: 'Tienda f├¡sica', price: 0, estimatedDays: 0 },
++  { id: 'point', name: 'Punto de Encuentro', description: 'Estaciones del tren', price: 3, estimatedDays: 2 },
++  { id: 'motorized', name: 'Total Motorizado', description: 'Entrega a domicilio', price: 10, estimatedDays: 1 },
++  { id: 'province', name: 'Provincia - Shalom', description: 'Env├¡o a todo el Per├║', price: 15, estimatedDays: 3 },
++];
++
+ const CheckoutShippingForm: React.FC = () => {
+-  const { handleGoToDelivery } = useCheckoutStore();
+-  const { startLoadingMyAddresses } = useClientPersonStore(); // ­ƒæê Traemos la funci├│n del store
++  const { handleGoToPayment } = useCheckoutStore();
++  const { startLoadingMyAddresses } = useClientPersonStore();
+   
+   const { status, email, phone, id } = useAppSelector((state) => state.auth);
+   const isAuthenticated = status === 'authenticated';
+@@ -26,8 +42,8 @@ const CheckoutShippingForm: React.FC = () => {
+   } = useFormContext<CheckoutFormValues>();
+ 
+   const selectedAddressId = watch('selectedAddressId');
++  const selectedDeliveryMethod = watch('selectedDeliveryMethod');
+ 
+-  // ­ƒÜÇ FETCH LIMPIO Y REUTILIZABLE
+   useEffect(() => {
+     if (isAuthenticated) {
+       if (email) setValue('email', email);
+@@ -35,8 +51,6 @@ const CheckoutShippingForm: React.FC = () => {
+       
+       const fetchMyAddresses = async () => {
+         setIsLoadingAddresses(true);
+-        
+-        // Ô£¿ Una sola l├¡nea de c├│digo hace toda la magia
+         const data = await startLoadingMyAddresses();
+         
+         if (data && data.length > 0) {
+@@ -44,17 +58,26 @@ const CheckoutShippingForm: React.FC = () => {
+           const defaultIndex = data.findIndex((addr: AddressInput) => addr.is_default);
+           setValue('selectedAddressId', String(defaultIndex !== -1 ? defaultIndex : 0));
+         }
+-        
+         setIsLoadingAddresses(false);
+       };
+-
+       fetchMyAddresses();
+     }
+   }, [isAuthenticated, email, phone, setValue, id]);
+ 
+   const handleNext = async () => {
+-    const isValid = await trigger(['email', 'phone', 'selectedAddressId']);
+-    if (isValid) handleGoToDelivery();
++    // Validar siempre email, phone y delivery method
++    let fieldsToValidate: any[] = ['email', 'phone', 'selectedDeliveryMethod'];
++    
++    if (selectedDeliveryMethod?.id === 'motorized') {
++      fieldsToValidate.push('selectedAddressId');
++    } else if (selectedDeliveryMethod?.id === 'point') {
++      fieldsToValidate.push('trainStation');
++    } else if (selectedDeliveryMethod?.id === 'province') {
++      fieldsToValidate.push('shalomAgency');
++    }
++
++    const isValid = await trigger(fieldsToValidate);
++    if (isValid) handleGoToPayment();
+   };
+ 
+   const handleAddAddress = (addressData: any) => {
+@@ -72,27 +95,26 @@ const CheckoutShippingForm: React.FC = () => {
+     setValue('selectedAddressId', String(savedAddresses.length));
+   };
+ 
+-  return (
+-    <div className="bg-white rounded-sm p-8 border border-[#594246]/30 shadow-sm space-y-6">
+-      <div className="mb-6">
+-        {isAuthenticated ? (
+-          <>
+-            <h1 className="text-[25px] font-semibold mb-2 text-[#594246]">Completa tu informaci├│n de contacto</h1>
+-            <p className="text-sm text-gray-500">Usa tus datos registrados o actual├¡zalos.</p>
+-          </>
+-        ) : (
+-          <>
+-            <h1 className="text-2xl font-bold mb-2 text-[#594246]">Informaci├│n de Contacto</h1>
+-            <p className="text-sm text-[#F2778D]">Completa tu email y tel├®fono</p>
+-          </>
+-        )}
+-      </div>
++  const getMethodIcon = (id: string) => {
++    switch (id) {
++      case 'store': return <Store size={18} className="text-[#594246]" />;
++      case 'point': return <Train size={18} className="text-[#594246]" />;
++      case 'motorized': return <Bike size={18} className="text-[#594246]" />;
++      case 'province': return <Truck size={18} className="text-[#594246]" />;
++      default: return <MapPin size={18} className="text-[#594246]" />;
++    }
++  };
+ 
+-      <form className="space-y-6">
+-        {/* Email y Tel├®fono */}
+-        <div className="grid grid-cols-2 gap-4">
++  return (
++    <div className="bg-[#FAF9F6] rounded-sm p-6 lg:p-8 border border-[#EBEAE8] shadow-sm space-y-8">
++      {/* 1. INFORMACI├ôN DE CONTACTO */}
++      <div>
++        <h2 className="text-[18px] font-serif text-[#632034] mb-1">1. Informaci├│n de Contacto</h2>
++        <p className="text-[13px] text-[#594246]/70 mb-4">Usa tus datos registrados o actual├¡zalos.</p>
++        
++        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           <div>
+-            <label className="block text-sm font-medium mb-2 text-[#594246]">Email*</label>
++            <label className="block text-[13px] font-medium mb-2 text-[#594246]">Email*</label>
+             <input
+               type="email"
+               placeholder="correo@ejemplo.com"
+@@ -100,103 +122,186 @@ const CheckoutShippingForm: React.FC = () => {
+                 required: 'El email es requerido',
+                 pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Email inv├ílido' },
+               })}
+-              className={`w-full px-4 py-2 border rounded-sm focus:outline-[#594246] transition-colors ${errors.email ? 'border-red-500' : 'border-gray-200'}`}
++              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] transition-colors ${errors.email ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+             />
+             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+           </div>
+ 
+           <div>
+-            <label className="block text-sm font-medium mb-2 text-[#594246]">Tel├®fono*</label>
++            <label className="block text-[13px] font-medium mb-2 text-[#594246]">Tel├®fono*</label>
+             <input
+               type="tel"
+               placeholder="987654321"
+               {...register('phone', { required: 'El tel├®fono es requerido' })}
+-              className={`w-full px-4 py-2 border rounded-sm focus:outline-[#594246] transition-colors ${errors.phone ? 'border-red-500' : 'border-gray-200'}`}
++              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] transition-colors ${errors.phone ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+             />
+             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
+           </div>
+         </div>
++      </div>
++
++      {/* 2. M├ëTODO DE ENTREGA */}
++      <div className="pt-6 border-t border-[#EBEAE8]">
++        <h2 className="text-[18px] font-serif text-[#632034] mb-1">2. M├®todo de Entrega</h2>
++        <p className="text-[13px] text-[#594246]/70 mb-4">Selecciona c├│mo deseas recibir tu pedido.</p>
++
++        <Controller
++          name="selectedDeliveryMethod"
++          control={control}
++          rules={{ required: 'Debes seleccionar un m├®todo de entrega' }}
++          render={({ field: { value, onChange } }) => (
++            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
++              {deliveryMethods.map((method) => (
++                <div
++                  key={method.id}
++                  onClick={() => onChange(method)}
++                  className={`border rounded-sm p-4 cursor-pointer transition-all flex items-start gap-3 ${
++                    value?.id === method.id 
++                      ? "border-[#632034] bg-[#FCF5F5] shadow-sm" 
++                      : "border-[#EBEAE8] bg-white hover:border-[#D9A2A8]"
++                  }`}
++                >
++                  <div className={`mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${value?.id === method.id ? "border-[#632034]" : "border-gray-300"}`}>
++                    {value?.id === method.id && <div className="w-2 h-2 bg-[#632034] rounded-full" />}
++                  </div>
++                  <div className="flex-1">
++                    <div className="flex justify-between items-center mb-1">
++                      <p className="font-medium text-[14px] text-[#594246]">{method.name}</p>
++                      {getMethodIcon(method.id)}
++                    </div>
++                    <p className="text-[12px] text-[#594246]/70">{method.description}</p>
++                    <p className="text-[13px] font-bold text-[#632034] mt-1">
++                      {method.price === 0 ? 'GRATIS' : `S/ ${method.price.toFixed(2)}`}
++                    </p>
++                  </div>
++                </div>
++              ))}
++            </div>
++          )}
++        />
++        {errors.selectedDeliveryMethod && <p className="text-red-500 text-xs mt-1">{errors.selectedDeliveryMethod.message}</p>}
+ 
+-        {/* Secci├│n de Direcci├│n */}
+-        <div className="pt-4 border-t border-gray-200">
+-          <div className="flex items-center justify-between mb-4">
+-            <h3 className="text-lg font-semibold text-[#594246]">Elegir Direcci├│n</h3>
+-            <button type="button" onClick={() => setIsAddressModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-sm font-semibold hover:bg-gray-800 transition-colors">
+-              <Plus size={16} /> Agregar
+-            </button>
++        {/* 3. CAMPOS DIN├üMICOS SEG├ÜN M├ëTODO */}
++        
++        {/* RECOJO EN TIENDA */}
++        {selectedDeliveryMethod?.id === 'store' && (
++          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm flex items-center gap-3">
++            <Store className="text-[#632034]" />
++            <p className="text-[13px] text-[#594246]">Tu pedido estar├í listo para recoger en nuestra tienda principal. Te notificaremos por correo.</p>
+           </div>
++        )}
++
++        {/* PUNTO DE ENCUENTRO (TREN) */}
++        {selectedDeliveryMethod?.id === 'point' && (
++          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm space-y-3">
++            <label className="block text-[13px] font-medium text-[#594246]">Selecciona la estaci├│n de la L├¡nea 1*</label>
++            <select
++              {...register('trainStation', { required: 'Selecciona una estaci├│n' })}
++              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] ${errors.trainStation ? 'border-red-500' : 'border-[#EBEAE8]'}`}
++            >
++              <option value="">Selecciona...</option>
++              {TRAIN_STATIONS.map(station => (
++                <option key={station} value={station}>{station}</option>
++              ))}
++            </select>
++            {errors.trainStation && <p className="text-red-500 text-xs">{errors.trainStation.message}</p>}
++          </div>
++        )}
++
++        {/* SHALOM */}
++        {selectedDeliveryMethod?.id === 'province' && (
++          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm space-y-3">
++            <label className="block text-[13px] font-medium text-[#594246]">Ingresa la agencia Shalom m├ís cercana a tu domicilio*</label>
++            <input
++              type="text"
++              placeholder="Ej: Shalom Piura Centro"
++              {...register('shalomAgency', { required: 'Ingresa la agencia Shalom' })}
++              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] ${errors.shalomAgency ? 'border-red-500' : 'border-[#EBEAE8]'}`}
++            />
++            {errors.shalomAgency && <p className="text-red-500 text-xs">{errors.shalomAgency.message}</p>}
++            <p className="text-[12px] text-[#594246]/70">El env├¡o a provincia toma entre 3 a 5 d├¡as h├íbiles.</p>
++          </div>
++        )}
+ 
+-          {isLoadingAddresses ? (
+-            <div className="flex items-center justify-center py-6 text-[#F2778D]">
+-              <Loader2 className="animate-spin w-6 h-6 mr-2" />
+-              <span className="text-sm font-medium text-gray-500">Cargando tus direcciones...</span>
++        {/* TOTAL MOTORIZADO (DIRECCI├ôN) */}
++        {selectedDeliveryMethod?.id === 'motorized' && (
++          <div className="p-5 bg-white border border-[#EBEAE8] rounded-sm">
++            <div className="flex items-center justify-between mb-4">
++              <h3 className="text-[15px] font-medium text-[#594246]">Seleccionar Direcci├│n de Entrega</h3>
++              <button type="button" onClick={() => setIsAddressModalOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[12px] rounded-sm hover:bg-[#632034] transition-colors">
++                <Plus size={14} /> Agregar
++              </button>
+             </div>
+-          ) : (
+-            <>
+-              <p className="text-sm text-[#594246] mb-4 flex items-center gap-2">
+-                <MapPin size={16} className="text-[#F2778D]" />
+-                {savedAddresses.length > 0 ? '┬┐Desea agregar otra direcci├│n?' : 'Agrega una direcci├│n para tu env├¡o'}
+-              </p>
+ 
++            {isLoadingAddresses ? (
++              <div className="flex items-center justify-center py-4">
++                <Loader2 className="animate-spin w-5 h-5 text-[#632034] mr-2" />
++                <span className="text-[13px] text-[#594246]">Cargando tus direcciones...</span>
++              </div>
++            ) : (
+               <div className="space-y-3">
+                 {savedAddresses.map((addr, idx) => (
+                   <label
+                     key={idx}
+-                    className={`flex items-center gap-4 p-4 border rounded-sm cursor-pointer transition-all ${
+-                      selectedAddressId === String(idx) ? 'border-[#F2778D] bg-[#F2D0D3]/30' : 'border-gray-200 hover:border-[#594246]'
++                    className={`flex items-start gap-3 p-4 border rounded-sm cursor-pointer transition-all ${
++                      selectedAddressId === String(idx) ? 'border-[#632034] bg-[#FCF5F5]' : 'border-[#EBEAE8] hover:border-[#D9A2A8]'
+                     }`}
+                   >
+-                    <input type="radio" {...register('selectedAddressId', { required: 'Debes seleccionar una direcci├│n' })} value={String(idx)} className="w-4 h-4 accent-[#F2778D]" />
++                    <input type="radio" {...register('selectedAddressId', { required: 'Debes seleccionar una direcci├│n' })} value={String(idx)} className="mt-1 w-3.5 h-3.5 accent-[#632034]" />
+                     <div className="flex-1">
+-                      <p className="font-semibold text-[#594246]">
+-                        {addr.address_line} {addr.reference && `, Ref: ${addr.reference}`}
++                      <p className="font-medium text-[13px] text-[#594246]">
++                        {addr.address_line} {addr.reference && `(${addr.reference})`}
+                       </p>
+-                      <p className="text-xs text-gray-500">
+-                        {addr.district}, {addr.department} {addr.province && `ÔÇó ${addr.province}`}
++                      <p className="text-[12px] text-[#594246]/70 mt-0.5">
++                        {addr.district}, {addr.department}
+                       </p>
+                     </div>
+                   </label>
+                 ))}
+                 
+                 {savedAddresses.length === 0 && (
+-                  <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-sm">
+-                    <p className="text-sm text-gray-500">No tienes direcciones guardadas.</p>
++                  <div className="text-center py-6 border border-dashed border-[#EBEAE8] rounded-sm bg-[#FAF9F6]">
++                    <p className="text-[13px] text-[#594246]/70">No tienes direcciones guardadas para entrega a domicilio.</p>
+                   </div>
+                 )}
+               </div>
+-            </>
+-          )}
+-
+-          {errors.selectedAddressId && <p className="text-red-500 text-xs mt-2">{errors.selectedAddressId.message}</p>}
+-        </div>
+-
+-        {/* Checkbox Newsletter */}
+-        <div className="flex items-center gap-3">
+-          <Controller
+-            name="wantsNews"
+-            control={control}
+-            render={({ field: { value, onChange } }) => (
+-              <input type="checkbox" id="wantsNews" checked={value} onChange={onChange} className="w-4 h-4 rounded" style={{ accentColor: '#F2778D' }} />
+             )}
+-          />
+-          <label htmlFor="wantsNews" className="text-sm text-[#594246]">Me gustar├¡a recibir actualizaciones sobre los ├║ltimos productos y promociones</label>
+-        </div>
++            {errors.selectedAddressId && <p className="text-red-500 text-xs mt-2">{errors.selectedAddressId.message}</p>}
++          </div>
++        )}
++      </div>
+ 
+-        {/* Bot├│n Next */}
+-        <div className="pt-4 flex justify-center">
+-          <button
+-            type="button"
+-            onClick={handleNext}
+-            disabled={isSubmitting || isLoadingAddresses}
+-            className="w-2/3 h-14 rounded-full text-black font-bold bg-[#F2B6C1] hover:bg-[#F2778D] transition-colors disabled:opacity-50"
+-          >
+-            {isSubmitting ? 'Validando...' : 'Continuar Compra'}
+-          </button>
+-        </div>
+-      </form>
++      {/* 4. NEWSLETTER */}
++      <div className="pt-4 flex items-center gap-3 border-t border-[#EBEAE8]">
++        <Controller
++          name="wantsNews"
++          control={control}
++          render={({ field: { value, onChange } }) => (
++            <input type="checkbox" id="wantsNews" checked={value} onChange={onChange} className="w-4 h-4 rounded accent-[#632034]" />
++          )}
++        />
++        <label htmlFor="wantsNews" className="text-[13px] text-[#594246]">Me gustar├¡a recibir actualizaciones sobre los ├║ltimos productos y promociones</label>
++      </div>
++
++      {/* BOT├ôN CONTINUAR */}
++      <div className="pt-4 flex justify-end">
++        <button
++          type="button"
++          onClick={handleNext}
++          disabled={isSubmitting || isLoadingAddresses}
++          className="w-full md:w-auto px-10 py-3.5 rounded-sm text-white text-[12px] uppercase tracking-wider font-bold bg-black hover:bg-[#632034] transition-all disabled:opacity-50"
++        >
++          {isSubmitting ? 'Validando...' : 'Siguiente: Pago'}
++        </button>
++      </div>
+ 
+       {isAddressModalOpen && (
+-        <AddAddressModal isOpen={isAddressModalOpen} onClose={() => setIsAddressModalOpen(false)} onSave={handleAddAddress} />
++        <AddAddressModal 
++          isOpen={isAddressModalOpen} 
++          onClose={() => setIsAddressModalOpen(false)} 
++          onSave={handleAddAddress} 
++          restrictToLima={selectedDeliveryMethod?.id === 'motorized'}
++        />
+       )}
+     </div>
+   );
+diff --git a/src/components/organisms/checkout/checkout-step-renderer.tsx b/src/components/organisms/checkout/checkout-step-renderer.tsx
+index 1e4b9c1..6e5735f 100644
+--- a/src/components/organisms/checkout/checkout-step-renderer.tsx
++++ b/src/components/organisms/checkout/checkout-step-renderer.tsx
+@@ -4,7 +4,6 @@ import React from 'react';
+ import { CheckoutStep } from '@/core/models/checkout';
+ import {
+   CheckoutShippingForm,
+-  CheckoutDeliveryMethodForm,
+   CheckoutPaymentForm,
+   CheckoutReviewStep
+ } from './index';
+@@ -17,8 +16,6 @@ const CheckoutStepRenderer: React.FC<CheckoutStepRendererProps> = ({ currentStep
+   switch (currentStep) {
+     case 'shipping':
+       return <CheckoutShippingForm />;
+-    case 'delivery':
+-      return <CheckoutDeliveryMethodForm />;
+     case 'payment':
+       return <CheckoutPaymentForm />;
+     case 'review':
+diff --git a/src/components/organisms/checkout/checkout-summary-card.tsx b/src/components/organisms/checkout/checkout-summary-card.tsx
+index 28fb002..1ccb779 100644
+--- a/src/components/organisms/checkout/checkout-summary-card.tsx
++++ b/src/components/organisms/checkout/checkout-summary-card.tsx
+@@ -6,10 +6,13 @@ import { RootState } from '@/store/store';
+ import { OrderSummary } from '@/components/organisms/order-summary';
+ import { CartItem } from '@/core/models/cart';
+ import { useCartStore } from '@/hooks';
++import { useFormContext } from 'react-hook-form';
++import { CheckoutFormValues } from '@/core/models/checkout';
+ 
+ const CheckoutSummaryCard: React.FC = () => {
+-
+   const { items, loadCart } = useCartStore();
++  const { watch } = useFormContext<CheckoutFormValues>();
++  const selectedDeliveryMethod = watch('selectedDeliveryMethod');
+ 
+   // 3. Tip de Ingenier├¡a: Aseguramos que la data est├® cargada
+   // por si el usuario entra directamente a la URL de /checkout sin pasar por /cart
+@@ -20,7 +23,7 @@ const CheckoutSummaryCard: React.FC = () => {
+   }, [items.length, loadCart]);
+ 
+   // 4. Renderizamos el resumen con la data real
+-  return <OrderSummary items={items} showButton={false} />;
++  return <OrderSummary items={items} showButton={false} deliveryPrice={selectedDeliveryMethod?.price} />;
+ };
+ 
+ export default CheckoutSummaryCard;
+diff --git a/src/components/organisms/checkout/index.ts b/src/components/organisms/checkout/index.ts
+index 4b8fc64..b2007a8 100644
+--- a/src/components/organisms/checkout/index.ts
++++ b/src/components/organisms/checkout/index.ts
+@@ -2,6 +2,5 @@ export { default as CheckoutShell } from './checkout-shell';
+ export { default as CheckoutStepRenderer } from './checkout-step-renderer';
+ export { default as CheckoutSummaryCard } from './checkout-summary-card';
+ export { default as CheckoutShippingForm } from './checkout-shipping-form';
+-export { default as CheckoutDeliveryMethodForm } from './checkout-delivery-method-form';
+ export { default as CheckoutPaymentForm } from './checkout-payment-form';
+ export { default as CheckoutReviewStep } from './checkout-review-step';
+diff --git a/src/components/organisms/direction-modal/add-address-modal.tsx b/src/components/organisms/direction-modal/add-address-modal.tsx
+index 31686d8..ff4c626 100644
+--- a/src/components/organisms/direction-modal/add-address-modal.tsx
++++ b/src/components/organisms/direction-modal/add-address-modal.tsx
+@@ -1,106 +1,194 @@
+ "use client";
+ 
+ import React, { useState, useEffect } from 'react';
+-import { X, MapPin, Navigation, Map } from 'lucide-react'; // A├▒ad├¡ el icono 'Map' para el distrito
++import { X } from 'lucide-react';
+ 
+ interface AddressModalProps {
+   isOpen: boolean;
+   onClose: () => void;
+   onSave: (address: any) => void;
++  restrictToLima?: boolean;
+ }
+ 
+-export const AddAddressModal = ({ isOpen, onClose, onSave }: AddressModalProps) => {
++export const AddAddressModal = ({ isOpen, onClose, onSave, restrictToLima = false }: AddressModalProps) => {
+   const [departments, setDepartments] = useState<any[]>([]);
+   const [provinces, setProvinces] = useState<any[]>([]);
+ 
+-  // 1. A├▒adimos 'district' al estado inicial
+   const [form, setForm] = useState({
++    firstName: '',
++    lastName: '',
++    addressLine: '',
++    apartment: '',
++    reference: '',
+     department: '',
+     province: '',
+-    district: '', 
+-    addressLine: '',
+-    reference: ''
++    district: '',
++    phone: '',
++    saveForFuture: true,
+   });
+ 
+   // Cargar Departamentos
+   useEffect(() => {
+     if (isOpen) {
+       fetch('https://api-ubigeo-peru.elmerastonitas.workers.dev/api/v1/pe/departments')
+-        .then(res => {
+-          if (!res.ok) throw new Error("Error en red");
+-          return res.json();
+-        })
++        .then(res => res.json())
+         .then(data => {
+-          const deps = data.data || data;
+-          setDepartments(Array.isArray(deps) ? deps : []);
++          let deps = data.data || data;
++          if (Array.isArray(deps)) {
++            if (restrictToLima) {
++              deps = deps.filter((d: any) => d.name.toUpperCase() === 'LIMA');
++              if (deps.length > 0) {
++                setForm(prev => ({ ...prev, department: deps[0].code }));
++              }
++            }
++            setDepartments(deps);
++          }
+         })
+         .catch(() => setDepartments([]));
+     }
+-  }, [isOpen]);
++  }, [isOpen, restrictToLima]);
+ 
+   // Cargar Provincias
+   useEffect(() => {
+     if (form.department) {
+       fetch(`https://api-ubigeo-peru.elmerastonitas.workers.dev/api/v1/pe/provinces?department=${form.department}`)
+-        .then(res => {
+-          if (!res.ok) throw new Error("Error en red");
+-          return res.json();
+-        })
++        .then(res => res.json())
+         .then(data => {
+-          const provs = data.data || data;
+-          setProvinces(Array.isArray(provs) ? provs : []);
++          let provs = data.data || data;
++          if (Array.isArray(provs)) {
++            if (restrictToLima) {
++              provs = provs.filter((p: string) => p.toUpperCase() === 'LIMA');
++              if (provs.length > 0) {
++                setForm(prev => ({ ...prev, province: provs[0] }));
++              }
++            }
++            setProvinces(provs);
++          }
+         })
+         .catch(() => setProvinces([]));
+-      
+-      setForm(prev => ({ ...prev, province: '' }));
+     } else {
+       setProvinces([]);
+     }
+-  }, [form.department]);
++  }, [form.department, restrictToLima]);
+ 
+   if (!isOpen) return null;
+ 
++  const isFormValid = 
++    form.firstName && form.lastName && form.addressLine && 
++    form.department && form.province && form.district && form.phone;
++
+   return (
+     <div 
+-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
++      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+       onClick={(e) => {
+         e.nativeEvent.stopImmediatePropagation(); 
+         onClose();
+       }}
+     >
+       <div 
+-        className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300"
++        className="bg-white w-full max-w-2xl rounded-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]"
+         onClick={(e) => {
+           e.stopPropagation();
+           e.nativeEvent.stopImmediatePropagation();
+         }}
+       >
+         {/* Header */}
+-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#FAF9F6]">
++        <div className="p-6 border-b border-gray-100 flex justify-between items-start">
+           <div>
+-            <h3 className="text-lg font-bold text-[#594246]">Nueva Ubicaci├│n</h3>
+-            <p className="text-xs text-gray-400">Selecciona departamento y provincia</p>
++            <h3 className="text-[22px] font-semibold text-[#594246]">Direcci├│n de entrega</h3>
++            <p className="text-[13px] text-gray-500 mt-1">Completa los datos para que podamos enviarte tu pedido</p>
+           </div>
+           <button 
+             type="button"
+-            onClick={(e) => {
+-              e.nativeEvent.stopImmediatePropagation();
+-              onClose();
+-            }} 
++            onClick={onClose} 
+             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+           >
+-            <X size={20} className="text-gray-400" />
++            <X size={20} className="text-gray-500" />
+           </button>
+         </div>
+ 
+-        {/* Body */}
+-        <div className="p-6 space-y-5">
++        {/* Body Scrollable */}
++        <div className="p-6 overflow-y-auto space-y-5">
++          {/* Fila Nombres y Apellidos */}
+           <div className="grid grid-cols-2 gap-4">
+-            <div className="space-y-1">
+-              <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400 ml-1">Departamento</label>
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Nombres <span className="text-[#D9A2A8]">*</span>
++              </label>
++              <input 
++                type="text" 
++                placeholder="Ej: Mar├¡a"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++                value={form.firstName}
++                onChange={(e) => setForm({...form, firstName: e.target.value})}
++              />
++            </div>
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Apellidos <span className="text-[#D9A2A8]">*</span>
++              </label>
++              <input 
++                type="text" 
++                placeholder="Ej: L├│pez Torres"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++                value={form.lastName}
++                onChange={(e) => setForm({...form, lastName: e.target.value})}
++              />
++            </div>
++          </div>
++
++          {/* Fila Direcci├│n */}
++          <div>
++            <label className="block text-[13px] font-bold text-[#594246] mb-1">
++              Direcci├│n <span className="text-[#D9A2A8]">*</span>
++            </label>
++            <input 
++              type="text" 
++              placeholder="Ej: Av. Benavides 1234"
++              className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++              value={form.addressLine}
++              onChange={(e) => setForm({...form, addressLine: e.target.value})}
++            />
++          </div>
++
++          {/* Fila Dpto y Referencia */}
++          <div className="grid grid-cols-2 gap-4">
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                N┬░ interior / Dpto <span className="font-normal text-gray-400">(opcional)</span>
++              </label>
++              <input 
++                type="text" 
++                placeholder="Ej: Dpto 302"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++                value={form.apartment}
++                onChange={(e) => setForm({...form, apartment: e.target.value})}
++              />
++            </div>
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Referencia <span className="font-normal text-gray-400">(opcional)</span>
++              </label>
++              <input 
++                type="text" 
++                placeholder="Ej: Frente al parque"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++                value={form.reference}
++                onChange={(e) => setForm({...form, reference: e.target.value})}
++              />
++            </div>
++          </div>
++
++          {/* Fila Ubigeo */}
++          <div className="grid grid-cols-3 gap-4">
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Departamento <span className="text-[#D9A2A8]">*</span>
++              </label>
+               <select 
+-                className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-[#F2D0D3] outline-none text-sm text-[#594246]"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px] disabled:bg-gray-50"
+                 value={form.department}
++                disabled={restrictToLima}
+                 onChange={(e) => setForm({...form, department: e.target.value})}
+               >
+                 <option value="">Seleccionar...</option>
+@@ -109,12 +197,13 @@ export const AddAddressModal = ({ isOpen, onClose, onSave }: AddressModalProps)
+                 ))}
+               </select>
+             </div>
+-
+-            <div className="space-y-1">
+-              <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400 ml-1">Provincia</label>
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Provincia <span className="text-[#D9A2A8]">*</span>
++              </label>
+               <select 
+-                disabled={!form.department}
+-                className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl disabled:opacity-50 text-sm text-[#594246]"
++                disabled={!form.department || restrictToLima}
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl disabled:bg-gray-50 outline-none text-[14px]"
+                 value={form.province}
+                 onChange={(e) => setForm({...form, province: e.target.value})}
+               >
+@@ -124,57 +213,52 @@ export const AddAddressModal = ({ isOpen, onClose, onSave }: AddressModalProps)
+                 ))}
+               </select>
+             </div>
+-          </div>
+-
+-          <hr className="border-gray-50" />
+-
+-          {/* Inputs de Texto */}
+-          <div className="space-y-4">
+-            {/* 2. Nuevo Input para Distrito */}
+-            <div className="relative">
+-              <Map size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
++            <div>
++              <label className="block text-[13px] font-bold text-[#594246] mb-1">
++                Distrito <span className="text-[#D9A2A8]">*</span>
++              </label>
+               <input 
+                 type="text" 
+-                placeholder="Distrito (Ej: Miraflores)"
+-                className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:border-[#F2778D] outline-none text-sm"
++                placeholder="Miraflores"
++                className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
+                 value={form.district}
+                 onChange={(e) => setForm({...form, district: e.target.value})}
+               />
+             </div>
++          </div>
+ 
+-            <div className="relative">
+-              <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#F2778D]" />
+-              <input 
+-                type="text" 
+-                placeholder="Direcci├│n (Ej: Jr. Fanning 331)"
+-                className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:border-[#F2778D] outline-none text-sm"
+-                value={form.addressLine}
+-                onChange={(e) => setForm({...form, addressLine: e.target.value})}
+-              />
+-            </div>
++          {/* Fila Tel├®fono */}
++          <div>
++            <label className="block text-[13px] font-bold text-[#594246] mb-1">
++              Tel├®fono de contacto <span className="text-[#D9A2A8]">*</span>
++            </label>
++            <input 
++              type="tel" 
++              placeholder="Ej: 987 274 915"
++              className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:border-[#D9A2A8] outline-none text-[14px]"
++              value={form.phone}
++              onChange={(e) => setForm({...form, phone: e.target.value})}
++            />
++            <p className="text-[11px] text-gray-400 mt-1">Para coordinar la entrega si es necesario</p>
++          </div>
+ 
+-            <div className="relative">
+-              <Navigation size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
+-              <input 
+-                type="text" 
+-                placeholder="Referencia (Ej: Frente al parque)"
+-                className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl outline-none text-sm"
+-                value={form.reference}
+-                onChange={(e) => setForm({...form, reference: e.target.value})}
+-              />
+-            </div>
++          {/* Checkbox Guardar */}
++          <div className="flex items-center gap-2 mt-4">
++            <input 
++              type="checkbox" 
++              id="saveAddress"
++              checked={form.saveForFuture}
++              onChange={(e) => setForm({...form, saveForFuture: e.target.checked})}
++              className="w-4 h-4 rounded accent-[#D9A2A8]"
++            />
++            <label htmlFor="saveAddress" className="text-[13px] font-bold text-[#594246]">
++              Guardar esta direcci├│n para futuras compras
++            </label>
+           </div>
+         </div>
+ 
+         {/* Footer */}
+-        <div className="p-6 bg-gray-50 flex gap-3">
+-          <button 
+-            type="button"
+-            onClick={onClose}
+-            className="flex-1 py-3 text-sm font-bold text-gray-400 hover:text-[#594246] transition-colors"
+-          >
+-            Cancelar
+-          </button>
++        <div className="p-6 border-t border-gray-100 flex justify-end">
+           <button 
+             type="button"
+             onClick={(e) => {
+@@ -183,19 +267,17 @@ export const AddAddressModal = ({ isOpen, onClose, onSave }: AddressModalProps)
+ 
+                 const depName = departments.find(d => d.code === form.department)?.name || "";
+                 
+-                // 3. Enviamos el distrito escrito manualmente
+                 onSave({
+                   ...form, 
+                   departmentName: depName,
+                   provinceName: form.province,
+-                  districtName: form.district // Mapeamos district a districtName para el padre
++                  districtName: form.district
+                 }); 
+             }}
+-            // 4. A├▒adimos !form.district a la validaci├│n para no dejar guardar si est├í vac├¡o
+-            disabled={!form.province || !form.district || !form.addressLine} 
+-            className="flex-[2] py-3 bg-[#F2B6C1] hover:bg-[#F2778D] text-black font-bold rounded-full transition-all disabled:opacity-50"
++            disabled={!isFormValid} 
++            className="w-full py-4 bg-[#D9A2A8] hover:bg-[#C98288] text-white font-bold rounded-xl transition-all disabled:opacity-50"
+             >
+-            A├▒adir Direcci├│n
++            Confirmar direcci├│n
+           </button>
+         </div>
+       </div>
+diff --git a/src/components/organisms/order-summary/order-summary.tsx b/src/components/organisms/order-summary/order-summary.tsx
+index 4a50a8e..f7464f4 100644
+--- a/src/components/organisms/order-summary/order-summary.tsx
++++ b/src/components/organisms/order-summary/order-summary.tsx
+@@ -7,6 +7,7 @@ import { useAppSelector } from "@store";
+ interface OrderSummaryProps {
+   items: CartItem[];
+   showButton?: boolean;
++  deliveryPrice?: number;
+ }
+ 
+ const currency = (value: number) =>
+@@ -16,7 +17,7 @@ const currency = (value: number) =>
+     minimumFractionDigits: 2,
+   }).format(value);
+ 
+-export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) => {
++export const OrderSummary = ({ items, showButton = true, deliveryPrice }: OrderSummaryProps) => {
+   const router = useRouter();
+   const authUid = useAppSelector((state) => state.auth.uid);
+   const authStatus = useAppSelector((state) => state.auth.status);
+@@ -25,6 +26,7 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
+ 
+   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+   const subtotal = total;
++  const finalTotal = subtotal + (deliveryPrice || 0);
+   const igv = subtotal * 0.18;
+   const taxedOperation = subtotal * 0.82;
+ 
+@@ -55,7 +57,9 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
+         </div>
+         <div className="flex items-center justify-between">
+           <span>Env├¡o</span>
+-          <span className="font-semibold">Ver al finalizar</span>
++          <span className="font-semibold">
++            {deliveryPrice === undefined ? "Ver al finalizar" : deliveryPrice === 0 ? "GRATIS" : currency(deliveryPrice)}
++          </span>
+         </div>
+         <div className="flex items-center justify-between">
+           <span>IGV (18%)</span>
+@@ -71,7 +75,7 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
+ 
+       <div className="flex items-center justify-between text-[#632034]">
+         <span className="text-[14px] font-medium">Total</span>
+-        <span className="text-[24px] leading-none font-serif text-[#632034]">{currency(subtotal)}</span>
++        <span className="text-[24px] leading-none font-serif text-[#632034]">{currency(finalTotal)}</span>
+       </div>
+ 
+       {showButton && (
+diff --git a/src/core/models/checkout/checkout.models.ts b/src/core/models/checkout/checkout.models.ts
+index 645d786..f7d4482 100644
+--- a/src/core/models/checkout/checkout.models.ts
++++ b/src/core/models/checkout/checkout.models.ts
+@@ -1,4 +1,4 @@
+-export type CheckoutStep = 'shipping' | 'delivery' | 'payment' | 'review';
++export type CheckoutStep = 'shipping' | 'payment' | 'review';
+ 
+ export interface BillingAddress {
+   firstName: string;
+@@ -25,6 +25,8 @@ export interface ShippingFormValues {
+   
+   selectedAddressId?: string;
+   wantsNews: boolean;
++  trainStation?: string;
++  shalomAgency?: string;
+ }
+ 
+ export interface DeliveryMethod {
+diff --git a/src/hooks/extra/use-checkout-store.ts b/src/hooks/extra/use-checkout-store.ts
+index 49e355e..8575aa6 100644
+--- a/src/hooks/extra/use-checkout-store.ts
++++ b/src/hooks/extra/use-checkout-store.ts
+@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
+ import { RootState } from '@/store/store';
+ import {
+   goToShippingStep,
+-  goToDeliveryStep,
+   goToPaymentStep,
+   goToReviewStep,
+   setCheckoutStep,
+@@ -17,12 +16,10 @@ export const useCheckoutStore = () => {
+   const currentStep = useSelector((state: RootState) => state.checkout.currentStep);
+ 
+   const isShippingStep = currentStep === 'shipping';
+-  const isDeliveryStep = currentStep === 'delivery';
+   const isPaymentStep = currentStep === 'payment';
+   const isReviewStep = currentStep === 'review';
+ 
+   const handleGoToShipping = () => dispatch(goToShippingStep());
+-  const handleGoToDelivery = () => dispatch(goToDeliveryStep());
+   const handleGoToPayment = () => dispatch(goToPaymentStep());
+   const handleGoToReview = () => dispatch(goToReviewStep());
+   const handleSetStep = (step: CheckoutStep) => dispatch(setCheckoutStep(step));
+@@ -31,11 +28,9 @@ export const useCheckoutStore = () => {
+   return {
+     currentStep,
+     isShippingStep,
+-    isDeliveryStep,
+     isPaymentStep,
+     isReviewStep,
+     handleGoToShipping,
+-    handleGoToDelivery,
+     handleGoToPayment,
+     handleGoToReview,
+     handleSetStep,
+diff --git a/src/store/extra/checkout-slice.ts b/src/store/extra/checkout-slice.ts
+index ea7f2fe..8af64bf 100644
+--- a/src/store/extra/checkout-slice.ts
++++ b/src/store/extra/checkout-slice.ts
+@@ -15,9 +15,6 @@ const checkoutSlice = createSlice({
+     goToShippingStep: (state) => {
+       state.currentStep = 'shipping';
+     },
+-    goToDeliveryStep: (state) => {
+-      state.currentStep = 'delivery';
+-    },
+     goToPaymentStep: (state) => {
+       state.currentStep = 'payment';
+     },
+@@ -33,7 +30,6 @@ const checkoutSlice = createSlice({
+ export const {
+   setCheckoutStep,
+   goToShippingStep,
+-  goToDeliveryStep,
+   goToPaymentStep,
+   goToReviewStep,
+   resetCheckout,

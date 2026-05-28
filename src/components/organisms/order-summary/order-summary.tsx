@@ -72,7 +72,12 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
           <span>Subtotal (incluye IGV)</span>
           <span className="font-semibold">{currency(subtotal)}</span>
         </div>
-
+        <div className="flex items-center justify-between">
+          <span>Envío {deliveryName ? `(${deliveryName})` : ''}</span>
+          <span className="font-semibold">
+            {deliveryCost === 0 && !deliveryName ? "Ver al finalizar" : deliveryCost === 0 ? "GRATIS" : currency(deliveryCost)}
+          </span>
+        </div>
         <div className="flex items-center justify-between">
           <span>IGV (18%)</span>
           <span className="font-semibold">{currency(igv)}</span>
@@ -80,10 +85,6 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
         <div className="flex items-center justify-between">
           <span>Op. gravada</span>
           <span className="font-semibold">{currency(taxedOperation)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Precio de entrega {deliveryName ? `(${deliveryName})` : ''}</span>
-          <span className="font-semibold">{deliveryCost > 0 ? currency(deliveryCost) : 'Ver al finalizar'}</span>
         </div>
       </div>
 

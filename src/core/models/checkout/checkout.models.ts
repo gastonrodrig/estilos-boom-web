@@ -25,6 +25,8 @@ export interface ShippingFormValues {
   
   selectedAddressId?: string;
   wantsNews: boolean;
+  trainStation?: string;
+  shalomAgency?: string;
 }
 
 export interface DeliveryMethod {
@@ -40,9 +42,9 @@ export interface PaymentFormValues {
   cardNumber?: string;
   expiryDate?: string;
   securityCode?: string;
+  operationNumber?: string;
   billingSameAsShipping: boolean;
   billingAddress?: BillingAddress;
-  operationNumber?: string;
 }
 
 export interface CheckoutFormValues extends ShippingFormValues, PaymentFormValues {

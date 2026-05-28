@@ -8,10 +8,10 @@ interface CheckoutStepperProps {
 
 const steps = [
   "Carrito",
-  "Identificacion",
+  "Identificación",
   "Entrega",
   "Pago",
-  "Confirmacion",
+  "Confirmación",
 ];
 
 export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep }) => {
