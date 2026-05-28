@@ -66,8 +66,6 @@ const CheckoutShippingForm: React.FC = () => {
         </div>
       </div>
 
-      </div>
-
       {/* 4. NEWSLETTER */}
       <div className="pt-4 flex items-center gap-3 border-t border-[#EBEAE8]">
         <Controller
