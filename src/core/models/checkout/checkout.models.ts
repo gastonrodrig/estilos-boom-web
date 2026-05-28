@@ -42,6 +42,7 @@ export interface PaymentFormValues {
   cardNumber?: string;
   expiryDate?: string;
   securityCode?: string;
+  operationNumber?: string;
   billingSameAsShipping: boolean;
   billingAddress?: BillingAddress;
 }
