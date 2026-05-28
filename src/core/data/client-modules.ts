@@ -16,54 +16,48 @@ export interface ClientModule {
 
 export const clientModules: ClientModule[] = [
   {
-    label: "Dashboard",
+    label: "Inicio",
     href: "/client",
-    icon: "dashboard",
+    icon: "home",
     requiredPermission: "dashboard:view",
   },
   {
-    label: "Gestionar Ordenes",
-    icon: "shopping-bag",
-    requiredPermission: "orders:view",
+    label: "Mis Pedidos",
+    icon: "package",
     children: [
       {
-        label: "Recientes",
-        href: "/client/orders/recents",
-        requiredPermission: "orders:view",
+        label: "Activos",
+        href: "/client/orders/active",
       },
       {
-        label: "En Progreso",
-        href: "/client/orders/in-progress",
-        requiredPermission: "orders:view",
-      },
-      {
-        label: "Finalizadas",
-        href: "/client/orders/finished",
-        requiredPermission: "orders:view",
+        label: "Historial",
+        href: "/client/orders/history",
       },
     ],
   },
   {
-    label: "Gestionar Cotización",
-    href: "/client/quotations",
-    icon: "booktext",
-    requiredPermission: "quotations:view",
+    label: "Favoritos",
+    href: "/client/favorites",
+    icon: "heart",
   },
   {
-    label: "Gestionar Perfil",
-    icon: "contact",
-    requiredPermission: "profile:manage",
-    children: [
-      {
-        label: "Información",
-        href: "/client/personal-information",
-        requiredPermission: "profile:manage",
-      },
-      {
-        label: "Direcciones",
-        href: "/client/addresses",
-        requiredPermission: "profile:manage",
-      },
-    ],
+    label: "Reseñas",
+    href: "/client/reviews",
+    icon: "star",
+  },
+  {
+    label: "Sugerencias",
+    href: "/client/suggestions",
+    icon: "message-square",
+  },
+  {
+    label: "Mi Perfil",
+    href: "/client/profile",
+    icon: "user",
+  },
+  {
+    label: "Configuración",
+    href: "/client/settings",
+    icon: "settings",
   },
 ];

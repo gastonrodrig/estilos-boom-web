@@ -7,147 +7,133 @@ import { MailIcon, MapIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="relative w-full overflow-hidden bg-gradient-to-b from-[#f6e4ea] via-[#f2d5df] to-[#e8c8d4] text-[#6b4a4a]">
-      <div className="absolute inset-0 bg-[radial-gradient(70%_70%_at_20%_10%,rgba(255,255,255,0.55),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(80%_80%_at_80%_30%,rgba(255,183,197,0.35),transparent_60%)]" />
-      <div className="absolute inset-0 overflow-hidden">
-        <Image
-          src="/assets/footer-patern.png"
-          alt="footer pattern"
-          fill
-          className="object-cover opacity-15"
-        />
-      </div>
-
+    <footer className="relative w-full border-t border-[#EBEAE8] bg-[#FAF9F6] text-[#594246]">
       <div className="relative mx-auto max-w-6xl px-6 py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
-          {/* Marca + Contacto */}
-          <div className="space-y-6">
-            <div className="flex justify-center">
-              <Logo width={180} isHome={false} />
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+          {/* Marca + Social */}
+          <div className="space-y-6 md:col-span-12 lg:col-span-3">
+            <div className="flex justify-start">
+              <Logo width={160} isHome={false} />
             </div>
-            <p className="text-sm leading-7 text-[#6b4a4a]/90">
+            <p className="text-sm leading-relaxed text-[#594246]/80 font-medium max-w-sm">
               Ropa femenina moderna y cómoda, pensada para mujeres que valoran la
               elegancia y la simplicidad.
             </p>
-
-            <div>
-              <h3 className="text-lg font-semibold text-[#7b5050]">Contacto</h3>
-              <ul className="mt-4 space-y-3 text-sm text-[#6b4a4a]">
-                <li className="flex items-center gap-3">
-                  <PhoneIcon size={25} className="flex-shrink-0 text-[#8b6b6b]"/>
-                  <span>+51 987 654 321</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <MailIcon size={25} className="flex-shrink-0 text-[#8b6b6b]"/>
-                  <span>estiloboom.oficial@gmail.com</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <MapPinIcon size={25} className="flex-shrink-0 text-[#8b6b6b]"/>
-                  <span>C. Campanillas 135-101, Ate 15022, Perú</span>
-                </li>
-              </ul>
-
-              <div className="mt-5 flex items-center gap-3">
-                <Link
-                  href="https://www.facebook.com/estilo.boom.online"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm hover:bg-white transition"
-                >
-                  <FacebookIcon size={22} color="#6b4a4a" />
-                </Link>
-                <Link
-                  href="https://www.instagram.com/estilo_boom_"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm hover:bg-white transition"
-                >
-                  <InstagramIcon size={22} color="#6b4a4a" />
-                </Link>
-                <Link
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Tiktok"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm hover:bg-white transition"
-                >
-                  <TiktokIcon size={22} color="#6b4a4a" />
-                </Link>
-              </div>
+            <div className="mt-8 flex items-center gap-4">
+              <Link
+                href="https://www.facebook.com/estilo.boom.online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#594246] hover:text-[#632034] transition-colors"
+              >
+                <FacebookIcon size={24} color="currentColor" />
+              </Link>
+              <Link
+                href="https://www.instagram.com/estilo_boom_"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#594246] hover:text-[#632034] transition-colors"
+              >
+                <InstagramIcon size={24} color="currentColor" />
+              </Link>
+              <Link
+                href="https://tiktok.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#594246] hover:text-[#632034] transition-colors"
+              >
+                <TiktokIcon size={24} color="currentColor" />
+              </Link>
             </div>
           </div>
 
           {/* Enlaces rápidos */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#7b5050]">Enlaces rápidos</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+          <div className="md:col-span-4 lg:col-span-2">
+            <h3 className="text-sm font-bold text-[#632034] uppercase tracking-wider mb-6">Explorar</h3>
+            <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link href="/home" className="hover:text-[#7b5050]">New In</Link>
+                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Nueva Colección</Link>
               </li>
               <li>
-                <Link href="/catalog" className="hover:text-[#7b5050]">Best Seller</Link>
+                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Lo Más Vendido</Link>
               </li>
               <li>
-                <Link href="/catalog" className="hover:text-[#7b5050]">Dresses</Link>
+                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Vestidos</Link>
               </li>
             </ul>
           </div>
 
           {/* Información */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#7b5050]">Información</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+          <div className="md:col-span-4 lg:col-span-2">
+            <h3 className="text-sm font-bold text-[#632034] uppercase tracking-wider mb-6">Información</h3>
+            <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link href="/shipping" className="hover:text-[#7b5050]">Envíos y entregas</Link>
+                <Link href="/shipping" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Envíos y entregas</Link>
               </li>
               <li>
-                <Link href="/payment" className="hover:text-[#7b5050]">Medios de pago</Link>
+                <Link href="/payment" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Medios de pago</Link>
               </li>
               <li>
-                <Link href="/pickup" className="hover:text-[#7b5050]">Puntos de recojo</Link>
+                <Link href="/pickup" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Puntos de recojo</Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-[#7b5050]">Términos y condiciones</Link>
+                <Link href="/terms" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Términos y condiciones</Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-[#7b5050]">Política de privacidad</Link>
+                <Link href="/privacy" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Política de privacidad</Link>
               </li>
               <li>
-                <Link href="/refund" className="hover:text-[#7b5050]">Política de reembolso</Link>
+                <Link href="/refund" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Política de reembolso</Link>
               </li>
             </ul>
           </div>
 
           {/* Nosotros */}
-          <div>
-            <h3 className="text-lg font-semibold text-[#7b5050]">Nosotros</h3>
-            <ul className="mt-5 space-y-3 text-sm">
+          <div className="md:col-span-4 lg:col-span-2">
+            <h3 className="text-sm font-bold text-[#632034] uppercase tracking-wider mb-6">Nosotros</h3>
+            <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link href="/about" className="hover:text-[#7b5050]">Quiénes somos</Link>
+                <Link href="/about" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Quiénes somos</Link>
               </li>
               <li>
-                <Link href="/reviews" className="hover:text-[#7b5050]">Reviews de clientes</Link>
+                <Link href="/reviews" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Reseñas de clientes</Link>
               </li>
               <li>
-                <Link href="/stores" className="hover:text-[#7b5050]">Nuestra tienda</Link>
+                <Link href="/stores" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Nuestra tienda</Link>
               </li>
               <li>
-                <Link href="/wholesale" className="hover:text-[#7b5050]">Ventas mayoristas</Link>
+                <Link href="/wholesale" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Ventas mayoristas</Link>
               </li>
               <li>
-                <Link href="/jobs" className="hover:text-[#7b5050]">Trabaja con nosotros</Link>
+                <Link href="/jobs" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Trabaja con nosotros</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contacto */}
+          <div className="md:col-span-12 lg:col-span-3">
+            <h3 className="text-sm font-bold text-[#632034] uppercase tracking-wider mb-6">Contacto</h3>
+            <ul className="space-y-4 text-sm font-medium text-[#594246]">
+              <li className="flex items-start gap-3">
+                <PhoneIcon size={18} className="flex-shrink-0 text-[#632034] mt-0.5"/>
+                <span>+51 987 654 321</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <MailIcon size={18} className="flex-shrink-0 text-[#632034] mt-0.5"/>
+                <span>estiloboom.oficial@gmail.com</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPinIcon size={18} className="flex-shrink-0 text-[#632034] mt-0.5"/>
+                <span className="leading-tight">C. Campanillas 135-101,<br/>Ate 15022, Perú</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 w-full bg-[#d7b9c0]/60 h-[2px]" />
+        <div className="mt-16 w-full border-t border-[#EBEAE8]" />
 
-        <div className="mt-6 flex flex-col gap-4 text-sm text-[#7b5050] md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} Estilos Boom. Todos los derechos reservados.</p>
+        <div className="mt-8 flex flex-col gap-4 text-xs font-medium text-[#594246]/60 md:flex-row md:items-center md:justify-between tracking-wide">
+          <p>© {new Date().getFullYear()} ESTILOS BOOM. TODOS LOS DERECHOS RESERVADOS.</p>
         </div>
       </div>
     </footer>

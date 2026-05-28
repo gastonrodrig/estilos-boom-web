@@ -22,8 +22,10 @@ export default function CartPage() {
   useEffect(() => {
     if (isAuthChecking || loadInitialCartRef.current) return;
     loadInitialCartRef.current = true;
-    void loadCart();
-  }, [isAuthChecking, loadCart]);
+    if (items.length === 0) {
+      void loadCart();
+    }
+  }, [isAuthChecking, loadCart, items.length]);
 
   useEffect(() => {
     if (!isAuth || isAuthChecking) return;
@@ -51,7 +53,7 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="bg-[#ffffff]  rounded-sm  px-4 py-2  md:px-5">
-              <div className="hidden grid-cols-[1fr_150px_140px_24px] gap-4 border-b border-[#F2B6C1] px-2 py-3 text-[15px] font-normal text-[#594246] md:grid ">
+              <div className="hidden grid-cols-[1fr_150px_140px_24px] gap-4 border-b border-[#F5E3E6] px-2 py-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#D9A2A8] md:grid ">
                 <span>Producto</span>
                 <span className="text-center truncate text-[15px]">Cantidad</span>
                 <span className="text-right truncate text-[15px]">Precio</span>
@@ -81,7 +83,7 @@ export default function CartPage() {
                         />
 
                         <div className="min-w-0">
-                          <h2 className="truncate text-[18px] font-medium text-[#594246]">
+                          <h2 className="truncate text-[18px] font-serif text-[#632034]">
                             {item.name}
                           </h2>
                            <p className="text-[12px] text-[#000000]/70">
@@ -107,10 +109,10 @@ export default function CartPage() {
                           disabled={!canDecrease}
                           whileTap={canDecrease ? { scale: 1.08 } : undefined}
                           transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                          className={`h-7 w-7 rounded border text-sm text-[#000000] transition ${
+                          className={`h-7 w-7 rounded border text-sm text-[#000000] transition-all ${
                             canDecrease
-                              ? "border-[#F2D0D3] bg-[#F2D0D3] text-[#594246] hover:cursor-pointer hover:bg-[#F291A3]/70"
-                                      : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
+                              ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034]"
+                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300"
                           }`}
                           aria-label="Restar cantidad"
                         >
@@ -133,10 +135,10 @@ export default function CartPage() {
                           }
                           whileTap={{ scale: 1.08 }}
                           transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                          className={`h-7 w-7 rounded border text-sm text-[#000000] transition ${
+                          className={`h-7 w-7 rounded border text-sm text-[#000000] transition-all ${
                                     canIncrease
-                                      ? "border-[#F2D0D3] bg-[#F2D0D3] text-[#000000] hover:cursor-pointer hover:bg-[#F291A3]/70"
-                                      : "cursor-not-allowed border-[#F3F4F6] text-gray-300"
+                                      ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034]"
+                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300"
                                   }`}
                           aria-label="Sumar cantidad"
                         >
@@ -144,7 +146,7 @@ export default function CartPage() {
                         </motion.button>
                       </div>
 
-                      <p className="text-left text-[16px] leading-none font-semimedium text-[#594246] md:text-right">
+                      <p className="text-left text-[16px] leading-none font-medium text-[#632034] md:text-right">
                         S/ {(item.price * item.quantity).toFixed(2)}
                       </p>
 
@@ -152,7 +154,7 @@ export default function CartPage() {
                         onClick={() =>
                           removeItem(item.productId, item.size, item.color)
                         }
-                        className="justify-self-start text-[#594246]/70 transition hover:text-[#594246] hover:cursor-pointer md:justify-self-end"
+                        className="justify-self-start text-gray-400 transition hover:text-[#C5A059] hover:cursor-pointer md:justify-self-end"
                         aria-label="Eliminar producto"
                       >
                         <Trash2 size={15} />
