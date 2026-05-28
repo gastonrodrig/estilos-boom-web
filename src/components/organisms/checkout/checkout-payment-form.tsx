@@ -8,10 +8,12 @@ import { IMaskInput } from 'react-imask';
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { X } from 'lucide-react';
 
 const CheckoutPaymentForm: React.FC = () => {
   const { handleGoToReview, handleGoToDelivery } = useCheckoutStore();
   const [qrMethod, setQrMethod] = useState<'yape' | 'plin'>('yape');
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const {
     register,
     control,
@@ -219,12 +221,22 @@ const CheckoutPaymentForm: React.FC = () => {
               </h3>
             </div>
             <div className="p-4 flex justify-center bg-white">
-              <div className="relative w-full max-w-lg aspect-[16/9] bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center border border-gray-100">
-                <span className="text-gray-400 text-sm text-center px-4">[Imagen de Guía paso a paso de {qrMethod === 'yape' ? 'Yape' : 'Plin'}]</span>
-                {/* 
-                  Aquí iría la imagen real de la guía, ej:
-                  <Image src={`/assets/guia-${qrMethod}.png`} alt="Guia" fill className="object-contain" />
-                */}
+              <div 
+                className="relative w-full max-w-lg flex items-center justify-center cursor-pointer group"
+                onClick={() => setIsImageModalOpen(true)}
+              >
+                <Image 
+                  src="/assets/GuiaYapear.png" 
+                  alt="Guía paso a paso" 
+                  width={500} 
+                  height={800} 
+                  className="w-full h-auto rounded-lg shadow-sm border border-gray-100 object-contain group-hover:opacity-90 transition-opacity"
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-lg">
+                  <span className="bg-white/90 text-[#594246] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                    Ampliar imagen
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -345,6 +357,31 @@ const CheckoutPaymentForm: React.FC = () => {
           {isSubmitting ? 'Procesando...' : 'Revisar Pedido'}
         </button>
       </footer>
+
+      {/* 🖼️ MODAL DE IMAGEN AMPLIADA */}
+      {isImageModalOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setIsImageModalOpen(false)}
+        >
+          <div className="relative max-w-3xl w-full h-auto max-h-[90vh] flex flex-col items-center">
+            <button 
+              onClick={() => setIsImageModalOpen(false)}
+              className="absolute -top-10 right-0 md:-right-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <Image 
+              src="/assets/GuiaYapear.png" 
+              alt="Guía paso a paso Ampliada" 
+              width={1000} 
+              height={1600} 
+              className="w-full h-auto max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
