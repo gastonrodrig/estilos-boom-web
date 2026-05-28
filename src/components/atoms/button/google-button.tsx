@@ -10,11 +10,11 @@ type GoogleButtonProps = {
 }
 
 const baseGoogleClasses = `
-  inline-flex items-center justify-center gap-3 rounded-full
-  px-8 py-[14px] text-sm font-medium tracking-wide transition
-  bg-gray-200 text-black hover:bg-gray-300 active:scale-95 
-  hover:cursor-pointer mt-3 sm:mt-4 py-2.5 sm:py-3 text-sm 
-  sm:text-base
+  mt-3 sm:mt-4 flex w-full items-center justify-center gap-3 rounded-sm 
+  border border-gray-200 bg-white px-8 py-[14px]
+  text-sm sm:text-[15px] font-semibold tracking-wide text-gray-700 shadow-sm
+  transition-all duration-300 hover:bg-gray-50 hover:shadow-md hover:border-gray-300
+  hover:cursor-pointer active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
 `
 
 export const GoogleButton: React.FC<GoogleButtonProps> = ({
