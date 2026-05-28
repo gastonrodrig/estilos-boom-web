@@ -8,7 +8,8 @@ interface CheckoutStepperProps {
 
 const steps = [
   "Carrito",
-  "Envío",
+  "Identificación",
+  "Entrega",
   "Pago",
   "Confirmación",
 ];

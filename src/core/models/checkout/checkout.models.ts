@@ -1,4 +1,4 @@
-export type CheckoutStep = 'shipping' | 'payment' | 'review';
+export type CheckoutStep = 'shipping' | 'delivery' | 'payment' | 'review';
 
 export interface BillingAddress {
   firstName: string;

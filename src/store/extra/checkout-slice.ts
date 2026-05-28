@@ -15,6 +15,9 @@ const checkoutSlice = createSlice({
     goToShippingStep: (state) => {
       state.currentStep = 'shipping';
     },
+    goToDeliveryStep: (state) => {
+      state.currentStep = 'delivery';
+    },
     goToPaymentStep: (state) => {
       state.currentStep = 'payment';
     },
@@ -30,6 +33,7 @@ const checkoutSlice = createSlice({
 export const {
   setCheckoutStep,
   goToShippingStep,
+  goToDeliveryStep,
   goToPaymentStep,
   goToReviewStep,
   resetCheckout,
