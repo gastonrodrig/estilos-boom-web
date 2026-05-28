@@ -4,7 +4,6 @@ import React from 'react';
 import { CheckoutStep } from '@/core/models/checkout';
 import {
   CheckoutShippingForm,
-  CheckoutDeliveryMethodForm,
   CheckoutPaymentForm,
   CheckoutReviewStep
 } from './index';
@@ -17,8 +16,6 @@ const CheckoutStepRenderer: React.FC<CheckoutStepRendererProps> = ({ currentStep
   switch (currentStep) {
     case 'shipping':
       return <CheckoutShippingForm />;
-    case 'delivery':
-      return <CheckoutDeliveryMethodForm />;
     case 'payment':
       return <CheckoutPaymentForm />;
     case 'review':

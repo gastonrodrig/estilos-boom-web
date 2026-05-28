@@ -12,10 +12,9 @@ const CheckoutShell: React.FC = () => {
   const { currentStep } = useCheckoutStore();
 
   const stepMap: Record<string, number> = {
-    'shipping': 1, // Identificación / Envío
-    'delivery': 2, // Entrega
-    'payment': 3,  // Pago
-    'review': 4    // Confirmación
+    'shipping': 1, // Envío
+    'payment': 2,  // Pago
+    'review': 3    // Confirmación
   };
 
   return (

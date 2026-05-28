@@ -1,4 +1,4 @@
-export type CheckoutStep = 'shipping' | 'delivery' | 'payment' | 'review';
+export type CheckoutStep = 'shipping' | 'payment' | 'review';
 
 export interface BillingAddress {
   firstName: string;
@@ -25,6 +25,8 @@ export interface ShippingFormValues {
   
   selectedAddressId?: string;
   wantsNews: boolean;
+  trainStation?: string;
+  shalomAgency?: string;
 }
 
 export interface DeliveryMethod {

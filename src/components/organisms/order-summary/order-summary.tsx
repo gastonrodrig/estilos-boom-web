@@ -7,6 +7,7 @@ import { useAppSelector } from "@store";
 interface OrderSummaryProps {
   items: CartItem[];
   showButton?: boolean;
+  deliveryPrice?: number;
 }
 
 const currency = (value: number) =>
@@ -16,7 +17,7 @@ const currency = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, showButton = true, deliveryPrice }: OrderSummaryProps) => {
   const router = useRouter();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
@@ -25,6 +26,7 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
 
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const subtotal = total;
+  const finalTotal = subtotal + (deliveryPrice || 0);
   const igv = subtotal * 0.18;
   const taxedOperation = subtotal * 0.82;
 
@@ -55,7 +57,9 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
         </div>
         <div className="flex items-center justify-between">
           <span>Envío</span>
-          <span className="font-semibold">Ver al finalizar</span>
+          <span className="font-semibold">
+            {deliveryPrice === undefined ? "Ver al finalizar" : deliveryPrice === 0 ? "GRATIS" : currency(deliveryPrice)}
+          </span>
         </div>
         <div className="flex items-center justify-between">
           <span>IGV (18%)</span>
@@ -71,7 +75,7 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
 
       <div className="flex items-center justify-between text-[#632034]">
         <span className="text-[14px] font-medium">Total</span>
-        <span className="text-[24px] leading-none font-serif text-[#632034]">{currency(subtotal)}</span>
+        <span className="text-[24px] leading-none font-serif text-[#632034]">{currency(finalTotal)}</span>
       </div>
 
       {showButton && (

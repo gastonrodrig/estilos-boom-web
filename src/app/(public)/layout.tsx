@@ -10,6 +10,8 @@ export default function PublicLayout({
 }) {
   const pathname = usePathname();
   const isHome = pathname === "/" || pathname === "/home";
+  const isCatalogue = pathname.startsWith("/catalogue");
+  const removePadding = isHome || isCatalogue;
 
   return (
     <>
@@ -17,10 +19,10 @@ export default function PublicLayout({
 
       {/* Añadimos pt-[140px] para que el contenido empiece 
           justo debajo del Navbar. 
-          En el Home (isHome) no lo ponemos para que la imagen 
-          de portada sí se meta debajo del menú transparente.
+          En el Home o Catálogo no lo ponemos para que las portadas 
+          sí se metan debajo del menú y no dejen líneas en blanco.
       */}
-      <div className={`relative ${!isHome ? "pt-[80px] md:pt-[100px]" : ""}`}>
+      <div className={`relative ${!removePadding ? "pt-[80px] md:pt-[100px]" : ""}`}>
         <main className="min-h-[70vh]">
           {children}
         </main>
