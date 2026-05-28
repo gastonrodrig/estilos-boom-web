@@ -20,6 +20,14 @@ type LoginFormValues = {
 
 import { Suspense } from "react";
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
 function LoginContent() {
   const { 
     status,
@@ -55,7 +63,7 @@ function LoginContent() {
           {...register("email", {
             required: "El correo es obligatorio",
           })}
-          containerClassName="mb-8"
+          containerClassName="mb-5"
         />
 
         <PasswordInput
@@ -66,13 +74,13 @@ function LoginContent() {
           {...register("password", {
             required: "La contraseña es obligatoria",
           })}
-          containerClassName="mb-2"
+          containerClassName="mb-1"
         />
 
-        <div className="text-right mb-6 sm:mb-8">
+        <div className="text-right mb-5 sm:mb-6">
           <Link
             href="/forgot-password"
-            className="text-xs sm:text-sm text-neutral-500 hover:text-[#f2b6c1] transition"
+            className="text-xs sm:text-sm font-medium text-[#594246]/70 hover:text-[#632034] transition-colors"
           >
             ¿Olvidaste tu contraseña?
           </Link>
@@ -94,24 +102,16 @@ function LoginContent() {
           Continuar con Google
         </GoogleButton>
 
-        <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-neutral-500">
+        <p className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-[#594246]/80 font-medium tracking-wide">
           ¿Aún no tienes una cuenta?{" "}
           <Link
             href="/auth/register"
-            className="font-medium text-neutral-700 hover:text-[#f2b6c1] transition"
+            className="font-bold text-[#632034] hover:text-[#D9A2A8] transition-colors"
           >
             Crear Cuenta
           </Link>
         </p>
       </form>
     </AuthSplitCard>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<div>Cargando...</div>}>
-      <LoginContent />
-    </Suspense>
   );
 }
