@@ -6,6 +6,8 @@ import { RootState } from '@/store/store';
 import { OrderSummary } from '@/components/organisms/order-summary';
 import { CartItem } from '@/core/models/cart';
 import { useCartStore } from '@/hooks';
+import { useFormContext } from 'react-hook-form';
+import { CheckoutFormValues } from '@/core/models/checkout';
 
 const CheckoutSummaryCard: React.FC = () => {
 
@@ -19,8 +21,11 @@ const CheckoutSummaryCard: React.FC = () => {
     }
   }, [items.length, loadCart]);
 
+  const { watch } = useFormContext<CheckoutFormValues>();
+  const selectedDeliveryMethod = watch('selectedDeliveryMethod');
+
   // 4. Renderizamos el resumen con la data real
-  return <OrderSummary items={items} showButton={false} />;
+  return <OrderSummary items={items} showButton={false} deliveryCost={selectedDeliveryMethod?.price} deliveryName={selectedDeliveryMethod?.name} />;
 };
 
 export default CheckoutSummaryCard;

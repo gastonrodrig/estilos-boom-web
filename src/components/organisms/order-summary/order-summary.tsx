@@ -7,6 +7,8 @@ import { useAppSelector } from "@store";
 interface OrderSummaryProps {
   items: CartItem[];
   showButton?: boolean;
+  deliveryCost?: number;
+  deliveryName?: string;
 }
 
 const currency = (value: number) =>
@@ -16,17 +18,17 @@ const currency = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliveryName }: OrderSummaryProps) => {
   const router = useRouter();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
 
   const isAuthenticated = Boolean(authUid) || authStatus === "authenticated";
 
-  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const subtotal = total;
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const igv = subtotal * 0.18;
   const taxedOperation = subtotal * 0.82;
+  const total = subtotal + deliveryCost;
 
   const handlePrimaryAction = () => {
     if (!isAuthenticated) {
@@ -48,15 +50,29 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
         </p>
       </div>
 
+      {!showButton && items.length > 0 && (
+        <div className="mt-5 space-y-3">
+          <p className="text-[13px] font-semibold text-[#594246] border-b border-[#F2B6C1] pb-2">Productos ({items.length})</p>
+          <ul className="space-y-3 max-h-48 overflow-y-auto pr-2">
+            {items.map((item) => (
+              <li key={`${item.productId}-${item.color}-${item.size}`} className="flex justify-between items-start text-[12px] text-[#594246]">
+                <div className="flex flex-col">
+                  <span className="font-medium line-clamp-1">{item.name}</span>
+                  <span className="text-[#827D7D] text-[11px]">Cant: {item.quantity} | Talla: {item.size}</span>
+                </div>
+                <span className="font-semibold whitespace-nowrap ml-2">{currency(item.price * item.quantity)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="mt-5 space-y-3 text-[13px] font-medium text-[#594246]">
         <div className="flex items-center justify-between">
           <span>Subtotal (incluye IGV)</span>
           <span className="font-semibold">{currency(subtotal)}</span>
         </div>
-        <div className="flex items-center justify-between">
-          <span>Envío</span>
-          <span className="font-semibold">Ver al finalizar</span>
-        </div>
+
         <div className="flex items-center justify-between">
           <span>IGV (18%)</span>
           <span className="font-semibold">{currency(igv)}</span>
@@ -65,13 +81,17 @@ export const OrderSummary = ({ items, showButton = true }: OrderSummaryProps) =>
           <span>Op. gravada</span>
           <span className="font-semibold">{currency(taxedOperation)}</span>
         </div>
+        <div className="flex items-center justify-between">
+          <span>Precio de entrega {deliveryName ? `(${deliveryName})` : ''}</span>
+          <span className="font-semibold">{deliveryCost > 0 ? currency(deliveryCost) : 'Ver al finalizar'}</span>
+        </div>
       </div>
 
       <div className="my-5 h-px bg-[#F2B6C1]" />
 
       <div className="flex items-center justify-between text-[#594246]">
         <span className="text-[20px] font-semibold">Total</span>
-        <span className="text-[22px] leading-none font-semibold text-[#F2778D]">{currency(subtotal)}</span>
+        <span className="text-[22px] leading-none font-semibold text-[#F2778D]">{currency(total)}</span>
       </div>
 
       {showButton && (
