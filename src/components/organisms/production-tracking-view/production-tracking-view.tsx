@@ -44,14 +44,10 @@ export function ProductionTrackingView({
       ? Math.min(100, Math.round((unitsReady / totalExpected) * 100))
       : 0;
 
-  const botFlowComplete =
-    order.botState === "COMPLETED" &&
-    !!order.progress?.corteIniciado &&
-    !!order.progress?.costuraIniciada &&
-    !!order.progress?.fechaProyectadaFin;
-
   const isReadyForQuality =
-    order.status === "CONTROL_CALIDAD" || botFlowComplete;
+    order.status === "CONTROL_CALIDAD" ||
+    order.status === "COMPLETADA" ||
+    order.botState === "COMPLETED";
 
   const orderCode =
     order.order_number || order.pre_order_number || "Orden sin numero";
@@ -170,7 +166,12 @@ export function ProductionTrackingView({
 
               <InfoRow
                 label="Proyeccion de fin"
-                value={order.progress?.fechaProyectadaFin || "Pendiente"}
+                value={
+                  order.progress?.fechaProyectadaFin ||
+                  (order.botState === "COMPLETED"
+                    ? new Date().toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })
+                    : "Pendiente")
+                }
               />
             </div>
 
