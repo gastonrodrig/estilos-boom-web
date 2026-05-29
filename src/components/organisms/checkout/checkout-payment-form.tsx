@@ -220,21 +220,25 @@ const CheckoutPaymentForm: React.FC = () => {
                 ✨ Guía para {qrMethod === 'yape' ? 'Yapear' : 'Plinear'} correctamente
               </h3>
             </div>
-            <div className="p-4 flex justify-center bg-white">
+            <div className="p-4 bg-white">
               <div 
-                className="relative w-full max-w-lg flex items-center justify-center cursor-pointer group"
+                className="relative w-full h-[250px] overflow-hidden rounded-lg border border-gray-100 cursor-pointer group shadow-sm bg-gray-50"
                 onClick={() => setIsImageModalOpen(true)}
               >
                 <Image 
-                  src="/assets/GuiaYapear.png" 
+                  src="/assets/GuiaYapearV2.png" 
                   alt="Guía paso a paso" 
-                  width={500} 
-                  height={800} 
-                  className="w-full h-auto rounded-lg shadow-sm border border-gray-100 object-contain group-hover:opacity-90 transition-opacity"
+                  width={600} 
+                  height={1200} 
+                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 rounded-lg">
-                  <span className="bg-white/90 text-[#594246] px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
-                    Ampliar imagen
+                
+                {/* Degradado blanco en la parte inferior para dar a entender que sigue */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                  <span className="bg-white text-[#594246] px-5 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                    Ampliar guía completa
                   </span>
                 </div>
               </div>
@@ -361,24 +365,26 @@ const CheckoutPaymentForm: React.FC = () => {
       {/* 🖼️ MODAL DE IMAGEN AMPLIADA */}
       {isImageModalOpen && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[100] overflow-y-auto bg-black/90 backdrop-blur-sm p-2 sm:p-8 animate-in fade-in duration-200"
           onClick={() => setIsImageModalOpen(false)}
         >
-          <div className="relative max-w-3xl w-full h-auto max-h-[90vh] flex flex-col items-center">
-            <button 
-              onClick={() => setIsImageModalOpen(false)}
-              className="absolute -top-10 right-0 md:-right-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
-            >
-              <X size={20} />
-            </button>
-            <Image 
-              src="/assets/GuiaYapear.png" 
-              alt="Guía paso a paso Ampliada" 
-              width={1000} 
-              height={1600} 
-              className="w-full h-auto max-h-[90vh] object-contain rounded-lg shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
+          <div className="min-h-full flex items-center justify-center py-10">
+            <div className="relative w-full max-w-[1400px] flex flex-col items-center">
+              <button 
+                onClick={() => setIsImageModalOpen(false)}
+                className="absolute -top-12 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors z-10"
+              >
+                <X size={24} />
+              </button>
+              <Image 
+                src="/assets/GuiaYapearV2.png" 
+                alt="Guía paso a paso Ampliada" 
+                width={2500} 
+                height={2500} 
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           </div>
         </div>
       )}
