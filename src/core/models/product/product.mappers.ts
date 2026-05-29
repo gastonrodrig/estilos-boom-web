@@ -29,6 +29,8 @@ type ApiProduct = {
   id_category?: string;
   category?: ApiCategory;
   variants?: ApiVariant[];
+  origin_type?: 'RETAIL' | 'PRODUCCION';
+  technical_sheet?: { id_supply: string; quantity: number }[];
   created_at?: string;
   updated_at?: string;
 };
@@ -36,7 +38,7 @@ type ApiProduct = {
 const mapVariant = (variant: ApiVariant): ProductVariant => ({
   id_variant: variant.id_variant ?? variant._id ?? "",
   size: variant.size ?? "",
-  color: variant.color ?? "",
+  color: (variant.color as any) ?? "",
   stock: Number(variant.stock ?? 0),
   sku_variant: variant.sku_variant ?? "",
 });
@@ -53,6 +55,9 @@ export const mapApiProductToModel = (apiProduct: ApiProduct): Product => ({
   images: Array.isArray(apiProduct.images) ? apiProduct.images : [],
   id_category: apiProduct.id_category ?? apiProduct.category?._id ?? "",
   category: apiProduct.category?.name ? { name: apiProduct.category.name } : undefined,
+  gender: 'MUJER', // fallback básico
+  origin_type: apiProduct.origin_type ?? 'RETAIL',
+  technical_sheet: apiProduct.technical_sheet ?? [],
   variants: Array.isArray(apiProduct.variants) ? apiProduct.variants.map(mapVariant) : [],
   created_at: apiProduct.created_at,
   updated_at: apiProduct.updated_at,
