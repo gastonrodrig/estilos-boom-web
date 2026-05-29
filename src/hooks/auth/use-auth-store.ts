@@ -89,7 +89,6 @@ export const useAuthStore = () => {
         uid: user.auth_id,
         email: user.email,
         role: user.role,
-        permissions: user.permissions,
         userStatus: user.status,
 
         firstName: user.client?.first_name ?? user.first_name ?? null,

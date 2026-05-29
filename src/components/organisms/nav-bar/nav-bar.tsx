@@ -59,7 +59,7 @@ export const Navbar = ({
   const isStorekeeperRoute = pathname.startsWith("/storekeeper");
   const isBackofficeRoute = isAdminRoute || isStorekeeperRoute;
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { status, role, onLogout, permissions } = useAuthStore();
+  const { status, role, onLogout } = useAuthStore();
   const { loadCart, items } = useCartStore();
   const cartItemsCount = useMemo(
     () => items.reduce((acc, item) => acc + item.quantity, 0),
