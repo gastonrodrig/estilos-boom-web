@@ -52,13 +52,13 @@ export const Footer = () => {
             <h3 className="text-sm font-bold text-[#632034] uppercase tracking-wider mb-6">Explorar</h3>
             <ul className="space-y-4 text-sm font-medium">
               <li>
-                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Nueva Colección</Link>
+                <Link href="/catalogue/new-in" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Nueva Colección</Link>
               </li>
               <li>
-                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Lo Más Vendido</Link>
+                <Link href="/catalogue/best-seller" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Lo Más Vendido</Link>
               </li>
               <li>
-                <Link href="/catalogue" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Vestidos</Link>
+                <Link href="/catalogue/dresses" className="text-[#594246]/80 hover:text-[#632034] transition-colors">Vestidos</Link>
               </li>
             </ul>
           </div>

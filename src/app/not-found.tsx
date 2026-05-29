@@ -162,7 +162,7 @@ export default function NotFound() {
             <div className="flex flex-wrap gap-3 justify-center">
               {!isClientRoute && (
                 <Link
-                  href="/catalog"
+                  href="/catalogue/new-in"
                   className="text-[#F2778D] hover:text-[#F391A3] text-sm font-medium underline"
                 >
                   Productos
