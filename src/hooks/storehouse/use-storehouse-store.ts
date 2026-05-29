@@ -374,35 +374,38 @@ const startInitalQualityCheck = useCallback(async (purchaseOrderId: string, preO
    * PATCH /purchase-orders/:id/approve
    */
  // En useStorehouseStore.ts
-const approveInventory = useCallback(async (id: string, rating: number) => {
-  return await executeRequest(async () => {
-    const config = await getConfig();
-    
-    const { data } = await storehouseApi.patch(
-      `/purchase-orders/${id}/approve`, 
-      { quality_rating: rating }, 
-      config
-    );
+const approveInventory = useCallback(async (
+    id: string, 
+    rating: number, 
+    auditNotes?: string,
+    incidencesQty?: number // 👈 Enviamos las unidades dañadas/faltantes encontradas en la inspección
+  ) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      
+      const payload = { 
+        quality_rating: rating,
+        observations: auditNotes || "Sin observaciones adicionales.",
+        qty_incidences: incidencesQty || 0 // 👈 Mapea el campo extra para el Kardex
+      };
+      
+      const { data } = await storehouseApi.patch(`/purchase-orders/${id}/approve`, payload, config);
 
-    // ✅ DEBUG: Imprime qué está llegando realmente
-    console.log("Respuesta de approve:", data);
+      console.log("Respuesta de consolidación de inventario:", data);
 
-    // ✅ VALIDACIÓN DEFENSIVA: Solo hacer dispatch si el objeto existe
-    if (data && data.prePurchaseOrder) {
-        dispatch(onUpdatePreOrder(data.prePurchaseOrder));
-    } else {
-        // Si el back no mandó la data, recargamos toda la lista como plan B
-        console.warn("Backend no devolvió prePurchaseOrder. Recargando la lista...");
-        await startLoadingPrePurchaseOrders();
-    }
-    
-    // Refrescamos los movimientos para ver la entrada en el Kardex
-    await startLoadingInventoryMovements();
+      if (data && data.prePurchaseOrder) {
+          dispatch(onUpdatePreOrder(data.prePurchaseOrder));
+      } else {
+          await startLoadingPrePurchaseOrders();
+      }
+      
+      // Refrescamos automáticamente los movimientos globales para ver el nuevo Kardex
+      await startLoadingInventoryMovements();
 
-    toast.success("¡Mercadería ingresada al inventario con éxito!");
-    return true;
-  }, "Error al procesar el ingreso de mercadería.");
-}, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements, startLoadingPrePurchaseOrders]);
+      toast.success("¡Control de calidad cerrado. Mercadería integrada al stock!");
+      return true;
+    }, "Error al procesar el ingreso de mercadería.");
+  }, [dispatch, executeRequest, getConfig, startLoadingInventoryMovements, startLoadingPrePurchaseOrders]);
 
     const completedOrders = useMemo(() => {
       return purchaseOrders.filter(order => order.status === 'COMPLETADA');

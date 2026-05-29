@@ -67,6 +67,28 @@ export default function AdminTransfersPage() {
 
   const handleProcessReception = async (transfer: any) => {
     const currentWorkerId = "65f1c2b3e4b0123456789abc";
+
+    // 🛡️ EXTRACCIÓN PROTEGIDA: Si es un objeto por el populate, extrae su ._id; si no, usa el string directo
+    const sourceWarehouseId = typeof transfer.id_source_warehouse === 'object' 
+      ? transfer.id_source_warehouse?._id 
+      : transfer.id_source_warehouse;
+
+    const targetWarehouseId = typeof transfer.id_target_warehouse === 'object' 
+      ? transfer.id_target_warehouse?._id 
+      : transfer.id_target_warehouse;
+
+    console.log("=================== PAYLOAD CORREGIDO EN CLIENTE ===================");
+    console.log("ID Transferencia:", transfer._id);
+    console.log("ID Almacén Origen extraído:", sourceWarehouseId);
+    console.log("ID Almacén Destino extraído:", targetWarehouseId);
+    console.log("====================================================================");
+
+    // Validamos de forma estricta antes de disparar la petición HTTP
+    if (!sourceWarehouseId || !targetWarehouseId) {
+      toast.error("Error crítico: Los identificadores de los almacenes no son válidos.");
+      return;
+    }
+
     if (window.confirm(`¿Confirmas la recepción física del traslado ${transfer.code} en Tienda Principal?`)) {
       const success = await startCompleteTransfer(transfer._id, currentWorkerId);
       if (success) {
@@ -138,14 +160,22 @@ export default function AdminTransfersPage() {
     doc.setFont("helvetica", "bold");
     doc.text("DETALLE DE LAS PRENDAS:", 15, 115);
 
-    const tableRows = (transfer.items || []).map((item: any, i: number) => [
-      i + 1,
-      item.variant?.sku_variant || `SKU-${i}`,
-      item.variant?.name || "Prenda Estilos Boom",
-      `${item.variant?.size || "M"} - ${item.variant?.color?.name || "Varios"}`,
-      item.quantity,
-      "Unidades"
-    ]);
+    const tableRows = (transfer.items || []).map((item: any, i: number) => {
+      // Accedemos de forma segura al objeto variante poblado
+      const variant = item.id_variant;
+      const productName = variant?.id_product?.name || "Prenda Estilos Boom";
+      const sku = variant?.sku_variant || `SKU-${i}`;
+      const sizeColor = `${variant?.size || "M"} - ${variant?.color?.name || "Varios"}`;
+
+      return [
+        i + 1,
+        sku,
+        productName,
+        sizeColor,
+        item.quantity,
+        "Unidades"
+      ];
+    });
 
     autoTable(doc, {
       startY: 120,

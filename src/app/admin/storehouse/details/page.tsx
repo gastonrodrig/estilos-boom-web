@@ -40,13 +40,13 @@ const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating
 };
 
 export default function PrePurchaseOrderTracking() {
-  const { startLoadingPrePurchaseOrders, prePurchaseOrders } = useStorehouseStore();
+  const { startLoadingPrePurchaseOrders, prePurchaseOrders,loading } = useStorehouseStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     startLoadingPrePurchaseOrders('ABASTECIMIENTO');
-	console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
+        console.log("PrePurchaseOrders cargadas:", prePurchaseOrders);
   }, [startLoadingPrePurchaseOrders]);
 
   const isDeliveryToday = (opp: any) => {
@@ -213,12 +213,21 @@ function OPPCard({ opp }: { opp: any }) {
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  
-  const { startUpdateSupplierQuote, startSelectWinnerAndConvert,approveInventory, extendOCDate } = useStorehouseStore();
+
+  const { startUpdateSupplierQuote, startSelectWinnerAndConvert, approveInventory, extendOCDate, loading } = useStorehouseStore();
   const { startInitalQualityCheck } = useStorehouseStore();
+
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
     ? opp.id_purchase_order?._id 
     : opp.id_purchase_order;
+
+  // 🚀 CORRECCIÓN AQUÍ: Usamos 'opp' que es la prop real de tu tarjeta
+  // Sumamos las cantidades ordenadas guardadas en los items de la OC
+  const totalItemsInOrder = useMemo(() => {
+    return opp.id_purchase_order?.items?.reduce(
+      (acc: number, item: any) => acc + item.quantity, 0
+    ) || 0;
+  }, [opp.id_purchase_order?.items]);
 
   const firstItem = opp.base_items?.[0]?.id_variant?.id_product;
     const handleApprove = async (rating: number) => {
@@ -236,6 +245,7 @@ function OPPCard({ opp }: { opp: any }) {
   if (opp.status === "COMPARANDO") return 25; 
   return 10;
 };
+
 	const selectedQuote = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
   const totalAmount = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')?.total_amount || 0;
 
@@ -549,11 +559,17 @@ function OPPCard({ opp }: { opp: any }) {
 			setIsWinnerModalOpen(false);
 		}}
 		/>
+    
     <ApproveInventoryModal 
       isOpen={isApproveModalOpen}
       onClose={() => setIsApproveModalOpen(false)}
-      onConfirm={handleApprove}
-      isLoading={false}
+      // 🚀 CONEXIÓN REFACTORIZADA: Pasa el rating, las notas y las incidencias de forma ordenada
+      onConfirm={async (rating, notes, incidences) => {
+        await approveInventory(purchaseOrderId, rating, notes, incidences);
+        setIsApproveModalOpen(false);
+      }}
+      maxQuantity={totalItemsInOrder}
+      isLoading={loading}
       agentName={selectedQuote?.id_agent?.name_company || selectedQuote?.id_agent?.name}
     />
     
@@ -697,14 +713,14 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
                   </div>
                   <div>
                     <p className="font-bold text-[#594246]">{agentName}</p>
-                    <p className="text-xs text-[#9b8088] flex items-center gap-2">
+                    <div className="text-xs text-[#9b8088] flex items-center gap-2">
                       Ranking Score: 
                       <span className="text-[#F2778D] font-bold">
                         {(q.ranking_score * 100).toFixed(0)}/100
                       </span>
                       <span className="text-[#ede8e9]">|</span>
                       <StarRating rating={q.id_agent?.rating || 5} size={3} />
-                    </p>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">

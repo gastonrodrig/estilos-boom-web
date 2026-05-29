@@ -25,12 +25,29 @@ export default function StockActualPage() {
 
   useEffect(() => {
     const initData = async () => {
-      // ✅ SOLUCIÓN: Pásale un objeto vacío para satisfacer el argumento requerido
       await startLoadingProducts({}); 
       await startLoadingSupplies();
     };
     initData();
   }, [startLoadingProducts, startLoadingSupplies]);
+
+  // 2. 🤖 Efecto de mapeo: Setea los stocks del catálogo apenas 'products' cambie
+  useEffect(() => {
+    if (products && Array.isArray(products) && products.length > 0) {
+      const initialStocks: Record<string, { almacen: number; tienda: number }> = {};
+      
+      products.forEach((prod: any) => {
+        prod.variants?.forEach((v: any) => {
+          initialStocks[v._id] = {
+            almacen: v.physical_stock || v.stock || 0, // Fallback automático de Mongoose
+            tienda: 0 // Inicia en cero para el módulo de transferencias
+          };
+        });
+      });
+
+      setStocksByVariant(initialStocks);
+    }
+  }, [products]); // 👈 Escucha reactivamente al estado global de Redux
 
   // Al expandir un producto, cargamos en caliente la distribución de stock de sus variantes de la BD
   const toggleExpandProduct = async (productId: string, productVariants: any[]) => {
@@ -147,13 +164,13 @@ export default function StockActualPage() {
                 // 🧮 CÁLCULO PREVENTIVO: Evaluamos con el ID correcto
                 const hasLoadedAnyVariant = prod.variants?.some((v: any) => stocksByVariant[v._id] !== undefined);
                 
-                const totalAlmacen = hasLoadedAnyVariant
-                  ? prod.variants?.reduce((acc: number, v: any) => acc + (stocksByVariant[v._id]?.almacen || 0), 0)
-                  : null;
+                const totalAlmacen = prod.variants?.reduce(
+                  (acc: number, v: any) => acc + (stocksByVariant[v._id]?.almacen || 0), 0
+                ) ?? 0;
 
-                const totalTienda = hasLoadedAnyVariant
-                  ? prod.variants?.reduce((acc: number, v: any) => acc + (stocksByVariant[v._id]?.tienda || 0), 0)
-                  : null;
+                const totalTienda = prod.variants?.reduce(
+                  (acc: number, v: any) => acc + (stocksByVariant[v._id]?.tienda || 0), 0
+                ) ?? 0;
 
                 return (
                   <Fragment key={productKey}>
@@ -179,10 +196,12 @@ export default function StockActualPage() {
                         </div>
                       </td>
                       <td className="p-4 text-center font-bold text-lg text-gray-700">
-                        {totalAlmacen !== null ? totalAlmacen : <span className="text-xs font-normal text-gray-300">⚡ Cargar</span>}
+                        {totalAlmacen}
                       </td>
+                      
+                      {/* CELDA TOTAL TIENDA */}
                       <td className="p-4 text-center font-bold text-lg text-rose-400">
-                        {totalTienda !== null ? totalTienda : <span className="text-xs font-normal text-gray-300">⚡ Cargar</span>}
+                        {totalTienda}
                       </td>
                       <td className="p-4 text-center">
                         <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase border border-emerald-100">
