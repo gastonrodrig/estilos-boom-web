@@ -25,7 +25,7 @@ const iconMap = {
 
 export function ClientSidebar({ items, hasTopBar = false }: ClientSidebarProps) {
     const pathname = usePathname();
-    const { permissions } = useAuthStore();
+    const { role } = useAuthStore();
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
     const [showSidebar, setShowSidebar] = useState(() => {
         if (typeof window === "undefined") return false;
@@ -60,7 +60,7 @@ export function ClientSidebar({ items, hasTopBar = false }: ClientSidebarProps) 
     }, []);
 
     const renderItem = (item: ClientModule, depth = 0) => {
-        if (item.requiredPermission && !permissions.includes(item.requiredPermission)) {
+        if (item.requiredRoles && role && !item.requiredRoles.includes(role)) {
             return null;
         }
 
@@ -71,7 +71,7 @@ export function ClientSidebar({ items, hasTopBar = false }: ClientSidebarProps) 
 
         const isOpen = openSections[item.label] ?? hasActiveChild;
 
-        const filteredChildren = item.children?.filter(child => !child.requiredPermission || permissions.includes(child.requiredPermission));
+        const filteredChildren = item.children?.filter(child => !child.requiredRoles || (role && child.requiredRoles.includes(role)));
         const hasVisibleChildren = filteredChildren && filteredChildren.length > 0;
 
         if (hasVisibleChildren) {

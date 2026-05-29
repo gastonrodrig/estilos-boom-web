@@ -3,7 +3,7 @@ export type StorekeeperModule = {
   href?: string;
   icon?: string;
   highlighted?: boolean;
-  requiredPermission?: string;
+  requiredRoles?: string[];
   children?: StorekeeperModule[];
 };
 
@@ -17,6 +17,6 @@ export const storekeeperModules: StorekeeperModule[] = [
     label: "Almacén",
     href: "/storekeeper/inventory",
     icon: "inventory",
-    requiredPermission: "products_inventory:view",
+    requiredRoles: ["Almacenero"],
   }
 ];

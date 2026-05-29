@@ -3,14 +3,14 @@
 export interface ClientModuleChild {
   label: string;
   href: string;
-  requiredPermission?: string;
+  requiredRoles?: string[];
 }
 
 export interface ClientModule {
   label: string;
   href?: string;
   icon?: string;
-  requiredPermission?: string;
+  requiredRoles?: string[];
   children?: ClientModuleChild[];
 }
 
@@ -19,7 +19,7 @@ export const clientModules: ClientModule[] = [
     label: "Inicio",
     href: "/client",
     icon: "home",
-    requiredPermission: "dashboard:view",
+    requiredRoles: ["Cliente"],
   },
   {
     label: "Mis Pedidos",

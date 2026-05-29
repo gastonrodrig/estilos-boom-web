@@ -135,14 +135,13 @@ export const Navbar = ({
 
   const drawerItems: NavDrawerItem[] = isAdminRoute
   ? adminModules
-      // 1. Filtramos los módulos principales
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
         href: item.href || "",
         // 2. Filtramos también los hijos de cada módulo
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
             href: child.href || "",
@@ -151,12 +150,12 @@ export const Navbar = ({
 
   : isStorekeeperRoute
   ? storekeeperModules
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
         href: item.href || "",
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
             href: child.href || "",
@@ -165,12 +164,12 @@ export const Navbar = ({
 
   : isClientRoute
   ? clientModules
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
         href: item.href || "",
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
             href: child.href || "",
@@ -352,9 +351,9 @@ export const Navbar = ({
                       className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl text-[#364152] md:mt-3 md:w-60 md:rounded-2xl"
                     >
                       <div className="py-1.5 md:py-2">
-                        {userMenuItems.map(({ label, href, icon, requiredPermission }) => {
+                        {userMenuItems.map(({ label, href, icon, requiredRoles }) => {
                           // VALIDACIÓN NUEVA:
-                          if (requiredPermission && !permissions.includes(requiredPermission)) return null;
+                          if (requiredRoles && role && !requiredRoles.includes(role)) return null;
                           const ItemIcon = userMenuIconMap[icon];
 
                           return (
