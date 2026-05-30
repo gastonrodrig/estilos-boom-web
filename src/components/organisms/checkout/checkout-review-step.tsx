@@ -2,105 +2,29 @@
 
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useCheckoutStore } from '@/hooks/extra';
-import { useClientPersonStore } from '@/hooks'; // 👈 Importamos el store
+import { useCheckoutStore, useOrderSubmission } from '@/hooks/extra';
 import { CheckoutFormValues } from '@/core/models/checkout';
-import { useAppSelector } from '@/store';
 import { AddressInput } from '@models';
 import { Loader2 } from 'lucide-react';
 
 const CheckoutReviewStep: React.FC = () => {
   const { handleGoToPayment } = useCheckoutStore();
-  const { startLoadingMyAddresses } = useClientPersonStore(); // 👈 Usamos la función
-
   const { watch } = useFormContext<CheckoutFormValues>();
-  const formData = watch(); 
-  
-  const { status, firstName, lastName } = useAppSelector((state) => state.auth);
-  const isAuthenticated = status === 'authenticated';
+  const formData = watch();
 
-  const [savedAddresses, setSavedAddresses] = useState<AddressInput[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    submitOrder,
+    isLoadingAddresses,
+    displayFirstName,
+    displayLastName,
+    displayAddress,
+    displayDistrict,
+    displayDepartment,
+  } = useOrderSubmission();
 
-  // 🚀 FETCH LIMPIO
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchAddresses = async () => {
-        setIsLoading(true);
-        const data = await startLoadingMyAddresses(); // ✨ Magia
-        setSavedAddresses(data);
-        setIsLoading(false);
-      };
-      fetchAddresses();
-    }
-  }, [isAuthenticated]);
-
-  // Lógica de visualización cruzada
-  const displayFirstName = isAuthenticated && firstName ? firstName : formData.firstName;
-  const displayLastName = isAuthenticated && lastName ? lastName : formData.lastName;
-
-  let displayAddress = formData.address || "";
-  let displayDistrict = formData.district || "";
-  let displayDepartment = formData.department || "";
-
-  if (isAuthenticated && savedAddresses.length > 0 && formData.selectedAddressId !== undefined) {
-    const activeAddr = savedAddresses[Number(formData.selectedAddressId)];
-    if (activeAddr) {
-      displayAddress = activeAddr.address_line || "";
-      displayDistrict = activeAddr.district || "";
-      displayDepartment = activeAddr.department || "";
-    }
-  }
-
-  const onSubmitOrder = () => {
-    // 🏗️ CONSTRUCCIÓN DEL PAYLOAD FINAL
-    // Este es el objeto que viajará a tu API en NestJS
-    const orderPayload = {
-      // Datos del Cliente
-      customer: {
-        firstName: displayFirstName,
-        lastName: displayLastName,
-        email: formData.email,
-        phone: formData.phone,
-        isAuthenticated: isAuthenticated,
-        
-      },
-      // Datos de Envío (Consolidados)
-      shipping: {
-        address: displayAddress,
-        district: displayDistrict,
-        department: displayDepartment,
-        postalCode: formData.postalCode || null,
-        method: formData.selectedDeliveryMethod?.id,
-        shippingCost: formData.selectedDeliveryMethod?.price,
-      },
-      // Datos de Pago
-      payment: {
-        method: formData.paymentMethod,
-        billingSameAsShipping: formData.billingSameAsShipping,
-        // Si el pago es con tarjeta, aquí irían los tokens (no los datos planos por seguridad)
-      },
-      // Metadata
-      wantsNewsletter: formData.wantsNews,
-      createdAt: new Date().toISOString(),
-    };
-
-    console.log("🚀 PREPARANDO ENVÍO A ESTILOS BOOM...");
-    
-    // 1. Log en tabla para lectura rápida
-    console.table({
-      "👤 Cliente": `${orderPayload.customer.firstName} ${orderPayload.customer.lastName}`,
-      "📍 Destino": `${orderPayload.shipping.address} (${orderPayload.shipping.district})`,
-      "🚚 Método": orderPayload.shipping.method,
-      "💰 Total Envío": `S/ ${orderPayload.shipping.shippingCost}`,
-      "💳 Pago": orderPayload.payment.method
-    });
-
-    // 2. Log del JSON REAL (Lo que copiarías a Postman para probar el backend)
-    console.log("📦 PAYLOAD FINAL PARA API:", orderPayload);
-
+  const onSubmitOrder = async () => {
+    const success = await submitOrder();
     // 🔴 PRÓXIMO PASO:
-    // const success = await startCreatingOrder(orderPayload);
     // if(success) router.push('/checkout/success');
   };
 
@@ -119,7 +43,7 @@ const CheckoutReviewStep: React.FC = () => {
             <button className="text-[#F2778D] text-xs underline">Editar</button>
           </div>
           
-          {isLoading ? (
+          {isLoadingAddresses ? (
              <div className="flex items-center gap-2 py-2">
                <Loader2 size={14} className="animate-spin text-[#F2778D]" />
                <span className="text-xs text-gray-400">Cargando datos...</span>
@@ -157,7 +81,7 @@ const CheckoutReviewStep: React.FC = () => {
         
         <button
           onClick={onSubmitOrder}
-          disabled={isLoading}
+          disabled={isLoadingAddresses}
           className="w-full md:w-2/3 py-5 bg-[#F2778D] text-white rounded-full font-bold text-lg hover:bg-[#F2778D]/90 shadow-lg transition-all active:scale-95 disabled:opacity-50"
         >
           Finalizar Compra y Pagar

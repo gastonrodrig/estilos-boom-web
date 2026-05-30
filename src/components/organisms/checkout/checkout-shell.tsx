@@ -8,7 +8,7 @@ import { CheckoutStepper } from '@/components/molecules';
 
 const CheckoutShell: React.FC = () => {
 
-  
+
   const { currentStep } = useCheckoutStore();
 
   const stepMap: Record<string, number> = {
@@ -20,7 +20,7 @@ const CheckoutShell: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full">
-      
+
       {/* 3. Colocamos el Stepper aquí arriba para que siempre sea visible */}
       <div className="mb-5 mt-0 pt-0">
         <CheckoutStepper currentStep={stepMap[currentStep]} />
