@@ -103,15 +103,15 @@ export const Navbar = ({
 
   const bgClass = isHome
     ? scrolled
-      ? "bg-[#FAF9F6]/95 dark:bg-[#3A242A]/95 dark:border-b dark:border-[#4A2633]"
+      ? "bg-[#FAF9F6]/95 dark:bg-[#FDFBFB]/95 dark:border-b dark:border-black/5 border-black/5"
       : "bg-transparent"
-    : "bg-[#FAF9F6]/95 dark:bg-[#3A242A]/95 dark:border-b dark:border-[#4A2633]";
+    : "bg-[#FAF9F6]/95 dark:bg-[#FDFBFB]/95 dark:border-b dark:border-black/5 border-b border-black/5";
 
   const textClass = isHome
     ? scrolled
-      ? "text-[#594246] dark:text-gray-200"
+      ? "text-[#594246] dark:text-[#594246]"
       : "text-white"
-    : "text-[#594246] dark:text-gray-200";
+    : "text-[#594246] dark:text-[#594246]";
 
   const isActive = (href: string) => pathname === href;
 
