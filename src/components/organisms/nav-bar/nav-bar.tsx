@@ -23,6 +23,7 @@ import { SearchDrawer } from "../search-drawer";
 import { NavDrawer, NavDrawerItem } from "../nav-drawer";
 import { CheckoutDrawer } from "../checkout-drawer";
 import { useCartStore } from "@/hooks/cart/use-cart-store";
+import { ThemeSwitcher } from "../theme-switcher/theme-switcher";
 
 interface NavbarProps {
   isHome?: boolean;
@@ -102,15 +103,15 @@ export const Navbar = ({
 
   const bgClass = isHome
     ? scrolled
-      ? "bg-[#FAF9F6]/95"
+      ? "bg-[#FAF9F6]/95 dark:bg-[#3A242A]/95 dark:border-b dark:border-[#4A2633]"
       : "bg-transparent"
-    : "bg-[#FAF9F6]/95";
+    : "bg-[#FAF9F6]/95 dark:bg-[#3A242A]/95 dark:border-b dark:border-[#4A2633]";
 
   const textClass = isHome
     ? scrolled
-      ? "text-[#594246]"
+      ? "text-[#594246] dark:text-gray-200"
       : "text-white"
-    : "text-[#594246]";
+    : "text-[#594246] dark:text-gray-200";
 
   const isActive = (href: string) => pathname === href;
 
@@ -295,6 +296,13 @@ export const Navbar = ({
                 >
                   <Search className={iconClass} />
                 </button>
+              )}
+
+              {/* Theme Switcher Button (only for admin/backoffice for now) */}
+              {isBackofficeRole && (
+                <div className="flex items-center justify-center mr-1">
+                  <ThemeSwitcher />
+                </div>
               )}
 
               <div className="relative" ref={userMenuRef}>

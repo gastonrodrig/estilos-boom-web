@@ -86,23 +86,13 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
-    label: "Gestionar Ordenes",
+    label: "Órdenes de Venta",
     icon: "shopping-bag",
     requiredPermission: "orders:view",
     children: [
       {
-        label: "Recientes",
-        href: "/admin/recents",
-        requiredPermission: "orders:view",
-      },
-      {
-        label: "En Progreso",
-        href: "/admin/orders/in-progress",
-        requiredPermission: "orders:view",
-      },
-      {
-        label: "Finalizadas",
-        href: "/admin/orders/finished",
+        label: "Órdenes de Venta",
+        href: "/admin/orders/history",
         requiredPermission: "orders:view",
       },
     ],
@@ -199,5 +189,27 @@ export const adminModules: SidebarModule[] = [
     label: "Usuarios y Roles",
     href: "/admin/users-roles",
     icon: "users",
+  },
+  {
+    label: "Gestionar Movimientos",
+    icon: "arrow-right-left",
+    children: [
+      {
+        label: "Panel General",
+        href: "/admin/warehouse/dashboard",
+      },
+      {
+        label: "Recepciones",
+        href: "/admin/warehouse/receptions",
+      },
+      {
+        label: "Movimientos de productos",
+        href: "/admin/warehouse/transfers",
+      },
+      {
+        label: "Historial",
+        href: "/admin/warehouse/history",
+      },
+    ],
   },
 ];
