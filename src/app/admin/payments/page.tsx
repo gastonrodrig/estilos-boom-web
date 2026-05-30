@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CreditCard, AlertTriangle, CheckCircle2, XCircle, Info } from "lucide-react";
 import { usePaymentStore } from "@hooks";
-import { PaymentRowState, YapeFormatStatus, PaymentStatus } from "@models";
+import { PaymentRowState, YapeFormatStatus, PaymentStatus, Payment } from "@models";
+import { PaymentDetailModal } from "@/components/features/admin/payments/payment-detail-modal";
 
 // ─── Stat card ───────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ interface PaymentRowProps {
   isOdd: boolean;
   onConfirm: (id: string) => Promise<boolean>;
   onReject: (id: string) => Promise<boolean>;
+  onViewDetail: (payment: Payment) => void;
   isActioning: boolean;
 }
 
@@ -100,6 +102,7 @@ function PaymentTableRow({
   isOdd,
   onConfirm,
   onReject,
+  onViewDetail,
   isActioning,
 }: PaymentRowProps) {
   const { payment, formatStatus, canConfirm } = row;
@@ -147,7 +150,7 @@ function PaymentTableRow({
             </>
           ) : (
             <button
-              onClick={() => alert(`Detalle del pago ${payment.operationNumber}`)}
+              onClick={() => onViewDetail(payment)}
               className="rounded-full border border-gray-300 bg-white px-4 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
             >
               Ver detalle
@@ -158,6 +161,62 @@ function PaymentTableRow({
     </tr>
   );
 }
+
+// ─── Mocks temporales ───────────────────────────────────────────────────────────
+// TODO: eliminar mocks cuando admin-payments devuelva datos reales desde MongoDB.
+const mockPaymentRows: PaymentRowState[] = [
+  {
+    payment: {
+      id: "mock-1",
+      orderNumber: "EB-0038",
+      idClient: "cli-1",
+      clientName: "Ana Flores",
+      method: "Yape",
+      amount: 55.00,
+      operationNumber: "20250523001234",
+      status: PaymentStatus.PENDIENTE,
+      transactionType: "MANUAL",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    formatStatus: "format_ok",
+    canConfirm: true,
+  },
+  {
+    payment: {
+      id: "mock-2",
+      orderNumber: "EB-0039",
+      idClient: "cli-2",
+      clientName: "Rosa Huanca",
+      method: "Transferencia Bancaria",
+      amount: 120.00,
+      operationNumber: "20250522009871",
+      status: PaymentStatus.PENDIENTE,
+      transactionType: "MANUAL",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    formatStatus: "format_ok",
+    canConfirm: true,
+  },
+  {
+    payment: {
+      id: "mock-3",
+      orderNumber: "EB-0040",
+      idClient: "cli-3",
+      clientName: "María Quispe",
+      method: "Mercado Pago",
+      amount: 89.00,
+      operationNumber: "MP-123456789",
+      status: PaymentStatus.VERIFICADO,
+      transactionType: "MERCADO_PAGO",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    formatStatus: "format_ok",
+    canConfirm: false,
+  }
+];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -171,9 +230,24 @@ export default function AdminPaymentsPage() {
     startRejectPayment,
   } = usePaymentStore();
 
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
   useEffect(() => {
     void startLoadingPayments();
   }, [startLoadingPayments]);
+
+  const handleOpenDetail = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDetailOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailOpen(false);
+    setSelectedPayment(null);
+  };
+
+  const displayRows = paymentRows.length > 0 ? paymentRows : mockPaymentRows;
 
   return (
     <div className="space-y-6 p-6">
@@ -248,23 +322,24 @@ export default function AdminPaymentsPage() {
                     ))}
                   </tr>
                 ))
-              ) : paymentRows.length === 0 ? (
+              ) : displayRows.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-6 py-12 text-center text-sm text-gray-400"
                   >
                     Sin pagos pendientes de verificación.
                   </td>
                 </tr>
               ) : (
-                paymentRows.map((row, idx) => (
+                displayRows.map((row, idx) => (
                   <PaymentTableRow
                     key={row.payment.id}
                     row={row}
                     isOdd={idx % 2 !== 0}
                     onConfirm={startConfirmPayment}
                     onReject={startRejectPayment}
+                    onViewDetail={handleOpenDetail}
                     isActioning={loading}
                   />
                 ))
@@ -282,6 +357,12 @@ export default function AdminPaymentsPage() {
           </p>
         </div>
       </div>
+
+      <PaymentDetailModal
+        open={isDetailOpen}
+        payment={selectedPayment}
+        onClose={handleCloseDetail}
+      />
     </div>
   );
 }
