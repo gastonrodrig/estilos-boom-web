@@ -20,7 +20,9 @@ export const ProductCardCatalogue = ({ product }: Props) => {
     textDark: "#594246",
   };
 
-  const uniqueColors = Array.from(new Set(product.variants.map((v) => v.color))).slice(0, 3);
+  const uniqueColors = Array.from(
+    new Set(product.variants.map((v) => typeof v.color === 'string' ? v.color : (v.color?.name || "")))
+  ).filter(Boolean).slice(0, 3);
 
   const getColorHex = (colorName: string) => {
     const colorMap: Record<string, string> = {
@@ -35,124 +37,98 @@ export const ProductCardCatalogue = ({ product }: Props) => {
 
   return (
     <motion.div
-      className="group flex flex-col bg-white rounded-lg overflow-hidden"
+      className="group flex flex-col relative"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ 
-        y: -5,
-        transition: { duration: 0.3 }
-      }}
     >
       {/* Contenedor de Imagen con Efectos */}
-      <div className="relative aspect-3/4 overflow-hidden bg-[#FAF9F6] rounded-sm mb-4">
-        <Link href={`/product/${product.id_product}`}>
+      <div className="relative aspect-3/4 overflow-hidden bg-[#FAF9F6] mb-5">
+        <Link href={`/product/${product.id_product}`} className="block w-full h-full">
           <motion.img
             src={product.images[0] || "/placeholder.jpg"}
             alt={product.name}
             className="w-full h-full object-cover"
-            animate={{ scale: isHovered ? 1.08 : 1 }}
-            transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
+            animate={{ scale: isHovered ? 1.05 : 1 }}
+            transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
           />
 
-          {/* EFECTO DE BRILLO (Shine) */}
+          {/* Overlay oscuro para hover */}
           <motion.div
-            className="pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent z-10"
-            initial={{ x: "-100%", skewX: -20 }}
-            animate={{ x: isHovered ? "200%" : "-100%" }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          />
-
-          {/* Overlay de oscuridad suave */}
-          <motion.div
-            className="absolute inset-0 bg-black/5 z-0"
+            className="absolute inset-0 bg-black/15 z-0"
             animate={{ opacity: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4 }}
           />
+
+          {/* Botón flotante 'Ver Detalle' (Estándar Alta Costura) */}
+          <motion.div
+            className="absolute bottom-6 left-0 right-0 flex justify-center z-30"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <span className="bg-white/95 text-[#632034] px-8 py-3 text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg border border-[#EBEAE8] hover:bg-[#632034] hover:text-[#FAF9F6] transition-colors">
+              Ver Detalle
+            </span>
+          </motion.div>
         </Link>
 
-        {/* Badges dinámicos */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-20">
-          {product.is_new_in && (
-            <motion.span 
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="bg-[#F2778D] text-white text-[9px] px-2 py-1 font-bold uppercase tracking-widest shadow-sm"
-            >
-              Nuevo
-            </motion.span>
-          )}
-          <span className="bg-[#594246]/80 text-white text-[9px] px-2 py-1 font-bold uppercase tracking-widest backdrop-blur-sm">
-            -20%
-          </span>
-        </div>
-
-        {/* Botón Favoritos con escala */}
+        {/* Botón Favoritos dorado */}
         <motion.button 
-          whileHover={{ scale: 1.2 }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="absolute top-3 right-3 bg-white/90 p-2 rounded-full shadow-sm text-[#594246] hover:text-[#F2778D] transition-colors z-20"
+          className="absolute top-3 right-3 bg-white/80 p-2 rounded-full shadow-sm text-[#C5A059] hover:text-[#632034] transition-colors z-20 backdrop-blur-md"
         >
-          <Heart size={16} fill={isHovered ? "currentColor" : "none"} className="transition-all" />
+          <Heart size={16} fill={isHovered ? "currentColor" : "none"} strokeWidth={1.5} className="transition-all" />
         </motion.button>
       </div>
 
-      {/* Información del Producto con Animación de Texto */}
-      <div className="flex flex-col gap-1 px-2 pb-4">
-        <span className="text-gray-400 text-[10px] uppercase tracking-[0.2em] font-medium">
-          {product.category?.name || "Colección"}
-        </span>
+      {/* Información del Producto Limpia */}
+      <div className="flex flex-col gap-1.5 px-1">
+        <div className="flex items-center gap-2">
+          {product.is_new_in && (
+            <span className="text-[#C5A059] text-[9px] uppercase tracking-[0.25em] font-bold">
+              Nuevo •
+            </span>
+          )}
+          <span className="text-[#C5A059] text-[9px] uppercase tracking-[0.25em] font-medium">
+            {product.category?.name || "Colección"}
+          </span>
+        </div>
         
         <Link href={`/product/${product.id_product}`}>
-          <motion.h3 
-            className="text-[#594246] font-light text-[18px] leading-tight tracking-wide line-clamp-1"
-            animate={{ 
-              color: isHovered ? "#000" : "#594246",
-              x: isHovered ? 2 : 0 
-            }}
-          >
+          <h3 className="text-[#594246] font-serif text-[17px] leading-tight tracking-wide line-clamp-1 group-hover:text-[#632034] transition-colors">
             {product.name}
-          </motion.h3>
+          </h3>
         </Link>
 
-        <motion.p 
-          className="font-bold text-sm mt-1"
-          animate={{ 
-            scale: isHovered ? 1.05 : 1,
-            color: isHovered ? "#F2778D" : "#594246" 
-          }}
-          transition={{ duration: 0.2 }}
-        >
-          S/ {product.base_price.toFixed(2)}
-        </motion.p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <p className="text-[#632034] font-medium text-sm tracking-wide">
+            S/ {product.base_price.toFixed(2)}
+          </p>
+          <span className="text-[#594246]/60 text-[10px] font-bold tracking-widest">-20%</span>
+        </div>
 
-        {/* Círculos de Colores con stagger effect */}
-        <div className="flex items-center gap-1.5 mt-3">
+        {/* Círculos de Colores sutiles */}
+        <div className="flex items-center gap-2 mt-2">
           {uniqueColors.map((color, idx) => (
             <motion.span
               key={idx}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: idx * 0.1 }}
-              className="w-3 h-3 rounded-full border border-gray-100 shadow-sm cursor-help"
+              className="w-3.5 h-3.5 rounded-full border border-[#EBEAE8] shadow-sm cursor-help"
               title={color}
               style={{ backgroundColor: getColorHex(color) }}
               whileHover={{ y: -2 }}
             />
           ))}
           {product.variants.length > 3 && (
-            <span className="text-[9px] text-gray-400 ml-1">+{product.variants.length - 3}</span>
+            <span className="text-[10px] text-[#594246]/50 font-medium ml-1">+{product.variants.length - 3}</span>
           )}
         </div>
-
-        <Link
-          href={`/product/${product.id_product}`}
-          className="mt-3 w-full rounded-lg bg-[#F2778D] px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-[#FAF9F6] shadow-sm transition hover:bg-[#F291A3]"
-        >
-          Ver detalle
-        </Link>
       </div>
     </motion.div>
   );

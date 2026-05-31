@@ -4,7 +4,7 @@ export type UserMenuItem = {
   label: string;
   href: string;
   icon: "dashboard" | "package" | "user";
-  requiredPermission?: string;
+  requiredRoles?: string[];
   children?: UserMenuItem[];
 };
 
@@ -14,7 +14,7 @@ export const userMenuItemsByRole: Record<UserMenuRole, UserMenuItem[]> = {
       label: "Panel de Administración",
       href: "/admin",
       icon: "dashboard",
-      requiredPermission: "dashboard:view",
+      requiredRoles: ["Administrador"],
     },
   ],
   client: [
@@ -22,19 +22,19 @@ export const userMenuItemsByRole: Record<UserMenuRole, UserMenuItem[]> = {
       label: "Panel de Cliente",
       href: "/client",
       icon: "dashboard",
-      requiredPermission: "dashboard:view",
+      requiredRoles: ["Cliente"],
     },
     {
       label: "Mis Productos",
       href: "/new-in",
       icon: "package",
-      requiredPermission: "orders:view",
+      requiredRoles: ["Cliente"],
     },
     {
       label: "Mi Cuenta",
       href: "/client/settings",
       icon: "user",
-      requiredPermission: "profile:view",
+      requiredRoles: ["Cliente"],
     },
   ],
   storekeeper: [
@@ -42,7 +42,7 @@ export const userMenuItemsByRole: Record<UserMenuRole, UserMenuItem[]> = {
       label: "Panel de Almacén",
       href: "/storekeeper",
       icon: "dashboard",
-      requiredPermission: "dashboard:view",
+      requiredRoles: ["Almacenero"],
     },
   ],
 };

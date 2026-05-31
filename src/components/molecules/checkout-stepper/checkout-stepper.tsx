@@ -8,10 +8,10 @@ interface CheckoutStepperProps {
 
 const steps = [
   "Carrito",
-  "Identificacion",
+  "Identificación",
   "Entrega",
   "Pago",
-  "Confirmacion",
+  "Confirmación",
 ];
 
 export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep }) => {
@@ -27,23 +27,23 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep })
               <div className="flex items-center gap-2">
                 {/* Círculo del paso */}
                 <span
-                  className={`h-2.5 w-2.5 rounded-full transition-colors duration-300 ${
-                    isActive || isCompleted ? "bg-black" : "bg-gray-300"
+                  className={`h-2 w-2 rounded-full transition-colors duration-300 ${
+                    isActive ? "bg-[#632034]" : isCompleted ? "bg-[#D9A2A8]" : "bg-[#F5E3E6]"
                   }`}
                 />
                 
                 {/* Etiqueta y línea inferior decorativa */}
                 <div className="flex flex-col items-start">
                   <span
-                    className={`text-[13px] md:text-[14px] font-semibold tracking-wide transition-colors duration-300 ${
-                      isActive || isCompleted ? "text-black" : "text-gray-400"
+                    className={`text-[12px] md:text-[13px] font-medium capitalize transition-colors duration-300 ${
+                      isActive ? "text-[#632034]" : isCompleted ? "text-[#D9A2A8]" : "text-[#D9A2A8]/60"
                     }`}
                   >
                     {step}
                   </span>
                   <span
-                    className={`mt-0.5 h-px w-full transition-all duration-300 ${
-                      isActive ? "bg-black" : "bg-transparent"
+                    className={`mt-1 h-px w-full transition-all duration-300 ${
+                      isActive ? "bg-[#632034]" : "bg-transparent"
                     }`}
                   />
                 </div>
@@ -52,7 +52,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep })
                 {index < steps.length - 1 && (
                   <span 
                     className={`mx-1 h-px w-4 md:w-8 transition-colors duration-300 ${
-                      isCompleted ? "bg-black" : "bg-gray-300"
+                      isCompleted ? "bg-[#D9A2A8]" : "bg-[#F5E3E6]"
                     }`} 
                   />
                 )}

@@ -31,7 +31,7 @@ export const ProductDetail = ({ product }: Props) => {
         ? product.variants.map((v) => ({
             id_variant: v.id_variant ?? "",
             size: v.size ?? "",
-            color: v.color ?? "",
+            color: typeof v.color === 'string' ? v.color : (v.color?.name ?? ""),
             stock: Number(v.stock ?? 0),
             sku_variant: v.sku_variant ?? "",
           }))
@@ -107,9 +107,9 @@ export const ProductDetail = ({ product }: Props) => {
     <div className="min-h-screen bg-[#FAF9F6] text-[#594246] font-sans">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <nav className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-10 flex gap-2">
-          <span className="hover:text-[#F2778D] cursor-pointer transition-colors">Inicio</span> /
-          <span className="hover:text-[#F2778D] cursor-pointer transition-colors">Catálogo</span> /
-          <span className="font-bold text-[#594246]">{product.name}</span>
+          <span className="hover:text-[#632034] cursor-pointer transition-colors">Inicio</span> /
+          <span className="hover:text-[#632034] cursor-pointer transition-colors">Catálogo</span> /
+          <span className="font-bold text-[#632034]">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
@@ -120,7 +120,7 @@ export const ProductDetail = ({ product }: Props) => {
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 alt={product.name}
               />
-              <button className="absolute top-6 right-6 p-3 bg-white/70 backdrop-blur-sm rounded-full text-[#594246] hover:text-[#F2778D] transition-all">
+              <button className="absolute top-6 right-6 p-3 bg-white/70 backdrop-blur-sm rounded-full text-[#594246] hover:text-[#632034] transition-all">
                 <Heart size={20} className="stroke-2" />
               </button>
             </motion.div>
@@ -131,7 +131,7 @@ export const ProductDetail = ({ product }: Props) => {
                   key={idx}
                   onClick={() => setMainImage(img)}
                   className={`aspect-square bg-white border transition-all ${
-                    mainImage === img ? "border-[#F2778D] p-0.5" : "border-[#EBEAE8]"
+                    mainImage === img ? "border-[#C5A059] p-0.5" : "border-[#EBEAE8]"
                   }`}
                 >
                   <img
@@ -147,16 +147,16 @@ export const ProductDetail = ({ product }: Props) => {
           <div className="lg:col-span-4 flex flex-col gap-8">
             <div className="border-b border-[#EBEAE8] pb-6">
               {product.is_new_in && (
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[#F291A3] font-bold mb-2">
+                <span className="inline-block bg-[#D9A2A8] text-white text-[9px] px-2.5 py-1 font-bold uppercase tracking-widest mb-4 shadow-sm">
                   New Arrival
-                </p>
+                </span>
               )}
-              <h1 className="text-3xl font-light uppercase tracking-widest leading-tight mb-3 text-[#594246]">
+              <h1 className="text-3xl md:text-4xl font-serif uppercase tracking-widest leading-tight mb-3 text-[#632034]">
                 {product.name}
               </h1>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="flex text-[#F2778D]">
+                <div className="flex text-[#C5A059]">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={14} fill="currentColor" stroke="none" />
                   ))}
@@ -166,7 +166,7 @@ export const ProductDetail = ({ product }: Props) => {
                 </span>
               </div>
 
-              <p className="text-2xl font-medium tracking-tight text-[#594246]">
+              <p className="text-2xl font-medium tracking-tight text-[#632034]">
                 S/ {product.base_price.toFixed(2)}
               </p>
             </div>
@@ -185,7 +185,7 @@ export const ProductDetail = ({ product }: Props) => {
                       setQuantity(1);
                     }}
                     className={`w-9 h-9 rounded-full border transition-all ${
-                      selectedColor === color ? "border-[#F2778D] p-1 scale-110" : "border-[#EBEAE8]"
+                      selectedColor === color ? "border-[#C5A059] p-1 scale-110" : "border-[#EBEAE8]"
                     }`}
                   >
                     <div
@@ -203,11 +203,11 @@ export const ProductDetail = ({ product }: Props) => {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[11px] uppercase tracking-[0.2em] font-bold">
-                  Talla: <span className="font-light text-gray-500">{selectedSize || "Seleccionar"}</span>
+                  Talla: <span className="font-bold text-[#632034]">{selectedSize || "Seleccionar"}</span>
                 </span>
                 <button 
                   onClick={handleOpenSizeGuide}
-                  className="text-[10px] uppercase tracking-widest border-b border-[#594246] pb-0.5 font-bold hover:text-[#F2778D] hover:border-[#F2778D] transition-all"
+                  className="text-[10px] uppercase tracking-widest border-b border-[#594246] pb-0.5 font-bold hover:text-[#C5A059] hover:border-[#C5A059] transition-all"
                 >
                   Guía de tallas
                 </button>
@@ -221,12 +221,12 @@ export const ProductDetail = ({ product }: Props) => {
                       setSelectedSize(size);
                       setQuantity(1);
                     }}
-                    className={`h-12 text-[11px] font-bold transition-all border ${
+                    className={`h-12 text-xs font-bold transition-all border ${
                       stock === 0
                         ? "bg-[#FAF9F6] border-[#EBEAE8] text-gray-300 cursor-not-allowed"
                         : selectedSize === size
-                        ? "bg-[#594246] border-[#594246] text-white"
-                        : "bg-white border-[#EBEAE8] hover:border-[#594246] text-[#594246]"
+                        ? "bg-[#632034] border-[#632034] text-white"
+                        : "bg-white border-gray-300 hover:bg-[#FCF5F5] hover:border-[#D9A2A8] hover:text-[#632034] text-[#594246]"
                     }`}
                   >
                     {size}
@@ -234,7 +234,7 @@ export const ProductDetail = ({ product }: Props) => {
                 ))}
               </div>
               {selectedSize && (
-                <p className="mt-4 text-[11px] uppercase tracking-widest text-[#F2778D] font-bold">
+                <p className="mt-4 text-[11px] uppercase tracking-widest text-[#C5A059] font-bold">
                   Stock: {maxStockForSelection}
                 </p>
               )}
@@ -256,20 +256,20 @@ export const ProductDetail = ({ product }: Props) => {
                   </select>
                   <ChevronDown
                     size={14}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-[#F2778D] transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-[#632034] transition-colors"
                   />
                 </div>
 
                 <button
                   onClick={handleAddToCart}
                   disabled={!canAddToCart}
-                  className={`flex-1 text-white text-[11px] font-bold uppercase tracking-[0.3em] py-4 rounded-sm transition-all ${
+                  className={`flex-1 text-[11px] font-bold uppercase tracking-[0.3em] py-4 rounded-sm transition-all ${
                     canAddToCart
-                      ? "bg-[#594246] hover:bg-black active:scale-[0.98]"
-                      : "bg-gray-400 cursor-not-allowed"
+                      ? "bg-[#632034] hover:bg-black text-white active:scale-[0.98]"
+                      : "bg-[#FDF9F3] text-[#594246]/60 border border-[#EBEAE8] cursor-not-allowed"
                   }`}
                 >
-                  Agregar al carrito
+                  {canAddToCart ? "Agregar al carrito" : "Selecciona tu talla"}
                 </button>
               </div>
               <p className="text-[10px] text-center text-gray-400 italic">
@@ -277,19 +277,19 @@ export const ProductDetail = ({ product }: Props) => {
               </p>
             </div>
 
-            <div className="bg-white border border-[#EBEAE8] rounded-sm p-6 space-y-4">
+            <div className="bg-[#FCF5F5] border border-[#E5B3B8] rounded-sm p-6 space-y-4 shadow-sm">
               <div className="flex items-center gap-4 text-xs">
-                <Truck className="text-[#F2D0D3]" size={20} />
+                <Truck className="text-[#D9A2A8]" size={20} />
                 <div>
                   <p className="font-bold text-[#594246]">Envíos gratis</p>
-                  <p className="text-gray-400">En Lima Metropolitana mayores a S/199.</p>
+                  <p className="text-gray-500">En Lima Metropolitana mayores a S/199.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs border-t border-[#EBEAE8] pt-4">
-                <RefreshCcw className="text-[#F2778D]" size={20} />
+              <div className="flex items-center gap-4 text-xs border-t border-[#E5B3B8] pt-4">
+                <RefreshCcw className="text-[#D9A2A8]" size={20} />
                 <div>
                   <p className="font-bold text-[#594246]">Cambios fáciles</p>
-                  <p className="text-gray-400">Hasta 30 días después de tu compra.</p>
+                  <p className="text-gray-500">Hasta 30 días después de tu compra.</p>
                 </div>
               </div>
             </div>
@@ -305,7 +305,7 @@ export const ProductDetail = ({ product }: Props) => {
                 <ul className="space-y-3">
                   {product.highlights?.map((bullet, i) => (
                     <li key={i} className="text-sm text-gray-500 font-light flex items-start gap-3">
-                      <span className="mt-1.5 w-1 h-1 rounded-full bg-[#F2778D] shrink-0" />
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-[#C5A059] shrink-0" />
                       {bullet}
                     </li>
                   ))}

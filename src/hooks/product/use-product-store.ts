@@ -60,6 +60,8 @@ const idCategory = categoryData ? categoryData._id : (p.id_category as string ??
     highlights: Array.isArray(p.highlights) ? (p.highlights as string[]) : [],
     custom_size_guide_url: (p.custom_size_guide_url as string) ?? "",
     technical_details: (p.technical_details as any) ?? {},
+    origin_type: (p.origin_type as any) ?? "RETAIL",
+    technical_sheet: Array.isArray(p.technical_sheet) ? (p.technical_sheet as any[]) : [],
     
     // ----------------------------------------------------
 

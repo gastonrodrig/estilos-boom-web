@@ -3,11 +3,11 @@ export interface SidebarModule {
   label: string;
   href?: string;
   icon?: string;
-  requiredPermission?: string; // <--- Importante: aquí le decimos que existe
+  requiredRoles?: string[]; // <--- Importante: aquí le decimos que existe
   children?: {
     label: string;
     href: string;
-    requiredPermission?: string; // <--- También para los hijos
+    requiredRoles?: string[]; // <--- También para los hijos
   }[];
 }
 
@@ -17,7 +17,7 @@ export const adminModules: SidebarModule[] = [
     label: "Dashboard",
     href: "/admin",
     icon: "dashboard",
-    requiredPermission: "dashboard:view", // <-- Agrega el permiso correspondiente
+    requiredRoles: ["Administrador"], // <-- Agrega el permiso correspondiente
   },
   {
     label: "Gestionar Productos",
@@ -27,12 +27,12 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Categorías",
         href: "/admin/categories",
-        requiredPermission: "categories:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Productos",
         href: "/admin/products",
-        requiredPermission: "products:view",
+        requiredRoles: ["Administrador"],
       },
     ],
   },
@@ -40,7 +40,7 @@ export const adminModules: SidebarModule[] = [
       label: "Gestionar Insumos",
       icon: "spool", // ✂️ Evoca confección, telas e hilados
       href: "/admin/supplies",
-      requiredPermission: "products:view",
+      requiredRoles: ["Administrador"],
     },
   {
     label: "Produccion",
@@ -49,17 +49,17 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Crear Orden de Produccion",
         href: "/admin/production/plan",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Seguimiento de Ordenes",
         href: "/admin/production/details",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Ordenes Completadas",
         href: "/admin/production/complete",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
     ],
   },
@@ -70,17 +70,17 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Crear Ordenes de Pre-Compra",
         href: "/admin/storehouse",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Seguimiento de Ordenes",
         href: "/admin/storehouse/details",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Ordenes Completas",
         href: "/admin/storehouse/complete",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       
     ],
@@ -88,22 +88,22 @@ export const adminModules: SidebarModule[] = [
   {
     label: "Gestionar Ordenes",
     icon: "shopping-bag",
-    requiredPermission: "orders:view",
+    requiredRoles: ["Administrador"],
     children: [
       {
         label: "Recientes",
         href: "/admin/recents",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "En Progreso",
         href: "/admin/orders/in-progress",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Finalizadas",
         href: "/admin/orders/finished",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
     ],
   },
@@ -111,39 +111,39 @@ export const adminModules: SidebarModule[] = [
     label: "Gestionar Cotización",
     href: "/admin/quotations",
     icon: "booktext",
-    requiredPermission: "quotations:view",
+    requiredRoles: ["Administrador"],
   },
   {
     label: "Gestionar Pagos",
     href: "/admin/payments",
     icon: "banknote",
-    requiredPermission: "payments:view",
+    requiredRoles: ["Administrador"],
   },
   {
       label: "Gestionar Facturas",
       icon: "notepad-text", // ✂️ Evoca confección, telas e hilados
       href: "/admin/invoice",
-      requiredPermission: "products:view",
+      requiredRoles: ["Administrador"],
   },
   {
       label: "Gestionar Inventario",
       icon: "notepad-text", // ✂️ Evoca confección, telas e hilados
-      requiredPermission: "products:view",
+      requiredRoles: ["Administrador"],
       children: [
       {
         label: "Stock Actual",
         href: "/admin/movements/stock",
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Movimientos",
         href: "/admin/invoice", 
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Historial de movimientos",
         href: "/admin/movements", 
-        requiredPermission: "orders:view",
+        requiredRoles: ["Administrador"],
       }
     
     ],
@@ -151,27 +151,41 @@ export const adminModules: SidebarModule[] = [
   {
     label: "Gestionar Clientes",
     icon: "contact",
-    requiredPermission: "clients:view",
+    requiredRoles: ["Administrador"],
     children: [
       {
         label: "Persona",
         href: "/admin/clients/persons",
-        requiredPermission: "clients:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Empresa",
         href: "/admin/clients/companies",
-        requiredPermission: "clients:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Proveedores",
         href: "/admin/suppliers",
-        requiredPermission: "clients:view",
+        requiredRoles: ["Administrador"],
       },
       {
         label: "Talleres",
         href: "/admin/workshops",
-        requiredPermission: "clients:view",
+        requiredRoles: ["Administrador"],
+      },
+    ],
+  },
+  {
+    label: "Gestionar Trabajadores",
+    icon: "briefcase", 
+    children: [
+      {
+        label: "Trabajadores",
+        href: "/admin/workers/worker",
+      },
+      {
+        label: "Roles / Tipos",
+        href: "/admin/workers/WorkerType",
       },
     ],
   },
@@ -179,10 +193,10 @@ export const adminModules: SidebarModule[] = [
     label: "Visualizar Reseñas",
     href: "/admin/reviews",
     icon: "eye",
-    requiredPermission: "reviews:view",
+    requiredRoles: ["Administrador"],
   },
   {
-    label: "Usuarios y Roles",
+    label: "Usuarios",
     href: "/admin/users-roles",
     icon: "users",
   },

@@ -20,10 +20,10 @@ type CTAProps =
     }
 
 const baseClasses =`
-  inline-flex items-center justify-center gap-2 rounded-full 
-  px-8 py-[14px] text-sm font-medium tracking-wide transition bg-[#f2b6c1] 
-  text-black hover:opacity-90 active:scale-95 hover:cursor-pointer
-  py-2.5 sm:py-3 text-sm sm:text-base
+  inline-flex items-center justify-center gap-2 rounded-sm 
+  px-8 py-[14px] text-sm font-semibold tracking-widest uppercase transition-all duration-300
+  bg-[#632034] text-white shadow-sm hover:bg-[#4a1827] hover:shadow-lg active:scale-[0.98]
+  hover:cursor-pointer
 `
 
 const MotionLink = motion.create(Link)

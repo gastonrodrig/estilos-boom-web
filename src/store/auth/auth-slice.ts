@@ -14,7 +14,6 @@ const initialState: AuthState = {
   documentType: null,
   documentNumber: null,
   role: null,
-  permissions: [],
   clientType: null,
   needsPasswordChange: null,
   userStatus: null,
@@ -43,7 +42,6 @@ export const authSlice = createSlice({
       state.documentType = payload.documentType ?? null;
       state.documentNumber = payload.documentNumber ?? null;
       state.role = payload.role;
-      state.permissions = payload.permissions;
       state.needsPasswordChange = payload.needsPasswordChange ?? null;
       state.userStatus = payload.userStatus;
       state.photoURL = payload.photoURL ?? null;

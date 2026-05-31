@@ -8,7 +8,7 @@ import { CheckoutStepper } from '@/components/molecules';
 
 const CheckoutShell: React.FC = () => {
 
-  
+
   const { currentStep } = useCheckoutStore();
 
   const stepMap: Record<string, number> = {
@@ -20,20 +20,20 @@ const CheckoutShell: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full">
-      
+
       {/* 3. Colocamos el Stepper aquí arriba para que siempre sea visible */}
       <div className="mb-5 mt-0 pt-0">
         <CheckoutStepper currentStep={stepMap[currentStep]} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 lg:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
         {/* Columna izquierda: Formularios dinámicos */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-7">
           <CheckoutStepRenderer currentStep={currentStep} />
         </div>
 
         {/* Columna derecha: Resumen (Este se queda fijo) */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-5">
           <CheckoutSummaryCard />
         </div>
       </div>

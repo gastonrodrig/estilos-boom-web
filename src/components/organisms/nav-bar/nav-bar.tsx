@@ -59,7 +59,7 @@ export const Navbar = ({
   const isStorekeeperRoute = pathname.startsWith("/storekeeper");
   const isBackofficeRoute = isAdminRoute || isStorekeeperRoute;
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const { status, role, onLogout, permissions } = useAuthStore();
+  const { status, role, onLogout } = useAuthStore();
   const { loadCart, items } = useCartStore();
   const cartItemsCount = useMemo(
     () => items.reduce((acc, item) => acc + item.quantity, 0),
@@ -102,15 +102,15 @@ export const Navbar = ({
 
   const bgClass = isHome
     ? scrolled
-      ? "bg-[#f2b6c1]"
+      ? "bg-[#FAF9F6]/95"
       : "bg-transparent"
-    : "bg-[#f2b6c1]";
+    : "bg-[#FAF9F6]/95";
 
   const textClass = isHome
     ? scrolled
-      ? "text-black"
+      ? "text-[#594246]"
       : "text-white"
-    : "text-black";
+    : "text-[#594246]";
 
   const isActive = (href: string) => pathname === href;
 
@@ -135,45 +135,44 @@ export const Navbar = ({
 
   const drawerItems: NavDrawerItem[] = isAdminRoute
   ? adminModules
-      // 1. Filtramos los módulos principales
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         // 2. Filtramos también los hijos de cada módulo
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 
   : isStorekeeperRoute
   ? storekeeperModules
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 
   : isClientRoute
   ? clientModules
-      .filter((item) => !item.requiredPermission || permissions.includes(item.requiredPermission))
+      .filter((item) => !item.requiredRoles || (role && item.requiredRoles.includes(role)))
       .map((item) => ({
         label: item.label,
-        href: item.href,
+        href: item.href || "",
         children: item.children
-          ?.filter((child) => !child.requiredPermission || permissions.includes(child.requiredPermission))
+          ?.filter((child) => !child.requiredRoles || (role && child.requiredRoles.includes(role)))
           .map((child) => ({
             label: child.label,
-            href: child.href,
+            href: child.href || "",
           })),
       }))
 
@@ -239,22 +238,6 @@ export const Navbar = ({
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50">
-        {/* Top bar */}
-        {showTopBar &&
-          (isHome ? (
-            <motion.div
-              className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-            </motion.div>
-          ) : (
-            <div className="w-full bg-[#fffdf9] text-black text-xs md:text-sm text-center py-2 tracking-wide">
-              ENVÍO GRATIS EN COMPRAS MAYORES A S/149
-            </div>
-          ))}
 
         {/* Navbar */}
         <motion.div
@@ -368,9 +351,9 @@ export const Navbar = ({
                       className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl text-[#364152] md:mt-3 md:w-60 md:rounded-2xl"
                     >
                       <div className="py-1.5 md:py-2">
-                        {userMenuItems.map(({ label, href, icon, requiredPermission }) => {
+                        {userMenuItems.map(({ label, href, icon, requiredRoles }) => {
                           // VALIDACIÓN NUEVA:
-                          if (requiredPermission && !permissions.includes(requiredPermission)) return null;
+                          if (requiredRoles && role && !requiredRoles.includes(role)) return null;
                           const ItemIcon = userMenuIconMap[icon];
 
                           return (

@@ -28,7 +28,7 @@ import {
 import { FirebaseError } from "firebase/app";
 import { clientApi, AuthApi } from "@api";
 import { getFirebaseAuthToken } from "@helpers";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { UserStatus } from "@enums";
 import { useCartStore } from "@hooks";
@@ -43,18 +43,20 @@ export const useAuthStore = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { mergeLocalCartToRemote, loadCart } = useCartStore();
-
   const auth = useAppSelector((state) => state.auth);
   const { uid } = auth;
 
   const resolvePostAuthRedirect = () => {
-    const returnTo = searchParams?.get("returnTo");
+    let returnTo = null;
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      returnTo = params.get("redirect") || params.get("callbackUrl") || params.get("returnTo");
+    }
     if (returnTo && returnTo.startsWith("/")) {
       return returnTo;
     }
-    return "/cart";
+    return "/";
   };
 
   const syncGuestCartAfterAuth = async () => {
@@ -87,7 +89,6 @@ export const useAuthStore = () => {
         uid: user.auth_id,
         email: user.email,
         role: user.role,
-        permissions: user.permissions,
         userStatus: user.status,
 
         firstName: user.client?.first_name ?? user.first_name ?? null,

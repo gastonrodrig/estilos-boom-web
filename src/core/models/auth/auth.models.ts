@@ -22,7 +22,6 @@ export interface AuthState {
   documentType: string | null;
   documentNumber: string | null;
   role: string | null;
-  permissions: string[];
   clientType?: ClientType.PERSON | ClientType.COMPANY | null;
   needsPasswordChange: boolean | null;
   userStatus: UserStatus.ACTIVO | UserStatus.INACTIVO | null;
@@ -42,7 +41,6 @@ export interface LoginPayload {
   uid: string;
   email: string;
   role: string;
-  permissions: string[];
   userStatus: UserStatus.ACTIVO | UserStatus.INACTIVO;
   isExtraDataCompleted: boolean;
   firstName?: string | null;
