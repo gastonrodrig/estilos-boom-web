@@ -6,7 +6,10 @@ import {
   useAppDispatch,
   useAppSelector,
   setLoadingClientCompany,
-  refreshClientsCompany
+  refreshClientsCompany,
+  setPageClientCompany,
+  setRowsPerPageClientCompany,
+  selectedClientCompany
 } from "@store"
 import { 
   ClientCompany,
@@ -109,6 +112,18 @@ export const useClientCompanyStore = () => {
     }
   };
 
+  const setSelectedClientCompany = (client: ClientCompany | null) => {
+    dispatch(selectedClientCompany(client ? { ...client } : null));
+  };
+
+  const setPageGlobal = (page: number) => {
+    dispatch(setPageClientCompany(page));
+  };
+
+  const setRowsPerPageGlobal = (rows: number) => {
+    dispatch(setRowsPerPageClientCompany(rows));
+  };
+
   return {
     clientsCompany,
     selected,
@@ -122,6 +137,9 @@ export const useClientCompanyStore = () => {
     setOrderBy,
     order,
     setOrder,
+    setSelectedClientCompany,
+    setPageGlobal,
+    setRowsPerPageGlobal,
     startCreateClientCompany,
     startLoadingClientsCompanyPaginated,
     startUpdateClientCompany

@@ -46,10 +46,31 @@ export const ReceptionModal = ({
       title="Recepción Final"
       description={`Finalizar orden ${order?.order_number ?? ""}`}
     >
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <TextInput label="Fecha Real" type="date" {...register("delivery_date_actual")} />
-        <TextInput label="Calidad (1-5)" type="number" {...register("quality_rating")} />
-        <TextInput label="Costo Envío" type="number" {...register("shipping_cost")} />
+      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Fecha Real</label>
+          <input
+            type="date"
+            {...register("delivery_date_actual")}
+            className="w-full h-14 px-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Calidad (1-5)</label>
+          <input
+            type="number"
+            {...register("quality_rating")}
+            className="w-full h-14 px-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Costo Envío</label>
+          <input
+            type="number"
+            {...register("shipping_cost")}
+            className="w-full h-14 px-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
+          />
+        </div>
         
         <ModalFooter
           isSubmitType

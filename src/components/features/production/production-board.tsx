@@ -176,49 +176,51 @@ export const ProductionBoard = () => {
   };
 
   return (
-    <section className="mx-auto max-w-6xl px-4 space-y-6 pb-24">
+    <section className="mx-auto max-w-6xl px-4 space-y-6 pb-24 transition-colors duration-500">
       {/* ── Header ── */}
-      <header>
-        <p className="text-[15px] font-semibold uppercase tracking-[0.24em] text-[#b79ca5]">
-          Planeamiento de Producción
-        </p>
-        <h1 className="font-(--font-vidaloka) mt-1 text-3xl text-[#594246]">
-          Crear Órdenes de Producción
-        </h1>
-        <p className="mt-0.5 text-[12px] text-[#9b8088]">
-          Sistema de planeamiento para órdenes de producción basado en alertas de stock.
-        </p>
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-2">
+            Planeamiento de Producción
+          </p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+            Crear Órdenes de Producción
+          </h1>
+          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+            Sistema de planeamiento para órdenes de producción basado en alertas de stock.
+          </p>
+        </div>
       </header>
 
       {/* ── Stat cards ── */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="relative overflow-hidden rounded-2xl bg-rose-100 px-6 py-5">
-          <p className="text-5xl font-bold text-[#594246]">{criticalCount}</p>
-          <p className="mt-1 text-sm font-medium text-[#594246]">Alertas Críticas</p>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-rose-300/50">
-            <AlertTriangle className="h-5 w-5 text-rose-600" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
+          <p className="text-5xl font-black text-[#D6405F] dark:text-[#F8BBD0]">{criticalCount}</p>
+          <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Alertas Críticas</p>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+            <AlertTriangle className="h-6 w-6 text-[#D6405F] dark:text-[#F8BBD0]" />
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl bg-[#ede8e9] px-6 py-5">
-          <p className="text-5xl font-bold text-[#594246]">{lowCount}</p>
-          <p className="mt-1 text-sm font-medium text-[#9b8088]">Stock Bajo</p>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-full bg-[#594246]">
-            <TrendingDown className="h-5 w-5 text-white" />
+        <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
+          <p className="text-5xl font-black text-[#40202D] dark:text-white">{lowCount}</p>
+          <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Stock Bajo</p>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+            <TrendingDown className="h-6 w-6 text-[#8C6B79] dark:text-gray-400" />
           </div>
         </div>
       </div>
 
       {isLoading && (
-        <div className="rounded-2xl border border-rose-100 bg-white p-5 text-sm text-[#9b8088]">
+        <div className="rounded-3xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md p-6 text-sm font-medium text-[#8C6B79] dark:text-gray-400 text-center animate-pulse">
           Cargando inventario y estado de órdenes...
         </div>
       )}
 
       {/* ── Product list ── */}
       {!isLoading && filtered.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-[20px] font-normal text-[#594246]">
+        <div className="space-y-4">
+          <h2 className="text-xl font-black text-[#40202D] dark:text-white tracking-wide px-2">
             Productos para Producción
           </h2>
 
@@ -239,99 +241,99 @@ export const ProductionBoard = () => {
             return (
               <article
                 key={product.id_product}
-                className="overflow-hidden rounded-2xl border border-[#F2778D] bg-white shadow-sm"
+                className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm transition-all duration-300"
               >
                 <button
                   type="button"
                   onClick={() => setExpanded(isOpen ? null : product.id_product)}
-                  className="flex w-full items-center justify-between gap-6 px-5 py-4 text-left hover:bg-rose-50/30 transition-colors"
+                  className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left hover:bg-white/50 dark:hover:bg-white/5 transition-colors group"
                 >
-                  <div className="flex flex-1 items-center gap-4 min-w-0">
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-rose-100 bg-rose-50">
+                  <div className="flex flex-1 items-center gap-5 min-w-0">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[1.5rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 shadow-inner group-hover:scale-105 transition-transform">
                       {getProductImage(product) ? (
                         <Image
                           src={getProductImage(product)}
                           alt={product.name}
                           fill
-                          sizes="64px"
+                          sizes="80px"
                           className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                          <Package2 className="h-6 w-6 text-rose-300" />
+                          <Package2 className="h-8 w-8 text-[#8C6B79] dark:text-gray-500" />
                         </div>
                       )}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-[16px] font-semibold text-[#594246]">
+                      <div className="flex flex-wrap items-center gap-3 mb-2">
+                        <span className="truncate text-[18px] font-black text-[#40202D] dark:text-white tracking-wide">
                           {product.name}
                         </span>
-                        <span className="rounded-sm bg-[#F291A3] capitalize px-2 py-0.5 text-[13px] font-bold text-white">
-                          {product.category?.name ?? product.gender.toLowerCase()}
+                        <span className="rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 uppercase px-3 py-1 text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 shadow-sm">
+                          {product.category?.name ?? product.gender}
                         </span>
                         <span
-                          className={`rounded-sm px-2 py-0.5 text-[13px] font-semibold text-white ${
-                            critical > 0 ? "bg-[#F2D0D3]" : "bg-[#F2778D]"
+                          className={`rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
+                            critical > 0 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
                           }`}
                         >
                           {critical > 0 ? "Crítico" : "Bajo"}
                         </span>
                       </div>
 
-                      <p className="mt-1 text-[12px] text-[#9b8088]">
-                        Stock: <span className="font-semibold text-[#F2778D]">{stockTotal} unidades</span>
-                        <span className="mx-2 text-rose-200">|</span>
-                        Mínimo: <span className="font-semibold text-[#594246]">{minTotal} unidades</span>
+                      <p className="mt-1 text-[13px] font-medium text-[#8C6B79] dark:text-gray-400">
+                        Stock: <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{stockTotal} uds</span>
+                        <span className="mx-3 opacity-30">|</span>
+                        Mínimo: <span className="font-black text-[#40202D] dark:text-white">{minTotal} uds</span>
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-6">
                     {deficit > 0 && (
-                      <div className="hidden md:block rounded-xl bg-rose-50 border border-rose-100 px-4 py-2 max-w-[280px]">
+                      <div className="hidden md:block rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-4 py-2 shadow-inner">
                         <div className="flex items-center gap-1.5">
-                          <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
+                          <Lightbulb className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
                             Sugerencia
                           </span>
                         </div>
-                        <p className="mt-0.5 text-[11px] leading-tight text-[#9b8088]">
-                          Producir <span className="font-bold text-[#594246]">{deficit} unidades</span>
+                        <p className="mt-1 text-[12px] font-medium text-[#8C6B79] dark:text-gray-300">
+                          Producir <span className="font-black text-[#40202D] dark:text-white">{deficit} uds</span>
                         </p>
                       </div>
                     )}
 
-                    <div className="shrink-0 text-[#c5adb5]">
-                      {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                    <div className="shrink-0 text-[#8C6B79] dark:text-gray-400 group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0] transition-colors">
+                      {isOpen ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
                     </div>
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-[#F2D0D3] bg-[#FAF9F6] px-6 py-6 transition-all">
-                    <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-[13px] font-bold tracking-wider text-[#594246] uppercase">
-                        Detalle por prenda
+                  <div className="border-t border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 px-6 py-8 transition-all">
+                    <div className="mb-6 flex items-center justify-between">
+                      <h3 className="text-[11px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">
+                        Detalle por variante
                       </h3>
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-separate border-spacing-y-2">
+                    <div className="overflow-x-auto custom-scrollbar">
+                      <table className="w-full text-left border-collapse">
                         <thead>
-                          <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#b79ca5]">
-                            <th className="px-4 pb-2">Talla</th>
-                            <th className="px-4 pb-2">Color</th>
-                            <th className="px-4 pb-2">Stock Actual</th>
-                            <th className="px-4 pb-2">Mínimo</th>
-                            <th className="px-4 pb-2">Nivel</th>
-                            <th className="px-4 pb-2">Estado</th>
-                            <th className="px-4 pb-2">Métricas</th>
-                            <th className="px-4 pb-2 text-center">Acción</th>
+                          <tr className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
+                            <th className="px-4 py-4">Talla</th>
+                            <th className="px-4 py-4">Color</th>
+                            <th className="px-4 py-4">Stock</th>
+                            <th className="px-4 py-4">Mínimo</th>
+                            <th className="px-4 py-4">Nivel</th>
+                            <th className="px-4 py-4">Estado</th>
+                            <th className="px-4 py-4">Métricas</th>
+                            <th className="px-4 py-4 text-center">Acción</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
                           {variants.map((variant) => {
                             const stock = Number(variant.stock ?? 0);
                             const key = `${product.id_product}-${variant.id_variant}`;
@@ -342,46 +344,46 @@ export const ProductionBoard = () => {
                             const checked = Boolean(selected[key]);
 
                             return (
-                              <tr key={key} className="group bg-white transition-shadow hover:shadow-sm">
-                                <td className="rounded-l-xl px-4 py-4 text-sm font-semibold text-[#594246]">
+                              <tr key={key} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group/row">
+                                <td className="px-4 py-5 text-[13px] font-black text-[#40202D] dark:text-white">
                                   {variant.size || "-"}
                                 </td>
-                                <td className="px-4 py-4 text-sm text-[#9b8088]">
+                                <td className="px-4 py-5 text-[13px] font-bold text-[#8C6B79] dark:text-gray-300">
                                   {typeof variant.color === 'object' ? (variant.color as any)?.name : variant.color || "-"}
                                 </td>
-                                <td className={`px-4 py-4 text-base font-bold ${stock < minimum ? 'text-[#F2778D]' : 'text-[#594246]'}`}>
+                                <td className={`px-4 py-5 text-[15px] font-black ${stock < minimum ? 'text-[#D6405F] dark:text-[#F8BBD0]' : 'text-[#40202D] dark:text-white'}`}>
                                   {stock}
                                 </td>
-                                <td className="px-4 py-4">
-                                  <div className="inline-flex min-w-[40px] items-center justify-center rounded-lg border border-[#F2D0D3] bg-[#FAF9F6] px-3 py-1 text-sm font-bold text-[#594246]">
+                                <td className="px-4 py-5">
+                                  <div className="inline-flex min-w-[40px] items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-3 py-1 text-[12px] font-black text-[#8C6B79] dark:text-gray-400 shadow-inner">
                                     {minimum}
                                   </div>
                                 </td>
-                                <td className="px-4 py-4">
-                                  <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[#EBEAE8]">
+                                <td className="px-4 py-5">
+                                  <div className="h-2 w-24 overflow-hidden rounded-full bg-black/5 dark:bg-white/10 shadow-inner">
                                     <div 
-                                      className={`h-full rounded-full ${stock < minimum ? 'bg-[#F2778D]' : 'bg-[#594246]'}`}
+                                      className={`h-full rounded-full transition-all duration-500 ${stock < minimum ? 'bg-gradient-to-r from-[#D6405F] to-[#F23B69]' : 'bg-[#40202D] dark:bg-gray-400'}`}
                                       style={{ width: `${percentage}%` }}
                                     />
                                   </div>
                                 </td>
-                                <td className="px-4 py-4">
-                                  <span className={`text-[12px] font-bold ${status.tone} flex items-center gap-1`}>
+                                <td className="px-4 py-5">
+                                  <span className={`text-[11px] font-black uppercase tracking-wider ${status.tone} flex items-center gap-1.5`}>
                                     {status.icon}
                                     {status.label}
                                   </span>
                                 </td>
-                                <td className="px-4 py-4">
-                                  <div className="flex flex-col gap-0.5 text-[10px] text-[#9b8088]">
+                                <td className="px-4 py-5">
+                                  <div className="flex flex-col gap-1 text-[10px] font-bold tracking-wide uppercase text-[#8C6B79] dark:text-gray-500">
                                     <div className="flex items-center gap-1.5">
                                       <Eye className="h-3 w-3" /> {Math.floor(Math.random() * 500) + 100}
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-rose-400 font-bold">
+                                    <div className="flex items-center gap-1.5 text-[#D6405F] dark:text-[#F8BBD0]">
                                       <ArrowUp className="h-3 w-3" /> {Math.floor(Math.random() * 40) + 5} ventas
                                     </div>
                                   </div>
                                 </td>
-                                <td className="rounded-r-xl px-4 py-4 text-center">
+                                <td className="px-4 py-5 text-center">
                                   {pendingTransit === 0 ? (
                                     <button
                                       onClick={() => toggleVariant({
@@ -394,16 +396,16 @@ export const ProductionBoard = () => {
                                         minimum,
                                         requestUnits: Math.max(1, minimum - stock),
                                       })}
-                                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-2 px-3 text-[10px] font-bold transition-all
+                                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm
                                         ${checked 
-                                          ? 'bg-[#594246] text-white shadow-md' 
-                                          : 'bg-rose-100 text-[#F2778D] hover:bg-rose-200'
+                                          ? 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white' 
+                                          : 'bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 border border-[#EAE0E2] dark:border-white/10'
                                         }`}
                                     >
-                                      {checked ? <Check className="h-3 w-3" /> : 'SELECCIONAR'}
+                                      {checked ? <Check className="h-4 w-4" /> : 'AÑADIR'}
                                     </button>
                                   ) : (
-                                    <span className="text-[10px] font-bold text-blue-400 uppercase">En proceso</span>
+                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-full">En proceso</span>
                                   )}
                                 </td>
                               </tr>
@@ -414,31 +416,31 @@ export const ProductionBoard = () => {
                     </div>
 
                     {hasSelections && (
-                      <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-rose-200 bg-rose-50/50 p-5 md:flex-row">
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#F2778D] shadow-sm">
-                            <FilePlus2 className="h-5 w-5" />
+                      <div className="mt-8 flex flex-col items-center justify-between gap-6 rounded-[2rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md p-6 md:flex-row shadow-sm">
+                        <div className="flex items-center gap-5">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 dark:bg-white/5 text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                            <FilePlus2 className="h-6 w-6" />
                           </div>
                           <div>
-                            <p className="text-[13px] font-bold text-[#594246]">Producción en curso</p>
-                            <p className="text-[11px] text-[#9b8088]">
-                              {selectedVariantsForThisProduct.length} variantes · {totalRequestUnits} unidades totales
+                            <p className="text-[14px] font-black text-[#40202D] dark:text-white tracking-wide">Producción en curso</p>
+                            <p className="text-[12px] font-bold text-[#8C6B79] dark:text-gray-400 mt-0.5">
+                              {selectedVariantsForThisProduct.length} variantes seleccionadas · <span className="text-[#D6405F] dark:text-[#F8BBD0]">{totalRequestUnits} uds totales</span>
                             </p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
                           <button
                             onClick={() => setSelected({})}
-                            className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-[12px] font-bold text-[#9b8088] border border-rose-100 hover:text-rose-500 transition-colors"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-white/50 dark:bg-white/5 px-6 py-3 text-[12px] font-black text-[#8C6B79] dark:text-gray-400 border border-[#EAE0E2] dark:border-white/10 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm w-full md:w-auto"
                           >
                             <Trash2 className="h-4 w-4" /> Limpiar
                           </button>
                           <button
                             onClick={startProduction}
-                            className="flex items-center gap-2 rounded-xl bg-[#F2778D] px-6 py-2 text-[12px] font-bold text-white shadow-lg shadow-rose-200 hover:bg-[#d9657a] transition-all"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-8 py-3 text-[12px] font-black uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto"
                           >
-                            <Factory className="h-4 w-4" /> Crear orden de producción
+                            <Factory className="h-4 w-4" /> Crear Orden
                           </button>
                         </div>
                       </div>
@@ -452,8 +454,9 @@ export const ProductionBoard = () => {
       )}
 
       {!isLoading && filtered.length === 0 && (
-        <div className="rounded-2xl border border-rose-100 bg-white px-6 py-10 text-center">
-          <p className="text-sm text-[#9b8088]">No hay productos con alertas de stock.</p>
+        <div className="rounded-3xl border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-6 py-12 text-center shadow-sm">
+          <Package2 className="h-12 w-12 text-[#8C6B79] dark:text-gray-500 mx-auto mb-4 opacity-50" />
+          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-400 tracking-wide">No hay productos con alertas de stock o coincidiendo con tu búsqueda.</p>
         </div>
       )}
     </section>

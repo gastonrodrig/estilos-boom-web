@@ -35,21 +35,27 @@ export default function AdminStorehouseCreatePage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6">
-      <header>
-        <h1 className="font-(--font-vidaloka) text-3xl text-[#594246]">Crear Orden de Pre-Compra</h1>
-        <p className="text-sm text-[#9b8088]">Gestión de reposición de inventario</p>
+      <header className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+          Crear Orden de Pre-Compra
+        </h1>
+        <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+          Gestión de reposición de inventario
+        </p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[380px_1fr]">
         {/* COLUMNA IZQUIERDA: Información del Producto */}
         <aside className="space-y-6">
-          <article className="overflow-hidden rounded-2xl border border-[#f2b6c1]/70 bg-white shadow-sm">
-            <div className="p-4 border-b border-rose-50">
-               <h2 className="text-sm font-bold text-[#594246]">Información del Producto</h2>
+          <article className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm">
+            <div className="p-6 border-b border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5">
+               <h2 className="text-[13px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                 Información del Producto
+               </h2>
             </div>
             
-            <div className="p-4">
-              <div className="relative h-48 w-full overflow-hidden rounded-xl bg-rose-50">
+            <div className="p-6">
+              <div className="relative h-56 w-full overflow-hidden rounded-[1.5rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 shadow-inner">
                 {productInfo.image && !imageError ? (
                   <Image
                     src={productInfo.image}
@@ -59,49 +65,51 @@ export default function AdminStorehouseCreatePage() {
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-rose-100">
-                    <Image src="/placeholder.png" alt="No image" width={100} height={100} />
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Image src="/placeholder.png" alt="No image" width={100} height={100} className="opacity-50" />
                   </div>
                 )}
               </div>
 
-              <div className="mt-4 space-y-3">
+              <div className="mt-6 space-y-4">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#b79ca5]">Producto Seleccionado</p>
-                  <span className="mt-1 inline-block rounded-md bg-[#F2778D] px-2 py-0.5 text-xs font-bold text-white uppercase">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-2">Producto Seleccionado</p>
+                  <span className="inline-flex rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-4 py-1.5 text-[11px] font-black tracking-widest text-white uppercase shadow-sm">
                     {productInfo.name || "Vestidos"}
                   </span>
                 </div>
 
-                <div className="flex justify-between border-b border-rose-50 pb-2 text-sm">
-                  <span className="text-[#9b8088]">Stock Actual</span>
-                  <span className="flex items-center gap-1 font-bold text-[#F2778D]">
-                    {productInfo.stockActual} <AlertCircle className="h-3 w-3" />
+                <div className="flex justify-between items-center border-b border-[#EAE0E2] dark:border-white/10 pb-3 text-[13px]">
+                  <span className="font-bold text-[#8C6B79] dark:text-gray-400">Stock Actual</span>
+                  <span className="flex items-center gap-1.5 font-black text-[#D6405F] dark:text-[#F8BBD0]">
+                    {productInfo.stockActual} <AlertCircle className="h-4 w-4" />
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-rose-50 pb-2 text-sm">
-                  <span className="text-[#9b8088]">Stock Mínimo</span>
-                  <span className="font-bold text-[#594246]">{productInfo.stockMinimo}</span>
+                <div className="flex justify-between items-center border-b border-[#EAE0E2] dark:border-white/10 pb-3 text-[13px]">
+                  <span className="font-bold text-[#8C6B79] dark:text-gray-400">Stock Mínimo</span>
+                  <span className="font-black text-[#40202D] dark:text-white">{productInfo.stockMinimo}</span>
                 </div>
 
                 {/* Sugerencia del Sistema */}
-                <div className="rounded-xl bg-[#F2D0D3]/40 p-4">
-                  <div className="flex items-center gap-2 text-[#d06d84]">
-                    <Info className="h-4 w-4" />
-                    <p className="text-xs font-bold uppercase tracking-tight">Sugerencia del Sistema</p>
+                <div className="rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 p-5 shadow-inner">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Info className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
+                    <p className="text-[11px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
+                      Sugerencia del Sistema
+                    </p>
                   </div>
-                  <div className="mt-3 space-y-2 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-[#8d7079]">Unidades a Reponer</span>
-                      <span className="font-bold text-[#F2778D]">{productInfo.unidadesReponer}</span>
+                  <div className="space-y-3 text-[12px]">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-[#8C6B79] dark:text-gray-400">Unidades a Reponer</span>
+                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.unidadesReponer}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#8d7079]">Ventas Promedio/Mes</span>
-                      <span className="font-bold text-[#F2778D]">{productInfo.ventasPromedio}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-[#8C6B79] dark:text-gray-400">Ventas Promedio/Mes</span>
+                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.ventasPromedio}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#8d7079]">Variantes Seleccionadas</span>
-                      <span className="font-bold text-[#F2778D]">{productInfo.variantes}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-[#8C6B79] dark:text-gray-400">Variantes Seleccionadas</span>
+                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.variantes}</span>
                     </div>
                   </div>
                 </div>
@@ -122,26 +130,27 @@ export default function AdminStorehouseCreatePage() {
         {/* COLUMNA DERECHA: Proveedores y Variantes */}
         <main className="space-y-6">
           {/* Seleccionar Proveedor */}
-          <article className="rounded-2xl border border-[#f2b6c1]/70 bg-white p-6 shadow-sm">
-            <header className="mb-4">
-              <h2 className="text-base font-bold text-[#594246]">Seleccionar Proveedor</h2>
-              <p className="text-xs text-[#9e8a91]">Elegir socio comercial más compatible para este pedido</p>
+          <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm transition-all">
+            <header className="mb-6">
+              <h2 className="text-[16px] font-black text-[#40202D] dark:text-white tracking-wide">Seleccionar Proveedor</h2>
+              <p className="text-[12px] font-medium text-[#8C6B79] dark:text-gray-400 mt-1">
+                Elegir socio comercial más compatible para este pedido
+              </p>
             </header>
 
             <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b79ca5]" />
+              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400" />
               <input
                 type="text"
                 value={supplierSearch}
                 onChange={(e) => setSupplierSearch(e.target.value)}
                 placeholder="Buscar proveedor por nombre, ubicación o categoría..."
-                className="h-11 w-full rounded-xl border border-rose-100 bg-rose-50/30 pl-10 pr-4 text-sm outline-none ring-[#F2778D] focus:ring-1"
+                className="h-14 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md pl-12 pr-4 text-[13px] font-medium text-[#40202D] dark:text-white placeholder:text-[#8C6B79] outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
               />
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredSuppliers.map((s) => {
-              // Ahora verificamos si el ID está en la lista de seleccionados
               const isSelected = selectedSupplierIds.includes(s._id);
               const rating = Math.max(1, Math.min(5, Math.round(Number(s.rating || 3))));
               
@@ -149,41 +158,41 @@ export default function AdminStorehouseCreatePage() {
                 <button
                   key={s._id}
                   type="button"
-                  onClick={() => toggleSupplier(s._id)} // toggle en lugar de set fijo
-                  className={`relative rounded-2xl border p-4 text-left transition-all ${
+                  onClick={() => toggleSupplier(s._id)}
+                  className={`relative rounded-2xl border p-5 text-left transition-all shadow-sm group hover:scale-[1.02] ${
                     isSelected 
-                      ? "border-[#F2778D] bg-rose-50 ring-1 ring-[#F2778D]" 
-                      : "border-rose-100 bg-white hover:border-rose-300"
+                      ? "border-[#D6405F] bg-white/80 dark:bg-white/10 ring-2 ring-[#D6405F]" 
+                      : "border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md hover:border-[#8C6B79]/50"
                   }`}
                 >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="text-sm font-bold text-[#594246]">{s.name_company}</p>
-                        <span className="mt-1 inline-block rounded bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-[#F2778D] uppercase">
+                        <p className={`text-[14px] font-black tracking-wide ${isSelected ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{s.name_company}</p>
+                        <span className="mt-1.5 inline-flex rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[9px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest shadow-sm">
                           {s.category?.name || "Ropa formal"}
                         </span>
                       </div>
-                      <div className="flex gap-0.5 text-amber-400">
+                      <div className="flex gap-0.5 text-amber-400 bg-white/50 dark:bg-white/5 px-2 py-1 rounded-lg border border-[#EAE0E2] dark:border-white/10 shadow-inner">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`h-3 w-3 ${i < rating ? "fill-current" : "text-gray-200"}`} />
+                          <Star key={i} className={`h-3 w-3 ${i < rating ? "fill-current" : "text-gray-300 dark:text-gray-600"}`} />
                         ))}
                       </div>
                     </div>
 
-                    <div className="mt-4 space-y-1.5 text-[11px]">
-                      <div className="flex items-center gap-1 text-[#9b8088]">
-                        <MapPin className="h-3 w-3" /> {s.address || "San Isidro"}
+                    <div className="space-y-2 text-[11px] font-medium text-[#8C6B79] dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3.5 w-3.5" /> {s.address || "San Isidro"}
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#9b8088]">Último precio:</span>
-                        <span className="font-bold text-[#F2778D]">S/ {s.last_price || "42.50"}</span>
+                      <div className="flex justify-between items-center bg-white/30 dark:bg-white/5 p-2 rounded-xl border border-[#EAE0E2] dark:border-white/10">
+                        <span>Último precio:</span>
+                        <span className="font-black text-[#40202D] dark:text-white">S/ {s.last_price || "42.50"}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#9b8088]">Confiabilidad:</span>
-                        <span className="font-bold text-emerald-500">Excelente</span>
+                      <div className="flex justify-between items-center bg-white/30 dark:bg-white/5 p-2 rounded-xl border border-[#EAE0E2] dark:border-white/10">
+                        <span>Confiabilidad:</span>
+                        <span className="font-black text-emerald-500">Excelente</span>
                       </div>
                     </div>
-                    <p className="mt-3 border-t border-rose-50 pt-2 text-[11px] italic text-[#9e8a91]">
+                    <p className="mt-4 border-t border-[#EAE0E2] dark:border-white/10 pt-3 text-[11px] italic text-[#8C6B79] dark:text-gray-500">
                       "{s.description || "El mejor proveedor para vestidos"}"
                     </p>
                   </button>
@@ -193,23 +202,25 @@ export default function AdminStorehouseCreatePage() {
           </article>
 
           {/* Variantes Solicitadas */}
-          <article className="rounded-2xl border border-[#f2b6c1]/70 bg-[#F2D0D3]/20 p-6 shadow-sm">
-            <h2 className="mb-4 text-base font-bold text-[#594246]">Variantes Solicitadas</h2>
+          <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm">
+            <h2 className="mb-6 text-[16px] font-black text-[#40202D] dark:text-white tracking-wide">
+              Variantes Solicitadas
+            </h2>
             
-            <div className="mb-3 grid grid-cols-12 gap-4 px-2 text-[10px] font-bold uppercase tracking-wider text-[#9b8088]">
+            <div className="mb-4 grid grid-cols-12 gap-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
               <p className="col-span-4 lg:col-span-4">Talla</p>
               <p className="col-span-5 lg:col-span-5">Color</p>
-              <p className="col-span-2 lg:col-span-2">Cantidad</p>
+              <p className="col-span-2 lg:col-span-2 text-center">Cant.</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {items.map((it, idx) => (
-                <div key={idx} className="grid grid-cols-12 items-center gap-4">
+                <div key={idx} className="grid grid-cols-12 items-center gap-4 group">
                   <div className="col-span-4">
                     <select
                       value={it.size}
                       onChange={(e) => handleChangeItem(idx, "size", e.target.value)}
-                      className="h-11 w-full rounded-xl border border-rose-100 bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-[#F2778D]"
+                      className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all appearance-none"
                     >
                       {SIZES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
@@ -218,7 +229,7 @@ export default function AdminStorehouseCreatePage() {
                     <select
                       value={it.color}
                       onChange={(e) => handleChangeItem(idx, "color", e.target.value)}
-                      className="h-11 w-full rounded-xl border border-rose-100 bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-[#F2778D]"
+                      className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all appearance-none"
                     >
                       {COLORS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
@@ -228,12 +239,12 @@ export default function AdminStorehouseCreatePage() {
                       type="number"
                       value={it.quantity}
                       onChange={(e) => handleChangeItem(idx, "quantity", Number(e.target.value))}
-                      className="h-11 w-full rounded-xl border border-rose-100 bg-white px-3 text-center text-sm font-bold outline-none focus:ring-1 focus:ring-[#F2778D]"
+                      className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-2 text-center text-[13px] font-black text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
                     />
                   </div>
                   <button 
                     onClick={() => handleRemoveItem(idx)}
-                    className="col-span-1 flex justify-center text-rose-300 hover:text-rose-500"
+                    className="col-span-1 flex justify-center text-[#8C6B79] hover:text-[#D6405F] dark:text-gray-500 dark:hover:text-[#F8BBD0] transition-colors"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
@@ -244,39 +255,43 @@ export default function AdminStorehouseCreatePage() {
             <button
               type="button"
               onClick={() => handleAddVariant()}
-              className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#F2778D]/30 bg-white/50 text-sm font-bold text-[#F2778D] transition-all hover:bg-white"
+              className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#EAE0E2] dark:border-white/20 bg-white/30 dark:bg-white/5 text-[12px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/50 dark:hover:bg-white/10 hover:border-[#8C6B79] hover:text-[#40202D] dark:hover:text-white shadow-inner"
             >
-              <Plus className="h-4 w-4" /> Agregar Variante (Sugerida automáticamente)
+              <Plus className="h-5 w-5" /> Agregar Variante (Sugerida)
             </button>
 
-            <div className="mt-6 flex items-center justify-between rounded-xl border border-[#F2778D]/30 bg-white p-4">
-              <span className="text-sm font-bold text-[#594246]">Total Unidades Solicitadas:</span>
-              <span className="text-2xl font-black text-[#F2778D]">{totalUnits}</span>
+            <div className="mt-8 flex items-center justify-between rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 p-6 shadow-inner">
+              <span className="text-[13px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                Total Solicitadas:
+              </span>
+              <span className="text-3xl font-black text-[#40202D] dark:text-white">{totalUnits}</span>
             </div>
 
-            <div className="mt-6 space-y-2">
-              <label className="text-xs font-bold text-[#594246]">Observaciones (opcional)</label>
+            <div className="mt-8 space-y-3">
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                Observaciones (opcional)
+              </label>
               <textarea
                 value={confirmation.notes}
                 onChange={(e) => setConfirmation(c => ({ ...c, notes: e.target.value }))}
                 placeholder="Notas adicionales sobre el pedido..."
-                className="h-24 w-full resize-none rounded-xl border border-rose-100 bg-white p-4 text-sm outline-none focus:ring-1 focus:ring-[#F2778D]"
+                className="h-28 w-full resize-none rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md p-5 text-[13px] font-medium text-[#40202D] dark:text-white placeholder:text-[#8C6B79] outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all custom-scrollbar"
               />
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="mt-10 grid grid-cols-2 gap-5">
               <button
                 onClick={() => router.push("/admin/storehouse")}
-                className="h-12 rounded-xl border border-[#F2778D] bg-rose-50 font-bold text-[#F2778D] transition-colors hover:bg-rose-100"
+                className="h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[12px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white shadow-sm"
               >
                 Cancelar
               </button>
               <button
                 disabled={loading || !items.length || selectedSupplierIds.length === 0}
                 onClick={handleCreate}
-                className="h-12 rounded-xl bg-[#F2778D] font-bold text-white shadow-lg disabled:opacity-50"
+                className="h-14 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-[12px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
               >
-                {loading ? "Cargando..." : "Crear Orden de Pre-Compra"}
+                {loading ? "Procesando..." : "Crear Pre-Compra"}
               </button>
             </div>
           </article>

@@ -17,20 +17,20 @@ export const ApproveInventoryModal = ({ isOpen, onClose, onConfirm, isLoading, a
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-[30px] w-full max-w-md p-8 shadow-2xl">
+      <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#594246]">Control de Calidad</h2>
-          <button onClick={onClose} className="p-2 hover:bg-rose-50 rounded-full transition-colors">
-            <X className="w-6 h-6 text-[#9b8088]" />
+          <h2 className="text-2xl font-black text-[#40202D] dark:text-white tracking-wide">Control de Calidad</h2>
+          <button onClick={onClose} className="p-2 hover:bg-white/80 dark:hover:bg-white/10 rounded-full transition-colors border border-transparent hover:border-[#EAE0E2] dark:hover:border-white/10">
+            <X className="w-6 h-6 text-[#8C6B79] dark:text-gray-400" />
           </button>
         </div>
 
-        <p className="text-[#9b8088] mb-8 text-center">
-          ¿Cómo calificarías la calidad del trabajo de <span className="text-[#F2778D] font-bold">{agentName || 'este agente'}</span>?
+        <p className="text-[14px] font-medium text-[#8C6B79] dark:text-gray-300 mb-8 text-center leading-relaxed">
+          ¿Cómo calificarías la calidad del trabajo de <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black">{agentName || 'este agente'}</span>?
         </p>
 
         {/* Estrellas Interactivas */}
-        <div className="flex justify-center gap-2 mb-10">
+        <div className="flex justify-center gap-3 mb-10">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
@@ -41,22 +41,22 @@ export const ApproveInventoryModal = ({ isOpen, onClose, onConfirm, isLoading, a
             >
               <Star
                 className={`w-12 h-12 ${
-                  star <= (hover || rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'
+                  star <= (hover || rating) ? 'fill-amber-400 text-amber-400 drop-shadow-md' : 'text-[#EAE0E2] dark:text-gray-600'
                 }`}
               />
             </button>
           ))}
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <button
             onClick={() => onConfirm(rating)}
             disabled={isLoading}
-            className="w-full py-4 rounded-2xl bg-[#4CAF50] text-white font-bold text-lg hover:bg-[#43a047] disabled:opacity-50 flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-100"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-lg hover:scale-[1.02] disabled:opacity-50"
           >
-            {isLoading ? "Procesando..." : <><CheckCircle2 className="w-6 h-6" /> Aprobar e Ingresar</>}
+            {isLoading ? "Procesando..." : <><CheckCircle2 className="w-5 h-5" /> Aprobar a Inventario</>}
           </button>
-          <button onClick={onClose} className="w-full py-3 text-[#9b8088] font-medium hover:text-[#594246]">
+          <button onClick={onClose} className="w-full py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm">
             Cancelar
           </button>
         </div>

@@ -34,15 +34,15 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] p-4 md:p-8 text-[#594246]">
+    <div className="min-h-screen p-4 md:p-8 text-[#40202D] dark:text-white transition-colors duration-500">
       {/* Header de Navegación */}
-      <div className="max-w-6xl mx-auto mb-8 flex justify-between items-center">
-        <Link href="/admin/products" className="flex items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity">
+      <div className="max-w-6xl mx-auto mb-8 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+        <Link href="/admin/products" className="flex items-center gap-2 text-sm font-bold opacity-70 hover:opacity-100 transition-opacity uppercase tracking-wider">
           <ArrowLeft size={18} /> Volver al catálogo
         </Link>
         <Link 
           href={`/admin/products/edit/${product._id || product.id_product}`}
-          className="flex items-center gap-2 bg-[#594246] text-white px-6 py-2 rounded-lg hover:bg-black transition-all shadow-md text-sm font-bold"
+          className="flex items-center gap-2 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] px-6 py-2.5 rounded-xl hover:scale-[1.02] shadow-lg transition-all text-sm font-bold tracking-wide"
         >
           <Edit3 size={16} /> Editar Producto
         </Link>
@@ -52,17 +52,17 @@ export default function ProductDetailPage() {
         
         {/* COLUMNA IZQUIERDA: GALERÍA */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-white border border-[#EBEAE8] shadow-sm">
-            <img src={mainImage || "/placeholder-prenda.png"} alt={product.name} className="w-full h-full object-cover" />
+          <div className="aspect-[3/4] rounded-3xl overflow-hidden bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm p-2">
+            <img src={mainImage || "/placeholder-prenda.png"} alt={product.name} className="w-full h-full object-cover rounded-2xl" />
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
             {product.images?.map((img: string, idx: number) => (
               <button 
                 key={idx} 
                 onClick={() => setMainImage(img)}
-                className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${mainImage === img ? 'border-[#F2778D]' : 'border-transparent opacity-60'}`}
+                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all flex-shrink-0 bg-white/50 dark:bg-black/50 backdrop-blur-md p-1 ${mainImage === img ? 'border-[#D6405F] dark:border-[#F8BBD0] shadow-md scale-105' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'}`}
               >
-                <img src={img} className="w-full h-full object-cover" alt="miniatura" />
+                <img src={img} className="w-full h-full object-cover rounded-xl" alt="miniatura" />
               </button>
             ))}
           </div>
@@ -72,63 +72,63 @@ export default function ProductDetailPage() {
         <div className="lg:col-span-7 space-y-6">
           
           {/* Info Principal */}
-          <section>
+          <section className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-4">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="bg-[#F2D0D3] text-[#594246] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+              <span className="bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/20 text-[#D6405F] dark:text-[#F8BBD0] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
                 {product.id_category?.name || 'Sin Categoría'}
               </span>
-              <span className="bg-[#594246]/10 text-[#594246] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1">
+              <span className="bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/20 text-[#40202D] dark:text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-sm">
                 <Layers size={10}/> {product.origin_type === 'PRODUCCION' ? 'Producción Propia' : 'Retail / Comercial'}
               </span>
-              <span className="text-xs opacity-40 font-mono ml-auto">{product.sku}</span>
+              <span className="text-xs opacity-50 font-mono ml-auto tracking-widest">{product.sku}</span>
             </div>
-            <h1 className="text-4xl font-serif font-bold mb-3">{product.name}</h1>
-            <p className="text-2xl font-light text-[#F2778D] mb-4">S/ {(product.base_price || 0).toFixed(2)}</p>
-            <div className="p-4 bg-white rounded-xl border border-[#EBEAE8] text-sm leading-relaxed opacity-80">
+            <h1 className="text-4xl font-black tracking-wide">{product.name}</h1>
+            <p className="text-3xl font-bold text-[#D6405F] dark:text-[#F8BBD0] drop-shadow-sm pb-4 border-b border-[#EAE0E2] dark:border-white/10">S/ {(product.base_price || 0).toFixed(2)}</p>
+            <div className="p-5 bg-white/50 dark:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 text-sm leading-relaxed opacity-90 shadow-inner">
               {product.description || 'Sin descripción disponible para este producto.'}
             </div>
           </section>
 
           {/* Especificaciones Técnicas Básicas */}
           <section className="grid grid-cols-3 gap-4">
-            <div className="p-4 bg-white rounded-xl border border-[#EBEAE8]">
-              <div className="flex items-center gap-2 mb-1 opacity-50"><Tag size={13}/><span className="text-[9px] font-bold uppercase tracking-wider">Material</span></div>
-              <p className="text-xs font-bold truncate">{product.composition || 'No especificado'}</p>
+            <div className="p-5 bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm hover:scale-[1.02] transition-transform">
+              <div className="flex items-center gap-2 mb-2 opacity-60"><Tag size={14} className="text-[#D6405F] dark:text-[#F8BBD0]"/><span className="text-[9px] font-bold uppercase tracking-wider">Material</span></div>
+              <p className="text-sm font-black truncate">{product.composition || 'No especificado'}</p>
             </div>
-            <div className="p-4 bg-white rounded-xl border border-[#EBEAE8]">
-              <div className="flex items-center gap-2 mb-1 opacity-50"><Info size={13}/><span className="text-[9px] font-bold uppercase tracking-wider">Género</span></div>
-              <p className="text-xs font-bold">{product.gender}</p>
+            <div className="p-5 bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm hover:scale-[1.02] transition-transform">
+              <div className="flex items-center gap-2 mb-2 opacity-60"><Info size={14} className="text-[#D6405F] dark:text-[#F8BBD0]"/><span className="text-[9px] font-bold uppercase tracking-wider">Género</span></div>
+              <p className="text-sm font-black">{product.gender}</p>
             </div>
-            <div className="p-4 bg-white rounded-xl border border-[#EBEAE8]">
-              <div className="flex items-center gap-2 mb-1 opacity-50"><Package size={13}/><span className="text-[9px] font-bold uppercase tracking-wider">Temporada</span></div>
-              <p className="text-xs font-bold truncate">{product.season || 'Todo el año'}</p>
+            <div className="p-5 bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm hover:scale-[1.02] transition-transform">
+              <div className="flex items-center gap-2 mb-2 opacity-60"><Package size={14} className="text-[#D6405F] dark:text-[#F8BBD0]"/><span className="text-[9px] font-bold uppercase tracking-wider">Temporada</span></div>
+              <p className="text-sm font-black truncate">{product.season || 'Todo el año'}</p>
             </div>
           </section>
 
           {/* 🧵 RENDERIZADO CONDICIONAL: FICHA TÉCNICA DE INSUMOS */}
           {product.origin_type === 'PRODUCCION' && product.technical_sheet && product.technical_sheet.length > 0 && (
-            <section className="bg-white rounded-2xl border border-[#EBEAE8] shadow-sm overflow-hidden animate-in fade-in duration-300">
-              <div className="p-4 bg-[#FAF9F6] border-b border-[#EBEAE8] flex items-center gap-2">
-                <Scissors size={16} className="text-[#594246]" />
-                <h3 className="font-bold uppercase text-xs tracking-wider text-[#594246]">
+            <section className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden animate-in fade-in duration-300">
+              <div className="p-5 bg-white/50 dark:bg-black/30 border-b border-[#EAE0E2] dark:border-white/10 flex items-center gap-2">
+                <Scissors size={18} className="text-[#D6405F] dark:text-[#F8BBD0]" />
+                <h3 className="font-bold uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                   Ficha Técnica de Materiales / Insumos
                 </h3>
               </div>
               <div className="p-2">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="text-gray-400 font-bold uppercase tracking-wider border-b border-gray-50">
-                      <th className="p-3">Material Requerido</th>
-                      <th className="p-3">Unidad de Medida</th>
-                      <th className="p-3 text-right">Cant. por Prenda</th>
+                    <tr className="text-[#8C6B79] dark:text-gray-400 font-bold uppercase tracking-wider border-b border-[#EAE0E2] dark:border-white/10">
+                      <th className="p-4">Material Requerido</th>
+                      <th className="p-4">Unidad de Medida</th>
+                      <th className="p-4 text-right">Cant. por Prenda</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                     {product.technical_sheet.map((item: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-gray-50/50">
-                        <td className="p-3 font-bold text-[#594246]">{item.name}</td>
-                        <td className="p-3 opacity-60 uppercase">{item.unit}</td>
-                        <td className="p-3 text-right font-black text-[#F2778D]">{item.quantity}</td>
+                      <tr key={idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                        <td className="p-4 font-black text-[#40202D] dark:text-white">{item.name}</td>
+                        <td className="p-4 opacity-70 uppercase text-xs">{item.unit}</td>
+                        <td className="p-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -138,60 +138,62 @@ export default function ProductDetailPage() {
           )}
 
           {/* TABLA DE VARIANTES E INVENTARIO */}
-          <section className="bg-white rounded-2xl border border-[#EBEAE8] shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-[#FAF9F6] flex justify-between items-center">
-              <h3 className="font-bold flex items-center gap-2 uppercase text-xs tracking-wider">
-                <Palette size={16} className="text-[#F2778D]"/> Control de Stock por Variantes
+          <section className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 flex justify-between items-center">
+              <h3 className="font-bold flex items-center gap-2 uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
+                <Palette size={18} className="text-[#D6405F] dark:text-[#F8BBD0]"/> Control de Stock por Variantes
               </h3>
             </div>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-[10px] uppercase opacity-40 bg-[#FAF9F6]">
-                  <th className="px-6 py-3">Talla</th>
-                  <th className="px-6 py-3">Color Comercial</th>
-                  <th className="px-6 py-3">SKU Variante</th>
-                  <th className="px-6 py-3 text-right">Stock Inicial</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#FAF9F6]">
-                {product.variants?.map((variant: any, idx: number) => {
-                  // 🛡️ Extraemos de forma segura el objeto de color enriquecido { name, hex }
-                  const colorName = variant.color?.name || "No definido";
-                  const colorHex = variant.color?.hex || "#FFFFFF";
-                  const isStockLow = variant.stock <= (variant.min_stock_alert || 10);
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-xs uppercase font-bold text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
+                    <th className="px-6 py-4">Talla</th>
+                    <th className="px-6 py-4">Color Comercial</th>
+                    <th className="px-6 py-4">SKU Variante</th>
+                    <th className="px-6 py-4 text-right">Stock</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
+                  {product.variants?.map((variant: any, idx: number) => {
+                    // 🛡️ Extraemos de forma segura el objeto de color enriquecido { name, hex }
+                    const colorName = variant.color?.name || "No definido";
+                    const colorHex = variant.color?.hex || "#FFFFFF";
+                    const isStockLow = variant.stock <= (variant.min_stock_alert || 10);
 
-                  return (
-                    <tr key={variant._id || idx} className="hover:bg-[#FAF9F6]/50 transition-colors">
-                      <td className="px-6 py-4 font-black text-sm text-[#594246]">{variant.size}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2.5 text-sm font-medium">
-                          {/* 🎨 Círculo interactivo inyectando el color HEX real de la base de datos */}
-                          <div 
-                            className="w-4 h-4 rounded-full border border-black/10 shadow-sm flex-shrink-0" 
-                            style={{ backgroundColor: colorHex }}
-                            title={`Código HEX: ${colorHex}`}
-                          />
-                          <span>{colorName}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-xs font-mono opacity-50">{variant.sku_variant}</td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex flex-col items-end">
-                          <span className={`font-bold ${isStockLow ? 'text-red-500' : 'text-[#594246]'}`}>
-                            {variant.stock} uds
-                          </span>
-                          {isStockLow && (
-                            <span className="text-[9px] flex items-center gap-1 text-red-400 font-bold uppercase mt-0.5">
-                              <AlertTriangle size={10}/> Stock Bajo
+                    return (
+                      <tr key={variant._id || idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                        <td className="px-6 py-4 font-black text-sm text-[#40202D] dark:text-white">{variant.size}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3 text-sm font-bold text-[#40202D] dark:text-white">
+                            {/* 🎨 Círculo interactivo inyectando el color HEX real de la base de datos */}
+                            <div 
+                              className="w-4 h-4 rounded-full border border-black/10 dark:border-white/10 shadow-inner flex-shrink-0" 
+                              style={{ backgroundColor: colorHex }}
+                              title={`Código HEX: ${colorHex}`}
+                            />
+                            <span>{colorName}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-xs font-mono opacity-70">{variant.sku_variant}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex flex-col items-end">
+                            <span className={`font-black text-lg drop-shadow-sm ${isStockLow ? 'text-red-500' : 'text-[#D6405F] dark:text-[#F8BBD0]'}`}>
+                              {variant.stock} <span className="text-xs opacity-70 font-bold uppercase">uds</span>
                             </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                            {isStockLow && (
+                              <span className="text-[9px] flex items-center gap-1 text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full font-bold uppercase mt-1">
+                                <AlertTriangle size={10}/> Stock Bajo
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </section>
 
         </div>

@@ -59,7 +59,7 @@ export default function AdminDocumentsMovementsPage() {
     >
       {/* HEADER */}
       <div className="flex items-center gap-4 mb-2 opacity-80">
-        <FileText className="w-5 h-5 text-[#D6405F] dark:text-[#F3D899] drop-shadow-[0_0_8px_rgba(243,216,153,0.3)] transition-colors" />
+        <FileText className="w-5 h-5 text-[#D6405F] dark:text-white drop-shadow-sm transition-colors" />
         <h2 className="text-xs font-bold text-gray-500 dark:text-[#F8BBD0]/80 uppercase tracking-widest">
           Solicitudes de Movimientos
         </h2>
@@ -69,7 +69,7 @@ export default function AdminDocumentsMovementsPage() {
       </h1>
 
       {/* TABS ELEGANTES GLASSMORPHISM */}
-      <div className="flex flex-wrap gap-2 mb-10 p-1.5 bg-white/90 dark:bg-black/40 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-2xl w-fit shadow-sm">
+      <div className="flex w-full gap-2 mb-10 p-2 bg-white/90 dark:bg-black/40 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-[2rem] shadow-sm">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -77,22 +77,22 @@ export default function AdminDocumentsMovementsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="relative px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all focus:outline-none flex items-center gap-2 group tracking-wide"
+              className="relative flex-1 py-3.5 rounded-[1.5rem] text-sm font-medium transition-all focus:outline-none flex justify-center items-center gap-2 group tracking-wide"
             >
               {isActive && (
                 <motion.div
                   layoutId="documentTabs"
-                  className="absolute inset-0 bg-white dark:bg-[#F2778D]/10 rounded-xl shadow-sm border border-[#F2DEE4] dark:border-[#F2778D]/30"
+                  className="absolute inset-0 bg-white dark:bg-[#F2778D]/10 rounded-[1.5rem] shadow-sm border border-[#F2DEE4] dark:border-[#F2778D]/30"
                   initial={false}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className={`relative z-10 flex items-center gap-2 transition-colors duration-300 ${
+              <span className={`relative z-10 flex items-center justify-center gap-2 transition-colors duration-300 ${
                 isActive 
                   ? "text-[#D6405F] dark:text-[#F8BBD0]" 
                   : "text-gray-500 dark:text-gray-400 group-hover:text-[#40202D] dark:group-hover:text-white"
               }`}>
-                <Icon className={`w-4 h-4 transition-all duration-300 ${isActive ? "opacity-100 text-[#D6405F] dark:text-[#F3D899] drop-shadow-[0_0_5px_rgba(243,216,153,0.4)]" : "opacity-50 text-current"}`} />
+                <Icon className={`w-4 h-4 transition-all duration-300 ${isActive ? "opacity-100 text-[#D6405F] dark:text-[#F8BBD0] drop-shadow-sm" : "opacity-50 text-current"}`} />
                 {tab.label}
                 {tab.count !== undefined && (
                   <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${

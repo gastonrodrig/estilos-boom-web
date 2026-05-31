@@ -103,15 +103,15 @@ export const Navbar = ({
 
   const bgClass = isHome
     ? scrolled
-      ? "bg-[#FAF9F6]/95 dark:bg-[#FDFBFB]/95 dark:border-b dark:border-black/5 border-black/5"
+      ? "bg-gradient-to-r from-[#FAF9F6]/90 via-white/80 to-[#FAF9F6]/90 dark:from-[#0A0508]/70 dark:via-[#40202D]/40 dark:to-[#0A0508]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/5 shadow-inner"
       : "bg-transparent"
-    : "bg-[#FAF9F6]/95 dark:bg-[#FDFBFB]/95 dark:border-b dark:border-black/5 border-b border-black/5";
+    : "bg-gradient-to-r from-[#FAF9F6]/90 via-white/80 to-[#FAF9F6]/90 dark:from-[#0A0508]/70 dark:via-[#40202D]/40 dark:to-[#0A0508]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/5 shadow-inner";
 
   const textClass = isHome
     ? scrolled
-      ? "text-[#594246] dark:text-[#594246]"
+      ? "text-[#594246] dark:text-gray-200"
       : "text-white"
-    : "text-[#594246] dark:text-[#594246]";
+    : "text-[#594246] dark:text-gray-200";
 
   const isActive = (href: string) => pathname === href;
 
@@ -119,19 +119,19 @@ export const Navbar = ({
     "w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110";
 
   const iconButtonClass =
-    "group flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-black/5 hover:cursor-pointer";
+    "group flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#D6405F]/10 dark:hover:bg-[#F8BBD0]/10 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] hover:cursor-pointer";
 
   const adminUserButtonClass =
-    "group flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 transition-colors duration-200 hover:bg-gray-200 hover:cursor-pointer";
+    "group flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 border border-transparent dark:border-white/10 transition-all duration-300 hover:bg-gray-200 dark:hover:bg-[#D6405F]/20 dark:hover:border-[#D6405F]/40 hover:cursor-pointer shadow-sm";
 
   const adminUserIconClass =
-    "h-[18px] w-[18px] text-gray-600 transition-transform duration-200 group-hover:scale-110";
+    "h-[18px] w-[18px] text-gray-600 dark:text-gray-300 transition-transform duration-200 group-hover:scale-110 group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0]";
 
   const menuLinkClass = (href: string) =>
-    `transition-colors duration-200 ${
+    `transition-all duration-300 ${
       isActive(href)
-        ? "font-semibold border-b-2 pb-1"
-        : "hover:opacity-70 font-light"
+        ? "font-bold text-[#D6405F] dark:text-[#F8BBD0] border-b-2 border-[#D6405F] dark:border-[#F8BBD0] pb-1 drop-shadow-[0_0_8px_rgba(214,64,95,0.4)]"
+        : "hover:text-[#D6405F] dark:hover:text-[#F8BBD0] font-light"
     }`;
 
   const drawerItems: NavDrawerItem[] = isAdminRoute

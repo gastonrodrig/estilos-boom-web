@@ -234,17 +234,17 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] p-8 text-[#594246]">
+    <div className="min-h-screen p-8 text-[#40202D] dark:text-white transition-colors duration-500">
       {/* Header */}
-      <div className="max-w-5xl mx-auto mb-8 flex justify-between items-center">
-        <Link href="/admin/products" className="flex items-center gap-2 text-sm opacity-60 hover:opacity-100">
+      <div className="max-w-5xl mx-auto mb-8 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+        <Link href="/admin/products" className="flex items-center gap-2 text-sm font-bold opacity-70 hover:opacity-100 transition-opacity uppercase tracking-wider">
           <ArrowLeft size={16} /> Volver a Productos
         </Link>
         <div className="flex gap-3">
           <button 
             disabled={loadingProducts} 
             onClick={handleSubmit} 
-            className="px-6 py-2 bg-[#F2778D] text-white rounded-md flex items-center gap-2 disabled:opacity-50 hover:bg-[#d65c72] transition-colors"
+            className="px-6 py-2.5 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] rounded-xl flex items-center gap-2 disabled:opacity-50 hover:scale-[1.02] shadow-lg transition-all font-bold tracking-wide"
           >
             {loadingProducts ? 'Guardando...' : <><Save size={18} /> Guardar producto</>}
           </button>
@@ -254,18 +254,18 @@ export default function CreateProductPage() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-5xl mx-auto">
         {/* COLUMNA IZQUIERDA: IMÁGENES */}
         <div className="md:col-span-4 space-y-4">
-          <div className="bg-white p-6 rounded-xl border border-[#EBEAE8]">
-            <h3 className="font-bold mb-4">Imágenes ({selectedImages.length}/5)</h3>
+          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+            <h3 className="font-black mb-4 tracking-wide uppercase text-sm">Imágenes ({selectedImages.length}/5)</h3>
             <input type="file" id="file-upload" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-            <label htmlFor="file-upload" className="border-2 border-dashed border-[#F2B6C1] rounded-lg p-8 flex flex-col items-center justify-center bg-[#FAF9F6] cursor-pointer">
-              <Upload className="text-[#F2778D] mb-2" size={32} />
-              <p className="text-xs text-center opacity-60">Haz clic para subir fotos</p>
+            <label htmlFor="file-upload" className="border-2 border-dashed border-[#EAE0E2] dark:border-white/20 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] rounded-2xl p-8 flex flex-col items-center justify-center bg-white/50 dark:bg-white/5 cursor-pointer transition-colors group">
+              <Upload className="text-[#D6405F] dark:text-[#F8BBD0] mb-2 group-hover:scale-110 transition-transform" size={32} />
+              <p className="text-xs text-center opacity-60 group-hover:opacity-100 font-bold uppercase tracking-wider">Haz clic para subir fotos</p>
             </label>
             <div className="grid grid-cols-3 gap-2 mt-4">
               {selectedImages.map((file, idx) => (
-                <div key={idx} className="relative aspect-square bg-gray-100 rounded-md overflow-hidden group">
+                <div key={idx} className="relative aspect-square bg-white/50 dark:bg-white/10 rounded-xl overflow-hidden group border border-[#EAE0E2] dark:border-white/10 shadow-sm">
                   <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" alt="preview" />
-                  <button type="button" onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button type="button" onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/60 backdrop-blur-md text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500">
                     <X size={12} />
                   </button>
                 </div>
@@ -278,22 +278,22 @@ export default function CreateProductPage() {
         <div className="md:col-span-8 space-y-6">
           
           {/* Selector de Origen */}
-          <div className="bg-white p-6 rounded-xl border border-[#EBEAE8] shadow-sm">
+          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
             <h3 className="font-bold mb-3 flex items-center gap-2 text-xs uppercase tracking-wider opacity-70">
-              <Layers size={16} className="text-[#F2778D]"/> Tipo de Origen de Prenda *
+              <Layers size={16} className="text-[#D6405F] dark:text-[#F8BBD0]"/> Tipo de Origen de Prenda *
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => handleOriginChange('RETAIL')}
-                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'RETAIL' ? 'border-[#F2778D] bg-rose-50/30 font-bold text-[#F2778D]' : 'border-[#EBEAE8] opacity-60'}`}
+                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'RETAIL' ? 'border-[#D6405F] dark:border-[#F8BBD0] bg-white/80 dark:bg-white/10 font-bold text-[#D6405F] dark:text-[#F8BBD0] shadow-sm' : 'border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-black/30 opacity-60 hover:opacity-100'}`}
               >
                 Flujo Comercial (Retail)
               </button>
               <button
                 type="button"
                 onClick={() => handleOriginChange('PRODUCCION')}
-                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'PRODUCCION' ? 'border-[#F2778D] bg-rose-50/30 font-bold text-[#F2778D]' : 'border-[#EBEAE8] opacity-60'}`}
+                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'PRODUCCION' ? 'border-[#D6405F] dark:border-[#F8BBD0] bg-white/80 dark:bg-white/10 font-bold text-[#D6405F] dark:text-[#F8BBD0] shadow-sm' : 'border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-black/30 opacity-60 hover:opacity-100'}`}
               >
                 Orden de Producción Propia
               </button>
@@ -301,39 +301,39 @@ export default function CreateProductPage() {
           </div>
 
           {/* Información General */}
-          <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm space-y-4">
-            <h3 className="font-bold text-lg border-b border-[#FAF9F6] pb-2">Información general</h3>
+          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-4">
+            <h3 className="font-bold text-lg border-b border-[#EAE0E2] dark:border-white/10 pb-2">Información general</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="text-xs font-bold uppercase opacity-50">Nombre del producto *</label>
-                <input type="text" className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" placeholder="Ej: Vestido Gala" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: Vestido Gala" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">Precio Base (S/.) *</label>
-                <input type="number" className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" placeholder="0.00" value={formData.base_price || ''} onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })} />
+                <input type="number" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="0.00" value={formData.base_price || ''} onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })} />
               </div>
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">Material / Tela</label>
-                <input type="text" className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" placeholder="Ej: 95% Algodón, 5% Elastano" value={formData.composition} onChange={(e) => setFormData({ ...formData, composition: e.target.value })} />
+                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: 95% Algodón, 5% Elastano" value={formData.composition} onChange={(e) => setFormData({ ...formData, composition: e.target.value })} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">Categoría *</label>
-                <select className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" value={formData.id_category} onChange={(e) => setFormData({...formData, id_category: e.target.value})}>
-                  <option value="">Selecciona una categoría</option>
-                  {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+                <select className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" value={formData.id_category} onChange={(e) => setFormData({...formData, id_category: e.target.value})}>
+                  <option value="" className="dark:bg-[#1A0B11]">Selecciona una categoría</option>
+                  {categories.map(cat => <option key={cat._id} value={cat._id} className="dark:bg-[#1A0B11]">{cat.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">Temporada</label>
-                <select className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" value={formData.season} onChange={(e) => setFormData({...formData, season: e.target.value})}>
-                  <option value="">Selecciona temporada</option>
-                  <option value="PRIMAVERA 2026">Primavera 2026</option>
-                  <option value="VERANO 2026">Verano 2026</option>
-                  <option value="OTOÑO / INVIERNO">Otoño / Invierno</option>
-                  <option value="TODO EL AÑO">Todo el año</option>
+                <select className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" value={formData.season} onChange={(e) => setFormData({...formData, season: e.target.value})}>
+                  <option value="" className="dark:bg-[#1A0B11]">Selecciona temporada</option>
+                  <option value="PRIMAVERA 2026" className="dark:bg-[#1A0B11]">Primavera 2026</option>
+                  <option value="VERANO 2026" className="dark:bg-[#1A0B11]">Verano 2026</option>
+                  <option value="OTOÑO / INVIERNO" className="dark:bg-[#1A0B11]">Otoño / Invierno</option>
+                  <option value="TODO EL AÑO" className="dark:bg-[#1A0B11]">Todo el año</option>
                 </select>
               </div>
             </div>
@@ -341,13 +341,13 @@ export default function CreateProductPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">SKU Base *</label>
-                <input type="text" className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md outline-none" placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
+                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
               </div>
               <div>
                 <label className="text-xs font-bold uppercase opacity-50">Género *</label>
-                <div className="flex p-1 bg-[#FAF9F6] rounded-lg mt-1">
+                <div className="flex p-1 bg-white/30 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl mt-1 shadow-inner">
                   {['MUJER', 'HOMBRE', 'UNISEX'].map((g) => (
-                    <button key={g} type="button" onClick={() => setFormData({...formData, gender: g})} className={`flex-1 py-2 text-xs font-bold rounded-md transition-all ${formData.gender === g ? 'bg-[#F2778D] text-white shadow-sm' : 'opacity-40'}`}>
+                    <button key={g} type="button" onClick={() => setFormData({...formData, gender: g})} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${formData.gender === g ? 'bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] shadow-sm' : 'opacity-40 hover:opacity-100'}`}>
                       {g}
                     </button>
                   ))}
@@ -356,39 +356,39 @@ export default function CreateProductPage() {
             </div>
             <div>
               <label className="text-xs font-bold uppercase opacity-50">Descripción</label>
-              <textarea className="w-full p-3 mt-1 bg-[#FAF9F6] border-none rounded-md h-20 outline-none" placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
+              <textarea className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl h-20 outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
             </div>
           </div>
 
           {/* 🧵 FICHA TÉCNICA DE INSUMOS DINÁMICA CONECTADA A TU BASE DE DATOS */}
           {formData.origin_type === 'PRODUCCION' && (
-            <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-              <h3 className="font-bold text-lg border-b border-[#FAF9F6] pb-2 flex items-center gap-2">
+            <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+              <h3 className="font-bold text-lg border-b border-[#EAE0E2] dark:border-white/10 pb-2 flex items-center gap-2">
                 Ficha técnica de insumos
               </h3>
-              <div className="flex items-end gap-3 bg-[#FAF9F6] p-4 rounded-xl">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 p-4 rounded-2xl shadow-inner">
                 <div className="flex-1">
                   <label className="text-[10px] font-bold uppercase opacity-50">Seleccionar Insumo Real</label>
                   <select 
-                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm outline-none font-medium"
+                    className="w-full p-2.5 mt-1 bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-medium shadow-sm"
                     value={selectedInsumoId}
                     onChange={(e) => setSelectedInsumoId(e.target.value)}
                   >
-                    <option value="">Selecciona materia prima del catálogo...</option>
+                    <option value="" className="dark:bg-[#1A0B11]">Selecciona materia prima del catálogo...</option>
                     {/* Filtramos para renderizar solo los insumos que estén ACTIVOS */}
                     {supplies.filter(s => s.is_active).map((ins) => (
-                      <option key={ins._id || ins.id} value={ins._id || ins.id}>
+                      <option key={ins._id || ins.id} value={ins._id || ins.id} className="dark:bg-[#1A0B11]">
                         {ins.name} ({ins.unit})
                       </option>
                     ))}
                   </select>
                 </div>
-                <div className="w-28">
+                <div className="w-full sm:w-28">
                   <label className="text-[10px] font-bold uppercase opacity-50">Cantidad</label>
                   <input 
                     type="number" 
                     min={1} 
-                    className="w-full p-2.5 mt-1 bg-white border border-[#EBEAE8] rounded-md text-sm text-center outline-none font-bold"
+                    className="w-full p-2.5 mt-1 bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm text-center outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-bold shadow-sm"
                     value={insumoQuantity}
                     onChange={(e) => setInsumoQuantity(Math.max(1, Number(e.target.value)))}
                   />
@@ -396,31 +396,31 @@ export default function CreateProductPage() {
                 <button
                   type="button"
                   onClick={handleAddInsumo}
-                  className="px-5 py-2.5 bg-[#F2778D] text-white text-sm font-bold rounded-md hover:bg-[#d65c72] transition-colors flex items-center gap-1"
+                  className="px-5 py-2.5 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] text-sm font-bold rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-1"
                 >
                   <Plus size={16}/> Agregar
                 </button>
               </div>
 
               {technicalSheet.length > 0 ? (
-                <div className="border rounded-lg overflow-hidden border-[#EBEAE8]">
+                <div className="border rounded-2xl overflow-hidden border-[#EAE0E2] dark:border-white/10 shadow-sm bg-white/30 dark:bg-white/5 backdrop-blur-md">
                   <table className="w-full text-sm text-left">
-                    <thead className="bg-[#FAF9F6] text-xs font-bold uppercase opacity-60">
+                    <thead className="bg-white/50 dark:bg-black/30 border-b border-[#EAE0E2] dark:border-white/10 text-xs font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                       <tr>
-                        <th className="p-3">Insumo</th>
-                        <th className="p-3">Unidad</th>
-                        <th className="p-3">Cantidad</th>
-                        <th className="p-3 text-center">Acción</th>
+                        <th className="p-4">Insumo</th>
+                        <th className="p-4">Unidad</th>
+                        <th className="p-4">Cantidad</th>
+                        <th className="p-4 text-center">Acción</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#FAF9F6]">
+                    <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                       {technicalSheet.map((item, index) => (
-                        <tr key={index} className="hover:bg-[#FAF9F6]/30">
-                          <td className="p-3 font-medium text-gray-800">{item.name}</td>
-                          <td className="p-3 text-xs opacity-60 uppercase">{item.unit}</td>
-                          <td className="p-3 font-bold text-[#F2778D]">{item.quantity}</td>
-                          <td className="p-3 text-center">
-                            <button type="button" onClick={() => handleRemoveInsumo(index)} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <tr key={index} className="hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
+                          <td className="p-4 font-bold text-[#40202D] dark:text-white">{item.name}</td>
+                          <td className="p-4 text-xs opacity-70 uppercase">{item.unit}</td>
+                          <td className="p-4 font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity}</td>
+                          <td className="p-4 text-center">
+                            <button type="button" onClick={() => handleRemoveInsumo(index)} className="p-2 text-[#8C6B79] dark:text-gray-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                               <Trash2 size={16} />
                             </button>
                           </td>
@@ -430,15 +430,15 @@ export default function CreateProductPage() {
                   </table>
                 </div>
               ) : (
-                <div className="text-center py-8 bg-[#FAF9F6]/40 rounded-xl border border-dashed border-[#EBEAE8]">
-                  <p className="text-xs opacity-50 italic">Aún no has agregado insumos del catálogo</p>
+                <div className="text-center py-8 bg-white/30 dark:bg-black/30 rounded-2xl border-2 border-dashed border-[#EAE0E2] dark:border-white/20">
+                  <p className="text-xs opacity-60 font-bold uppercase tracking-widest">Aún no has agregado insumos del catálogo</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Variantes: Tallas y Colores */}
-          <div className="bg-white p-8 rounded-xl border border-[#EBEAE8] shadow-sm space-y-6">
+          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-6">
             {/* SECCIÓN TALLAS */}
             <div>
               <h3 className="font-bold mb-4 flex items-center gap-2"><Ruler size={18} /> Tallas *</h3>
@@ -446,7 +446,7 @@ export default function CreateProductPage() {
                 {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => {
                   const isSelected = selectedSizes.includes(size);
                   return (
-                    <button key={size} type="button" onClick={() => toggleSize(size)} className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-[#F2778D] text-white border-[#F2778D] shadow-md' : 'border-[#EBEAE8] hover:bg-[#F2D0D3] text-[#594246]'}`}>
+                    <button key={size} type="button" onClick={() => toggleSize(size)} className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] border-[#D6405F] dark:border-[#F8BBD0] shadow-md scale-110' : 'border-[#EAE0E2] dark:border-white/20 bg-white/50 dark:bg-black/50 hover:bg-[#D6405F]/10 dark:hover:bg-[#F8BBD0]/10 text-[#40202D] dark:text-white'}`}>
                       {size}
                     </button>
                   );
@@ -466,29 +466,29 @@ export default function CreateProductPage() {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full p-3 bg-[#FAF9F6] border border-transparent rounded-xl pl-10 text-sm outline-none focus:border-[#F2B6C1] transition-all shadow-sm"
+                        className="w-full p-3 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl pl-10 text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-all shadow-sm"
                         placeholder="Buscar color en español o inglés... (ej: azul, rosa, blue)"
                         value={colorSearch}
                         onFocus={() => setShowColorDropdown(true)}
                         onChange={(e) => setColorSearch(e.target.value)}
                       />
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F2B6C1]"></div>
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#D6405F] dark:bg-[#F8BBD0]"></div>
                     </div>
                     
                     {showColorDropdown && (
-                      <div className="absolute left-0 right-0 z-50 mt-2 bg-white border border-[#EBEAE8] rounded-xl shadow-xl max-h-60 overflow-y-auto divide-y divide-gray-50">
+                      <div className="absolute left-0 right-0 z-50 mt-2 bg-white/90 dark:bg-black/90 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-y-auto divide-y divide-[#EAE0E2] dark:divide-white/10">
                         {loadingColors ? (
                           <div className="p-4 text-center text-xs opacity-50">Consultando paleta CSS...</div>
                         ) : apiColors.length > 0 ? (
                           apiColors.map((color, idx) => (
                             <div 
                               key={idx} 
-                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-[#FAF9F6] transition-colors"
+                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 transition-colors"
                               onClick={() => handleSelectColor(color)}
                             >
                               <div className="flex items-center gap-3">
-                                <div className="w-4 h-4 rounded-full border border-gray-100 shadow-inner" style={{ backgroundColor: color.hex }} />
-                                <span className="text-sm font-medium text-[#594246]">{color.name}</span>
+                                <div className="w-4 h-4 rounded-full border border-gray-100 dark:border-gray-800 shadow-inner" style={{ backgroundColor: color.hex }} />
+                                <span className="text-sm font-bold text-[#40202D] dark:text-white">{color.name}</span>
                               </div>
                               <span className="text-xs font-mono opacity-40">{color.hex}</span>
                             </div>
@@ -501,7 +501,7 @@ export default function CreateProductPage() {
                           )
                         )}
                         <div 
-                          className="p-3 text-center text-xs font-bold text-[#F2778D] bg-rose-50/20 cursor-pointer hover:bg-rose-50/40 transition-colors border-t rounded-b-xl"
+                          className="p-3 text-center text-xs font-bold text-[#D6405F] dark:text-[#F8BBD0] bg-rose-50/20 dark:bg-white/5 cursor-pointer hover:bg-rose-50/40 dark:hover:bg-white/10 transition-colors border-t border-[#EAE0E2] dark:border-white/10 rounded-b-2xl"
                           onClick={() => {
                             setIsCreatingCustomColor(true);
                             setShowColorDropdown(false);
@@ -513,17 +513,17 @@ export default function CreateProductPage() {
                     )}
                   </>
                 ) : (
-                  <div className="p-4 bg-rose-50/10 border border-[#F2B6C1] rounded-xl space-y-3 animate-in slide-in-from-top-2 duration-200">
-                    <p className="text-xs font-bold uppercase tracking-wider text-[#F2778D]">✨ Nuevo color personalizado</p>
-                    <div className="flex items-center gap-3">
+                  <div className="p-4 bg-rose-50/10 dark:bg-white/5 backdrop-blur-md border border-[#D6405F]/30 dark:border-[#F8BBD0]/30 rounded-2xl space-y-3 animate-in slide-in-from-top-2 duration-200">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">✨ Nuevo color personalizado</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                       <input 
                         type="text" 
                         placeholder="Nombre del color (ej: Palo Rosa)" 
-                        className="flex-1 p-2.5 bg-white border border-[#EBEAE8] rounded-md text-sm outline-none"
+                        className="flex-1 p-2.5 bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0]"
                         value={customColorName}
                         onChange={(e) => setCustomColorName(e.target.value)}
                       />
-                      <div className="flex items-center bg-white border border-[#EBEAE8] p-1.5 rounded-md gap-2">
+                      <div className="flex items-center bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 p-1.5 rounded-xl gap-2">
                         <input 
                           type="color" 
                           className="w-8 h-8 rounded border-none cursor-pointer p-0 bg-transparent"
@@ -532,15 +532,15 @@ export default function CreateProductPage() {
                         />
                         <input 
                           type="text" 
-                          className="w-20 text-xs font-mono outline-none uppercase text-center" 
+                          className="w-20 text-xs font-mono outline-none uppercase text-center bg-transparent" 
                           value={customColorHex} 
                           onChange={(e) => setCustomColorHex(e.target.value)}
                         />
                       </div>
-                      <button type="button" onClick={handleAddCustomColor} className="px-4 py-2 bg-[#F2778D] text-white text-sm font-bold rounded-md">
+                      <button type="button" onClick={handleAddCustomColor} className="px-4 py-2.5 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] text-sm font-bold rounded-xl shadow-md hover:scale-105 transition-all">
                         Agregar
                       </button>
-                      <button type="button" onClick={() => setIsCreatingCustomColor(false)} className="px-3 py-2 border border-[#EBEAE8] text-sm rounded-md hover:bg-white">
+                      <button type="button" onClick={() => setIsCreatingCustomColor(false)} className="px-4 py-2.5 border border-[#EAE0E2] dark:border-white/20 text-sm font-bold rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
                         Cancelar
                       </button>
                     </div>
@@ -552,49 +552,49 @@ export default function CreateProductPage() {
 
               <div className="flex flex-wrap gap-2 pt-2">
                 {selectedColors.map((color) => (
-                  <div key={color.name} className="flex items-center gap-2 px-3 py-1.5 bg-white text-[#594246] rounded-full text-xs font-bold border border-[#EBEAE8] shadow-sm animate-in zoom-in-75 duration-150">
-                    <div className="w-3 h-3 rounded-full border border-black/5" style={{ backgroundColor: color.hex }} />
+                  <div key={color.name} className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-black/50 backdrop-blur-md text-[#40202D] dark:text-white rounded-full text-xs font-bold border border-[#EAE0E2] dark:border-white/10 shadow-sm animate-in zoom-in-75 duration-150">
+                    <div className="w-3 h-3 rounded-full border border-black/5 dark:border-white/10 shadow-inner" style={{ backgroundColor: color.hex }} />
                     {color.name}
-                    <X size={14} className="cursor-pointer text-gray-400 hover:text-[#F2778D]" onClick={() => setSelectedColors(selectedColors.filter(c => c.name !== color.name))} />
+                    <X size={14} className="cursor-pointer text-[#8C6B79] dark:text-gray-400 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] transition-colors" onClick={() => setSelectedColors(selectedColors.filter(c => c.name !== color.name))} />
                   </div>
                 ))}
                 {selectedColors.length === 0 && (
-                  <p className="text-xs opacity-40 italic mt-1">No hay colores seleccionados</p>
+                  <p className="text-xs opacity-40 italic mt-1 font-medium">No hay colores seleccionados</p>
                 )}
               </div>
             </div>
 
             {/* TABLA MATRIZ DE VARIANTES */}
             {variants.length > 0 && (
-              <div className="border border-[#EBEAE8] rounded-xl overflow-hidden animate-in fade-in duration-300">
-                <div className="bg-[#FAF9F6] p-3 border-b border-[#EBEAE8]">
-                  <p className="text-xs font-bold uppercase tracking-wider opacity-60">Matriz de Variantes Generadas ({variants.length})</p>
+              <div className="border border-[#EAE0E2] dark:border-white/10 rounded-2xl overflow-hidden animate-in fade-in duration-300 shadow-sm bg-white/30 dark:bg-white/5 backdrop-blur-md">
+                <div className="bg-white/50 dark:bg-black/30 p-4 border-b border-[#EAE0E2] dark:border-white/10">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">Matriz de Variantes Generadas ({variants.length})</p>
                 </div>
-                <div className="max-h-64 overflow-y-auto">
+                <div className="max-h-64 overflow-y-auto custom-scrollbar">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-[#FAF9F6]/60 sticky top-0 text-xs uppercase opacity-50 border-b">
+                    <thead className="bg-white/50 dark:bg-black/30 sticky top-0 text-xs font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0] border-b border-[#EAE0E2] dark:border-white/10 z-10">
                       <tr>
-                        <th className="p-3">Talla</th>
-                        <th className="p-3">Color</th>
-                        <th className="p-3">SKU Variante</th>
-                        <th className="p-3 text-right">Stock Inicial</th>
+                        <th className="p-4">Talla</th>
+                        <th className="p-4">Color</th>
+                        <th className="p-4">SKU Variante</th>
+                        <th className="p-4 text-right">Stock Inicial</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50 bg-white">
+                    <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                       {variants.map((v, i) => (
-                        <tr key={i} className="hover:bg-[#FAF9F6]/20">
-                          <td className="p-3 font-bold">{v.size}</td>
-                          <td className="p-3">
+                        <tr key={i} className="hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
+                          <td className="p-4 font-black text-[#40202D] dark:text-white">{v.size}</td>
+                          <td className="p-4 font-bold text-[#40202D] dark:text-white">
                             <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: v.color.hex }} />
+                              <div className="w-3 h-3 rounded-full border border-black/10 dark:border-white/10 shadow-inner" style={{ backgroundColor: v.color.hex }} />
                               {v.color.name}
                             </div>
                           </td>
-                          <td className="p-3 font-mono text-xs opacity-60">{v.sku_variant}</td>
-                          <td className="p-3 text-right">
+                          <td className="p-4 font-mono text-xs opacity-70">{v.sku_variant}</td>
+                          <td className="p-4 text-right">
                             <input 
                               type="number" 
-                              className="w-16 p-1 text-right bg-transparent border-b border-[#EBEAE8] outline-none font-bold text-[#F2778D]" 
+                              className="w-16 p-1 text-right bg-transparent border-b border-[#EAE0E2] dark:border-white/20 outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-black text-[#D6405F] dark:text-[#F8BBD0] transition-colors" 
                               value={v.stock} 
                               onChange={(e) => {
                                 const updated = [...variants];

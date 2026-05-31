@@ -76,7 +76,7 @@ export default function TrabajadoresPage() {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
   return (
-    <div className="p-6">
+    <>
       <DataTable
         rows={datosDePrueba}
         loading={false}
@@ -108,6 +108,6 @@ export default function TrabajadoresPage() {
         actions={actions}
         hasActions
       />
-    </div>
+    </>
   );
 }

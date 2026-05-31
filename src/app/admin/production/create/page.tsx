@@ -298,64 +298,64 @@ export default function AdminPreProductionCreatePage() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 space-y-8 min-h-screen bg-[#FDFCFB]">
-      <nav className="flex items-center gap-2 text-sm text-[#9b8088] mb-2">
-        <span onClick={() => router.push("/admin/pre-production")} className="hover:text-[#F2778D] cursor-pointer">Inventario</span>
-        <span className="text-rose-200">/</span>
-        <span onClick={() => setStep(1)} className={`cursor-pointer ${step === 1 ? 'font-semibold text-[#594246]' : 'hover:text-[#F2778D]'}`}>Planificar Producción</span>
-        {step === 2 && <><span className="text-rose-200">/</span><span className="font-semibold text-[#594246]">Detalles Producción</span></>}
+    <section className="mx-auto max-w-7xl px-4 py-8 space-y-8 min-h-screen transition-colors duration-500">
+      <nav className="flex items-center gap-2 text-sm text-[#8C6B79] dark:text-gray-400 mb-2 font-medium">
+        <span onClick={() => router.push("/admin/pre-production")} className="hover:text-[#D6405F] dark:hover:text-[#F8BBD0] cursor-pointer transition-colors">Inventario</span>
+        <span className="text-[#EAE0E2] dark:text-white/20">/</span>
+        <span onClick={() => setStep(1)} className={`cursor-pointer transition-colors ${step === 1 ? 'font-black text-[#40202D] dark:text-white drop-shadow-sm' : 'hover:text-[#D6405F] dark:hover:text-[#F8BBD0]'}`}>Planificar Producción</span>
+        {step === 2 && <><span className="text-[#EAE0E2] dark:text-white/20">/</span><span className="font-black text-[#40202D] dark:text-white drop-shadow-sm">Detalles Producción</span></>}
       </nav>
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
         <div>
-          <h1 className="font-(--font-vidaloka) text-4xl text-[#594246]">{step === 1 ? "Planificar Producción" : "Detalles de Producción"}</h1>
-          <p className="text-[#9b8088] text-sm mt-1">{step === 1 ? "Selecciona uno o más talleres" : "Define cantidades e insumos automáticos"}</p>
+          <h1 className="font-black text-3xl md:text-4xl text-[#40202D] dark:text-white tracking-wide">{step === 1 ? "Planificar Producción" : "Detalles de Producción"}</h1>
+          <p className="text-[#8C6B79] dark:text-gray-300 text-sm mt-2">{step === 1 ? "Selecciona uno o más talleres" : "Define cantidades e insumos automáticos"}</p>
         </div>
-        <button onClick={() => step === 1 ? router.back() : setStep(1)} className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-[#b79ca5] hover:text-[#594246]">
+        <button onClick={() => step === 1 ? router.back() : setStep(1)} className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-[#8C6B79] dark:text-gray-300 hover:text-[#40202D] dark:hover:text-white bg-white/50 dark:bg-white/5 rounded-full border border-[#EAE0E2] dark:border-white/10 transition-colors shadow-sm">
           <ArrowLeft className="h-4 w-4" /> {step === 1 ? "Volver al Tablero" : "Cambiar Talleres"}
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <aside className="lg:col-span-4 space-y-6">
-          <div className="bg-white rounded-[32px] border border-rose-100 p-6 shadow-sm overflow-hidden">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#b79ca5] mb-5">Información del Producto</h2>
-            <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-rose-50 border border-rose-100 mb-6 group">
+          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-6 shadow-sm overflow-hidden">
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-5">Información del Producto</h2>
+            <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 mb-6 group shadow-inner">
               {product?.product_image ? (
                 <Image src={product.product_image} alt={product.product_name} fill className="object-cover transition-transform group-hover:scale-105" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center"><Package2 className="h-16 w-16 text-rose-200" /></div>
+                <div className="flex h-full w-full items-center justify-center"><Package2 className="h-16 w-16 text-[#EAE0E2] dark:text-white/20" /></div>
               )}
             </div>
             <div className="space-y-4">
               <div>
-                <span className="text-[10px] font-bold text-[#b79ca5] uppercase tracking-wider">Producto Seleccionado</span>
-                <p className="text-xl font-medium text-[#594246] uppercase leading-tight mt-0.5">{product?.product_name || "Cargando..."}</p>
-                <div className="mt-2 inline-block px-2 py-0.5 bg-[#F2778D] text-white text-[10px] font-bold rounded-md uppercase">{product?.category_name || "Prenda de Vestir"}</div>
+                <span className="text-[10px] font-bold text-[#8C6B79] dark:text-gray-500 uppercase tracking-widest">Producto Seleccionado</span>
+                <p className="text-xl font-black text-[#40202D] dark:text-white uppercase leading-tight mt-1">{product?.product_name || "Cargando..."}</p>
+                <div className="mt-2 inline-block px-3 py-1 bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white text-[10px] font-black rounded-full uppercase tracking-wider shadow-sm">{product?.category_name || "Prenda de Vestir"}</div>
               </div>
-              <div className="pt-4 border-t border-rose-50 space-y-3">
-                <div className="flex justify-between items-center text-sm"><span className="text-[#9b8088]">Stock Actual</span><div className="flex items-center gap-1.5 font-bold text-[#F2778D]"><span>{product?.stock || 0}</span><AlertCircle className="h-3.5 w-3.5" /></div></div>
-                <div className="flex justify-between items-center text-sm"><span className="text-[#9b8088]">Stock Mínimo</span><span className="font-bold text-[#594246]">{product?.minimum || 0}</span></div>
+              <div className="pt-4 border-t border-[#EAE0E2] dark:border-white/10 space-y-3">
+                <div className="flex justify-between items-center text-sm"><span className="text-[#8C6B79] dark:text-gray-400 font-medium">Stock Actual</span><div className="flex items-center gap-1.5 font-black text-[#D6405F] dark:text-[#F8BBD0]"><span>{product?.stock || 0}</span><AlertCircle className="h-4 w-4" /></div></div>
+                <div className="flex justify-between items-center text-sm"><span className="text-[#8C6B79] dark:text-gray-400 font-medium">Stock Mínimo</span><span className="font-black text-[#40202D] dark:text-white">{product?.minimum || 0}</span></div>
               </div>
-              <div className="mt-6 p-5 rounded-2xl bg-[#FFF5F6] border border-rose-100 relative overflow-hidden">
+              <div className="mt-6 p-5 rounded-2xl bg-gradient-to-br from-[#D6405F]/10 to-[#F23B69]/5 dark:from-[#F8BBD0]/10 dark:to-[#F48FB1]/5 border border-[#D6405F]/20 dark:border-[#F8BBD0]/20 relative overflow-hidden backdrop-blur-md">
                 <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2"><Info className="h-4 w-4 text-[#F2778D]" /><span className="text-[10px] font-bold text-[#F2778D] uppercase tracking-wider">Sugerencia del Sistema</span></div>
-                  <div className="flex justify-between items-baseline"><span className="text-sm text-[#594246] font-medium">Unidades a Producir</span><span className="text-2xl font-bold text-[#F2778D]">{totalQuantity}</span></div>
+                  <div className="flex items-center gap-2 mb-2"><Info className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" /><span className="text-[10px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase tracking-wider">Sugerencia del Sistema</span></div>
+                  <div className="flex justify-between items-baseline"><span className="text-sm text-[#40202D] dark:text-white font-bold">Unidades a Producir</span><span className="text-3xl font-black text-[#D6405F] dark:text-[#F8BBD0] drop-shadow-sm">{totalQuantity}</span></div>
                 </div>
-                <div className="absolute -right-4 -bottom-4 opacity-5"><TrendingUp className="h-20 w-20 text-[#F2778D]" /></div>
+                <div className="absolute -right-4 -bottom-4 opacity-10 dark:opacity-20"><TrendingUp className="h-24 w-24 text-[#D6405F] dark:text-[#F8BBD0]" /></div>
               </div>
             </div>
           </div>
           {step === 2 && (
-            <div className="bg-rose-50 rounded-[32px] border border-rose-100 p-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-[#F2778D] mb-4">Talleres Asignados</h3>
+            <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-6 shadow-sm">
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-5">Talleres Asignados</h3>
               <div className="space-y-3">
                 {selectedWorkshopIds.map(id => {
                   const ws = workshops.find(w => w._id === id);
                   return ws ? (
-                    <div key={id} className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-rose-100">
-                      <Scissors className="h-4 w-4 text-[#F2778D]" />
-                      <span className="text-sm font-bold text-[#594246] truncate">{ws.name_company}</span>
+                    <div key={id} className="flex items-center gap-3 bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-colors hover:bg-white/80 dark:hover:bg-white/10">
+                      <Scissors className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
+                      <span className="text-sm font-bold text-[#40202D] dark:text-white truncate">{ws.name_company}</span>
                     </div>
                   ) : null;
                 })}
@@ -363,21 +363,22 @@ export default function AdminPreProductionCreatePage() {
             </div>
           )}
 
-          <div className="bg-[#594246] text-white rounded-[32px] p-8 shadow-xl shadow-rose-200/40 mt-auto">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-200/60 mb-6 font-sans">Configuración de Orden</h2>
-            <div className="space-y-6">
+          <div className="bg-[#40202D] dark:bg-[#1A0B11] text-white rounded-[32px] p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D6405F] dark:text-[#F8BBD0] mb-6 relative z-10">Configuración de Orden</h2>
+            <div className="space-y-6 relative z-10">
               <div className="flex justify-between items-baseline">
-                <span className="text-sm text-rose-100/80 font-medium">Total a producir:</span>
-                <span className="text-xl font-bold text-white">{totalQuantity} unidades</span>
+                <span className="text-sm text-gray-300 font-medium">Total a producir:</span>
+                <span className="text-2xl font-black text-white">{totalQuantity} unid.</span>
               </div>
               <div className="h-px bg-white/10 w-full" />
               <button
                 disabled={step === 1 && selectedWorkshopIds.length === 0}
                 onClick={step === 1 ? handleNextStep : handleConfirmOrder}
-                className="w-full py-5 bg-[#F2778D] hover:bg-[#d9667a] disabled:bg-[#7a6a6d] text-white font-bold rounded-2xl transition-all shadow-lg hover:shadow-rose-900/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full py-5 bg-gradient-to-r from-[#D6405F] to-[#F23B69] hover:from-[#F23B69] hover:to-[#D6405F] disabled:from-gray-500 disabled:to-gray-600 dark:from-[#F8BBD0] dark:to-[#F48FB1] dark:hover:from-[#F48FB1] dark:hover:to-[#F8BBD0] dark:disabled:from-gray-700 dark:disabled:to-gray-800 dark:text-[#1A0B11] text-white font-black rounded-2xl transition-all shadow-[0_8px_20px_rgba(214,64,95,0.3)] dark:shadow-[0_8px_20px_rgba(248,187,208,0.3)] disabled:shadow-none hover:scale-[1.02] disabled:hover:scale-100 flex items-center justify-center gap-2 uppercase tracking-wide"
               >
                 {step === 1 ? (
-                  <>Siguiente: Detalles <ChevronRight className="h-4 w-4" /></>
+                  <>Siguiente: Detalles <ChevronRight className="h-5 w-5" /></>
                 ) : (
                   "Crear Orden de Producción"
                 )}
@@ -390,17 +391,17 @@ export default function AdminPreProductionCreatePage() {
           <div key={step} style={{ animation: "fadeIn 0.3s ease-out" }} className="space-y-6">
             {step === 1 ? (
               <div className="space-y-6">
-                <div className="bg-white rounded-[32px] border border-rose-100 p-8 shadow-sm">
+                <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-8 shadow-sm">
                   <div className="flex flex-col xl:flex-row gap-4 mb-8">
                     <div className="relative flex-1">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#b79ca5]" />
-                      <input type="text" placeholder="Buscar taller..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full h-14 pl-12 pr-6 rounded-2xl border border-rose-50 bg-[#FCFBFB] outline-none focus:ring-2 focus:ring-[#F2778D]/20 transition-all" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#8C6B79] dark:text-gray-400" />
+                      <input type="text" placeholder="Buscar taller..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full h-14 pl-12 pr-6 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md outline-none focus:ring-2 focus:ring-[#D6405F]/20 dark:focus:ring-[#F8BBD0]/20 transition-all text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500 shadow-inner" />
                     </div>
                     <div className="flex gap-4">
-                      <select value={filterSpecialty} onChange={(e) => setFilterSpecialty(e.target.value)} className="h-14 px-6 rounded-2xl border border-rose-50 bg-[#FCFBFB] text-xs font-bold text-[#594246] outline-none">
+                      <select value={filterSpecialty} onChange={(e) => setFilterSpecialty(e.target.value)} className="h-14 px-6 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-xs font-bold text-[#40202D] dark:text-white outline-none shadow-inner">
                         {specialties.map(s => <option key={s} value={s}>{s}</option>)}
                       </select>
-                      <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="h-14 px-6 rounded-2xl border border-rose-50 bg-[#FCFBFB] text-xs font-bold text-[#594246] outline-none">
+                      <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="h-14 px-6 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-xs font-bold text-[#40202D] dark:text-white outline-none shadow-inner">
                         <option value="TODOS">TODOS LOS ESTADOS</option>
                         <option value="AVAILABLE">DISPONIBLE</option>
                         <option value="LIMITED">LIMITADO</option>
@@ -417,52 +418,52 @@ export default function AdminPreProductionCreatePage() {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-white rounded-[32px] border border-rose-100 p-8 shadow-sm">
-                  <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-normal text-[#594246] font-(--font-vidaloka)">Variantes y Cantidades</h2><button onClick={addVariant} className="flex items-center gap-1.5 text-xs font-bold text-[#F2778D]"><Plus className="h-4 w-4" /> Agregar Variante</button></div>
+                <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-8 shadow-sm">
+                  <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-black text-[#40202D] dark:text-white">Variantes y Cantidades</h2><button onClick={addVariant} className="flex items-center gap-1.5 text-xs font-bold text-[#D6405F] dark:text-[#F8BBD0] hover:text-[#F23B69]"><Plus className="h-4 w-4" /> Agregar Variante</button></div>
                   <div className="space-y-3">
-                    <div className="grid grid-cols-12 gap-4 px-4 text-[10px] font-bold uppercase tracking-widest text-[#b79ca5]">
+                    <div className="grid grid-cols-12 gap-4 px-4 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                       <div className="col-span-4">Talla</div><div className="col-span-4">Color</div><div className="col-span-3">Cantidad</div><div className="col-span-1"></div>
                     </div>
                     {variants.map(v => (
-                      <div key={v.id} className="grid grid-cols-12 gap-4 items-center bg-[#FCFBFB] p-2 rounded-2xl border border-rose-50">
-                        <input className="col-span-4 bg-white border border-rose-50 rounded-xl px-4 py-2 text-sm text-[#594246] outline-none" type="text" value={v.size} onChange={(e) => updateVariant(v.id, "size", e.target.value)} />
-                        <input className="col-span-4 bg-white border border-rose-50 rounded-xl px-4 py-2 text-sm text-[#594246] outline-none" type="text" value={v.color} onChange={(e) => updateVariant(v.id, "color", e.target.value)} />
+                      <div key={v.id} className="grid grid-cols-12 gap-4 items-center bg-white/50 dark:bg-white/5 backdrop-blur-md p-2 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                        <input className="col-span-4 bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 rounded-xl px-4 py-2 text-sm font-bold text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] shadow-inner" type="text" value={v.size} onChange={(e) => updateVariant(v.id, "size", e.target.value)} />
+                        <input className="col-span-4 bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 rounded-xl px-4 py-2 text-sm font-bold text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] shadow-inner" type="text" value={v.color} onChange={(e) => updateVariant(v.id, "color", e.target.value)} />
                         <div className="col-span-3 flex items-center gap-2">
-                          <button onClick={() => updateVariant(v.id, "quantity", Math.max(1, v.quantity - 1))} className="h-8 w-8 rounded-lg bg-rose-100 text-[#F2778D] flex items-center justify-center font-bold">-</button>
-                          <span className="w-8 text-center text-sm font-bold text-[#594246]">{v.quantity}</span>
-                          <button onClick={() => updateVariant(v.id, "quantity", v.quantity + 1)} className="h-8 w-8 rounded-lg bg-rose-100 text-[#F2778D] flex items-center justify-center font-bold">+</button>
+                          <button onClick={() => updateVariant(v.id, "quantity", Math.max(1, v.quantity - 1))} className="h-8 w-8 rounded-lg bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 text-[#D6405F] dark:text-[#F8BBD0] flex items-center justify-center font-bold hover:bg-[#D6405F]/20 transition-colors">-</button>
+                          <span className="w-8 text-center text-sm font-black text-[#40202D] dark:text-white">{v.quantity}</span>
+                          <button onClick={() => updateVariant(v.id, "quantity", v.quantity + 1)} className="h-8 w-8 rounded-lg bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 text-[#D6405F] dark:text-[#F8BBD0] flex items-center justify-center font-bold hover:bg-[#D6405F]/20 transition-colors">+</button>
                         </div>
-                        <button onClick={() => removeVariant(v.id)} className="col-span-1 text-rose-200 hover:text-rose-500 transition-colors"><Trash2 className="h-4 w-4" /></button>
+                        <button onClick={() => removeVariant(v.id)} className="col-span-1 text-[#8C6B79] dark:text-gray-500 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] transition-colors"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[32px] border border-rose-100 p-8 shadow-sm">
+                <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-8 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-xl font-normal text-[#594246] font-(--font-vidaloka)">Insumos por Pre-producción</h2>
-                      <p className="text-[10px] text-[#9b8088] mt-1 uppercase font-bold tracking-widest">Cálculo automático basado en ficha técnica</p>
+                      <h2 className="text-xl font-black text-[#40202D] dark:text-white">Insumos por Pre-producción</h2>
+                      <p className="text-[10px] text-[#8C6B79] dark:text-gray-400 mt-1 uppercase font-black tracking-widest">Cálculo automático basado en ficha técnica</p>
                     </div>
-                    <button onClick={addSupply} className="flex items-center gap-1.5 text-xs font-bold text-[#F2778D]"><Plus className="h-4 w-4" /> Agregar Insumo</button>
+                    <button onClick={addSupply} className="flex items-center gap-1.5 text-xs font-bold text-[#D6405F] dark:text-[#F8BBD0] hover:text-[#F23B69]"><Plus className="h-4 w-4" /> Agregar Insumo</button>
                   </div>
 
                   <div className="space-y-3">
-                    <div className="grid grid-cols-12 gap-4 px-4 text-[10px] font-bold uppercase tracking-widest text-[#b79ca5]">
+                    <div className="grid grid-cols-12 gap-4 px-4 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                       <div className="col-span-5">Insumo / Consumo Unit.</div>
                       <div className="col-span-4">Cantidad (Calculada + Adicional)</div>
                       <div className="col-span-2">Unidad</div>
                       <div className="col-span-1"></div>
                     </div>
                     {supplies.map(s => (
-                      <div key={s.id} className="grid grid-cols-12 gap-4 items-center bg-[#FCFBFB] p-2 rounded-2xl border border-rose-50 group">
+                      <div key={s.id} className="grid grid-cols-12 gap-4 items-center bg-white/50 dark:bg-white/5 backdrop-blur-md p-2 rounded-2xl border border-[#EAE0E2] dark:border-white/10 group shadow-sm">
                         <div className="col-span-5 flex flex-col px-4">
-                          <input className="bg-transparent border-none p-0 text-sm font-bold text-[#594246] outline-none" type="text" value={s.name} onChange={(e) => updateSupply(s.id, "name", e.target.value)} placeholder="Insumo..." />
-                          <span className="text-[9px] text-[#F2778D] font-bold uppercase">Consumo: {s.unitConsumption} {s.unit} / prenda</span>
+                          <input className="bg-transparent border-none p-0 text-sm font-bold text-[#40202D] dark:text-white outline-none placeholder:text-[#8C6B79]" type="text" value={s.name} onChange={(e) => updateSupply(s.id, "name", e.target.value)} placeholder="Insumo..." />
+                          <span className="text-[9px] text-[#D6405F] dark:text-[#F8BBD0] font-black uppercase">Consumo: {s.unitConsumption} {s.unit} / prenda</span>
                         </div>
                         <div className="col-span-4 relative">
                           <input
-                            className="w-full bg-white border border-rose-100 rounded-xl px-4 py-2 text-sm font-bold text-[#594246] outline-none focus:border-[#F2778D]"
+                            className="w-full bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 rounded-xl px-4 py-2 text-sm font-bold text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] shadow-inner"
                             type="number"
                             step="0.01"
                             min={s.theoreticalQuantity}
@@ -476,17 +477,17 @@ export default function AdminPreProductionCreatePage() {
                           )}
                         </div>
                         <div className="col-span-2">
-                          <select className="w-full bg-transparent text-xs font-bold text-[#b79ca5] uppercase outline-none" value={s.unit} onChange={(e) => updateSupply(s.id, "unit", e.target.value)}>
+                          <select className="w-full bg-transparent text-xs font-bold text-[#8C6B79] dark:text-gray-400 uppercase outline-none" value={s.unit} onChange={(e) => updateSupply(s.id, "unit", e.target.value)}>
                             <option value="metros">metros</option><option value="unidades">unidades</option><option value="conos">conos</option>
                           </select>
                         </div>
-                        <button onClick={() => removeSupply(s.id)} className="col-span-1 text-rose-100 hover:text-rose-500 transition-colors flex justify-center"><Trash2 className="h-4 w-4" /></button>
+                        <button onClick={() => removeSupply(s.id)} className="col-span-1 text-[#8C6B79] dark:text-gray-500 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] transition-colors flex justify-center"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     ))}
-                    <div className="mt-4 p-4 bg-rose-50/50 rounded-2xl flex items-start gap-3 border border-dashed border-rose-200">
-                      <Calculator className="h-5 w-5 text-[#F2778D] shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-[#9b8088] leading-relaxed">
-                        Los valores se calculan automáticamente multiplicando el consumo unitario por el total de <span className="font-bold text-[#F2778D]">{totalQuantity} unidades</span>.
+                    <div className="mt-4 p-4 bg-gradient-to-r from-[#D6405F]/5 to-transparent dark:from-[#F8BBD0]/5 rounded-2xl flex items-start gap-3 border border-dashed border-[#D6405F]/20 dark:border-[#F8BBD0]/20">
+                      <Calculator className="h-5 w-5 text-[#D6405F] dark:text-[#F8BBD0] shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-[#8C6B79] dark:text-gray-300 leading-relaxed font-medium">
+                        Los valores se calculan automáticamente multiplicando el consumo unitario por el total de <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{totalQuantity} unidades</span>.
                         Puedes aumentar la cantidad para incluir material adicional, pero el sistema no permitirá reducirlo por debajo del mínimo teórico necesario.
                       </p>
                     </div>
@@ -494,20 +495,20 @@ export default function AdminPreProductionCreatePage() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
-                  <div className="bg-white rounded-[32px] border border-rose-100 p-8 shadow-sm">
-                    <h2 className="text-xl font-normal mb-4 flex items-center gap-2 text-[#594246] font-(--font-vidaloka)"><Calendar className="h-5 w-5 text-[#F2778D]" /> Fecha Requerida</h2>
+                  <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-8 shadow-sm">
+                    <h2 className="text-xl font-black mb-4 flex items-center gap-2 text-[#40202D] dark:text-white"><Calendar className="h-5 w-5 text-[#D6405F] dark:text-[#F8BBD0]" /> Fecha Requerida</h2>
                     <input
                       type="date"
                       min={new Date().toISOString().split("T")[0]}
                       value={requiredDate}
                       onChange={(e) => setRequiredDate(e.target.value)}
-                      className="w-full bg-[#FCFBFB] border border-rose-50 rounded-2xl px-6 py-4 text-sm font-bold text-[#594246] outline-none focus:ring-2 focus:ring-[#F2778D]/20"
+                      className="w-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl px-6 py-4 text-sm font-bold text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] shadow-inner"
                     />
-                    <p className="mt-3 text-[11px] text-[#9b8088] flex items-center gap-1.5 font-medium uppercase tracking-wider"><Info className="h-3.5 w-3.5 text-[#F2778D]" /> Máximo 7 días desde hoy para producción express</p>
+                    <p className="mt-3 text-[11px] text-[#8C6B79] dark:text-gray-400 flex items-center gap-1.5 font-bold uppercase tracking-wider"><Info className="h-3.5 w-3.5 text-[#D6405F] dark:text-[#F8BBD0]" /> Máximo 7 días desde hoy para producción express</p>
                   </div>
-                  <div className="bg-white rounded-[32px] border border-rose-100 p-8 shadow-sm">
-                    <h2 className="text-xl font-normal mb-4 flex items-center gap-2 text-[#594246] font-(--font-vidaloka)"><MessageSquare className="h-5 w-5 text-[#F2778D]" /> Observaciones</h2>
-                    <textarea value={observations} onChange={(e) => setObservations(e.target.value)} placeholder="Instrucciones especiales para el taller..." className="w-full bg-[#FCFBFB] border border-rose-50 rounded-2xl px-6 py-4 text-sm text-[#594246] outline-none focus:ring-2 focus:ring-[#F2778D]/20 min-h-[120px] resize-none" />
+                  <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 p-8 shadow-sm">
+                    <h2 className="text-xl font-black mb-4 flex items-center gap-2 text-[#40202D] dark:text-white"><MessageSquare className="h-5 w-5 text-[#D6405F] dark:text-[#F8BBD0]" /> Observaciones</h2>
+                    <textarea value={observations} onChange={(e) => setObservations(e.target.value)} placeholder="Instrucciones especiales para el taller..." className="w-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl px-6 py-4 text-sm text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] min-h-[120px] resize-none shadow-inner custom-scrollbar" />
                   </div>
                 </div>
               </div>

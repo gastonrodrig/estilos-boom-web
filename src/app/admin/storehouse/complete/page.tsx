@@ -67,34 +67,34 @@ export default function CompletedOrdersPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
         <div>
-          <div className="flex items-center gap-2 text-[#F2778D]">
+          <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0]">
             <History className="h-5 w-5" />
-            <span className="text-sm font-bold uppercase tracking-widest">Almacén</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Almacén</span>
           </div>
-          <h1 className="text-4xl text-[#594246] mt-2 font-serif">Órdenes Finalizadas</h1>
-          <p className="text-[#9b8088] mt-1">Historial de mercadería ingresada al inventario.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide mt-2">Órdenes Finalizadas</h1>
+          <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Historial de mercadería ingresada al inventario.</p>
         </div>
 
         <div className="flex gap-4">
-          <div className="rounded-2xl bg-white border border-rose-100 p-5 shadow-sm min-w-[200px]">
-            <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Inversión Total</p>
-            <p className="text-2xl font-black text-[#F2778D] mt-1">{formatCurrency(totalInvestment)}</p>
+          <div className="rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 p-5 shadow-inner backdrop-blur-md min-w-[200px]">
+            <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
+            <p className="text-2xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1">{formatCurrency(totalInvestment)}</p>
           </div>
-          <div className="rounded-2xl bg-[#594246] p-5 shadow-sm min-w-[160px]">
-            <p className="text-[10px] font-bold text-rose-200/60 uppercase">Órdenes</p>
+          <div className="rounded-2xl bg-gradient-to-br from-[#40202D] to-[#594246] dark:from-white/10 dark:to-white/5 border border-[#EAE0E2]/20 dark:border-white/10 p-5 shadow-inner min-w-[160px]">
+            <p className="text-[10px] font-black text-white/60 dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
             <p className="text-2xl font-black text-white mt-1">{completedOCs.length} OCs</p>
           </div>
         </div>
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-sm">
-        <div className="overflow-x-auto">
+      <main className="overflow-hidden rounded-[2rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md shadow-sm">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-rose-50/50 text-[11px] font-bold uppercase tracking-wider text-[#b79ca5]">
+              <tr className="bg-white/30 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
                 <th className="px-6 py-5">Código OC</th>
                 <th className="px-6 py-5">Proveedor</th>
                 <th className="px-6 py-5">Fecha Llegada</th>
@@ -104,50 +104,50 @@ export default function CompletedOrdersPage() {
                 <th className="px-6 py-5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-rose-50 text-sm">
+            <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[13px]">
               {completedOCs.map((oc) => {
                 // ✅ CORRECCIÓN SEGÚN LOG: id_supplier y name_company
                 const supplierName = oc.id_supplier?.name_company || "Proveedor Desconocido";
 
                 return (
-                  <tr key={oc._id} className="hover:bg-rose-50/20 transition-colors group">
-                    <td className="px-6 py-5 font-bold text-[#594246]">
+                  <tr key={oc._id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+                    <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
                       {oc.order_number}
                     </td>
                     <td className="px-6 py-5">
-                        <p className="font-semibold text-[#594246]">
+                        <p className="font-bold text-[#40202D] dark:text-white">
                             {supplierName}
                         </p>
-                        <p className="text-[11px] text-[#9b8088]">Mantenimiento</p>
+                        <p className="text-[11px] font-medium text-[#8C6B79] dark:text-gray-400">Mantenimiento</p>
                     </td>
                     <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-[#594246]">
-                        <Calendar className="h-3.5 w-3.5 text-[#F2778D]" />
+                      <div className="flex items-center gap-2 text-[#40202D] dark:text-white font-medium">
+                        <Calendar className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
                         {/* Si delivery_date_actual es undefined, usamos updated_at */}
                         {formatDate(oc.delivery_date_actual || oc.updated_at)}
                       </div>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <span className="rounded-full bg-rose-50 px-3 py-1 text-[12px] font-bold text-[#F2778D]">
+                      <span className="inline-flex rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 px-3 py-1.5 text-[11px] font-black tracking-widest text-[#D6405F] dark:text-[#F8BBD0] shadow-sm">
                         {oc.items?.length || 0} SKU
                       </span>
                     </td>
-                    <td className="px-6 py-5 font-bold text-[#594246]">
+                    <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
                       {formatCurrency(oc.total_amount)}
                     </td>
                     <td className="px-6 py-5">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         {/* Manejo de calidad si viene undefined */}
-                        <span className={`h-2 w-2 rounded-full ${oc.quality_rating || 0 >= 4 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                        <span className="font-bold text-[#594246]">{oc.quality_rating || 'N/A'}/5</span>
+                        <span className={`h-2.5 w-2.5 rounded-full shadow-sm ${oc.quality_rating || 0 >= 4 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        <span className="font-black text-[#40202D] dark:text-white">{oc.quality_rating || 'N/A'}/5</span>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-3">
                       {/* Botón para ver el detalle de la OC (el que ya tenías) */}
                       <button 
                         title="Ver Detalle"
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#9b8088] hover:bg-[#594246] hover:text-white transition-all"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:bg-[#40202D] dark:hover:bg-white/10 hover:text-white transition-all shadow-sm"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -158,7 +158,7 @@ export default function CompletedOrdersPage() {
                         onClick={() => window.open(`/admin/storehouse/invoice/${oc._id}`, '_blank')}
                         
                         title="Ver Factura / Comprobante"
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#F2778D] hover:bg-[#F2778D] hover:text-white transition-all shadow-sm"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 text-[#D6405F] dark:text-[#F8BBD0] hover:bg-[#D6405F] dark:hover:bg-[#F8BBD0] hover:text-white dark:hover:text-black transition-all shadow-sm"
                       >
                         <FileText className="h-4 w-4" />
                       </button>
@@ -170,9 +170,9 @@ export default function CompletedOrdersPage() {
 
               {completedOCs.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-20 text-center text-[#9b8088]">
-                    No hay órdenes en estado <b>COMPLETADA</b>. <br/>
-                    <span className="text-xs">Actualmente hay {purchaseOrders.length} órdenes pero están en otros estados (ej. PENDIENTE).</span>
+                  <td colSpan={7} className="px-6 py-24 text-center">
+                    <p className="text-[14px] font-bold text-[#8C6B79] dark:text-gray-400">No hay órdenes en estado <b>COMPLETADA</b>.</p>
+                    <p className="text-[12px] font-medium text-[#8C6B79] dark:text-gray-500 mt-2">Actualmente hay {purchaseOrders.length} órdenes pero están en otros estados (ej. PENDIENTE).</p>
                   </td>
                 </tr>
               )}

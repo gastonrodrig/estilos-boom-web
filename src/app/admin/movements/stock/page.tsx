@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, Fragment } from "react";
 import { useProductStore, useStorehouseStore,useSupplyStore } from "@/hooks";
-import { Search, ChevronDown, ChevronUp, X, MoveRight, AlertCircle, ArrowRightLeft } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, X, MoveRight, AlertCircle, ArrowRightLeft, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -83,38 +83,38 @@ export default function StockActualPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] p-6 text-[#594246] flex gap-6">
+    <div className="min-h-screen p-6 text-[#40202D] dark:text-white flex flex-col lg:flex-row gap-6 transition-colors duration-500">
       
       {/* SECCIÓN IZQUIERDA: MATRIZ DE STOCK */}
       <div className="flex-1 space-y-6">
         {/* Filtros superiores */}
-        <div className="flex gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+        <div className="flex flex-col md:flex-row gap-4 items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400" size={18} />
             <input 
               type="text" 
               placeholder="Buscar producto..." 
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#EBEAE8] rounded-xl outline-none text-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl outline-none text-sm text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500 focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <select className="p-2.5 bg-white border border-[#EBEAE8] rounded-xl text-sm outline-none">
-            <option>Todos los productos</option>
+          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
+            <option className="text-black">Todos los productos</option>
           </select>
-          <select className="p-2.5 bg-white border border-[#EBEAE8] rounded-xl text-sm outline-none">
-            <option>Todas las ubicaciones</option>
+          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
+            <option className="text-black">Todas las ubicaciones</option>
           </select>
         </div>
 
         {/* Tallas Filter Badges */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {["Todos", "XS", "S", "M", "L", "XL"].map(size => (
             <button 
               key={size}
               onClick={() => setSelectedSizeFilter(size)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                selectedSizeFilter === size ? "bg-[#594246] text-white" : "bg-white border border-[#EBEAE8]"
+              className={`px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm ${
+                selectedSizeFilter === size ? "bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] border border-transparent shadow-md scale-105" : "bg-white/70 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-300 hover:scale-105"
               }`}
             >
               {size}
@@ -123,19 +123,19 @@ export default function StockActualPage() {
         </div>
 
         {/* Tabla / Matriz */}
-        <div className="bg-white border border-[#EBEAE8] rounded-2xl overflow-hidden shadow-sm overflow-x-auto">
+        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl overflow-hidden shadow-sm overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm min-w-[800px]">
-            <thead className="bg-[#FAF9F6] text-xs uppercase font-bold opacity-60 border-b">
+            <thead className="bg-white/50 dark:bg-black/30 text-xs uppercase font-bold text-[#D6405F] dark:text-[#F8BBD0] border-b border-[#EAE0E2] dark:border-white/10">
               <tr>
-                <th className="p-4 w-12 text-center"></th>
-                <th className="p-4 min-w-[280px]">Producto</th>
-                <th className="p-4 text-center w-36">Total Almacén</th>
-                <th className="p-4 text-center w-36">Total Tienda</th>
-                <th className="p-4 text-center w-32">Estado</th>
-                <th className="p-4 text-center w-28">Acción</th>
+                <th className="p-5 w-12 text-center"></th>
+                <th className="p-5 min-w-[280px]">Producto</th>
+                <th className="p-5 text-center w-36">Total Almacén</th>
+                <th className="p-5 text-center w-36">Total Tienda</th>
+                <th className="p-5 text-center w-32">Estado</th>
+                <th className="p-5 text-center w-28">Acción</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#FAF9F6]">
+            <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
               {products?.map((prod: any, index: number) => {
                 // ✅ CORRECCIÓN: Buscamos dinámicamente el ID real que use tu backend (id_product o _id)
                 const productId = prod.id_product || prod._id || `fallback-id-${index}`;
@@ -158,34 +158,33 @@ export default function StockActualPage() {
                 return (
                   <Fragment key={productKey}>
                     {/* FILA PADRE */}
-                    <tr className={`transition-colors font-medium border-b ${isExpanded ? "bg-[#FAF9F6]/40" : "hover:bg-[#FAF9F6]/30"}`}>
+                    <tr className={`transition-colors font-medium hover:bg-white/50 dark:hover:bg-white/5 ${isExpanded ? "bg-white/80 dark:bg-white/10" : ""}`}>
                       <td className="p-4 text-center">
                         <button 
                           type="button"
-                          // ✅ Pasamos el ID correcto para abrir de forma aislada
                           onClick={() => toggleExpandProduct(productId, prod.variants)}
-                          className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+                          className="p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                         >
-                          {isExpanded ? <ChevronUp size={18} className="text-[#594246]" /> : <ChevronDown size={18} className="text-[#594246]" />}
+                          {isExpanded ? <ChevronUp size={18} className="text-[#40202D] dark:text-white" /> : <ChevronDown size={18} className="text-[#40202D] dark:text-white" />}
                         </button>
                       </td>
                       <td className="p-4 flex items-center gap-3">
-                        <div className="w-10 h-12 rounded-lg bg-gray-50 border overflow-hidden shrink-0 shadow-sm">
+                        <div className="w-10 h-12 rounded-lg bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 overflow-hidden shrink-0 shadow-sm">
                           <img src={prod.images?.[0]} className="w-full h-full object-cover" alt="" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-bold text-gray-800 truncate">{prod.name}</p>
-                          <p className="text-xs opacity-50 truncate">{prod.id_category?.name || 'Prendas'}</p>
+                          <p className="font-bold text-[#40202D] dark:text-white truncate">{prod.name}</p>
+                          <p className="text-xs text-[#8C6B79] dark:text-gray-400 truncate">{prod.id_category?.name || 'Prendas'}</p>
                         </div>
                       </td>
-                      <td className="p-4 text-center font-bold text-lg text-gray-700">
-                        {totalAlmacen !== null ? totalAlmacen : <span className="text-xs font-normal text-gray-300">⚡ Cargar</span>}
+                      <td className="p-4 text-center font-black text-lg text-[#40202D] dark:text-white drop-shadow-sm">
+                        {totalAlmacen !== null ? totalAlmacen : <span className="text-xs font-normal opacity-50 flex items-center justify-center gap-1"><Sparkles size={10} className="animate-pulse text-[#D6405F] dark:text-[#F8BBD0]"/> Cargar</span>}
                       </td>
-                      <td className="p-4 text-center font-bold text-lg text-rose-400">
-                        {totalTienda !== null ? totalTienda : <span className="text-xs font-normal text-gray-300">⚡ Cargar</span>}
+                      <td className="p-4 text-center font-black text-lg text-[#D6405F] dark:text-[#F8BBD0] drop-shadow-sm">
+                        {totalTienda !== null ? totalTienda : <span className="text-xs font-normal opacity-50 flex items-center justify-center gap-1"><Sparkles size={10} className="animate-pulse text-[#D6405F] dark:text-[#F8BBD0]"/> Cargar</span>}
                       </td>
                       <td className="p-4 text-center">
-                        <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase border border-emerald-100">
+                        <span className="bg-emerald-500/10 text-emerald-600 dark:text-[#A5D6A7] px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase border border-emerald-500/20 shadow-sm">
                           Todo OK
                         </span>
                       </td>
@@ -193,7 +192,7 @@ export default function StockActualPage() {
                         <button 
                           type="button"
                           onClick={() => handleAddProductToOrder(prod)}
-                          className="px-4 py-1.5 bg-[#F2778D] hover:bg-[#d65c72] text-white text-xs font-bold rounded-full transition-colors shadow-sm"
+                          className="px-4 py-1.5 bg-[#D6405F] dark:bg-[#F8BBD0] hover:scale-105 text-white dark:text-[#40202D] text-xs font-bold rounded-full transition-transform shadow-md"
                         >
                           Mover
                         </button>
@@ -206,25 +205,25 @@ export default function StockActualPage() {
                       const hasStockData = stocksByVariant[variant._id] !== undefined;
 
                       return (
-                        <tr key={variantKey} className="bg-[#FAF9F6]/20 text-xs border-b border-gray-100/50">
+                        <tr key={variantKey} className="bg-white/40 dark:bg-white/5 text-xs">
                           <td></td>
                           {/* 🎨 CELDA DE PRODUCTO ADAPTATIVA Y RESPONSIVA */}
-                          <td className="p-3 pl-10">
+                          <td className="p-3 pl-10 border-l-2 border-[#D6405F] dark:border-[#F8BBD0]">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 min-w-0">
                               <div className="flex items-center gap-2 shrink-0">
-                                <div className="w-3 h-3 rounded-full border border-black/10 shadow-inner" style={{ backgroundColor: variant.color?.hex }} />
-                                <span className="font-bold text-gray-700 text-sm">{variant.size} • {variant.color?.name}</span>
+                                <div className="w-3 h-3 rounded-full border border-black/10 dark:border-white/10 shadow-inner" style={{ backgroundColor: variant.color?.hex }} />
+                                <span className="font-bold text-[#40202D] dark:text-white text-sm">{variant.size} • {variant.color?.name}</span>
                               </div>
-                              <span className="font-mono text-[11px] text-gray-400 bg-gray-100/70 px-2 py-0.5 rounded truncate max-w-[220px]">
+                              <span className="font-mono text-[11px] text-[#8C6B79] dark:text-gray-400 bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 px-2 py-0.5 rounded truncate max-w-[220px]">
                                 {variant.sku_variant}
                               </span>
                             </div>
                           </td>
-                          <td className="p-3 text-center font-bold text-gray-600 text-sm">
-                            {hasStockData ? stocksByVariant[variant._id].almacen : <span className="animate-pulse text-gray-300">...</span>}
+                          <td className="p-3 text-center font-bold text-[#40202D] dark:text-white text-sm">
+                            {hasStockData ? stocksByVariant[variant._id].almacen : <span className="animate-pulse opacity-50">...</span>}
                           </td>
-                          <td className="p-3 text-center font-bold text-rose-400 text-sm">
-                            {hasStockData ? stocksByVariant[variant._id].tienda : <span className="animate-pulse text-rose-300">...</span>}
+                          <td className="p-3 text-center font-bold text-[#D6405F] dark:text-[#F8BBD0] text-sm">
+                            {hasStockData ? stocksByVariant[variant._id].tienda : <span className="animate-pulse opacity-50">...</span>}
                           </td>
                           <td className="p-3"></td>
                           <td></td>
@@ -240,14 +239,16 @@ export default function StockActualPage() {
       </div>
 
       {/* 🔴 SECCIÓN DERECHA: PANEL FLOTANTE "ORDEN DE MOVIMIENTO" (Imagen 4) */}
-      <div className="w-80 bg-white border border-[#EBEAE8] rounded-2xl p-5 shadow-lg flex flex-col h-[calc(100vh-50px)] sticky top-6">
-        <div className="flex items-center gap-2 border-b pb-3 mb-4">
-          <ArrowRightLeft className="text-[#594246]" size={18} />
-          <h3 className="font-serif font-bold text-lg">Orden de movimiento</h3>
+      <div className="w-full lg:w-80 bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl p-5 shadow-sm flex flex-col h-[calc(100vh-50px)] sticky top-6 z-10">
+        <div className="flex items-center gap-2 border-b border-[#EAE0E2] dark:border-white/10 pb-4 mb-4">
+          <div className="w-8 h-8 rounded-full bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 flex items-center justify-center shrink-0">
+            <ArrowRightLeft className="text-[#D6405F] dark:text-[#F8BBD0]" size={16} />
+          </div>
+          <h3 className="font-bold tracking-wide text-lg text-[#40202D] dark:text-white">Orden de movimiento</h3>
         </div>
 
         {/* Lista de productos seleccionados */}
-        <div className="flex-1 overflow-y-auto space-y-3">
+        <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
           {Object.values(cartMovement).map((item: any, idx: number) => {
             // ✅ LLAVE DE RESPALDO: Si id_product fallara por algún motivo, el índice salva la UI
             const cartItemKey = item.id_product ? `cart-item-${item.id_product}` : `cart-idx-${idx}`;
@@ -255,13 +256,13 @@ export default function StockActualPage() {
             return (
               <div 
                 key={cartItemKey} // 🚀 Llave única y garantizada para React
-                className="flex items-center justify-between p-2 hover:bg-[#FAF9F6] rounded-xl border relative group animate-in fade-in zoom-in-95 duration-150"
+                className="flex items-center justify-between p-3 hover:bg-white/50 dark:hover:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 relative group animate-in fade-in zoom-in-95 duration-150 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <img src={item.image} className="w-8 h-10 object-cover rounded bg-gray-50" alt="" />
+                  <img src={item.image} className="w-10 h-12 object-cover rounded-xl bg-white/50 border border-[#EAE0E2] dark:border-white/5" alt="" />
                   <div>
-                    <p className="text-xs font-bold text-gray-800 truncate max-w-[140px]">{item.name}</p>
-                    <p className="text-[10px] opacity-40">{item.variants?.length} variantes</p>
+                    <p className="text-xs font-bold text-[#40202D] dark:text-white truncate max-w-[130px]">{item.name}</p>
+                    <p className="text-[10px] opacity-60 text-[#8C6B79] dark:text-gray-400 font-bold uppercase tracking-wider">{item.variants?.length} variantes</p>
                   </div>
                 </div>
                 <button 
@@ -271,7 +272,7 @@ export default function StockActualPage() {
                     delete copy[item.id_product];
                     setCartMovement(copy);
                   }}
-                  className="text-gray-400 hover:text-red-500 p-1 transition-colors"
+                  className="text-[#8C6B79] dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -280,25 +281,28 @@ export default function StockActualPage() {
           })}
           
           {cartItemsCount === 0 && (
-            <div className="text-center py-12 opacity-40 italic text-xs">No hay prendas en la orden.</div>
+            <div className="text-center py-12 flex flex-col items-center justify-center opacity-40">
+              <MoveRight className="w-8 h-8 mb-2 text-[#8C6B79] dark:text-gray-400" />
+              <p className="italic text-xs font-medium">No hay prendas en la orden.</p>
+            </div>
           )}
         </div>
 
         {/* Footer del Carrito */}
-        <div className="border-t pt-4 mt-4 space-y-3">
-          <div className="flex justify-between text-xs font-bold opacity-60">
+        <div className="border-t border-[#EAE0E2] dark:border-white/10 pt-4 mt-4 space-y-3">
+          <div className="flex justify-between text-xs font-black text-[#8C6B79] dark:text-gray-400 tracking-wider uppercase">
             <span>Resumen total:</span>
-            <span>{cartItemsCount} prod. • {cartVariantsCount} variantes</span>
+            <span className="text-[#D6405F] dark:text-[#F8BBD0]">{cartItemsCount} prod. • {cartVariantsCount} vars</span>
           </div>
           <button 
             disabled={cartItemsCount === 0}
             onClick={handleGoToWizard}
-            className="w-full py-3 bg-[#594246] hover:bg-black text-white text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-30 disabled:pointer-events-none"
+            className="w-full py-3.5 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#F2778D] dark:hover:bg-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-bold rounded-xl transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(242,119,141,0.2)] disabled:opacity-30 disabled:pointer-events-none disabled:hover:translate-y-0"
           >
-            ➔ Crear orden de movimiento
+            Crear orden <ArrowRightLeft className="w-4 h-4" />
           </button>
           {cartItemsCount > 0 && (
-            <button onClick={() => setCartMovement({})} className="text-center w-full text-[11px] font-bold text-red-400 hover:underline">
+            <button onClick={() => setCartMovement({})} className="text-center w-full text-[11px] font-bold text-red-500 dark:text-red-400 hover:underline uppercase tracking-wider">
               Limpiar todo
             </button>
           )}

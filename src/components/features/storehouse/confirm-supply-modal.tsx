@@ -34,12 +34,14 @@ export const ConfirmSupplyModal = ({
       title="Confirmar orden de compra"
       description="Se validará que la orden esté lista para proceso de recepción."
     >
-      <div className="space-y-5">
-        <div className="rounded-2xl border border-[#f2b6c1]/50 bg-[#fff7f9] p-4 text-sm text-[#594246]">
-          <p className="font-semibold">Orden: {order?.order_number ?? "-"}</p>
-          <p className="mt-1">Proveedor: {resolveSupplierName(order)}</p>
-          <p className="mt-1">Items: {order?.items.length ?? 0}</p>
-          <p className="mt-1">Total: S/ {order?.total_amount?.toFixed(2) ?? "0.00"}</p>
+      <div className="space-y-6">
+        <div className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md text-[13px] text-[#40202D] dark:text-white">
+          <p className="font-black text-[14px]">Orden: {order?.order_number ?? "-"}</p>
+          <div className="mt-4 space-y-2 font-medium text-[#8C6B79] dark:text-gray-300">
+            <p><span className="font-bold text-[#40202D] dark:text-white">Proveedor:</span> {resolveSupplierName(order)}</p>
+            <p><span className="font-bold text-[#40202D] dark:text-white">Items:</span> {order?.items.length ?? 0}</p>
+            <p><span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">Total:</span> S/ {order?.total_amount?.toFixed(2) ?? "0.00"}</p>
+          </div>
         </div>
 
         <ModalFooter
