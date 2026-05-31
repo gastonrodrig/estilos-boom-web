@@ -30,6 +30,8 @@ type ApiProduct = {
   id_category?: string;
   category?: ApiCategory;
   variants?: ApiVariant[];
+  origin_type?: 'RETAIL' | 'PRODUCCION';
+  technical_sheet?: { id_supply: string; quantity: number }[];
   created_at?: string;
   updated_at?: string;
 };
@@ -51,10 +53,12 @@ export const mapApiProductToModel = (apiProduct: ApiProduct): Product => ({
   is_active: Boolean(apiProduct.is_active),
   is_best_seller: Boolean(apiProduct.is_best_seller),
   is_new_in: Boolean(apiProduct.is_new_in),
-  gender: (apiProduct.gender as any) ?? "MUJER",
   images: Array.isArray(apiProduct.images) ? apiProduct.images : [],
   id_category: apiProduct.id_category ?? apiProduct.category?._id ?? "",
   category: apiProduct.category?.name ? { name: apiProduct.category.name } : undefined,
+  gender: (apiProduct.gender as any) ?? "MUJER",
+  origin_type: apiProduct.origin_type ?? 'RETAIL',
+  technical_sheet: apiProduct.technical_sheet ?? [],
   variants: Array.isArray(apiProduct.variants) ? apiProduct.variants.map(mapVariant) : [],
   created_at: apiProduct.created_at,
   updated_at: apiProduct.updated_at,

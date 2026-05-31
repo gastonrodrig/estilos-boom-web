@@ -34,6 +34,8 @@ export interface Product {
   highlights?: string[];      // Tus puntos rosas
   custom_size_guide_url?: string;
   technical_details?: Record<string, string>; // El Map de Mongo
+  origin_type?: 'RETAIL' | 'PRODUCCION';
+  technical_sheet?: { id_supply: string; quantity: number }[];
   // --------------------------------------------
 
   id_category: string;
