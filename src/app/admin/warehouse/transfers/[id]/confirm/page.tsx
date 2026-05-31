@@ -53,32 +53,32 @@ export default function ConfirmMovementPage() {
     >
         
       {/* HEADER */}
-      <Link href="/admin/warehouse/transfers" className="inline-flex items-center gap-2 text-sm font-bold text-[#8C6B79] hover:text-[#40202D] dark:text-[#F8BBD0]/80 dark:hover:text-white mb-6 transition-colors tracking-wide">
+      <Link href="/admin/warehouse/transfers" className="inline-flex items-center gap-2 text-sm font-medium text-[#8C6B79] hover:text-[#40202D] dark:text-[#F8BBD0]/80 dark:hover:text-white mb-6 transition-colors tracking-wide">
         <ArrowLeft className="w-4 h-4" /> Volver a órdenes pendientes
       </Link>
-      <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#40202D] dark:text-white mb-10 tracking-wide drop-shadow-md">
+      <h1 className="text-3xl md:text-4xl font-medium text-[#40202D] dark:text-white mb-10 tracking-wide drop-shadow-md">
         Confirmar movimiento
       </h1>
 
       {/* ORDER SUMMARY */}
-      <div className="bg-white/90 dark:bg-[#1A0B11]/60 backdrop-blur-2xl rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-[#EAE0E2] dark:border-[#F2778D]/25 transition-colors duration-300">
+      <div className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl rounded-3xl p-6 md:p-8 mb-8 shadow-sm border border-[#EAE0E2] dark:border-white/5 transition-colors duration-300">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <p className="text-sm font-bold text-[#8C6B79] dark:text-gray-400 mb-1 tracking-wide">Orden #{id}</p>
-            <h2 className="text-xl font-bold text-[#40202D] dark:text-white tracking-wide flex items-center gap-2">
+            <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-400 mb-1 tracking-wide">Orden #{id}</p>
+            <h2 className="text-xl font-medium text-[#40202D] dark:text-white tracking-wide flex items-center gap-2">
               {data.source} <span className="text-[#8C6B79] dark:text-[#F2778D]/50 mx-1">→</span> {data.target}
             </h2>
           </div>
-          <span className="px-4 py-1.5 bg-white dark:bg-[#F2778D]/10 text-[#5B283A] dark:text-[#F8BBD0] text-[11px] font-bold rounded-full border border-[#F2DEE4] dark:border-[#F2778D]/30 shadow-sm tracking-wide">
+          <span className="px-4 py-1.5 bg-white dark:bg-[#F2778D]/10 text-[#5B283A] dark:text-[#F8BBD0] text-[11px] font-medium rounded-full border border-[#F2DEE4] dark:border-white/10 shadow-sm tracking-wide">
             {data.status}
           </span>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-[#EAE0E2] dark:border-[#F2778D]/15">
-          <p className="text-xs font-bold text-[#8C6B79] dark:text-gray-400 mb-3 tracking-wide">Motivo(s) de la orden</p>
+        <div className="mt-6 pt-6 border-t border-[#EAE0E2] dark:border-white/5">
+          <p className="text-xs font-medium text-[#8C6B79] dark:text-gray-400 mb-3 tracking-wide">Motivo(s) de la orden</p>
           <div className="flex flex-wrap gap-2">
             {data.reasons.map((r, i) => (
-              <span key={i} className="px-3 py-1.5 bg-[#FCF8F9] dark:bg-black/30 text-[#40202D] dark:text-[#F8BBD0] text-[11px] font-bold tracking-wide rounded-lg border border-[#F2DEE4] dark:border-[#F2778D]/20">
+              <span key={i} className="px-3 py-1.5 bg-[#FCF8F9] dark:bg-white/5 text-[#40202D] dark:text-[#F8BBD0] text-[11px] font-medium tracking-wide rounded-lg border border-[#F2DEE4] dark:border-[#F2778D]/20">
                 {r}
               </span>
             ))}
@@ -87,14 +87,14 @@ export default function ConfirmMovementPage() {
       </div>
 
       {/* SUSTENTO / TRAZABILIDAD DE ORIGEN (EXPANDABLE) */}
-      <div className="bg-white/90 dark:bg-[#1A0B11]/60 backdrop-blur-2xl rounded-3xl shadow-sm border border-[#EAE0E2] dark:border-[#F2778D]/25 mb-10 overflow-hidden transition-colors duration-300">
+      <div className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl rounded-3xl shadow-sm border border-[#EAE0E2] dark:border-white/5 mb-10 overflow-hidden transition-colors duration-300">
         <button 
           onClick={() => setShowOriginDocs(!showOriginDocs)}
-          className="w-full px-6 md:px-8 py-5 flex items-center justify-between hover:bg-white dark:hover:bg-black/20 transition-colors"
+          className="w-full px-6 md:px-8 py-5 flex items-center justify-between hover:bg-white dark:hover:bg-white/10 transition-colors"
         >
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-[#F23B69] dark:text-[#F8BBD0]" />
-            <span className="font-bold text-[15px] text-[#40202D] dark:text-white tracking-wide">Ver Documentos de Sustento (Origen)</span>
+            <span className="font-medium text-[15px] text-[#40202D] dark:text-white tracking-wide">Ver Documentos de Sustento (Origen)</span>
           </div>
           <ChevronDown className={`w-5 h-5 text-[#8C6B79] dark:text-[#F8BBD0] transition-transform duration-300 ${showOriginDocs ? 'rotate-180' : ''}`} />
         </button>
@@ -105,31 +105,31 @@ export default function ConfirmMovementPage() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="px-6 md:px-8 pb-8 pt-4 border-t border-[#EAE0E2] dark:border-[#F2778D]/15"
+              className="px-6 md:px-8 pb-8 pt-4 border-t border-[#EAE0E2] dark:border-white/5"
             >
               <p className="text-[13px] text-[#8C6B79] dark:text-gray-400 mb-6 font-medium tracking-wide">
                 Estos documentos avalan el ingreso original de los productos al almacén y justifican su existencia para este movimiento de salida.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-black/30 border border-[#F2DEE4] dark:border-[#F2778D]/15 rounded-xl transition-colors">
+                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 rounded-xl transition-colors">
                   <FileText className="w-5 h-5 text-[#3b82f6] dark:text-[#60a5fa]" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-[#8C6B79] dark:text-gray-500 tracking-wide">Orden de Compra</span>
-                    <span className="text-[13px] font-bold text-[#40202D] dark:text-white">#OC-0089</span>
+                    <span className="text-[10px] uppercase font-medium text-[#8C6B79] dark:text-gray-500 tracking-wide">Orden de Compra</span>
+                    <span className="text-[13px] font-medium text-[#40202D] dark:text-white">#OC-0089</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-black/30 border border-[#F2DEE4] dark:border-[#F2778D]/15 rounded-xl transition-colors">
+                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 rounded-xl transition-colors">
                   <FileText className="w-5 h-5 text-[#10b981] dark:text-[#34d399]" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-[#8C6B79] dark:text-gray-500 tracking-wide">Guía de Remisión</span>
-                    <span className="text-[13px] font-bold text-[#40202D] dark:text-white">#GR-1452</span>
+                    <span className="text-[10px] uppercase font-medium text-[#8C6B79] dark:text-gray-500 tracking-wide">Guía de Remisión</span>
+                    <span className="text-[13px] font-medium text-[#40202D] dark:text-white">#GR-1452</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-black/30 border border-[#F2DEE4] dark:border-[#F2778D]/15 rounded-xl transition-colors">
+                <div className="flex items-center gap-3 px-4 py-3 bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 rounded-xl transition-colors">
                   <FileText className="w-5 h-5 text-[#a855f7] dark:text-[#c084fc]" />
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-[#8C6B79] dark:text-gray-500 tracking-wide">Factura / Boleta</span>
-                    <span className="text-[13px] font-bold text-[#40202D] dark:text-white">#F001-334</span>
+                    <span className="text-[10px] uppercase font-medium text-[#8C6B79] dark:text-gray-500 tracking-wide">Factura / Boleta</span>
+                    <span className="text-[13px] font-medium text-[#40202D] dark:text-white">#F001-334</span>
                   </div>
                 </div>
               </div>
@@ -139,46 +139,46 @@ export default function ConfirmMovementPage() {
       </div>
 
       {/* VERIFY QUANTITIES */}
-      <h3 className="text-xl md:text-2xl font-bold font-serif mb-6 text-[#40202D] dark:text-white tracking-wide">Verificar cantidades</h3>
+      <h3 className="text-xl md:text-2xl font-medium mb-6 text-[#40202D] dark:text-white tracking-wide">Verificar cantidades</h3>
       
       <div className="space-y-4 mb-10">
         {data.items.map(item => (
-          <div key={item.id} className="bg-white/90 dark:bg-[#1A0B11]/60 backdrop-blur-2xl rounded-3xl p-6 shadow-sm border border-[#EAE0E2] dark:border-[#F2778D]/25 transition-colors duration-300">
+          <div key={item.id} className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl rounded-3xl p-6 shadow-sm border border-[#EAE0E2] dark:border-white/5 transition-colors duration-300">
             <div className="mb-5">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#F23B69] dark:bg-[#F8BBD0]" />
-                <span className="font-bold text-[15px] text-[#40202D] dark:text-white tracking-wide">{item.name}</span>
+                <span className="font-medium text-[15px] text-[#40202D] dark:text-white tracking-wide">{item.name}</span>
               </div>
               <p className="text-xs text-[#8C6B79] dark:text-gray-400 font-mono font-medium ml-4 tracking-wider">{item.sku}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-5 mb-5">
               <div>
-                <label className="block text-xs font-bold text-[#8C6B79] dark:text-gray-400 mb-2 tracking-wide">Qty a mover</label>
-                <div className="w-full p-4 bg-[#FCF8F9] dark:bg-black/30 border border-[#F2DEE4] dark:border-[#F2778D]/15 rounded-xl text-sm font-bold text-[#8C6B79] dark:text-gray-500 cursor-not-allowed">
+                <label className="block text-xs font-medium text-[#8C6B79] dark:text-gray-400 mb-2 tracking-wide">Qty a mover</label>
+                <div className="w-full p-4 bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 rounded-xl text-sm font-medium text-[#8C6B79] dark:text-gray-500 cursor-not-allowed">
                   {item.expectedQty}
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#8C6B79] dark:text-gray-400 mb-2 tracking-wide">Qty real movida</label>
+                <label className="block text-xs font-medium text-[#8C6B79] dark:text-gray-400 mb-2 tracking-wide">Qty real movida</label>
                 <input 
                   type="number"
                   value={realQuantities[item.id]}
                   onChange={(e) => setRealQuantities({...realQuantities, [item.id]: Number(e.target.value)})}
-                  className="w-full p-4 bg-white dark:bg-black/50 border border-[#EAE0E2] dark:border-[#F2778D]/30 rounded-xl text-sm font-bold text-[#40202D] dark:text-white focus:outline-none focus:border-[#F23B69] dark:focus:border-[#F8BBD0] transition-colors"
+                  className="w-full p-4 bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm font-medium text-[#40202D] dark:text-white focus:outline-none focus:border-[#F23B69] dark:focus:border-[#F8BBD0] transition-colors"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#EAE0E2] dark:border-[#F2778D]/10">
+            <div className="flex items-center gap-3 mt-4 pt-4 border-t border-[#EAE0E2] dark:border-white/5">
               <input 
                 type="checkbox" 
                 id={`incident-${item.id}`}
                 checked={incidents[item.id] || false}
                 onChange={(e) => setIncidents({...incidents, [item.id]: e.target.checked})}
-                className="w-4 h-4 rounded border-[#EAE0E2] dark:border-[#F2778D]/30 text-[#F23B69] dark:text-[#F2778D] focus:ring-[#F23B69] dark:focus:ring-[#F2778D] dark:bg-black/30"
+                className="w-4 h-4 rounded border-[#EAE0E2] dark:border-white/10 text-[#F23B69] dark:text-[#F2778D] focus:ring-[#F23B69] dark:focus:ring-[#F2778D] dark:bg-white/5"
               />
-              <label htmlFor={`incident-${item.id}`} className="text-[13px] text-[#8C6B79] dark:text-[#F8BBD0]/80 font-bold tracking-wide cursor-pointer">
+              <label htmlFor={`incident-${item.id}`} className="text-[13px] text-[#8C6B79] dark:text-[#F8BBD0]/80 font-medium tracking-wide cursor-pointer">
                 ¿Hubo incidencia en esta variante?
               </label>
             </div>
@@ -190,7 +190,7 @@ export default function ConfirmMovementPage() {
       <div className="flex justify-end pb-12">
         <Link 
           href={`/admin/warehouse/transfers/${id}/finalize`}
-          className="py-4 px-10 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#F2778D] dark:hover:bg-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-bold rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(242,119,141,0.2)] transition-all tracking-wide"
+          className="py-4 px-10 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#F2778D] dark:hover:bg-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-medium rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(242,119,141,0.2)] transition-all tracking-wide"
         >
           Siguiente paso
         </Link>

@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden admin-font-scope">
       <Navbar isHome={false} showTopBar={false} />
 
       <div className="flex flex-1 overflow-hidden pt-16">

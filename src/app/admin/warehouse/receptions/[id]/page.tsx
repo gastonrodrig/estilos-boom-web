@@ -58,9 +58,9 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
 
   if (isConfirmed) {
     return (
-      <div className="w-full min-h-screen bg-[#F7EEF1] dark:bg-[#150D10] flex items-center justify-center p-4 font-sans transition-colors duration-300">
-        <div className="bg-white dark:bg-gradient-to-br dark:from-[#311824] dark:to-[#190B12] rounded-2xl p-8 md:p-12 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-[#38202A] max-w-md w-full text-center animate-in zoom-in-95 duration-500">
-          <div className="w-16 h-16 bg-[#FDF1F3] dark:bg-[#321A23] rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="w-full min-h-screen bg-[#F7EEF1] dark:bg-transparent flex items-center justify-center p-4 font-sans transition-colors duration-300">
+        <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-8 md:p-12 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 max-w-md w-full text-center animate-in zoom-in-95 duration-500">
+          <div className="w-16 h-16 bg-[#FDF1F3] dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-8 h-8 text-[#D6405F] dark:text-[#F2778D]" />
           </div>
           
@@ -69,7 +69,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
             La recepción <span className="font-bold text-[#40202D] dark:text-white">#{id.toUpperCase()}</span> ha sido procesada exitosamente.
           </p>
 
-          <div className="bg-[#FCF8F9] dark:bg-[#150D10] border border-[#EEDCE1] dark:border-[#38202A] rounded-xl p-5 text-left mb-8">
+          <div className="bg-[#FCF8F9] dark:bg-white/5 border border-[#EEDCE1] dark:border-white/5 rounded-xl p-5 text-left mb-8">
             <h3 className="font-bold text-[#40202D] dark:text-white mb-4 text-[13px] uppercase tracking-wider">Resumen de operación</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex justify-between items-center">
@@ -80,14 +80,14 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                 <span className="text-[#844C60] dark:text-[#C9B3BC] font-medium text-[13px]">Proveedor:</span>
                 <span className="text-[#40202D] dark:text-white font-bold">Confecciones María Elena</span>
               </li>
-              <li className="flex justify-between items-center pt-3 border-t border-[#EEDCE1] dark:border-[#38202A]">
+              <li className="flex justify-between items-center pt-3 border-t border-[#EEDCE1] dark:border-white/10">
                 <span className="text-[#844C60] dark:text-[#C9B3BC] font-medium text-[13px]">Total unidades:</span>
                 <span className="text-[#D6405F] dark:text-[#F2778D] font-bold text-lg">10</span>
               </li>
             </ul>
           </div>
 
-          <Link href="/admin/warehouse/dashboard" className="w-full flex items-center justify-center gap-2 bg-[#FCF8F9] dark:bg-[#201519] border border-[#EEDCE1] dark:border-[#38202A] hover:border-[#F2778D] hover:bg-white dark:hover:bg-[#311824] rounded-xl px-6 py-3.5 text-[#40202D] dark:text-white font-bold transition-all duration-300 transform hover:-translate-y-1">
+          <Link href="/admin/warehouse/dashboard" className="w-full flex items-center justify-center gap-2 bg-[#FCF8F9] dark:bg-white/5 border border-[#EEDCE1] dark:border-white/5 hover:border-[#F2778D] hover:bg-white dark:hover:bg-white/10 rounded-xl px-6 py-3.5 text-[#40202D] dark:text-white font-medium transition-all duration-300 transform hover:-translate-y-1">
             <Home className="w-4 h-4" />
             Volver al panel
           </Link>
@@ -97,7 +97,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#F7EEF1] dark:bg-[#150D10] p-4 pt-24 md:p-8 md:pt-28 font-sans transition-colors duration-300">
+    <div className="w-full min-h-screen bg-[#F7EEF1] dark:bg-transparent p-4 pt-24 md:p-8 md:pt-28 font-sans transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
         
         {/* TOP NAV */}
@@ -115,7 +115,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         </h1>
 
         {/* HEADER CARD */}
-        <div className="bg-white dark:bg-gradient-to-br dark:from-[#311824] dark:to-[#190B12] rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-[#38202A] mb-8 transition-colors duration-300">
+        <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 mb-8 transition-colors duration-300">
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
               <h2 className="text-xl font-bold text-[#40202D] dark:text-white">Orden #{id.toUpperCase()}</h2>
@@ -130,10 +130,10 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         </div>
 
         {/* PURCHASE ORDER (EXPANDABLE) */}
-        <div className="bg-white dark:bg-gradient-to-br dark:from-[#311824] dark:to-[#190B12] rounded-2xl shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-[#38202A] mb-8 overflow-hidden transition-colors duration-300">
+        <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 mb-8 overflow-hidden transition-colors duration-300">
           <button 
             onClick={() => setShowPurchaseOrder(!showPurchaseOrder)}
-            className="w-full px-6 md:px-8 py-5 flex items-center justify-between hover:bg-[#FCF8F9] dark:hover:bg-[#201519] transition-colors"
+            className="w-full px-6 md:px-8 py-5 flex items-center justify-between hover:bg-[#FCF8F9] dark:hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
               <FileText className="w-5 h-5 text-[#D6405F] dark:text-[#F2B6C1]" />
@@ -143,7 +143,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
           </button>
           
           {showPurchaseOrder && (
-            <div className="px-6 md:px-8 pb-8 pt-4 border-t border-[#EEDCE1] dark:border-[#38202A]">
+            <div className="px-6 md:px-8 pb-8 pt-4 border-t border-[#EEDCE1] dark:border-white/5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                 <div>
                   <p className="text-[11px] uppercase tracking-wider font-bold text-[#844C60] dark:text-[#C9B3BC] mb-1.5">Proveedor</p>
@@ -162,17 +162,17 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                   <p className="text-[14px] font-bold text-[#40202D] dark:text-white">Ana López</p>
                 </div>
               </div>
-              <div className="bg-[#FCF8F9] dark:bg-[#150D10] rounded-xl p-5 border border-[#EEDCE1] dark:border-[#38202A]">
+              <div className="bg-[#FCF8F9] dark:bg-white/5 rounded-xl p-5 border border-[#EEDCE1] dark:border-white/5">
                 <p className="text-[11px] font-bold text-[#844C60] dark:text-[#C9B3BC] mb-3 uppercase tracking-wider">Artículos solicitados (Sin precios)</p>
                 <ul className="space-y-3 text-[14px] text-[#40202D] dark:text-[#EAE0E2] font-medium">
-                  <li className="flex justify-between items-center border-b border-[#EEDCE1] dark:border-[#38202A] pb-3 last:border-0 last:pb-0">
+                  <li className="flex justify-between items-center border-b border-[#EEDCE1] dark:border-white/5 pb-3 last:border-0 last:pb-0">
                     <span className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-[#D6405F] dark:bg-[#F2778D]"></div>
                       Vestido Floral (M Rosa)
                     </span> 
                     <span className="font-bold text-[#40202D] dark:text-white">6 unds.</span>
                   </li>
-                  <li className="flex justify-between items-center border-b border-[#EEDCE1] dark:border-[#38202A] pb-3 last:border-0 last:pb-0">
+                  <li className="flex justify-between items-center border-b border-[#EEDCE1] dark:border-white/5 pb-3 last:border-0 last:pb-0">
                     <span className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-[#D6405F] dark:bg-[#F2778D]"></div>
                       Vestido Floral (S Rosa)
@@ -190,7 +190,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         
         <div className="space-y-5 mb-12">
           {variants.map((variant) => (
-            <div key={variant.id} className="bg-white dark:bg-gradient-to-br dark:from-[#311824] dark:to-[#190B12] rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-[#38202A] transition-colors duration-300">
+            <div key={variant.id} className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 transition-colors duration-300">
               
               {/* Variant Header */}
               <div className="flex items-center gap-2 mb-2">
@@ -207,7 +207,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                     type="number" 
                     value={variant.qtyOrdered}
                     readOnly
-                    className="w-full bg-[#FCF8F9] dark:bg-[#150D10] border border-[#EEDCE1] dark:border-[#38202A] rounded-xl px-4 py-3 text-[15px] text-[#40202D] dark:text-white font-bold outline-none opacity-80"
+                    className="w-full bg-[#FCF8F9] dark:bg-white/5 border border-[#EEDCE1] dark:border-white/5 rounded-xl px-4 py-3 text-[15px] text-[#40202D] dark:text-white font-medium outline-none opacity-80"
                   />
                 </div>
                 <div>
@@ -216,14 +216,14 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                     type="number" 
                     value={variant.qtyReceived}
                     onChange={(e) => handleVariantChange(variant.id, "qtyReceived", parseInt(e.target.value) || 0)}
-                    className="w-full bg-white dark:bg-[#100B0D] border-2 border-[#EEDCE1] dark:border-[#38202A] rounded-xl px-4 py-3 text-[15px] text-[#D6405F] dark:text-[#F2778D] font-bold outline-none focus:border-[#D6405F] dark:focus:border-[#F2778D] transition-colors shadow-sm"
+                    className="w-full bg-white dark:bg-white/5 border border-[#EEDCE1] dark:border-white/10 rounded-xl px-4 py-3 text-[15px] text-[#D6405F] dark:text-[#F2778D] font-medium outline-none focus:border-[#D6405F] dark:focus:border-[#F2778D] transition-colors shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Checkbox Incidencia */}
               <label className="flex items-center gap-3 cursor-pointer group w-fit">
-                <div className={`w-5 h-5 rounded-md flex items-center justify-center border-2 transition-colors ${variant.hasIncidence ? 'bg-[#D6405F] dark:bg-[#F2778D] border-[#D6405F] dark:border-[#F2778D]' : 'bg-[#FCF8F9] dark:bg-[#150D10] border-[#EEDCE1] dark:border-[#38202A] group-hover:border-[#D6405F]'}`}>
+                <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${variant.hasIncidence ? 'bg-[#D6405F] dark:bg-[#F2778D] border-[#D6405F] dark:border-[#F2778D]' : 'bg-[#FCF8F9] dark:bg-white/5 border-[#EEDCE1] dark:border-white/10 group-hover:border-[#D6405F]'}`}>
                   {variant.hasIncidence && <Check className="w-3.5 h-3.5 text-white dark:text-white" />}
                 </div>
                 <input 
@@ -248,7 +248,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                         className={`px-4 py-2 rounded-lg text-[13px] font-bold border transition-all ${
                           variant.incidenceReason === opt 
                             ? 'bg-[#D6405F] dark:bg-[#F2778D] border-[#D6405F] dark:border-[#F2778D] text-white shadow-md' 
-                            : 'bg-white dark:bg-[#150D10] border-[#EEDCE1] dark:border-[#38202A] text-[#844C60] dark:text-[#C9B3BC] hover:border-[#D6405F] dark:hover:border-[#F2778D] hover:text-[#D6405F] dark:hover:text-[#F2778D]'
+                            : 'bg-white dark:bg-white/5 border-[#EEDCE1] dark:border-white/10 text-[#844C60] dark:text-[#C9B3BC] hover:border-[#D6405F] dark:hover:border-[#F2778D] hover:text-[#D6405F] dark:hover:text-[#F2778D]'
                         }`}
                       >
                         {opt}
@@ -264,7 +264,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                         value={variant.incidenceCustomReason}
                         onChange={(e) => handleVariantChange(variant.id, "incidenceCustomReason", e.target.value)}
                         placeholder="Ej. La caja llegó rota y con olor a humedad"
-                        className="w-full bg-white dark:bg-[#100B0D] border border-[#EEDCE1] dark:border-[#38202A] rounded-xl px-4 py-3 text-[14px] text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] transition-colors placeholder:text-[#EEDCE1] dark:placeholder:text-[#592633]"
+                        className="w-full bg-white dark:bg-white/5 border border-[#EEDCE1] dark:border-white/10 rounded-xl px-4 py-3 text-[14px] text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] transition-colors placeholder:text-[#EEDCE1] dark:placeholder:text-white/20"
                       />
                     </div>
                   )}
@@ -276,13 +276,13 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                         type="number" 
                         value={variant.incidenceQty}
                         onChange={(e) => handleVariantChange(variant.id, "incidenceQty", parseInt(e.target.value) || 0)}
-                        className="w-full bg-white dark:bg-[#100B0D] border border-[#EEDCE1] dark:border-[#38202A] rounded-xl px-4 py-3 text-[15px] text-[#D6405F] dark:text-[#F2778D] font-bold outline-none focus:border-[#D6405F]"
+                        className="w-full bg-white dark:bg-white/5 border border-[#EEDCE1] dark:border-white/10 rounded-xl px-4 py-3 text-[15px] text-[#D6405F] dark:text-[#F2778D] font-medium outline-none focus:border-[#D6405F]"
                       />
                     </div>
                     
                     <div>
                       <label className="block text-[11px] uppercase tracking-wider font-bold text-[#844C60] dark:text-[#C9B3BC] mb-2">Fotografía (Obligatorio)</label>
-                      <button className="w-full flex items-center justify-center gap-2 bg-[#FCF8F9] dark:bg-[#150D10] border border-dashed border-[#D6405F] dark:border-[#F2778D] hover:bg-[#FDF1F3] dark:hover:bg-[#201519] rounded-xl px-4 py-3 text-[#D6405F] dark:text-[#F2778D] text-[14px] font-bold transition-colors">
+                      <button className="w-full flex items-center justify-center gap-2 bg-[#FCF8F9] dark:bg-white/5 border border-dashed border-[#D6405F] dark:border-[#F2778D] hover:bg-[#FDF1F3] dark:hover:bg-white/10 rounded-xl px-4 py-3 text-[#D6405F] dark:text-[#F2778D] text-[14px] font-medium transition-colors">
                         <Camera className="w-4 h-4" />
                         Subir foto evidencia
                       </button>
@@ -298,15 +298,15 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         {/* EVIDENCIAS GLOBALES */}
         <h3 className="text-xl font-bold font-sans text-[#40202D] dark:text-white mb-5">Evidencias documentales</h3>
         
-        <div className="bg-white dark:bg-gradient-to-br dark:from-[#311824] dark:to-[#190B12] rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-[#38202A] mb-10 transition-colors duration-300">
+        <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 mb-10 transition-colors duration-300">
           <p className="text-[14px] leading-relaxed text-[#844C60] dark:text-[#C9B3BC] mb-6 font-medium">
             Para finalizar la recepción, es obligatorio adjuntar la siguiente documentación. La <strong className="text-[#40202D] dark:text-white">Orden de Compra</strong> ya se encuentra registrada en el sistema.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Foto General */}
-            <div className="flex flex-col items-center justify-center p-8 bg-[#FCF8F9] dark:bg-[#150D10] border-2 border-dashed border-[#EEDCE1] dark:border-[#38202A] hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl cursor-pointer transition-colors group">
-              <div className="w-12 h-12 rounded-full bg-white dark:bg-[#1A1114] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+            <div className="flex flex-col items-center justify-center p-8 bg-[#FCF8F9] dark:bg-white/5 border border-dashed border-[#EEDCE1] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl cursor-pointer transition-colors group">
+              <div className="w-12 h-12 rounded-full bg-white dark:bg-[#F2778D]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
                 <Camera className="w-6 h-6 text-[#844C60] dark:text-[#C9B3BC] group-hover:text-[#D6405F] dark:group-hover:text-[#F2778D]" />
               </div>
               <span className="text-[15px] font-bold text-[#40202D] dark:text-white text-center mb-1.5">Foto de Recepción</span>
@@ -314,8 +314,8 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
             </div>
 
             {/* Boleta */}
-            <div className="flex flex-col items-center justify-center p-8 bg-[#FCF8F9] dark:bg-[#150D10] border-2 border-dashed border-[#EEDCE1] dark:border-[#38202A] hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl cursor-pointer transition-colors group">
-              <div className="w-12 h-12 rounded-full bg-white dark:bg-[#1A1114] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+            <div className="flex flex-col items-center justify-center p-8 bg-[#FCF8F9] dark:bg-white/5 border border-dashed border-[#EEDCE1] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl cursor-pointer transition-colors group">
+              <div className="w-12 h-12 rounded-full bg-white dark:bg-[#F2778D]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
                 <UploadCloud className="w-6 h-6 text-[#844C60] dark:text-[#C9B3BC] group-hover:text-[#D6405F] dark:group-hover:text-[#F2778D]" />
               </div>
               <span className="text-[15px] font-bold text-[#40202D] dark:text-white text-center mb-1.5">Boleta / Guía de Remisión</span>
