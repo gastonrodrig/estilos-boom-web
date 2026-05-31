@@ -141,7 +141,7 @@ export default function AdminDocumentsMovementsPage() {
               whileHover={{ y: -6, scale: 1.005 }}
               transition={{ layout: { type: "spring", stiffness: 300, damping: 24 } }}
               key={req.id} 
-              className="relative overflow-hidden group bg-white/90 dark:bg-black/50 backdrop-blur-2xl rounded-[2rem] p-6 md:p-8 shadow-sm border border-[#EAE0E2] dark:border-white/5 hover:border-white/20 transition-colors duration-500 hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)]"
+              className="relative overflow-hidden group bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[2rem] p-6 md:p-8 shadow-sm border border-[#EAE0E2] dark:border-white/5 hover:border-white/20 transition-colors duration-500 hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)]"
             >
               {/* Subtle internal glow orb on hover */}
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-white rounded-full mix-blend-screen filter blur-[80px] opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none" />
@@ -168,7 +168,7 @@ export default function AdminDocumentsMovementsPage() {
               </div>
 
               {/* Info Area (Glass Morphism in dark mode) */}
-              <div className="space-y-4 mb-8 bg-[#FCF8F9] dark:bg-white/5 rounded-2xl p-5 md:p-6 border border-[#F2DEE4] dark:border-white/5 backdrop-blur-md">
+              <div className="space-y-4 mb-8 bg-white/50 dark:bg-white/5 rounded-2xl p-5 md:p-6 border border-[#F2DEE4] dark:border-white/5 backdrop-blur-md">
                 <p className="text-[13px] text-[#8C6B79] dark:text-gray-300 font-medium tracking-wide">
                   Solicitado por <span className="font-medium text-[#40202D] dark:text-white">{req.creator}</span>
                 </p>
@@ -176,7 +176,7 @@ export default function AdminDocumentsMovementsPage() {
                 {/* Mini Cristales para las Unidades */}
                 <div className="flex flex-col gap-2.5 mt-2">
                   {req.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-3 backdrop-blur-md hover:bg-white/90 dark:hover:bg-white/10 transition-colors">
+                    <div key={idx} className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-3 backdrop-blur-md hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
                       <span className="text-[14px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">
                         {item.name}
                       </span>

@@ -20,11 +20,15 @@ export default function WarehouseLayout({
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0508] via-[#0A0508]/60 to-[#0A0508]/80" />
       </div>
 
-      {/* AMBIENT GLOWS FOR LIGHT MODE */}
-      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-[#F2778D] to-transparent rounded-full blur-[140px] pointer-events-none z-[-1] mix-blend-multiply opacity-15 dark:hidden" />
+      {/* MAGICAL BACKGROUND (LIGHT MODE) */}
+      <div className="absolute top-[-20px] bottom-[-20px] left-[-20px] right-[-40px] z-[-1] dark:hidden overflow-hidden bg-[#F2ECEE] pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-[#F2778D] rounded-full blur-[140px] opacity-[0.15] mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[800px] h-[800px] bg-[#8C6B79] rounded-full blur-[140px] opacity-[0.08] mix-blend-multiply" />
+        <div className="absolute top-[30%] left-[50%] w-[600px] h-[600px] bg-white rounded-full blur-[100px] opacity-[0.5]" />
+      </div>
 
       {/* GLOBAL CONTENT CONTAINER FOR WAREHOUSE */}
-      <div className="flex-1 w-full bg-[#FDFBFB] dark:bg-transparent p-6 md:p-10 lg:p-12 font-sans relative transition-colors duration-700">
+      <div className="flex-1 w-full bg-transparent p-6 md:p-10 lg:p-12 font-sans relative transition-colors duration-700">
         {children}
       </div>
     </div>

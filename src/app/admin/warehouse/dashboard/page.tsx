@@ -59,7 +59,7 @@ export default function WarehouseDashboardPage() {
       {/* STATS ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
         
-        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
+        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0 border border-rose-100 dark:border-[#F2778D]/30 group-hover:bg-rose-100 dark:group-hover:bg-[#F2778D]/20 transition-colors duration-300">
               <Package className="w-7 h-7 text-[#F23B69] dark:text-[#F8BBD0]" />
@@ -71,7 +71,7 @@ export default function WarehouseDashboardPage() {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
+        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-white/5 flex items-center justify-center shrink-0 border border-orange-100 dark:border-white/20 group-hover:bg-orange-100 dark:group-hover:bg-[#F2778D]/10 transition-colors duration-300">
               <Zap className="w-7 h-7 text-[#E67A50] dark:text-[#F8BBD0]" />
@@ -83,7 +83,7 @@ export default function WarehouseDashboardPage() {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
+        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0 border border-rose-100 dark:border-[#F2778D]/30 group-hover:bg-rose-100 dark:group-hover:bg-[#F2778D]/20 transition-colors duration-300">
               <AlertTriangle className="w-7 h-7 text-[#D6405F] dark:text-[#F48FB1]" />
@@ -95,7 +95,7 @@ export default function WarehouseDashboardPage() {
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
+        <motion.div variants={itemVariants} whileHover={{ y: -4, scale: 1.01 }} className="group bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 shadow-sm hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_10px_30px_rgba(255,255,255,0.05)] dark:hover:border-white/20 transition-all duration-300">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-white/5 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-white/20 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/10 transition-colors duration-300">
               <CheckCircle2 className="w-7 h-7 text-emerald-500 dark:text-[#A5D6A7]" />
@@ -112,12 +112,12 @@ export default function WarehouseDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
         
         {/* LEFT COLUMN: Lo que llega hoy */}
-        <motion.div variants={itemVariants} className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm">
+        <motion.div variants={itemVariants} className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm">
           <h2 className="text-xl md:text-2xl font-bold text-[#40202D] dark:text-white mb-6 drop-shadow-sm tracking-wide">Lo que llega hoy</h2>
           
           <div className="space-y-5">
             {/* Item 1 */}
-            <div className="group flex items-center gap-5 p-4 md:p-5 rounded-2xl bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
+            <div className="group flex items-center gap-5 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
               <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0 border border-[#F5DCE2] dark:border-[#F2778D]/30 shadow-sm">
                 <Scissors className="w-6 h-6 text-[#F2778D] dark:text-[#F8BBD0]" />
               </div>
@@ -136,7 +136,7 @@ export default function WarehouseDashboardPage() {
             </div>
 
             {/* Item 2 */}
-            <div className="group flex items-center gap-5 p-4 md:p-5 rounded-2xl bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
+            <div className="group flex items-center gap-5 p-4 md:p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
               <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0 border border-[#F5DCE2] dark:border-[#F2778D]/30 shadow-sm">
                 <Package className="w-6 h-6 text-[#5B283A] dark:text-[#F8BBD0]" />
               </div>
@@ -162,7 +162,7 @@ export default function WarehouseDashboardPage() {
         </motion.div>
 
         {/* RIGHT COLUMN: Órdenes pendientes */}
-        <motion.div variants={itemVariants} className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm">
+        <motion.div variants={itemVariants} className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-3xl p-6 md:p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-[#40202D] dark:text-white drop-shadow-sm tracking-wide">Documentos</h2>
             <button className="text-sm font-bold text-[#8C6B79] dark:text-[#F2778D] hover:text-[#40202D] dark:hover:text-[#F8BBD0] transition-colors tracking-wide">
@@ -174,7 +174,7 @@ export default function WarehouseDashboardPage() {
 
           <div className="space-y-5">
             {/* Movimiento 1 */}
-            <div className="group flex flex-col p-5 rounded-2xl bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
+            <div className="group flex flex-col p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-base font-medium text-[#40202D] dark:text-white tracking-wide">#MOV-0125</span>
                 <span className="px-3 py-1 bg-white dark:bg-[#F2778D]/10 text-[#F23B69] dark:text-[#F8BBD0] rounded-full text-xs font-medium border border-[#F2DEE4] dark:border-[#F2778D]/30 shadow-sm tracking-normal">
@@ -183,11 +183,11 @@ export default function WarehouseDashboardPage() {
               </div>
               
               <div className="flex flex-col gap-2 mb-4 mt-1">
-                <div className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
+                <div className="flex justify-between items-center bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
                   <span className="text-[13px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">Vestido Floral</span>
                   <span className="text-[11px] bg-[#FDF1F3] dark:bg-white/10 text-[#D6405F] dark:text-white/80 px-2 py-0.5 rounded-lg border border-[#F2DEE4] dark:border-white/5 font-medium">12 uds</span>
                 </div>
-                <div className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
+                <div className="flex justify-between items-center bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
                   <span className="text-[13px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">Blusa de Seda</span>
                   <span className="text-[11px] bg-[#FDF1F3] dark:bg-white/10 text-[#D6405F] dark:text-white/80 px-2 py-0.5 rounded-lg border border-[#F2DEE4] dark:border-white/5 font-medium">8 uds</span>
                 </div>
@@ -199,7 +199,7 @@ export default function WarehouseDashboardPage() {
             </div>
 
             {/* Movimiento 2 */}
-            <div className="group flex flex-col p-5 rounded-2xl bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
+            <div className="group flex flex-col p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 cursor-pointer">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-base font-medium text-[#40202D] dark:text-white tracking-wide">#MOV-0126</span>
                 <span className="px-3 py-1 bg-[#D6405F] dark:bg-[#F2778D]/20 text-white dark:text-[#F8BBD0] rounded-full text-xs font-medium shadow-sm border border-transparent dark:border-[#F2778D]/40 tracking-normal">
@@ -208,7 +208,7 @@ export default function WarehouseDashboardPage() {
               </div>
               
               <div className="flex flex-col gap-2 mb-4 mt-1">
-                <div className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
+                <div className="flex justify-between items-center bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
                   <span className="text-[13px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">Pantalón de Lino</span>
                   <span className="text-[11px] bg-[#FDF1F3] dark:bg-white/10 text-[#D6405F] dark:text-white/80 px-2 py-0.5 rounded-lg border border-[#F2DEE4] dark:border-white/5 font-medium">15 uds</span>
                 </div>

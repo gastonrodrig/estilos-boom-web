@@ -69,13 +69,13 @@ export default function FinalizeMovementPage() {
         </div>
         
         <div className="flex items-center gap-2 mb-6">
-          <span className="px-4 py-1.5 bg-[#FCF8F9] dark:bg-white/10 text-[#40202D] dark:text-white text-[11px] font-medium rounded-full flex items-center gap-2 border border-[#F2DEE4] dark:border-white/10 shadow-sm tracking-wide">
+          <span className="px-4 py-1.5 bg-white/50 dark:bg-white/10 text-[#40202D] dark:text-white text-[11px] font-medium rounded-full flex items-center gap-2 border border-[#F2DEE4] dark:border-white/10 shadow-sm tracking-wide">
              📄 Guía de traslado
           </span>
         </div>
 
         <div className="flex flex-wrap gap-4 mb-5">
-          <button className="flex-1 min-w-[150px] py-4 px-6 bg-white/90 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl flex items-center justify-center gap-3 hover:border-[#F23B69] dark:hover:border-[#F8BBD0] transition-colors shadow-sm">
+          <button className="flex-1 min-w-[150px] py-4 px-6 bg-white/70 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl flex items-center justify-center gap-3 hover:border-[#F23B69] dark:hover:border-[#F8BBD0] transition-colors shadow-sm">
             <ImageIcon className="w-5 h-5 text-[#8C6B79] dark:text-[#F8BBD0]" />
             <span className="text-sm font-medium text-[#40202D] dark:text-white tracking-wide">
               {data.type === "Salida" ? "Subir foto del paquete" : "Subir foto"}
@@ -83,7 +83,7 @@ export default function FinalizeMovementPage() {
           </button>
           
           {data.type !== "Salida" && (
-            <button className="flex-1 min-w-[150px] py-4 px-6 bg-white/90 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl flex items-center justify-center gap-3 hover:border-[#F23B69] dark:hover:border-[#F8BBD0] transition-colors shadow-sm">
+            <button className="flex-1 min-w-[150px] py-4 px-6 bg-white/70 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl flex items-center justify-center gap-3 hover:border-[#F23B69] dark:hover:border-[#F8BBD0] transition-colors shadow-sm">
               <Paperclip className="w-5 h-5 text-[#8C6B79] dark:text-[#F8BBD0]" />
               <span className="text-sm font-medium text-[#40202D] dark:text-white tracking-wide">Adjuntar archivo</span>
             </button>
@@ -97,7 +97,7 @@ export default function FinalizeMovementPage() {
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               placeholder="O ingresa la referencia (Ej: Factura #0042)"
-              className="w-full p-4 bg-white/90 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl text-sm font-medium text-[#40202D] dark:text-white focus:outline-none focus:border-[#F23B69] dark:focus:border-[#F8BBD0] placeholder:font-medium placeholder:text-[#8C6B79] dark:placeholder:text-[#F8BBD0]/40 transition-colors shadow-sm"
+              className="w-full p-4 bg-white/70 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/5 rounded-2xl text-sm font-medium text-[#40202D] dark:text-white focus:outline-none focus:border-[#F23B69] dark:focus:border-[#F8BBD0] placeholder:font-medium placeholder:text-[#8C6B79] dark:placeholder:text-[#F8BBD0]/40 transition-colors shadow-sm"
             />
             <p className="text-[12px] text-[#8C6B79] dark:text-gray-400 font-medium mt-3 tracking-wide">
               Si no tienes el documento ahora, puedes agregar la referencia y adjuntarlo después.
@@ -107,7 +107,7 @@ export default function FinalizeMovementPage() {
 
         {/* Opciones Especiales para Salida de Venta */}
         {data.type === "Salida" && (
-          <div className="mt-8 p-6 bg-[#FCF8F9] dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#F2DEE4] dark:border-white/5 shadow-sm">
+          <div className="mt-8 p-6 bg-white/50 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#F2DEE4] dark:border-white/5 shadow-sm">
             <h4 className="text-sm font-medium text-[#D6405F] dark:text-[#F8BBD0] mb-4 tracking-wide">Documentos de Salida (Venta)</h4>
             <div className="flex flex-col sm:flex-row gap-4">
               <button className="flex-1 py-3.5 px-4 bg-white dark:bg-black/50 border border-[#EAE0E2] dark:border-white/5 text-[#40202D] dark:text-white text-xs font-medium rounded-xl flex items-center justify-center gap-2 hover:border-[#F23B69] dark:hover:border-[#F8BBD0] transition-colors shadow-sm tracking-wide">
@@ -122,7 +122,7 @@ export default function FinalizeMovementPage() {
       </div>
 
       {/* ORDER SUMMARY CARD */}
-      <div className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl rounded-3xl p-6 md:p-8 shadow-sm border border-[#EAE0E2] dark:border-white/5 mb-10 transition-colors duration-300">
+      <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl p-6 md:p-8 shadow-sm border border-[#EAE0E2] dark:border-white/5 mb-10 transition-colors duration-300">
         <h3 className="text-xl font-medium text-[#40202D] dark:text-white mb-6 tracking-wide drop-shadow-sm">Resumen de la orden</h3>
         
         <div className="space-y-3 mb-8">
@@ -136,7 +136,7 @@ export default function FinalizeMovementPage() {
           {data.items.map((item, idx) => (
             <div key={idx} className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-2.5 backdrop-blur-md">
               <span className="text-[13px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">{item.name}</span>
-              <span className="text-[11px] bg-[#FDF1F3] dark:bg-white/10 text-[#D6405F] dark:text-white/80 px-2 py-0.5 rounded-lg border border-[#F2DEE4] dark:border-white/5 font-medium">{item.variants} variantes</span>
+              <span className="text-[11px] bg-white/50 dark:bg-[#F2778D]/10 text-[#D6405F] dark:text-white/80 px-2 py-0.5 rounded-lg border border-[#F2DEE4] dark:border-white/5 font-medium">{item.variants} variantes</span>
             </div>
           ))}
         </div>

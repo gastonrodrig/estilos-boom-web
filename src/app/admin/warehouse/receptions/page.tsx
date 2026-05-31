@@ -41,7 +41,7 @@ export default function ReceptionsListPage() {
       </div>
 
       {/* GLASSMORPHISM MAIN CARD */}
-      <div className="bg-white/90 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] p-6 md:p-10 shadow-sm">
+      <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] p-6 md:p-10 shadow-sm">
         
         <h2 className="text-xl md:text-2xl font-medium text-[#40202D] dark:text-white mb-8 flex items-center gap-2 tracking-wide drop-shadow-sm">
           Órdenes entrantes
@@ -52,7 +52,7 @@ export default function ReceptionsListPage() {
             <Link 
               key={rec.id} 
               href={`/admin/warehouse/receptions/${rec.id.toLowerCase()}`}
-              className="group flex flex-col md:flex-row md:items-center justify-between p-5 md:p-6 rounded-[1.5rem] bg-[#FCF8F9] dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 backdrop-blur-md relative overflow-hidden"
+              className="group flex flex-col md:flex-row md:items-center justify-between p-5 md:p-6 rounded-[1.5rem] bg-white/50 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:border-white/15 transition-all duration-300 backdrop-blur-md relative overflow-hidden"
             >
               {/* Subtle hover gradient inside card */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
