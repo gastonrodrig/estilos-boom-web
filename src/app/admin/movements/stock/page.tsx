@@ -25,66 +25,110 @@ export default function StockActualPage() {
 
   useEffect(() => {
     const initData = async () => {
-      await startLoadingProducts({}); 
+      await startLoadingProducts({});
       await startLoadingSupplies();
     };
     initData();
   }, [startLoadingProducts, startLoadingSupplies]);
 
-  // 2. 🤖 Efecto de mapeo: Setea los stocks del catálogo apenas 'products' cambie
+  // Carga el stock real de WarehouseStock para TODOS los productos al montar
+  // (no espera a que el usuario expanda una fila)
   useEffect(() => {
-    if (products && Array.isArray(products) && products.length > 0) {
-      const initialStocks: Record<string, { almacen: number; tienda: number }> = {};
-      
-      products.forEach((prod: any) => {
+    if (!products || !Array.isArray(products) || products.length === 0) return;
+
+    const loadAllStocks = async () => {
+      for (const prod of products as any[]) {
+        for (const variant of prod.variants ?? []) {
+          if (!variant._id) continue;
+          const res = await startLoadingStockByVariant(variant._id);
+          if (Array.isArray(res) && res.length > 0) {
+            const findAvailable = (code: string) => {
+              const entry = res.find(
+                (s: any) => s.id_warehouse?.code === code || s.id_warehouse?.name === code
+              );
+              return entry ? (entry.physical_stock ?? 0) - (entry.reserved_stock ?? 0) : 0;
+            };
+            setStocksByVariant((prev) => ({
+              ...prev,
+              [variant._id]: {
+                almacen: findAvailable("ALM-CEN"),
+                tienda: findAvailable("TND-PRI"),
+              },
+            }));
+          }
+        }
+      }
+    };
+    void loadAllStocks();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
+
+  // Inicializa nuevas variantes en 0 preservando las ya cargadas
+  useEffect(() => {
+    if (!products || !Array.isArray(products) || products.length === 0) return;
+    setStocksByVariant((prev) => {
+      const next = { ...prev };
+      (products as any[]).forEach((prod) => {
         prod.variants?.forEach((v: any) => {
-          initialStocks[v._id] = {
-            almacen: v.physical_stock || v.stock || 0, // Fallback automático de Mongoose
-            tienda: 0 // Inicia en cero para el módulo de transferencias
-          };
+          if (v._id && next[v._id] === undefined) {
+            next[v._id] = { almacen: 0, tienda: 0 };
+          }
         });
       });
+      return next;
+    });
+  }, [products]);
 
-      setStocksByVariant(initialStocks);
-    }
-  }, [products]); // 👈 Escucha reactivamente al estado global de Redux
-
-  // Al expandir un producto, cargamos en caliente la distribución de stock de sus variantes de la BD
+  // Al expandir un producto cargamos en caliente la distribución real desde WarehouseStock
   const toggleExpandProduct = async (productId: string, productVariants: any[]) => {
     const isExpanding = !expandedProducts[productId];
     setExpandedProducts(prev => ({ ...prev, [productId]: isExpanding }));
 
     if (isExpanding && productVariants) {
       for (const variant of productVariants) {
-        if (!stocksByVariant[variant._id]) {
-          const res = await startLoadingStockByVariant(variant._id);
-          if (res) {
-            // Buscamos cuánto hay en cada almacén en el array retornado por NestJS
-            const almacenStock = res.find((s: any) => s.id_warehouse?.name === "ALMACEN_CENTRAL")?.stock || 0;
-            const tiendaStock = res.find((s: any) => s.id_warehouse?.name === "TIENDA_PRINCIPAL")?.stock || 0;
-            
-            setStocksByVariant(prev => ({
-              ...prev,
-              [variant._id]: { almacen: almacenStock, tienda: tiendaStock }
-            }));
-          }
+        // Siempre recargamos para tener datos frescos de WarehouseStock
+        const res = await startLoadingStockByVariant(variant._id);
+        if (Array.isArray(res)) {
+          // WarehouseStock retorna: { id_warehouse: { name, code }, physical_stock, reserved_stock }
+          // available_stock = physical_stock - reserved_stock (virtual del schema)
+          const findAvailable = (warehouseCode: string) => {
+            const entry = res.find(
+              (s: any) => s.id_warehouse?.code === warehouseCode || s.id_warehouse?.name === warehouseCode
+            );
+            if (!entry) return 0;
+            return (entry.physical_stock ?? 0) - (entry.reserved_stock ?? 0);
+          };
+
+          setStocksByVariant(prev => ({
+            ...prev,
+            [variant._id]: {
+              almacen: findAvailable("ALM-CEN"),
+              tienda: findAvailable("TND-PRI"),
+            }
+          }));
         }
       }
     }
   };
 
   const handleAddProductToOrder = (product: any) => {
-    // ✅ CAPTURA DE ID BLINDADA: Nos aseguramos de extraer un ID válido
     const targetProductId = product.id_product || product._id;
+
+    // Enriquecemos cada variante con max_available (stock disponible en Almacén Central)
+    // para que el Wizard pueda leer el límite sin volver a pedir al backend
+    const variantsWithStock = (product.variants || []).map((v: any) => ({
+      ...v,
+      max_available: stocksByVariant[v._id]?.almacen ?? 0,
+    }));
 
     setCartMovement(prev => ({
       ...prev,
       [targetProductId]: {
-        id_product: targetProductId, // 👈 Forzamos a que se guarde con esta llave exacta
+        id_product: targetProductId,
         name: product.name,
-        category: product.id_category?.name || "Blusas",
+        category: product.id_category?.name || "Sin categoría",
         image: product.images?.[0] || "",
-        variants: product.variants || []
+        variants: variantsWithStock,
       }
     }));
     toast.success(`${product.name} añadido a la orden de movimiento.`);

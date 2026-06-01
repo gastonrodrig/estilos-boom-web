@@ -86,28 +86,6 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
-    label: "Gestionar Ordenes",
-    icon: "shopping-bag",
-    requiredRoles: ["Administrador"],
-    children: [
-      {
-        label: "Recientes",
-        href: "/admin/recents",
-        requiredRoles: ["Administrador"],
-      },
-      {
-        label: "En Progreso",
-        href: "/admin/orders/in-progress",
-        requiredRoles: ["Administrador"],
-      },
-      {
-        label: "Finalizadas",
-        href: "/admin/orders/finished",
-        requiredRoles: ["Administrador"],
-      },
-    ],
-  },
-  {
     label: "Gestionar Cotización",
     href: "/admin/quotations",
     icon: "booktext",
@@ -136,12 +114,7 @@ export const adminModules: SidebarModule[] = [
         requiredRoles: ["Administrador"],
       },
       {
-        label: "Movimientos",
-        href: "/admin/invoice", 
-        requiredRoles: ["Administrador"],
-      },
-      {
-        label: "Historial de movimientos",
+        label: "Documentos y Movimientos",
         href: "/admin/movements", 
         requiredRoles: ["Administrador"],
       }

@@ -157,16 +157,15 @@ export const useStorehouseStore = () => {
     const result = await executeRequest(async () => {
       const config = await getConfig();
       const { data } = await storehouseApi.get("/inventory/movements", config);
-      const items = Array.isArray(data) ? data.map((row) => mapInventoryMovement(row as Record<string, unknown>)) : [];
-      
-      dispatch(refreshStorehouseMovements(items));
-      
-      // ✅ CORRECCIÓN: Retornamos los items reales procesados de la base de datos
-      return items; 
+      const rawData: any[] = Array.isArray(data) ? data : [];
+      // Redux recibe la versión mapeada (compatible con InventoryMovement tipado)
+      const mapped = rawData.map((row) => mapInventoryMovement(row as Record<string, unknown>));
+      dispatch(refreshStorehouseMovements(mapped));
+      // El hook retorna los datos crudos para quien necesite los objetos populados (ej. Kárdex tab)
+      return rawData;
     }, "No se pudieron cargar los movimientos de inventario.");
 
-    // ✅ CORRECCIÓN: Si falla o es null, retornamos un array vacío [] para que la tabla no rompa
-    return result ?? []; 
+    return result ?? [];
   }, [dispatch, executeRequest, getConfig]);
 
   const startCreatePurchaseOrder = useCallback(async (payload: CreatePurchaseOrderModelInput) => {
@@ -442,14 +441,14 @@ const approveInventory = useCallback(async (
     return await executeRequest(async () => {
       const config = await getConfig();
       const { data } = await storehouseApi.get("/inventory/warehouses", config);
-      // Puedes despachar a Redux si creas un reductor, o manejarlo directo en la promesa
       return data;
     }, "No se pudieron cargar los almacenes.");
   }, [executeRequest, getConfig]);
 
   /**
-   * Consulta las existencias físicas de una variante segmentada por almacén
+   * Consulta el stock de una variante segmentado por almacén.
    * GET /inventory/stock/:variantId
+   * Retorna un array de WarehouseStock con physical_stock, reserved_stock y available_stock (virtual).
    */
   const startLoadingStockByVariant = useCallback(async (variantId: string) => {
     return await executeRequest(async () => {
@@ -459,58 +458,90 @@ const approveInventory = useCallback(async (
     }, "No se pudo recuperar la distribución de stock.");
   }, [executeRequest, getConfig]);
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // DOCUMENTOS DE ALMACÉN  (reemplazan el flujo obsoleto de /inventory/transfers)
+  // ─────────────────────────────────────────────────────────────────────────────
+
   /**
-   * Carga el historial completo de transferencias internas (Guías de Remisión)
-   * GET /inventory/transfers
+   * Lista todos los documentos de almacén (INGRESO_COMPRA, SALIDA_VENTA, TRANSFERENCIA, AJUSTE).
+   * GET /inventory/documents
    */
-  const startLoadingTransfers = useCallback(async () => {
+  const startLoadingWarehouseDocuments = useCallback(async () => {
     return await executeRequest(async () => {
       const config = await getConfig();
-      // Le pega a tu Get('transfers') que acabamos de actualizar con los populates
-      const { data } = await storehouseApi.get("/inventory/transfers", config);
-      
-      // Retornamos el array directamente para tu useState local del componente
+      const { data } = await storehouseApi.get("/inventory/documents", config);
       return Array.isArray(data) ? data : [];
-    }, "No se pudieron cargar las guías de transferencia.");
+    }, "No se pudieron cargar los documentos de almacén.");
   }, [executeRequest, getConfig]);
 
   /**
-   * Registra una nueva guía de traslado entre almacenes (PENDIENTE)
-   * POST /inventory/transfers
+   * Crea un documento en estado PENDIENTE.
+   * POST /inventory/documents
+   * El catálogo (Producto + Variante) debe existir antes de llamar esto.
    */
-  const startCreateTransfer = useCallback(async (payload: {
-    code: string;
-    id_source_warehouse: string;
-    id_target_warehouse: string;
+  const startCreateWarehouseDocument = useCallback(async (payload: {
+    document_number: string;
+    type: "INGRESO_COMPRA" | "SALIDA_VENTA" | "TRANSFERENCIA" | "AJUSTE";
+    id_source_warehouse?: string | null;
+    id_target_warehouse?: string | null;
+    id_origin_doc?: string | null;
     id_sender_worker: string;
-    items: { id_variant: string; quantity: number }[];
+    notes?: string;
+    items: { id_variant: string; quantity_expected: number; incidence_note?: string }[];
   }) => {
     const result = await executeRequest(async () => {
       const config = await getConfig();
-      await storehouseApi.post("/inventory/transfers", payload, config);
-      toast.success("Guía de transferencia emitida correctamente.");
-      return true;
-    }, "No se pudo registrar la transferencia.");
-    return result ?? false;
+      const { data } = await storehouseApi.post("/inventory/documents", payload, config);
+      toast.success("Documento de almacén creado correctamente.");
+      return data;
+    }, "No se pudo crear el documento de almacén.");
+    return result ?? null;
   }, [executeRequest, getConfig]);
 
   /**
-   * Aprueba y consolida el traspaso, descontando del origen e inyectando stock en tienda
-   * PATCH /inventory/transfers/:id/complete
+   * El almacenero da la conformidad física del documento.
+   * Acción atómica: actualiza WarehouseStock.physical_stock + graba líneas en InventoryMovements.
+   * PATCH /inventory/documents/:id/process
    */
-  const startCompleteTransfer = useCallback(async (id: string, idWorkerReceiver: string) => {
+  const startProcessWarehouseDocument = useCallback(async (
+    documentId: string,
+    workerId: string,
+    items: { id_variant: string; quantity_received: number; incidence_note?: string }[],
+  ) => {
     const result = await executeRequest(async () => {
       const config = await getConfig();
-      await storehouseApi.patch(`/inventory/transfers/${id}/complete`, { id_worker_receiver: idWorkerReceiver }, config);
-      
-      // Refrescamos los movimientos generales del inventario tras el traspaso masivo
+      await storehouseApi.patch(`/inventory/documents/${documentId}/process`, {
+        id_worker: workerId,
+        items,
+      }, config);
       await startLoadingInventoryMovements();
-      
-      toast.success("¡Mercadería ingresada a Tienda con éxito!");
+      toast.success("¡Documento procesado. Stock e historial actualizados!");
       return true;
-    }, "Error al procesar la recepción en tienda.");
+    }, "Error al procesar el documento de almacén.");
     return result ?? false;
   }, [executeRequest, getConfig, startLoadingInventoryMovements]);
+
+  // Aliases de compatibilidad hacia atrás (apuntan a los nuevos métodos)
+  /** @deprecated Usar startLoadingWarehouseDocuments */
+  const startLoadingTransfers = startLoadingWarehouseDocuments;
+  /** @deprecated Usar startCreateWarehouseDocument */
+  const startCreateTransfer = useCallback(async (payload: any) => {
+    return startCreateWarehouseDocument({
+      document_number: payload.code ?? `TR-${Date.now().toString().slice(-6)}`,
+      type: "TRANSFERENCIA",
+      id_source_warehouse: payload.id_source_warehouse ?? null,
+      id_target_warehouse: payload.id_target_warehouse ?? null,
+      id_sender_worker: payload.id_sender_worker,
+      items: (payload.items ?? []).map((i: any) => ({
+        id_variant: i.id_variant,
+        quantity_expected: i.quantity ?? i.quantity_expected ?? 0,
+      })),
+    });
+  }, [startCreateWarehouseDocument]);
+  /** @deprecated Usar startProcessWarehouseDocument */
+  const startCompleteTransfer = useCallback(async (id: string, workerId: string) => {
+    return startProcessWarehouseDocument(id, workerId, []);
+  }, [startProcessWarehouseDocument]);
 
   return {
     purchaseOrders,
@@ -560,8 +591,13 @@ const approveInventory = useCallback(async (
 
     startLoadingWarehouses,
     startLoadingStockByVariant,
+    // Nuevos métodos de WarehouseDocuments
+    startLoadingWarehouseDocuments,
+    startCreateWarehouseDocument,
+    startProcessWarehouseDocument,
+    // Aliases de compatibilidad (apuntan a los nuevos)
     startLoadingTransfers,
     startCreateTransfer,
-    startCompleteTransfer
+    startCompleteTransfer,
   };
 };

@@ -2,44 +2,74 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { DataTable, DataTableAction, DataTableColumn } from "@/components/organisms";
-import { useStorehouseStore } from "@/hooks"; 
-import { CheckCircle, ArrowRightLeft, FileText, Eye } from "lucide-react";
+import { useStorehouseStore } from "@/hooks";
+import { CheckCircle, FileText, Eye, Activity } from "lucide-react";
 import toast from "react-hot-toast";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export default function AdminTransfersPage() {
-  const { startLoadingTransfers, startLoadingInventoryMovements, startCompleteTransfer, loading } = useStorehouseStore();
-  const [transfers, setTransfers] = useState<any[]>([]);
+type ActiveTab = "documentos" | "kardex";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+const DOC_TYPE_LABELS: Record<string, string> = {
+  INGRESO_COMPRA: "📥 Ingreso compra",
+  SALIDA_VENTA: "📤 Salida venta",
+  TRANSFERENCIA: "⇄ Transferencia",
+  AJUSTE: "⚖️ Ajuste",
+};
+
+const DOC_TYPE_STYLES: Record<string, string> = {
+  INGRESO_COMPRA: "bg-blue-50 text-blue-600 border-blue-100",
+  SALIDA_VENTA: "bg-orange-50 text-orange-600 border-orange-100",
+  TRANSFERENCIA: "bg-amber-50 text-amber-600 border-amber-100",
+  AJUSTE: "bg-slate-50 text-slate-600 border-slate-100",
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  PENDIENTE: "bg-amber-50 text-amber-600 border-amber-100 animate-pulse",
+  EN_TRANSITO: "bg-sky-50 text-sky-600 border-sky-100",
+  COMPLETADO: "bg-emerald-50 text-emerald-600 border-emerald-100",
+  CANCELADO: "bg-gray-50 text-gray-400 border-gray-100",
+};
+
+const workerName = (w: any) =>
+  w?.first_name ? `${w.first_name} ${w.last_name?.[0] ?? ""}.` : "—";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENTE PRINCIPAL
+// ─────────────────────────────────────────────────────────────────────────────
+export default function AdminMovementsPage() {
+  const {
+    startLoadingWarehouseDocuments,
+    startProcessWarehouseDocument,
+    startLoadingInventoryMovements,
+    loading,
+  } = useStorehouseStore();
+
+  const [activeTab, setActiveTab] = useState<ActiveTab>("documentos");
+  const [documents, setDocuments] = useState<any[]>([]);
+  // rawMovements: datos directos del API sin pasar por el mapper del store (conserva objetos populados)
+  const [rawMovements, setRawMovements] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [tableLoading, setTableLoading] = useState(false);
-
-  // 🔄 ESTADOS PARA CONTROLAR LA PAGINACIÓN Y FILAS ACTIVAS
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // ── Carga inicial ──────────────────────────────────────────────────────────
   const loadData = async () => {
     setTableLoading(true);
     try {
-      const [transfersData, movementsData] = await Promise.all([
-        startLoadingTransfers(),           
-        startLoadingInventoryMovements()   
+      const [docs, moves] = await Promise.all([
+        startLoadingWarehouseDocuments(),
+        startLoadingInventoryMovements(),
       ]);
-
-      const cleanTransfers = Array.isArray(transfersData) ? transfersData : [];
-      const cleanMovements = Array.isArray(movementsData) ? movementsData : [];
-      const unifiedHistory = [...cleanTransfers, ...cleanMovements];
-
-      unifiedHistory.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return dateB - dateA; 
-      });
-
-      setTransfers(unifiedHistory);
-    } catch (error) {
-      console.error("Error al unificar el historial de movimientos:", error);
-      toast.error("Ocurrió un inconveniente al procesar el historial unificado.");
+      setDocuments(Array.isArray(docs) ? docs : []);
+      // startLoadingInventoryMovements retorna el array crudo antes del dispatch
+      setRawMovements(Array.isArray(moves) ? moves : []);
+    } catch {
+      toast.error("Error al cargar los datos de inventario.");
     } finally {
       setTableLoading(false);
     }
@@ -47,417 +77,446 @@ export default function AdminTransfersPage() {
 
   useEffect(() => {
     void loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 🎛️ MANEJADORES DE CAMBIO DE PÁGINA Y FILAS
-  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(event.target.value));
-    setPage(0); // Reiniciamos a la primera página para evitar desfases
-  };
-
-  // Cada vez que el usuario busque algo, regresamos la tabla a la página 0 automáticamente
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setPage(0);
-  };
-
-  const handleProcessReception = async (transfer: any) => {
-    const currentWorkerId = "65f1c2b3e4b0123456789abc";
-
-    // 🛡️ EXTRACCIÓN PROTEGIDA: Si es un objeto por el populate, extrae su ._id; si no, usa el string directo
-    const sourceWarehouseId = typeof transfer.id_source_warehouse === 'object' 
-      ? transfer.id_source_warehouse?._id 
-      : transfer.id_source_warehouse;
-
-    const targetWarehouseId = typeof transfer.id_target_warehouse === 'object' 
-      ? transfer.id_target_warehouse?._id 
-      : transfer.id_target_warehouse;
-
-    console.log("=================== PAYLOAD CORREGIDO EN CLIENTE ===================");
-    console.log("ID Transferencia:", transfer._id);
-    console.log("ID Almacén Origen extraído:", sourceWarehouseId);
-    console.log("ID Almacén Destino extraído:", targetWarehouseId);
-    console.log("====================================================================");
-
-    // Validamos de forma estricta antes de disparar la petición HTTP
-    if (!sourceWarehouseId || !targetWarehouseId) {
-      toast.error("Error crítico: Los identificadores de los almacenes no son válidos.");
+  // ── Procesar documento (conformidad física del almacenero) ─────────────────
+  const handleProcessDocument = async (doc: any) => {
+    if (doc.status !== "PENDIENTE") {
+      toast.error("Este documento ya fue procesado o cancelado.");
       return;
     }
 
-    if (window.confirm(`¿Confirmas la recepción física del traslado ${transfer.code} en Tienda Principal?`)) {
-      const success = await startCompleteTransfer(transfer._id, currentWorkerId);
-      if (success) {
-        toast.success("Traslado completado e inyectado a tienda con éxito.");
-        await loadData();
-      }
-    }
+    const workerId =
+      (typeof window !== "undefined"
+        ? localStorage.getItem("worker_id") ?? ""
+        : "") || "000000000000000000000001";
+
+    const confirm = window.confirm(
+      `¿Confirmas la recepción física del documento ${doc.document_number}?\n` +
+        "Esto actualizará el stock y registrará las líneas en el Kárdex."
+    );
+    if (!confirm) return;
+
+    // Auto-receive: quantity_received = quantity_expected para cada ítem
+    const items = (doc.items ?? []).map((item: any) => ({
+      id_variant: typeof item.id_variant === "object" ? item.id_variant._id : item.id_variant,
+      quantity_received: item.quantity_expected,
+    }));
+
+    const success = await startProcessWarehouseDocument(doc._id, workerId, items);
+    if (success) await loadData();
   };
 
-  // 📄 FUNCIÓN GENERADORA DEL PDF DE LA GUÍA DE REMISIÓN
-  const handleDownloadPDF = (transfer: any) => {
-    const doc = new jsPDF();
-    const primaryColor = [242, 119, 141]; // #F2778D
+  // ── Descargar PDF de la guía ───────────────────────────────────────────────
+  const handleDownloadPDF = (doc: any) => {
+    const pdf = new jsPDF();
+    const primaryColor: [number, number, number] = [242, 119, 141];
 
-    // 1. Encabezado / Branding
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.rect(0, 0, 210, 25, "F");
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("ESTILOS BOOM S.A.C.", 15, 16);
-    
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("SISTEMA DE GESTIÓN DE INVENTARIOS (SGI)", 120, 16);
+    pdf.setFillColor(...primaryColor);
+    pdf.rect(0, 0, 210, 25, "F");
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(16);
+    pdf.text("ESTILOS BOOM S.A.C.", 15, 16);
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("SISTEMA DE GESTIÓN DE INVENTARIOS (SGI)", 105, 16);
 
-    // 2. Bloque del Título del Documento
-    doc.setTextColor(51, 51, 51);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("GUÍA DE REMISIÓN INTERNA DE TRASLADO", 15, 40);
+    pdf.setTextColor(51, 51, 51);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(13);
+    pdf.text("DOCUMENTO DE ALMACÉN", 15, 40);
 
-    // Caja de código de guía (Estilo Sunat)
-    doc.setDrawColor(242, 119, 141);
-    doc.setLineWidth(0.5);
-    doc.rect(130, 32, 65, 15);
-    doc.setFontSize(11);
-    doc.text(`R.U.C. 20716253411`, 135, 38);
-    doc.text(`${transfer.code || "TR-000000"}`, 135, 44);
+    pdf.setDrawColor(...primaryColor);
+    pdf.setLineWidth(0.5);
+    pdf.rect(130, 32, 65, 15);
+    pdf.setFontSize(10);
+    pdf.text(doc.document_number ?? "DOC-000000", 135, 44);
 
-    // 3. Detalles de la Operación
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("DATOS DE TRASLADO:", 15, 58);
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`Fecha: ${new Date(doc.created_at ?? Date.now()).toLocaleDateString()}`, 15, 55);
+    pdf.text(`Tipo: ${DOC_TYPE_LABELS[doc.type] ?? doc.type}`, 15, 62);
+    pdf.text(`Estado: ${doc.status ?? "PENDIENTE"}`, 15, 69);
 
-    const isFromOC = !!transfer.id_purchase_order;
+    const srcName = doc.id_source_warehouse?.name?.replace("_", " ") ?? "Proveedor externo";
+    const tgtName = doc.id_target_warehouse?.name?.replace("_", " ") ?? "—";
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Origen:", 15, 82);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(srcName, 45, 82);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Destino:", 110, 82);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(tgtName, 140, 82);
 
-    doc.setFont("helvetica", "normal");
-    doc.text(`Fecha de Emisión:  ${new Date(transfer.created_at || new Date()).toLocaleDateString()}`, 15, 65);
-    doc.text(`Tipo de Movimiento: ${isFromOC ? "Entrada por Compra" : "Transferencia Interna SGI"}`, 15, 71);
-    doc.text(`Estado Actual:       ${transfer.status || "PENDIENTE"}`, 15, 77);
-
-    // Cuadro Origen y Destino
-    doc.setFillColor(250, 249, 246);
-    doc.rect(15, 85, 180, 20, "F");
-    doc.setDrawColor(235, 234, 232);
-    doc.rect(15, 85, 180, 20);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("PUNTO PARTIDA (Origen):", 20, 92);
-    doc.text("PUNTO LLEGADA (Destino):", 110, 92);
-
-    doc.setFont("helvetica", "normal");
-    doc.text(isFromOC ? "PROVEEDOR LOGÍSTICO" : (transfer.id_source_warehouse?.name?.replace("_", " ") || "Almacén Central"), 20, 98);
-    doc.text(transfer.id_target_warehouse?.name?.replace("_", " ") || "Tienda Principal", 110, 98);
-
-    // 4. Tabla de Artículos (Items)
-    doc.setFont("helvetica", "bold");
-    doc.text("DETALLE DE LAS PRENDAS:", 15, 115);
-
-    const tableRows = (transfer.items || []).map((item: any, i: number) => {
-      // Accedemos de forma segura al objeto variante poblado
-      const variant = item.id_variant;
-      const productName = variant?.id_product?.name || "Prenda Estilos Boom";
-      const sku = variant?.sku_variant || `SKU-${i}`;
-      const sizeColor = `${variant?.size || "M"} - ${variant?.color?.name || "Varios"}`;
-
+    const rows = (doc.items ?? []).map((item: any, i: number) => {
+      const v = item.id_variant;
       return [
         i + 1,
-        sku,
-        productName,
-        sizeColor,
-        item.quantity,
-        "Unidades"
+        v?.sku_variant ?? `SKU-${i}`,
+        v?.id_product?.name ?? "Prenda",
+        `${v?.size ?? "—"} / ${v?.color?.name ?? "—"}`,
+        item.quantity_expected,
+        item.quantity_received ?? "—",
+        "Unidades",
       ];
     });
 
-    autoTable(doc, {
-      startY: 120,
-      head: [["Item", "Código SKU", "Descripción del Producto", "Talla/Color", "Cant.", "U.M."]],
-      body: tableRows,
+    autoTable(pdf, {
+      startY: 90,
+      head: [["#", "SKU", "Producto", "Talla / Color", "Esperado", "Recibido", "U.M."]],
+      body: rows,
       headStyles: { fillColor: [89, 66, 70] },
-      styles: { fontSize: 9, font: "helvetica" },
-      columnStyles: { 4: { halign: "center" } }
+      styles: { fontSize: 9 },
     });
 
-    // 5. Bloque de Firmas de Auditoría
-    const finalY = (doc as any).lastAutoTable.finalY + 35;
-    
-    doc.setDrawColor(200, 200, 200);
-    doc.line(25, finalY, 85, finalY);
-    doc.line(125, finalY, 185, finalY);
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text("Despachado Por (Almacén)", 38, finalY + 5);
-    doc.text("Recibido Por (Tienda)", 142, finalY + 5);
-    
-    const senderName = transfer.id_sender_worker 
-      ? `${transfer.id_sender_worker.first_name} ${transfer.id_sender_worker.last_name?.slice(0,1)}.`
-      : "Carlos M.";
-      
-    const receiverName = transfer.id_receiver_worker 
-      ? `${transfer.id_receiver_worker.first_name} ${transfer.id_receiver_worker.last_name?.slice(0,1)}.`
-      : "Pendiente";
-
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Operario: " + senderName, 36, finalY + 10);
-    doc.text("Receptor: " + receiverName, 140, finalY + 10);
-
-    doc.save(`Guia_Remision_${transfer.code || "TRASLADO"}.pdf`);
+    pdf.save(`Guia_${doc.document_number ?? "DOC"}.pdf`);
   };
 
-  const handleOpenDetails = (transfer: any) => {
-    toast(`Abriendo visor de auditoría para la guía ${transfer.code}`, {
-      icon: "🔍",
-      style: { borderRadius: '12px', background: '#594246', color: '#fff' }
-    });
-  };
-
-  // CONFIGURACIÓN DE ACCIONES ATÓMICAS (Agregado Ver Detalles)
-  const actions: DataTableAction<any>[] = [
-    {
-      label: "Recibir en Tienda",
-      icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
-      onClick: handleProcessReception,
-      // Solo se muestra si es una transferencia interna y está PENDIENTE
-      show: (row) => !row.id_purchase_order && row.status === "PENDIENTE",
-    },
-    {
-      label: "Imprimir Guía (PDF)",
-      icon: <FileText className="h-4 w-4 text-blue-500" />,
-      onClick: handleDownloadPDF,
-      // 🚀 CONDICIONAL CLAVE: Solo se muestra si NO viene de una Orden de Compra (es decir, solo internas)
-      show: (row) => !row.id_purchase_order,
-    },
-    {
-      label: "Ver Guía Proveedor",
-      icon: <FileText className="h-4 w-4 text-blue-500" />,
-      onClick: (row) => {
-        if (row.id_purchase_order?.supplier_guide_url) {
-          window.open(row.id_purchase_order.supplier_guide_url, "_blank");
-        } else {
-          toast.error("No se adjuntó la guía digital del proveedor en la recepción.");
-        }
-      },
-      // 🚀 CONDICIONAL CLAVE: Solo se muestra si SÍ viene de una Orden de Compra
-      show: (row) => !!row.id_purchase_order,
-    },
-    {
-      label: "Ver detalles de movimiento",
-      icon: <Eye className="h-4 w-4 text-purple-500" />,
-      onClick: handleOpenDetails,
-      show: () => true, // Siempre visible para auditoría
-    }
-  ];
-
-  // COLUMNAS BAJO TU PROTOCOLO GRÁFICO EXACTO
-  const columns: DataTableColumn<any>[] = [
+  // ── Columnas — WarehouseDocuments ──────────────────────────────────────────
+  const docColumns: DataTableColumn<any>[] = [
     {
       id: "created_at",
-      label: "Fecha y hora",
+      label: "Fecha",
       sortable: true,
-      width: "140px",
+      width: "130px",
       accessor: (row) => {
         if (!row.created_at) return <span className="text-gray-300">—</span>;
-        const date = new Date(row.created_at);
+        const d = new Date(row.created_at);
         return (
           <div className="flex flex-col text-xs text-gray-700 font-medium">
-            <span>{date.toLocaleDateString("es-PE", { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
-            <span className="text-[10px] text-gray-400 mt-0.5">{date.toLocaleTimeString("es-PE", { hour: '2-digit', minute: '2-digit' })}</span>
+            <span>{d.toLocaleDateString("es-PE")}</span>
+            <span className="text-[10px] text-gray-400">
+              {d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
+            </span>
           </div>
         );
-      }
+      },
     },
-    { 
-      id: "type", 
-      label: "Tipo", 
+    {
+      id: "document_number",
+      label: "N° Documento",
+      width: "150px",
+      accessor: (row) => (
+        <span className="font-mono text-xs font-bold text-[#594246]">
+          {row.document_number ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "type",
+      label: "Tipo",
       width: "160px",
-      accessor: (row) => {
-        const isFromOC = !!row.id_purchase_order;
-        if (isFromOC) {
-          return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-500 border border-blue-100/50">
-              📥 ↓ Entrada compra
-            </span>
-          );
-        }
-        if (row.type === "INCIDENCIA") {
-          return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-50 text-orange-500 border border-orange-100/50">
-              📦 ⚡ Incidencia
-            </span>
-          );
-        }
-        if (row.type === "AJUSTE") {
-          return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-500 border border-slate-100/50">
-              ⚖️ ⚖️ Ajuste
-            </span>
-          );
-        }
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100/50">
-            ⇄ ⇄ Transferencia
-          </span>
-        );
-      }
+      accessor: (row) => (
+        <span
+          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+            DOC_TYPE_STYLES[row.type] ?? "bg-gray-50 text-gray-500 border-gray-100"
+          }`}
+        >
+          {DOC_TYPE_LABELS[row.type] ?? row.type}
+        </span>
+      ),
     },
-    { 
-      id: "id_source_warehouse", 
-      label: "Origen ➔ Destino", 
+    {
+      id: "route",
+      label: "Origen ➔ Destino",
       width: "220px",
       accessor: (row) => {
-        const isFromOC = !!row.id_purchase_order;
-        const sourceName = isFromOC 
-          ? "Proveedor Logístico" 
-          : (row.id_source_warehouse?.name?.replace("_", " ") || "Almacén Central");
-          
-        const targetName = row.id_target_warehouse?.name?.replace("_", " ") || "Tienda Principal";
-        
+        const src = row.id_source_warehouse?.name?.replace("_", " ") ?? "Externo";
+        const tgt = row.id_target_warehouse?.name?.replace("_", " ") ?? "—";
         return (
           <div className="flex flex-col text-xs font-semibold text-gray-700">
-            <span className={isFromOC ? "text-blue-500/90 text-[11px]" : ""}>{sourceName} ➔</span>
-            <span className="text-rose-400 text-[11px] mt-0.5">{targetName}</span>
+            <span>{src} ➔</span>
+            <span className="text-rose-400 text-[11px] mt-0.5">{tgt}</span>
           </div>
         );
-      }
+      },
+    },
+    {
+      id: "items_count",
+      label: "Prendas",
+      width: "80px",
+      accessor: (row) => (
+        <span className="text-xs font-bold text-gray-600 text-center block">
+          {row.items?.length ?? 0} variantes
+        </span>
+      ),
+    },
+    {
+      id: "status",
+      label: "Estado",
+      width: "120px",
+      accessor: (row) => (
+        <span
+          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+            STATUS_STYLES[row.status] ?? "bg-gray-50 text-gray-400 border-gray-100"
+          }`}
+        >
+          {row.status ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "sender",
+      label: "Creado por",
+      width: "130px",
+      accessor: (row) => {
+        const name = workerName(row.id_sender_worker);
+        return (
+          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
+            <div className="w-5 h-5 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center font-black text-[9px] shrink-0">
+              {name.slice(0, 2).toUpperCase()}
+            </div>
+            <span className="truncate max-w-[90px]">{name}</span>
+          </div>
+        );
+      },
+    },
+    {
+      id: "receiver",
+      label: "Procesado por",
+      width: "130px",
+      accessor: (row) => {
+        if (!row.id_receiver_worker?.first_name)
+          return <span className="text-gray-300 text-xs italic block text-center">—</span>;
+        const name = workerName(row.id_receiver_worker);
+        return (
+          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-[9px] shrink-0">
+              {name.slice(0, 2).toUpperCase()}
+            </div>
+            <span className="truncate max-w-[90px]">{name}</span>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const docActions: DataTableAction<any>[] = [
+    {
+      label: "Procesar / Dar conformidad",
+      icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
+      onClick: handleProcessDocument,
+      show: (row) => row.status === "PENDIENTE",
+    },
+    {
+      label: "Descargar guía PDF",
+      icon: <FileText className="h-4 w-4 text-blue-500" />,
+      onClick: handleDownloadPDF,
+      show: () => true,
+    },
+    {
+      label: "Ver detalle",
+      icon: <Eye className="h-4 w-4 text-purple-500" />,
+      onClick: (row) =>
+        toast(`Documento: ${row.document_number}`, {
+          icon: "🔍",
+          style: { borderRadius: "12px", background: "#594246", color: "#fff" },
+        }),
+      show: () => true,
+    },
+  ];
+
+  // ── Columnas — Kárdex (InventoryMovements) ─────────────────────────────────
+  const kardexColumns: DataTableColumn<any>[] = [
+    {
+      id: "created_at",
+      label: "Fecha",
+      sortable: true,
+      width: "130px",
+      accessor: (row) => {
+        if (!row.createdAt && !row.created_at) return <span className="text-gray-300">—</span>;
+        const d = new Date(row.createdAt ?? row.created_at);
+        return (
+          <div className="flex flex-col text-xs text-gray-700 font-medium">
+            <span>{d.toLocaleDateString("es-PE")}</span>
+            <span className="text-[10px] text-gray-400">
+              {d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      id: "sku",
+      label: "SKU variante",
+      width: "150px",
+      accessor: (row) => (
+        <span className="font-mono text-xs text-gray-600">
+          {row.id_variant?.sku_variant ?? row.variantSku ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "product_name",
+      label: "Producto",
+      width: "180px",
+      accessor: (row) => (
+        <span className="text-xs font-semibold text-gray-800 truncate block max-w-[170px]">
+          {row.id_variant?.id_product?.name ?? row.productName ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "warehouse",
+      label: "Almacén",
+      width: "130px",
+      accessor: (row) => (
+        <span className="text-xs text-gray-600">
+          {row.id_warehouse?.name?.replace("_", " ") ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "type",
+      label: "Tipo",
+      width: "100px",
+      accessor: (row) => (
+        <span
+          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+            row.type === "ENTRADA"
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+              : "bg-rose-50 text-rose-600 border-rose-100"
+          }`}
+        >
+          {row.type === "ENTRADA" ? "↑ Entrada" : "↓ Salida"}
+        </span>
+      ),
+    },
+    {
+      id: "quantity",
+      label: "Cantidad",
+      width: "90px",
+      accessor: (row) => (
+        <span className="text-sm font-bold text-gray-700 block text-center">{row.quantity ?? "—"}</span>
+      ),
+    },
+    {
+      id: "new_stock",
+      label: "Saldo",
+      width: "90px",
+      accessor: (row) => (
+        <span className="text-sm font-bold text-[#594246] block text-center">{row.new_stock ?? "—"}</span>
+      ),
     },
     {
       id: "reason",
       label: "Motivo",
-      width: "180px",
-      accessor: (row) => {
-        return (
-          <span className="text-xs text-gray-500 font-medium truncate max-w-[170px] block">
-            {row.reason || "Reposición urgente"}
-          </span>
-        );
-      }
+      width: "130px",
+      accessor: (row) => (
+        <span className="text-xs text-gray-500 font-medium">{row.reason ?? "—"}</span>
+      ),
     },
-    { 
-      id: "status_custom", // 👈 ¡CAMBIADO! Engañamos a la DataTable para que use tu accessor real
-      label: "Estado", 
-      width: "120px",
-      accessor: (row) => {
-        const isFromOC = !!row.id_purchase_order;
-        const isCompleted = row.status === "CONFIRMADO" || row.status === "COMPLETADO" || isFromOC;
-
-        return (
-          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            isCompleted 
-              ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
-              : "bg-amber-50 text-amber-600 border-amber-100 animate-pulse"
-          }`}>
-            {isCompleted ? "Confirmado" : "Pendiente"}
-          </span>
-        );
-      }
-    },
-    {
-      id: "created_by",
-      label: "Creado por",
-      width: "140px",
-      accessor: (row) => {
-        const workerObj = row.id_sender_worker || row.id_worker;
-        const name = workerObj && workerObj.first_name 
-          ? `${workerObj.first_name} ${workerObj.last_name?.[0] || ""}.` 
-          : "Carlos M.";
-          
-        return (
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center font-black text-[9px] shrink-0">
-              {name.slice(0,2).toUpperCase()}
-            </div>
-            <span className="truncate max-w-[95px]">{name}</span>
-          </div>
-        );
-      }
-    },
-    {
-      id: "confirmed_by",
-      label: "Confirmado por",
-      width: "140px",
-      accessor: (row) => {
-        const isFromOC = !!row.id_purchase_order;
-        
-        // Si proviene de una compra consolidada, el encargado del almacén central que firmó en created_by también da la conformidad
-        if (isFromOC) {
-          const workerObj = row.id_worker || row.id_sender_worker;
-          const name = workerObj && workerObj.first_name ? `${workerObj.first_name} ${workerObj.last_name?.[0] || ""}.` : "Carlos M.";
-          return (
-            <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-              <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-[9px] border border-emerald-100 shrink-0">
-                {name.slice(0,2).toUpperCase()}
-              </div>
-              <span className="truncate max-w-[95px]">{name}</span>
-            </div>
-          );
-        }
-
-        if (!row.id_receiver_worker || !row.id_receiver_worker.first_name) {
-          return <span className="text-gray-300 text-xs italic block text-center">—</span>;
-        }
-        const name = `${row.id_receiver_worker.first_name} ${row.id_receiver_worker.last_name?.[0] || ""}.`;
-        return (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-[9px] border border-emerald-100 shrink-0">
-              {name.slice(0,2).toUpperCase()}
-            </div>
-            <span className="truncate max-w-[95px]">{name}</span>
-          </div>
-        );
-      }
-    }
   ];
 
-  const filteredTransfers = useMemo(() => {
-    if (!searchTerm || !searchTerm.trim()) return transfers;
-    const lower = searchTerm.toLowerCase().trim();
-    return transfers.filter((t) => {
-      const statusText = t.status ? String(t.status) : "";
-      const reasonText = t.reason ? String(t.reason) : "";
-      const codeText = t.code ? String(t.code) : "";
-      const ocNumberText = t.id_purchase_order?.order_number ? String(t.id_purchase_order.order_number) : "";
-      const sourceName = t.id_purchase_order ? "proveedor" : (t.id_source_warehouse?.name || "almacen central");
-      const targetName = t.id_target_warehouse?.name || "tienda principal";
-
-      return [codeText, ocNumberText, statusText, reasonText, sourceName, targetName]
+  // ── Filtros ────────────────────────────────────────────────────────────────
+  const filteredDocuments = useMemo(() => {
+    if (!searchTerm.trim()) return documents;
+    const lower = searchTerm.toLowerCase();
+    return documents.filter((d) =>
+      [
+        d.document_number,
+        d.type,
+        d.status,
+        d.id_source_warehouse?.name,
+        d.id_target_warehouse?.name,
+      ]
         .filter(Boolean)
-        .some(v => v.toLowerCase().includes(lower));
-    });
-  }, [searchTerm, transfers]);
+        .some((v) => String(v).toLowerCase().includes(lower))
+    );
+  }, [documents, searchTerm]);
 
+  const filteredMovements = useMemo(() => {
+    if (!searchTerm.trim()) return rawMovements;
+    const lower = searchTerm.toLowerCase();
+    return rawMovements.filter((m) =>
+      [
+        m.type,
+        m.reason,
+        m.id_variant?.sku_variant,
+        m.id_variant?.id_product?.name,
+        m.id_warehouse?.name,
+      ]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(lower))
+    );
+  }, [rawMovements, searchTerm]);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="p-4">
-      <DataTable
-        rows={filteredTransfers}
-        loading={loading || tableLoading}
-        title="Movimientos entre Almacenes"
-        description="Emisión, seguimiento y control de guías de remisión internas. Autoriza el traslado de prendas desde el Almacén Central hacia la Tienda Principal de Estilos Boom."
-        onAddClick={() => {
-          toast.success("Abre el asistente de movimientos en Stock Actual.");
-        }}
-        
-        // 🚀 INYECTAMOS LOS CONTROLES DE LA PAGINACIÓN REACTIVA
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        
-        globalFilter={searchTerm}
-        onGlobalFilterChange={handleSearchChange}
-        columns={columns}
-        actions={actions}
-        hasActions
-      />
+    <div className="p-4 space-y-4">
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-[#EBEAE8]">
+        {(
+          [
+            { id: "documentos", label: "Documentos de Almacén", icon: FileText },
+            { id: "kardex", label: "Historial Kárdex", icon: Activity },
+          ] as const
+        ).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => { setActiveTab(id); setPage(0); setSearchTerm(""); }}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors border border-b-0 ${
+              activeTab === id
+                ? "bg-white text-[#594246] border-[#EBEAE8]"
+                : "bg-transparent text-gray-400 border-transparent hover:text-gray-600"
+            }`}
+          >
+            <Icon size={14} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab: Documentos de Almacén */}
+      {activeTab === "documentos" && (
+        <DataTable
+          rows={filteredDocuments}
+          loading={loading || tableLoading}
+          title="Documentos de Almacén"
+          description="Todos los movimientos físicos del inventario: ingresos por compra, salidas por venta, transferencias entre almacenes y ajustes por merma."
+          onAddClick={() =>
+            toast("Selecciona productos en 'Stock Actual' y usa el asistente de movimiento.", {
+              icon: "💡",
+            })
+          }
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(Number(e.target.value));
+            setPage(0);
+          }}
+          globalFilter={searchTerm}
+          onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
+          columns={docColumns}
+          actions={docActions}
+          hasActions
+        />
+      )}
+
+      {/* Tab: Kárdex */}
+      {activeTab === "kardex" && (
+        <DataTable
+          rows={filteredMovements as any[]}
+          loading={loading || tableLoading}
+          title="Historial del Kárdex"
+          description="Líneas inmutables de auditoría generadas automáticamente al procesar cada documento de almacén. Solo lectura."
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(Number(e.target.value));
+            setPage(0);
+          }}
+          globalFilter={searchTerm}
+          onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
+          columns={kardexColumns}
+          hasActions={false}
+        />
+      )}
     </div>
   );
 }
