@@ -422,6 +422,33 @@ const CheckoutPaymentForm: React.FC = () => {
           </button>
         )}
       </footer>
+
+      {/* 🖼️ MODAL DE IMAGEN AMPLIADA */}
+      {isImageModalOpen && (
+        <div 
+          className="fixed inset-0 z-[100] overflow-y-auto bg-black/90 backdrop-blur-sm p-2 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setIsImageModalOpen(false)}
+        >
+          <div className="min-h-full flex items-center justify-center py-10">
+            <div className="relative w-full max-w-[1400px] flex flex-col items-center">
+              <button 
+                onClick={() => setIsImageModalOpen(false)}
+                className="absolute -top-12 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors z-10"
+              >
+                <X size={24} />
+              </button>
+              <Image 
+                src="/assets/GuiaYapearV2.png" 
+                alt="Guía paso a paso Ampliada" 
+                width={2500} 
+                height={2500} 
+                className="w-full h-auto object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -104,7 +104,7 @@ export default function CreateTransferWizard() {
   return (
     <div className="min-h-screen bg-[#FAF9F6] p-8 text-[#594246] flex flex-col justify-between">
       {/* HEADER WIZARD */}
-      <div className="max-w-5xl mx-auto w-full flex justify-between items-center mb-6">
+      <div className="max-w-5xl mx-auto w-full flex justify-between items-center mb-8 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
         <div>
           <button
             onClick={() => router.back()}
@@ -112,8 +112,8 @@ export default function CreateTransferWizard() {
           >
             <ArrowLeft size={14} /> Volver
           </button>
-          <h1 className="text-3xl font-serif font-bold mt-2">Crear orden de movimiento</h1>
-          <p className="text-xs text-[#F2778D] font-bold mt-1 uppercase tracking-wider">
+          <h1 className="text-3xl font-black mt-3 tracking-wide drop-shadow-sm">Crear orden de movimiento</h1>
+          <p className="text-xs text-[#D6405F] dark:text-[#F8BBD0] font-black mt-2 uppercase tracking-widest bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 px-3 py-1 rounded-full w-fit border border-[#D6405F]/20 dark:border-[#F8BBD0]/20">
             Producto {currentIndex + 1} de {itemsToProcess.length}
           </p>
         </div>
@@ -129,8 +129,8 @@ export default function CreateTransferWizard() {
           <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 border mb-4">
             <img src={currentProduct.image} className="w-full h-full object-cover" alt={currentProduct.name} />
           </div>
-          <h2 className="text-2xl font-serif font-bold text-gray-800">{currentProduct.name}</h2>
-          <span className="inline-block mt-1 px-3 py-1 bg-rose-50 text-[#F2778D] rounded-full text-xs font-bold">
+          <h2 className="text-2xl font-black text-[#40202D] dark:text-white tracking-wide">{currentProduct.name}</h2>
+          <span className="inline-block mt-3 px-4 py-1.5 bg-white/50 dark:bg-white/10 text-[#D6405F] dark:text-[#F8BBD0] rounded-full text-xs font-bold uppercase tracking-wider border border-[#EAE0E2] dark:border-white/20 shadow-sm">
             {currentProduct.category}
           </span>
         </div>
@@ -205,7 +205,7 @@ export default function CreateTransferWizard() {
           onClick={() => setCurrentIndex((prev) => prev - 1)}
           className="px-5 py-2 text-sm font-bold border rounded-xl hover:bg-white disabled:opacity-20 transition-all flex items-center gap-1"
         >
-          🡨 Anterior
+          <ArrowLeft size={16}/> Anterior
         </button>
 
         {currentIndex < itemsToProcess.length - 1 ? (
@@ -219,7 +219,7 @@ export default function CreateTransferWizard() {
           <button
             disabled={loading}
             onClick={handleFinalizeTransfer}
-            className="px-8 py-2.5 bg-[#F2778D] hover:bg-[#d65c72] text-white text-sm font-bold rounded-xl transition-colors flex items-center gap-2 shadow-md shadow-rose-100"
+            className="px-8 py-3 bg-gradient-to-r from-[#D6405F] to-[#F23B69] hover:from-[#F23B69] hover:to-[#D6405F] dark:from-[#F8BBD0] dark:to-[#F48FB1] dark:hover:from-[#F48FB1] dark:hover:to-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-bold rounded-2xl transition-all flex items-center gap-2 shadow-[0_8px_20px_rgba(214,64,95,0.3)] dark:shadow-[0_8px_20px_rgba(248,187,208,0.3)] hover:scale-[1.02] disabled:opacity-50 disabled:pointer-events-none"
           >
             <Save size={16} />{" "}
             {loading ? "Procesando envío..." : "Finalizar y crear documento de traslado"}

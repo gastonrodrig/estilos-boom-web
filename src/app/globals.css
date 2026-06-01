@@ -131,10 +131,22 @@
   }
 
   h1,
-  h2,
-  h3 {
-    font-family: var(--font-vidaloka), serif;
+  h2 {
     letter-spacing: 0.01em;
+  }
+
+  /* Admin Module Typography Scope */
+  .admin-font-scope {
+    font-family: var(--font-inter), sans-serif;
+  }
+  
+  .admin-font-scope h1,
+  .admin-font-scope h2,
+  .admin-font-scope h3,
+  .admin-font-scope h4,
+  .admin-font-scope h5,
+  .admin-font-scope h6 {
+    font-family: var(--font-montserrat), sans-serif;
   }
 }
 

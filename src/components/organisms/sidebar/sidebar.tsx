@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, Package, Store,Spool, ShoppingBag, BookText,NotepadText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store,Spool, ShoppingBag, BookText,NotepadText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory, ArrowLeftRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/hooks";
 
@@ -35,6 +35,7 @@ const iconMap = {
     factory: Factory,
     spool: Spool,
     "notepad-text": NotepadText,
+    "arrow-right-left": ArrowLeftRight,
 } as const;
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
@@ -98,17 +99,17 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                     <button
                         onClick={() => handleToggleSection(item.label)}
                         className={`group flex items-center justify-between w-full px-3 py-2.5 
-                            rounded-lg transition-all duration-200 hover:cursor-pointer
-                            ${hasActiveChild ? "font-medium text-[#5B283A] bg-white shadow-sm" : "font-normal text-gray-900"}
-                            hover:bg-white hover:shadow-sm hover:text-[#5B283A]`}
+                            rounded-lg transition-colors duration-200 hover:cursor-pointer
+                            ${hasActiveChild ? "font-semibold text-white bg-[#5B283A]" : "font-medium text-[#C4A9B5]"}
+                            hover:bg-[#3D2330] hover:text-white`}
                     >
-                        <span className={`flex items-center gap-2.5 ${depth === 0 ? "text-[15px]" : "text-[14px]"} ${ItemIcon || depth > 0 ? "" : "pl-7"}`}>
-                            {ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
+                        <span className={`flex items-center gap-3 ${depth === 0 ? "text-[14px]" : "text-[13px]"} ${ItemIcon || depth > 0 ? "" : "pl-8"}`}>
+                            {ItemIcon ? <ItemIcon strokeWidth={1.5} className="w-5 h-5 shrink-0" /> : null}
                             <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
                                 {item.label}
                             </span>
                         </span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown strokeWidth={1.5} className={`w-4 h-4 text-[#A98495] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
 
                     <AnimatePresence>
@@ -120,7 +121,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                                 transition={{ duration: 0.3 }}
                                 className="overflow-hidden"
                             >
-                                <div className="ml-4 mt-1 border-l-2 border-[#d8bcc6] pl-2 flex flex-col gap-1">
+                                <div className="ml-5 mt-1 border-l border-[#4A2E3B] pl-3 flex flex-col gap-0.5">
                                     {filteredChildren.map(child => renderItem(child, depth + 1))}
                                 </div>
                             </motion.div>
@@ -136,12 +137,12 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
             <Link
                 key={item.label + (item.href || "")}
                 href={item.href || "#"}
-                className={`group flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200
-                    ${depth === 0 ? "text-[15px] py-2.5" : "text-[14px] py-2"}
-                    ${isItemActive ? "font-medium text-[#5B283A] bg-white shadow-sm" : "font-normal text-gray-900"}
-                    hover:bg-white hover:shadow-sm hover:text-[#5B283A]`}
+                className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200
+                    ${depth === 0 ? "text-[14px] py-2.5" : "text-[13px] py-2"}
+                    ${isItemActive ? "font-semibold text-white bg-[#5B283A]" : "font-medium text-[#C4A9B5]"}
+                    hover:bg-[#3D2330] hover:text-white`}
             >
-                {ItemIcon ? <ItemIcon className="w-4.5 h-4.5 shrink-0" /> : null}
+                {ItemIcon ? <ItemIcon strokeWidth={1.5} className="w-5 h-5 shrink-0" /> : null}
                 <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
                     {item.label}
                 </span>
@@ -157,7 +158,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -24, opacity: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className={`w-72 bg-[#F6F7F9] p-3 sticky ${sidebarTopClass} ${sidebarHeightClass} rounded-r-2xl border-r border-white/70 overflow-y-auto custom-scrollbar`}
+                    className={`w-72 bg-[#2A1620] p-4 sticky ${sidebarTopClass} ${sidebarHeightClass} border-r border-[#4A2E3B] overflow-y-auto custom-scrollbar`}
                 >
                     <nav className="space-y-1">
                         {items.map(item => renderItem(item))}

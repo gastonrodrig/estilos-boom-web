@@ -37,6 +37,7 @@ export const store = configureStore({
     supply: supplySlice.reducer,
     production: productionSlice.reducer,
     payment: paymentSlice.reducer,
+    
   },
 });
 

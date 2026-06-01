@@ -17,9 +17,9 @@ export const Modal = ({
   open,
   onClose,
   children,
-  panelClassName = "relative bg-white rounded-xl shadow-lg w-full max-w-md p-6 space-y-4",
+  panelClassName = "relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl space-y-6",
   title,
-  titleClassName = "text-lg font-semibold",
+  titleClassName = "text-2xl font-black text-[#40202D] dark:text-white tracking-wide",
   description,
 }: ModalProps) => {
   return (
@@ -35,7 +35,7 @@ export const Modal = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/30" />
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
           </Transition.Child>
 
           <Transition.Child
@@ -54,7 +54,7 @@ export const Modal = ({
                 </Dialog.Title>
               )}
               {description && (
-                <Dialog.Description className="text-sm text-neutral-600">{description}</Dialog.Description>
+                <Dialog.Description className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300">{description}</Dialog.Description>
               )}
               {children}
             </Dialog.Panel>

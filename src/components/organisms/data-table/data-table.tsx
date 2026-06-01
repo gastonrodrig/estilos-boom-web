@@ -67,6 +67,7 @@ interface DataTableProps<T> {
 
   globalFilter?: string;
   onGlobalFilterChange?: (value: string) => void;
+  containerClassName?: string;
 }
 
 function ActionMenu<T>({
@@ -216,6 +217,7 @@ export function DataTable<T extends object>({
 
   globalFilter = "",
   onGlobalFilterChange,
+  containerClassName,
 }: DataTableProps<T>) {
   const { isMd } = useScreenSizes();
   const [copiedCell, setCopiedCell] = useState<string | null>(null);
@@ -429,14 +431,14 @@ export function DataTable<T extends object>({
   };
 
   return (
-    <div className="w-full rounded-2xl bg-white shadow-sm max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!">
+    <div className={containerClassName || "w-full bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2rem] shadow-sm transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!"}>
 
       {(title || description || onAddClick || onGlobalFilterChange) && (
-        <div className="flex flex-col gap-3 px-6 pt-6">
+        <div className="flex flex-col gap-3 px-6 pt-8 pb-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              {title && <h2 className="text-xl font-semibold text-gray-900">{title}</h2>}
-              {description && <p className="text-sm text-gray-900/90">{description}</p>}
+              {title && <h2 className="text-2xl font-medium text-[#40202D] dark:text-white tracking-wide">{title}</h2>}
+              {description && <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-400 tracking-wide mt-1">{description}</p>}
             </div>
 
             {onAddClick && (
@@ -450,14 +452,14 @@ export function DataTable<T extends object>({
           </div>
 
           {onGlobalFilterChange && (
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <div className="relative w-full sm:w-80 mt-2">
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 value={globalFilter}
                 onChange={(e) => onGlobalFilterChange(e.target.value)}
                 placeholder="Buscar..."
-                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-[#d6687d] focus:outline-none focus:ring-2 focus:ring-[#d6687d]/30"
+                className="w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-md py-3 pl-11 pr-4 text-sm font-medium text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[#F8BBD0] focus:outline-none focus:ring-2 focus:ring-[#D6405F]/20 dark:focus:ring-[#F8BBD0]/20 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
           )}
@@ -562,19 +564,13 @@ export function DataTable<T extends object>({
           >
             <table className="min-w-full border-separate border-spacing-0">
               <thead
-                className={shouldEnableRowsScroll ? "sticky top-0 z-20 bg-[#dfa6b6]" : ""}
+                className={shouldEnableRowsScroll ? "sticky top-0 z-20" : ""}
               >
-                <tr className="bg-[#dfa6b6] text-xs font-semibold uppercase text-white">
+                <tr className="bg-[#FCF8F9] dark:bg-white/5 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                   {columnsArr.map((column, index) => (
                     <th
                       key={String(column.id)}
-                      className={`group bg-[#dfa6b6] px-6 py-3 text-left hover:cursor-pointer ${index === 0 && !shouldEnableRowsScroll ? "rounded-tl-2xl" : ""
-                        } ${index === columnsArr.length - 1 && !hasActions
-                          ? !shouldEnableRowsScroll
-                            ? "rounded-tr-2xl"
-                            : ""
-                          : ""
-                        }`}
+                      className={`group px-6 py-4 text-left hover:cursor-pointer border-y border-[#EAE0E2] dark:border-white/10 ${index === 0 ? "rounded-tl-2xl border-l" : ""} ${index === columnsArr.length - 1 && !hasActions ? "rounded-tr-2xl border-r" : ""}`}
                       style={{
                         maxWidth: column.width || "auto",
                       }}
@@ -591,19 +587,19 @@ export function DataTable<T extends object>({
                             <button
                               type="button"
                               onClick={() => onRequestSort?.(String(column.id))}
-                              className="inline-flex w-full items-center justify-start gap-2 cursor-pointer text-white transition-colors duration-200 hover:cursor-pointer"
+                              className="inline-flex w-full items-center justify-start gap-2 cursor-pointer transition-colors duration-200 hover:cursor-pointer uppercase"
                             >
-                              <span className="transition-all duration-200 group-hover:font-bold">
+                              <span className="transition-all duration-200 group-hover:font-black">
                                 {column.label}
                               </span>
                               <SortIcon
-                                className="h-4 w-4 stroke-2 text-white transition-all duration-200 group-hover:scale-110"
+                                className="h-4 w-4 stroke-2 transition-all duration-200 group-hover:scale-110"
                               />
                             </button>
                           );
                         })()
                       ) : (
-                        <span className="text-white transition-all duration-200 group-hover:font-bold">
+                        <span className="transition-all duration-200 group-hover:font-black">
                           {column.label}
                         </span>
                       )}
@@ -612,8 +608,7 @@ export function DataTable<T extends object>({
 
                   {hasActions && (
                     <th
-                      className={`bg-[#dfa6b6] px-6 py-3 text-right ${!shouldEnableRowsScroll ? "rounded-tr-2xl" : ""
-                        }`}
+                      className={`px-6 py-4 text-right border-y border-r border-[#EAE0E2] dark:border-white/10 rounded-tr-2xl`}
                     >
                       Acción
                     </th>
@@ -626,19 +621,19 @@ export function DataTable<T extends object>({
                   ? Array.from({ length: loadingRowsCount }, (_, rowIndex) => (
                     <tr
                       key={`desktop-skeleton-${rowIndex}`}
-                      className={`${rowIndex % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"}`}
+                      className="border-b border-[#EAE0E2]/50 dark:border-white/5"
                     >
                       {columnsArr.map((column) => (
                         <td
                           key={`desktop-skeleton-${String(column.id)}-${rowIndex}`}
-                          className="px-6 py-4"
+                          className="px-6 py-5"
                         >
                           <Skeleton width="100%" height="14px" borderRadius="8px" />
                         </td>
                       ))}
 
                       {hasActions && (
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-5 text-right">
                           <div className="flex justify-end">
                             <Skeleton width="36px" height="36px" borderRadius="9999px" />
                           </div>
@@ -650,7 +645,7 @@ export function DataTable<T extends object>({
                     <tr>
                       <td
                         colSpan={columnsArr.length + (hasActions ? 1 : 0)}
-                        className="px-6 py-10 text-center text-sm text-gray-500"
+                        className="px-6 py-10 text-center text-sm font-medium text-[#8C6B79] dark:text-gray-500"
                       >
                         No hay registros disponibles.
                       </td>
@@ -665,13 +660,12 @@ export function DataTable<T extends object>({
                       return (
                         <tr
                           key={rowKey}
-                          className={`transition-colors hover:bg-[#f7f1f4] ${rowIndex % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"
-                            }`}
+                          className="transition-colors hover:bg-white/80 dark:hover:bg-white/10 group/row"
                         >
-                          {columnsArr.map((column) => (
+                          {columnsArr.map((column, colIndex) => (
                             <td
                               key={`${String(column.id)}-${rowKey}`}
-                              className={`px-6 py-4 text-sm text-gray-900 ${column.truncate && !isCopyableColumn(String(column.id))
+                              className={`px-6 py-4 text-sm font-medium text-[#40202D] dark:text-white/90 border-b border-[#EAE0E2]/50 dark:border-white/5 group-last/row:border-0 ${colIndex === 0 ? "border-l" : ""} ${column.truncate && !isCopyableColumn(String(column.id))
                                   ? "max-w-55 truncate"
                                   : ""
                                 }`}
@@ -682,7 +676,7 @@ export function DataTable<T extends object>({
                           ))}
 
                           {hasActions && (
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-6 py-4 text-right border-b border-r border-[#EAE0E2]/50 dark:border-white/5 group-last/row:border-b-0">
                               {canShowActions(row) && (
                                 <div className="flex justify-end">
                                   <ActionMenu row={row} actions={visibleActions} />
@@ -699,16 +693,16 @@ export function DataTable<T extends object>({
         </div>
       )}
 
-      <div className="mt-6 flex flex-col items-center justify-between gap-4 border-t border-gray-100 px-6 pb-6 pt-4 md:flex-row">
-        <div className="flex h-9 w-full items-center justify-center gap-2 text-sm text-gray-500 md:w-auto md:justify-start">
+      <div className="mt-4 flex flex-col items-center justify-between gap-4 border-t border-[#EAE0E2] dark:border-white/10 px-8 pb-8 pt-6 md:flex-row rounded-b-[2rem]">
+        <div className="flex h-9 w-full items-center justify-center gap-3 text-sm font-medium text-[#8C6B79] dark:text-gray-400 md:w-auto md:justify-start">
           <span>Mostrar</span>
           <select
             value={safeRowsPerPage}
             onChange={(e) => onRowsPerPageChange?.(e)}
-            className="h-9 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 shadow-sm hover:cursor-pointer focus:border-[#d6687d] focus:outline-none"
+            className="h-10 rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-md px-4 text-sm font-bold text-[#40202D] dark:text-white shadow-sm hover:cursor-pointer focus:border-[#D6405F] dark:focus:border-[#F8BBD0] focus:outline-none transition-colors"
           >
             {[5, 10, 25, 50].map((value) => (
-              <option key={value} value={value}>
+              <option key={value} value={value} className="dark:bg-[#1A0B11]">
                 {value}
               </option>
             ))}
@@ -716,7 +710,7 @@ export function DataTable<T extends object>({
           <span>registros</span>
         </div>
 
-        <div className="flex h-9 w-full items-center justify-center text-center text-sm text-gray-500 md:w-auto">
+        <div className="flex h-9 w-full items-center justify-center text-center text-sm font-medium text-[#8C6B79] dark:text-gray-400 md:w-auto">
           {loading ? (
             <Skeleton width="180px" height="14px" borderRadius="8px" />
           ) : (
@@ -727,25 +721,25 @@ export function DataTable<T extends object>({
           )}
         </div>
 
-        <div className="flex w-full items-center justify-center gap-2 md:w-auto md:justify-end">
+        <div className="flex w-full items-center justify-center gap-3 md:w-auto md:justify-end">
           <button
             type="button"
             onClick={(e) => onPageChange?.(e, safePage - 1)}
             disabled={loading || safePage === 0}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#f2b6c1] bg-white text-[#c33f5a] transition-colors hover:cursor-pointer hover:bg-[#fbe5e8] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-[#40202D] dark:text-white transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Anterior"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
 
           <button
             type="button"
             onClick={(e) => onPageChange?.(e, safePage + 1)}
             disabled={loading || safePage >= totalPages - 1}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#f2b6c1] bg-white text-[#c33f5a] transition-colors hover:cursor-pointer hover:bg-[#fbe5e8] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-[#40202D] dark:text-white transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Siguiente"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       </div>

@@ -23,26 +23,26 @@ export const WorkerSelector = ({
     const isAdmin = authRole === "Administrador";
 
     return (
-        <article className="rounded-2xl border border-rose-100 bg-white p-4 shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-[#F2778D]">
-                  <UserCircle className="h-6 w-6" />
+        <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm">
+            <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner text-[#D6405F] dark:text-[#F8BBD0]">
+                  <UserCircle className="h-7 w-7" />
                 </div>
                 <div>
-                    <p className="text-sm font-bold text-[#594246]">Trabajador responsable</p>
-                    <p className="text-[10px] text-[#9b8088]">
+                    <p className="text-[15px] font-black tracking-wide text-[#40202D] dark:text-white">Trabajador responsable</p>
+                    <p className="text-[11px] font-medium text-[#8C6B79] dark:text-gray-400 mt-0.5">
                         {isAdmin ? "Persona que registrará la orden" : "Tu usuario actual"}
                     </p>
                 </div>
             </div>
 
-            <div className="mt-4">
+            <div className="mt-6">
                 {isAdmin ? (
                     <select
                         value={workerId}
                         onChange={(e) => onWorkerChange(e.target.value)}
                         disabled={loadingWorkers}
-                        className="h-10 w-full rounded-xl border border-rose-100 bg-rose-50/30 px-3 text-sm text-[#594246] outline-none ring-[#F2778D] focus:ring-1 disabled:opacity-50"
+                        className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner disabled:opacity-50 appearance-none"
                     >
                         <option value="">{loadingWorkers ? "Cargando..." : "Seleccionar trabajador"}</option>
                         {workers.map((worker) => {
@@ -59,7 +59,7 @@ export const WorkerSelector = ({
                         })}
                     </select>
                 ) : (
-                    <div className="rounded-xl border border-rose-50 bg-rose-50/50 px-3 py-2.5 text-sm font-medium text-[#594246]">
+                    <div className="rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 py-3.5 text-[13px] font-bold text-[#40202D] dark:text-white shadow-inner">
                         {selectedWorkerLabel}
                     </div>
                 )}

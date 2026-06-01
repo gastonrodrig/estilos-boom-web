@@ -86,6 +86,18 @@ export const adminModules: SidebarModule[] = [
     ],
   },
   {
+    label: "Órdenes de Venta",
+    icon: "shopping-bag",
+    requiredRoles: ["Administrador"],
+    children: [
+      {
+        label: "Órdenes de Venta",
+        href: "/admin/orders/history",
+        requiredRoles: ["Administrador"],
+      },
+    ],
+  },
+  {
     label: "Gestionar Cotización",
     href: "/admin/quotations",
     icon: "booktext",
@@ -172,5 +184,27 @@ export const adminModules: SidebarModule[] = [
     label: "Usuarios",
     href: "/admin/users-roles",
     icon: "users",
+  },
+  {
+    label: "Gestionar Movimientos",
+    icon: "arrow-right-left",
+    children: [
+      {
+        label: "Panel General",
+        href: "/admin/warehouse/dashboard",
+      },
+      {
+        label: "Recepciones",
+        href: "/admin/warehouse/receptions",
+      },
+      {
+        label: "Movimientos de productos",
+        href: "/admin/warehouse/transfers",
+      },
+      {
+        label: "Historial",
+        href: "/admin/warehouse/history",
+      },
+    ],
   },
 ];

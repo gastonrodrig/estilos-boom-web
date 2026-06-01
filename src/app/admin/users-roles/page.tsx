@@ -16,9 +16,9 @@ export default function UsuariosRolesPage() {
     }, [startLoadingUsers]);
 
     return (
-        <div className="bg-white border rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col min-h-[700px]">
+        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col min-h-[700px] transition-colors duration-500">
             {/* Header Principal */}
-            <div className="px-8 py-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/10">
+            <div className="px-8 py-6 border-b border-[#EAE0E2] dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/30 dark:bg-white/5 backdrop-blur-md">
                 <div>
                     <h1 className="text-2xl font-bold text-[#5B283A]">Gestión de Usuarios</h1>
                     <p className="text-[12px] text-gray-400 font-medium font-outfit">Listado y estado de los usuarios del sistema.</p>

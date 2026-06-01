@@ -137,47 +137,47 @@ export default function CompletedProductionOrders() {
   const selectedTotalUnits = selectedOrder?.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
         <div>
-          <div className="flex items-center gap-2 text-[#F2778D]">
+          <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0] mb-2">
             <History className="h-5 w-5" />
-            <span className="text-sm font-bold uppercase tracking-widest">Producción</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Producción</span>
           </div>
-          <div className="flex items-center gap-4 mt-2">
-            <h1 className="text-4xl text-[#594246] font-serif font-(--font-vidaloka)">Órdenes Finalizadas</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">Órdenes Finalizadas</h1>
             <button 
               onClick={() => {
                 localStorage.removeItem("mocked_created_orders");
                 window.location.reload();
               }}
-              className="text-xs text-rose-400 hover:text-rose-600 underline"
+              className="text-[10px] text-rose-400 dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase"
             >
               Limpiar simulador
             </button>
           </div>
-          <p className="text-[#9b8088] mt-1">Historial de prendas producidas ingresadas al inventario.</p>
+          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Historial de prendas producidas ingresadas al inventario.</p>
         </div>
 
-        <div className="flex gap-4">
-          <div className="rounded-2xl bg-white border border-rose-100 p-5 shadow-sm min-w-[200px]">
-            <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Inversión Total</p>
-            <p className="text-2xl font-black text-[#F2778D] mt-1">{formatCurrency(totalInvestment)}</p>
+        <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto">
+          <div className="rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 p-5 shadow-inner min-w-[200px] flex-1">
+            <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
+            <p className="text-2xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
           </div>
-          <div className="rounded-2xl bg-[#594246] p-5 shadow-sm min-w-[160px]">
-            <p className="text-[10px] font-bold text-rose-200/60 uppercase">Órdenes</p>
-            <p className="text-2xl font-black text-white mt-1">{completedOrders.length} OP</p>
+          <div className="rounded-2xl bg-gradient-to-br from-[#40202D] to-[#2D161F] dark:from-[#1A0B11] dark:to-black border border-[#594246] dark:border-white/10 p-5 shadow-lg min-w-[160px] flex-1">
+            <p className="text-[10px] font-black text-[#EAE0E2] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
+            <p className="text-2xl font-black text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
           </div>
         </div>
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-sm">
+      <main className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm transition-all">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-rose-50/50 text-[11px] font-bold uppercase tracking-wider text-[#b79ca5]">
+              <tr className="bg-white/30 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
                 <th className="px-6 py-5">Código OP</th>
                 <th className="px-6 py-5">Taller</th>
                 <th className="px-6 py-5">Fecha Término</th>
@@ -186,7 +186,7 @@ export default function CompletedProductionOrders() {
                 <th className="px-6 py-5 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-rose-50 text-sm">
+            <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-sm">
               {filteredOrders.map((order: any) => (
                 <CompletedOrderRow 
                   key={order._id} 
@@ -198,8 +198,13 @@ export default function CompletedProductionOrders() {
 
               {filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center text-[#9b8088]">
-                    No se encontraron órdenes completadas con esos criterios.
+                  <td colSpan={6} className="px-6 py-24 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                      <div className="bg-white/50 dark:bg-white/5 w-20 h-20 rounded-full flex items-center justify-center shadow-inner">
+                        <Package className="h-10 w-10 text-[#8C6B79] dark:text-gray-500" />
+                      </div>
+                      <p className="text-[#8C6B79] dark:text-gray-400 font-medium">No se encontraron órdenes completadas.</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -213,46 +218,46 @@ export default function CompletedProductionOrders() {
         <Modal 
           open={activeModal === "OBS"} 
           onClose={closeModal}
-          panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl p-8"
+          panelClassName="relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm w-full max-w-3xl p-8"
           title="Línea de Tiempo de Producción"
-          titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
+          titleClassName="text-2xl font-black text-[#40202D] dark:text-white"
         >
           <div className="pt-8 pb-4">
             <div className="relative">
               {/* Línea horizontal de fondo */}
-              <div className="absolute top-[26px] left-[10%] right-[10%] h-[4px] bg-rose-100/50 rounded-full z-0" />
+              <div className="absolute top-[26px] left-[10%] right-[10%] h-[4px] bg-[#EAE0E2]/50 dark:bg-white/5 rounded-full z-0" />
               
               <div className="grid grid-cols-3 relative z-10">
                 {/* Paso 1: Contacto Inicial */}
                 <div className="flex flex-col items-center text-center group">
-                  <div className="w-14 h-14 rounded-2xl bg-white border-2 border-rose-100 flex items-center justify-center text-[#b79ca5] shadow-sm group-hover:border-[#F2778D] group-hover:text-[#F2778D] transition-all duration-300">
+                  <div className="w-14 h-14 rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 flex items-center justify-center text-[#8C6B79] dark:text-gray-400 shadow-sm group-hover:border-[#D6405F] dark:group-hover:border-[#F8BBD0] group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0] transition-all duration-300">
                     <Package className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-bold text-[#594246]">Contacto Inicial</p>
-                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">Negociación</p>
-                    <p className="text-[11px] text-[#9b8088] font-medium leading-tight">{formatDate(selectedOrder.created_at)}</p>
+                    <p className="text-sm font-black text-[#40202D] dark:text-white">Contacto Inicial</p>
+                    <p className="text-[10px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase tracking-widest">Negociación</p>
+                    <p className="text-[11px] text-[#8C6B79] dark:text-gray-400 font-medium leading-tight">{formatDate(selectedOrder.created_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
-                      <p className="text-[10px] text-[#b79ca5] leading-none">Acuerdo de costos y asignación de taller.</p>
+                      <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium leading-none">Acuerdo de costos y asignación de taller.</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Paso 2: Producción */}
                 <div className="flex flex-col items-center text-center group">
-                  <div className="w-14 h-14 rounded-2xl bg-white border-2 border-rose-100 flex items-center justify-center text-[#b79ca5] shadow-sm group-hover:border-[#F2778D] group-hover:text-[#F2778D] transition-all duration-300">
+                  <div className="w-14 h-14 rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 flex items-center justify-center text-[#8C6B79] dark:text-gray-400 shadow-sm group-hover:border-[#D6405F] dark:group-hover:border-[#F8BBD0] group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0] transition-all duration-300">
                     <Factory className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-bold text-[#594246]">En Producción</p>
-                    <div className="flex flex-col gap-1 mt-2 bg-rose-50/50 p-2 rounded-lg border border-rose-100/50">
-                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Corte:</span> <span className="text-[#9b8088]">
+                    <p className="text-sm font-black text-[#40202D] dark:text-white">En Producción</p>
+                    <div className="flex flex-col gap-1 mt-2 bg-white/30 dark:bg-white/5 p-2 rounded-lg border border-[#EAE0E2] dark:border-white/10 backdrop-blur-md">
+                       <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Corte:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CORTE');
                             return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
                          })()}
                        </span></p>
-                       <p className="text-[9px] font-bold text-[#F2778D] uppercase flex justify-between gap-4"><span>Confección:</span> <span className="text-[#9b8088]">
+                       <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Confección:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CONFECCION');
                             return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
@@ -264,33 +269,33 @@ export default function CompletedProductionOrders() {
 
                 {/* Paso 3: Finalización */}
                 <div className="flex flex-col items-center text-center group">
-                  <div className="w-14 h-14 rounded-2xl bg-[#F2778D] text-white shadow-lg shadow-rose-100 flex items-center justify-center transition-transform hover:scale-110 duration-300">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-md shadow-emerald-400/20 flex items-center justify-center transition-transform hover:scale-110 duration-300">
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-bold text-[#594246]">Finalizado</p>
-                    <p className="text-[10px] font-bold text-[#F2778D] uppercase tracking-tighter">Entregado y Validado</p>
-                    <p className="text-[11px] text-[#9b8088] font-medium leading-tight">{formatDate(selectedOrder.updated_at)}</p>
+                    <p className="text-sm font-black text-[#40202D] dark:text-white">Finalizado</p>
+                    <p className="text-[10px] font-black text-[#10b981] dark:text-emerald-400 uppercase tracking-widest">Entregado y Validado</p>
+                    <p className="text-[11px] text-[#8C6B79] dark:text-gray-400 font-medium leading-tight">{formatDate(selectedOrder.updated_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
-                      <p className="text-[10px] text-[#b79ca5] leading-none">Control de calidad aprobado y registrado en inventario.</p>
+                      <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium leading-none">Control de calidad aprobado y registrado en inventario.</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-12 bg-rose-50/30 rounded-2xl p-5 border border-rose-50/50">
+            <div className="mt-12 bg-white/50 dark:bg-white/5 rounded-2xl p-5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
               <div className="flex items-center gap-3 mb-2">
-                <FileText className="w-5 h-5 text-[#F2778D]" />
-                <h4 className="text-xs font-bold text-[#594246] uppercase tracking-widest">Resumen de Auditoría</h4>
+                <FileText className="w-5 h-5 text-[#D6405F] dark:text-[#F8BBD0]" />
+                <h4 className="text-xs font-black text-[#40202D] dark:text-white uppercase tracking-widest">Resumen de Auditoría</h4>
               </div>
-              <p className="text-xs text-[#9b8088] leading-relaxed">
-                La orden <span className="font-bold text-[#594246]">{selectedOrder.pre_order_number}</span> completó satisfactoriamente todas las etapas de validación. 
-                Se confirma el ingreso de <span className="font-bold text-[#F2778D]">{selectedTotalUnits} unidades</span> al inventario central bajo la supervisión del taller <span className="font-bold text-[#594246]">{selectedWorkshopName}</span>.
+              <p className="text-xs text-[#8C6B79] dark:text-gray-400 leading-relaxed font-medium">
+                La orden <span className="font-black text-[#40202D] dark:text-white">{selectedOrder.pre_order_number}</span> completó satisfactoriamente todas las etapas de validación. 
+                Se confirma el ingreso de <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{selectedTotalUnits} unidades</span> al inventario central bajo la supervisión del taller <span className="font-black text-[#40202D] dark:text-white">{selectedWorkshopName}</span>.
               </p>
             </div>
 
-            <CTA className="w-full !bg-white border border-rose-100 !text-[#9b8088] mt-8" onClick={closeModal}>Cerrar Historial</CTA>
+            <CTA className="w-full !bg-white/50 dark:!bg-white/5 border border-[#EAE0E2] dark:border-white/10 !text-[#8C6B79] dark:!text-gray-400 mt-8 hover:!bg-white/80 dark:hover:!bg-white/10 hover:!text-[#40202D] dark:hover:!text-white backdrop-blur-md" onClick={closeModal}>Cerrar Historial</CTA>
           </div>
         </Modal>
       )}
@@ -299,61 +304,61 @@ export default function CompletedProductionOrders() {
         <Modal 
           open={activeModal === "TECH"} 
           onClose={closeModal}
-          panelClassName="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl p-8"
+          panelClassName="relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm w-full max-w-2xl p-8"
           title="Ficha Técnica Detallada"
-          titleClassName="text-xl font-bold text-[#594246] font-(--font-vidaloka)"
+          titleClassName="text-2xl font-black text-[#40202D] dark:text-white"
         >
           <div className="space-y-8 pt-4">
              <div className="flex flex-col sm:flex-row items-start gap-8">
-                <div className="relative h-48 w-full sm:w-48 shrink-0 overflow-hidden rounded-2xl border border-rose-100 shadow-inner">
+                <div className="relative h-48 w-full sm:w-48 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
                    <Image src={selectedFirstItem?.images?.[0] || "/placeholder.png"} alt="Product" fill className="object-cover" />
                 </div>
                 <div className="space-y-6 flex-1 w-full">
                    <div>
-                      <h4 className="text-2xl font-bold text-[#594246]">{selectedFirstItem?.name}</h4>
-                      <p className="text-sm text-[#F2778D] font-bold">Orden N° {selectedOrder.pre_order_number}</p>
+                      <h4 className="text-3xl font-black text-[#40202D] dark:text-white leading-tight">{selectedFirstItem?.name}</h4>
+                      <p className="text-sm text-[#D6405F] dark:text-[#F8BBD0] font-black mt-1">Orden N° {selectedOrder.pre_order_number}</p>
                    </div>
                    
                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-rose-50/30 p-3 rounded-lg border border-rose-50">
-                         <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Taller</p>
-                         <p className="text-sm font-bold text-[#594246] truncate">{selectedWorkshopName}</p>
+                      <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Taller</p>
+                         <p className="text-sm font-black text-[#40202D] dark:text-white truncate mt-0.5">{selectedWorkshopName}</p>
                       </div>
-                      <div className="bg-rose-50/30 p-3 rounded-lg border border-rose-50">
-                         <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Costo Unit. Promedio</p>
-                         <p className="text-sm font-bold text-[#594246]">S/ {(selectedTotalAmount / selectedTotalUnits).toFixed(2)}</p>
+                      <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Costo Unit. Promedio</p>
+                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">S/ {(selectedTotalAmount / selectedTotalUnits).toFixed(2)}</p>
                       </div>
-                      <div className="bg-rose-50/30 p-3 rounded-lg border border-rose-50">
-                         <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Material</p>
-                         <p className="text-sm font-bold text-[#594246]">Algodón / Poliéster</p>
+                      <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Material</p>
+                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">Algodón / Poliéster</p>
                       </div>
-                      <div className="bg-rose-50/30 p-3 rounded-lg border border-rose-50">
-                         <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Inversión Total</p>
-                         <p className="text-sm font-bold text-[#F2778D]">{formatCurrency(selectedTotalAmount)}</p>
+                      <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
+                         <p className="text-sm font-black text-[#D6405F] dark:text-[#F8BBD0] mt-0.5">{formatCurrency(selectedTotalAmount)}</p>
                       </div>
                    </div>
                 </div>
              </div>
 
              <div className="space-y-4">
-                <h5 className="text-xs font-bold text-[#594246] uppercase tracking-widest border-b border-rose-50 pb-2">Distribución de Producción</h5>
-                <div className="overflow-hidden border border-rose-50 rounded-xl bg-rose-50/10">
+                <h5 className="text-[11px] font-black text-[#40202D] dark:text-white uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 pb-2">Distribución de Producción</h5>
+                <div className="overflow-hidden border border-[#EAE0E2] dark:border-white/10 rounded-2xl bg-white/50 dark:bg-white/5 shadow-inner">
                    <table className="w-full text-left text-xs">
-                      <thead className="bg-rose-50/50 text-[#b79ca5]">
+                      <thead className="bg-white/30 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black uppercase tracking-widest text-[10px]">
                          <tr>
-                            <th className="p-4">Variante</th>
-                            <th className="p-4 text-center">Talla</th>
-                            <th className="p-4 text-center">Color</th>
-                            <th className="p-4 text-right">Cantidad Final</th>
+                            <th className="p-4 border-b border-[#EAE0E2] dark:border-white/10">Variante</th>
+                            <th className="p-4 text-center border-b border-[#EAE0E2] dark:border-white/10">Talla</th>
+                            <th className="p-4 text-center border-b border-[#EAE0E2] dark:border-white/10">Color</th>
+                            <th className="p-4 text-right border-b border-[#EAE0E2] dark:border-white/10">Cantidad Final</th>
                          </tr>
                       </thead>
-                      <tbody className="text-[#594246]">
+                      <tbody className="text-[#40202D] dark:text-gray-300">
                          {selectedOrder.base_items?.map((item: any, idx: number) => (
-                           <tr key={idx} className="border-t border-rose-50">
-                              <td className="p-4 font-medium">Lote A-{idx + 1}</td>
-                              <td className="p-4 text-center">{item.id_variant?.size || "M"}</td>
-                              <td className="p-4 text-center">{item.id_variant?.color || "N/A"}</td>
-                              <td className="p-4 text-right font-bold text-[#F2778D]">{item.quantity} uds.</td>
+                           <tr key={idx} className="border-b border-[#EAE0E2]/50 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors last:border-0">
+                              <td className="p-4 font-bold">Lote A-{idx + 1}</td>
+                              <td className="p-4 text-center font-medium">{item.id_variant?.size || "M"}</td>
+                              <td className="p-4 text-center font-medium">{item.id_variant?.color || "N/A"}</td>
+                              <td className="p-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>
                            </tr>
                          ))}
                       </tbody>
@@ -361,7 +366,7 @@ export default function CompletedProductionOrders() {
                 </div>
              </div>
 
-             <CTA className="w-full !bg-white border border-rose-100 !text-[#9b8088]" onClick={closeModal}>Cerrar Ficha Técnica</CTA>
+             <CTA className="w-full !bg-white/50 dark:!bg-white/5 border border-[#EAE0E2] dark:border-white/10 !text-[#8C6B79] dark:!text-gray-400 hover:!bg-white/80 dark:hover:!bg-white/10 hover:!text-[#40202D] dark:hover:!text-white backdrop-blur-md" onClick={closeModal}>Cerrar Ficha Técnica</CTA>
           </div>
         </Modal>
       )}
@@ -376,38 +381,38 @@ function CompletedOrderRow({ order, onOpenTech, onOpenObs }: { order: any; onOpe
   const totalUnits = order.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 
   return (
-    <tr className="hover:bg-rose-50/20 transition-colors group">
-      <td className="px-6 py-5 font-bold text-[#594246]">{order.pre_order_number}</td>
+    <tr className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+      <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</td>
       <td className="px-6 py-5">
-          <p className="font-semibold text-[#594246]">{workshopName}</p>
-          <p className="text-[11px] text-[#9b8088]">Producción</p>
+          <p className="font-bold text-[#40202D] dark:text-white">{workshopName}</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Producción</p>
       </td>
       <td className="px-6 py-5">
-        <div className="flex items-center gap-2 text-[#594246]">
-          <Calendar className="h-3.5 w-3.5 text-[#F2778D]" />
+        <div className="flex items-center gap-2 text-[#40202D] dark:text-white font-medium text-xs">
+          <Calendar className="h-3.5 w-3.5 text-[#D6405F] dark:text-[#F8BBD0]" />
           {formatDate(order.updated_at)}
         </div>
       </td>
       <td className="px-6 py-5 text-center">
-        <span className="rounded-full bg-rose-50 px-3 py-1 text-[12px] font-bold text-[#F2778D]">
+        <span className="rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[11px] font-black text-[#40202D] dark:text-white shadow-sm">
           {totalUnits} uds.
         </span>
       </td>
-      <td className="px-6 py-5 font-bold text-[#594246]">{formatCurrency(totalAmount)}</td>
+      <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">{formatCurrency(totalAmount)}</td>
       <td className="px-6 py-5 text-right">
         <div className="flex justify-end gap-2">
           {/* Ojo = Ficha Técnica */}
-          <button onClick={onOpenTech} title="Ver Ficha Técnica" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#9b8088] hover:bg-[#594246] hover:text-white transition-all">
+          <button onClick={onOpenTech} title="Ver Ficha Técnica" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-all shadow-sm">
             <Eye className="h-4 w-4" />
           </button>
           
           {/* Documento = Línea de Tiempo / Bitácora */}
-          <button onClick={onOpenObs} title="Línea de Tiempo" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 text-[#F2778D] hover:bg-[#F2778D] hover:text-white transition-all shadow-sm">
+          <button onClick={onOpenObs} title="Línea de Tiempo" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#D6405F]/30 dark:border-[#F8BBD0]/30 text-[#D6405F] dark:text-[#F8BBD0] bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 hover:bg-[#D6405F] dark:hover:bg-[#F8BBD0] hover:text-white dark:hover:text-[#1A0B11] transition-all shadow-sm">
             <History className="h-4 w-4" />
           </button>
 
           {/* Comprobante OP = Nueva Factura en Tab (Icono de documento) */}
-          <button onClick={() => window.open(`/admin/production/invoice/${order._id}`, '_blank')} title="Ver Comprobante OP" className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-100 bg-rose-50 text-[#F2778D] hover:bg-[#F2778D] hover:text-white transition-all shadow-sm">
+          <button onClick={() => window.open(`/admin/production/invoice/${order._id}`, '_blank')} title="Ver Comprobante OP" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-500/30 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-400/10 hover:bg-emerald-500 dark:hover:bg-emerald-400 hover:text-white dark:hover:text-[#1A0B11] transition-all shadow-sm">
             <FileText className="h-4 w-4" />
           </button>
         </div>

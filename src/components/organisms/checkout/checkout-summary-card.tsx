@@ -10,6 +10,8 @@ const CheckoutSummaryCard: React.FC = () => {
   const { items, loadCart } = useCartStore();
   const { watch } = useFormContext<CheckoutFormValues>();
   const selectedDeliveryMethod = watch('selectedDeliveryMethod');
+  const { watch } = useFormContext<CheckoutFormValues>();
+  const selectedDeliveryMethod = watch('selectedDeliveryMethod');
 
   // 3. Tip de Ingenieria: Aseguramos que la data este cargada
   // por si el usuario entra directamente a la URL de /checkout sin pasar por /cart

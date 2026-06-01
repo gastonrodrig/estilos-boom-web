@@ -17,39 +17,39 @@ useEffect(() => {
         
         {/* --- CABECERA DE ESTADOS --- */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-100">
-            <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Estado OPC</p>
-            <p className="text-sm font-bold text-[#594246]">{opp.status}</p>
+          <div className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md">
+            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Estado OPC</p>
+            <p className="text-[14px] font-black text-[#40202D] dark:text-white mt-1">{opp.status}</p>
           </div>
-          <div className="p-4 rounded-2xl bg-[#594246]/5 border border-[#594246]/10">
-            <p className="text-[10px] font-bold text-[#b79ca5] uppercase">Vínculo OC</p>
-            <p className="text-sm font-bold text-[#F2778D]">
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#40202D]/5 to-[#594246]/5 dark:from-white/5 dark:to-white/10 border border-[#40202D]/10 dark:border-white/10 shadow-inner backdrop-blur-md">
+            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Vínculo OC</p>
+            <p className="text-[14px] font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1">
               {oc?.order_number || "Sin OC generada"}
             </p>
           </div>
         </div>
 
         {/* --- INFORMACIÓN GENERAL --- */}
-        <section className="space-y-3">
-          <h5 className="text-sm font-bold text-[#594246] border-b border-rose-50 pb-2">Información de Origen</h5>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-sm">
+        <section className="space-y-4">
+          <h5 className="text-[12px] font-black text-[#40202D] dark:text-white border-b border-[#EAE0E2] dark:border-white/10 pb-2 tracking-wide">Información de Origen</h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 text-[13px] bg-white/30 dark:bg-black/20 p-5 rounded-2xl border border-[#EAE0E2] dark:border-white/10">
             <div>
-              <p className="text-[#9b8088] text-xs">Solicitante:</p>
-              <p className="font-medium text-[#594246]">{opp.id_worker?.first_name || 'Admin'} (Logística)</p>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Solicitante:</p>
+              <p className="font-bold text-[#40202D] dark:text-white">{opp.id_worker?.first_name || 'Admin'} <span className="font-medium text-[#8C6B79]">(Logística)</span></p>
             </div>
             <div>
-              <p className="text-[#9b8088] text-xs">Fecha Solicitud:</p>
-              <p className="font-medium text-[#594246]">{formatDate(opp.created_at)}</p>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Fecha Solicitud:</p>
+              <p className="font-bold text-[#40202D] dark:text-white">{formatDate(opp.created_at)}</p>
             </div>
             {isConverted && (
               <>
                 <div>
-                  <p className="text-[#9b8088] text-xs">Proveedor Elegido:</p>
-                  <p className="font-medium text-[#F2778D]">{oc?.id_supplier?.name_company}</p>
+                  <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Proveedor Elegido:</p>
+                  <p className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{oc?.id_supplier?.name_company}</p>
                 </div>
                 <div>
-                  <p className="text-[#9b8088] text-xs">Entrega Estimada:</p>
-                  <p className="font-medium text-[#594246]">{formatDate(oc?.delivery_date_estimated)}</p>
+                  <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Entrega Estimada:</p>
+                  <p className="font-bold text-[#40202D] dark:text-white">{formatDate(oc?.delivery_date_estimated)}</p>
                 </div>
               </>
             )}
@@ -57,26 +57,28 @@ useEffect(() => {
         </section>
 
         {/* --- TABLA DE ITEMS (RESUMEN TÉCNICO) --- */}
-        <section className="space-y-3">
-          <h5 className="text-sm font-bold text-[#594246] border-b border-rose-50 pb-2">Desglose de Mercadería</h5>
-          <div className="rounded-2xl border border-rose-50 overflow-hidden text-xs">
+        <section className="space-y-4">
+          <h5 className="text-[12px] font-black text-[#40202D] dark:text-white border-b border-[#EAE0E2] dark:border-white/10 pb-2 tracking-wide">Desglose de Mercadería</h5>
+          <div className="rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 shadow-inner overflow-hidden text-[13px]">
             <table className="w-full">
-              <thead className="bg-rose-50/30 text-[#9b8088]">
-                <tr>
-                  <th className="p-3 text-left">Variante</th>
-                  <th className="p-3 text-center">Cant.</th>
-                  <th className="p-3 text-right">Costo Est.</th>
+              <thead className="bg-white/50 dark:bg-white/5">
+                <tr className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">
+                  <th className="p-4 text-left">Variante</th>
+                  <th className="p-4 text-center">Cant.</th>
+                  <th className="p-4 text-right">Costo Est.</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-rose-50">
+              <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
                 {opp.base_items?.map((item: any, i: number) => (
-                  <tr key={i}>
-                    <td className="p-3">
-                      <span className="font-bold text-[#594246]">{item.id_variant?.size}</span> - {item.id_variant?.color}
+                  <tr key={i} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                    <td className="p-4 flex items-center gap-3">
+                      <span className="font-bold text-[#40202D] dark:text-white">{item.id_variant?.size}</span>
+                      <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
+                      <span className="font-medium text-[#8C6B79] dark:text-gray-300">{item.id_variant?.color}</span>
                     </td>
-                    <td className="p-3 text-center font-bold text-[#594246]">{item.quantity}</td>
-                    <td className="p-3 text-right text-[#9b8088]">
-                      {isConverted ? formatCurrency(oc?.items?.[i]?.unit_cost || 0) : 'Pendiente'}
+                    <td className="p-4 text-center font-black text-[#40202D] dark:text-white">{item.quantity}</td>
+                    <td className="p-4 text-right font-bold text-[#D6405F] dark:text-[#F8BBD0]">
+                      {isConverted ? formatCurrency(oc?.items?.[i]?.unit_cost || 0) : <span className="text-[#8C6B79] font-medium text-[11px] uppercase tracking-widest">Pendiente</span>}
                     </td>
                   </tr>
                 ))}
@@ -86,16 +88,16 @@ useEffect(() => {
         </section>
 
         {/* --- LOG DE ACTIVIDAD --- */}
-        <section className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-          <h5 className="text-xs font-bold text-[#9b8088] uppercase mb-2">Notas del Proceso:</h5>
-          <p className="text-xs text-[#594246] italic leading-relaxed">
+        <section className="p-5 rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md">
+          <h5 className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase mb-2">Notas del Proceso:</h5>
+          <p className="text-[13px] text-[#40202D] dark:text-white font-medium italic leading-relaxed">
             {opp.notes || "No se registraron observaciones adicionales para este seguimiento."}
           </p>
         </section>
 
         <button 
           onClick={onClose}
-          className="w-full py-4 bg-[#594246] text-white rounded-xl font-bold hover:bg-[#453235] transition-colors"
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest hover:scale-[1.02] shadow-lg transition-all"
         >
           Cerrar Expediente
         </button>

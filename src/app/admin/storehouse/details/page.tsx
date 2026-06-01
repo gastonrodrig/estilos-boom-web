@@ -153,34 +153,43 @@ export default function PrePurchaseOrderTracking() {
 
   
   return (
-    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 bg-[#fdfcfc]">
-      <header className="space-y-2">
-        <h1 className="text-4xl font-normal text-[#594246] font-(--font-vidaloka)">Seguimiento de Órdenes</h1>
-        <p className="text-base text-[#9b8088]">{counts.TODAS} procesos en curso</p>
+    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-2">
+            Seguimiento Activo
+          </p>
+          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+            Órdenes de Pre-Compra
+          </h1>
+          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+            {counts.TODAS} procesos en curso
+          </p>
+        </div>
       </header>
 
       {/* Buscador */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-[#b79ca5]" />
+        <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Buscar por N° de orden o código..."
-          className="h-16 w-full rounded-2xl border border-rose-100 bg-white pl-14 pr-4 text-base outline-none shadow-sm focus:ring-1 focus:ring-[#F2778D]"
+          className="h-16 w-full rounded-[2rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md pl-14 pr-6 text-[14px] font-bold text-[#40202D] dark:text-white placeholder:text-[#8C6B79] outline-none shadow-inner focus:ring-2 focus:ring-[#D6405F]/50 transition-all"
         />
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
         {Object.entries(counts).map(([key, count]) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold transition-all ${
+            className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[11px] font-black uppercase tracking-widest transition-all shadow-sm ${
               filter === key 
-                ? "bg-[#F2778D] text-white shadow-sm" 
-                : "border border-rose-100 bg-white text-[#9b8088] hover:bg-rose-50"
+                ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white hover:scale-[1.02]" 
+                : "border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white"
             }`}
           >
             {key === "ENTREGA HOY" ? <CalendarClock className="w-4 h-4" /> : <Package className="w-4 h-4" />}
@@ -196,9 +205,9 @@ export default function PrePurchaseOrderTracking() {
             <OPPCard key={opp._id} opp={opp} />
           ))
         ) : (
-          <div className="py-20 text-center border-2 border-dashed border-rose-100 rounded-3xl">
-             <Package className="mx-auto h-12 w-12 text-rose-200 mb-4" />
-             <p className="text-[#9b8088]">No se encontraron órdenes en esta categoría.</p>
+          <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/20 rounded-[3rem] bg-white/30 dark:bg-white/5 backdrop-blur-sm shadow-inner">
+             <Package className="mx-auto h-16 w-16 text-[#8C6B79] dark:text-gray-500 mb-6 opacity-40" />
+             <p className="text-[14px] font-bold text-[#8C6B79] dark:text-gray-400">No se encontraron órdenes en esta categoría.</p>
           </div>
         )}
       </div>
@@ -250,11 +259,10 @@ function OPPCard({ opp }: { opp: any }) {
   const totalAmount = opp.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')?.total_amount || 0;
 
   return (
-    <article className="rounded-[30px] border border-rose-100 bg-white p-5 sm:p-8 shadow-sm transition-all overflow-hidden">
+    <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm transition-all overflow-hidden group hover:shadow-md">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
-        <div className="flex items-start gap-4 sm:gap-6">
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-3xl bg-rose-50 border border-rose-100 flex items-center justify-center">
-            {/* ✅ SOLUCIÓN: Validamos estrictamente que exista la URL antes de renderizar */}
+        <div className="flex items-start gap-5 sm:gap-6">
+          <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[1.5rem] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner flex items-center justify-center transition-transform group-hover:scale-105">
             {firstItem?.images?.[0] && firstItem.images[0].trim() !== "" ? (
               <Image 
                 src={firstItem.images[0]} 
@@ -263,19 +271,18 @@ function OPPCard({ opp }: { opp: any }) {
                 className="object-cover" 
               />
             ) : (
-              /* 📦 Fallback elegante: Si no hay foto en BD, muestra un ícono con la misma estética de Estilos Boom */
-              <Package className="h-8 w-8 text-rose-300 opacity-60" />
+              <Package className="h-8 w-8 text-[#8C6B79] opacity-60" />
             )}
           </div>
-          <div className="space-y-2 flex-1">
+          <div className="space-y-3 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-xl sm:text-2xl font-normal text-[#594246] leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              <h3 className="text-xl sm:text-[22px] font-black text-[#40202D] dark:text-white tracking-wide leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               
-              <div className="flex flex-wrap gap-1.5">
-                <span className={`rounded-md px-3 py-1 text-[13px] font-normal text-white ${
-                  opp.status === 'COMPLETADA' ? 'bg-blue-500' :
-                  opp.status === 'EN_REVISION' ? 'bg-amber-500' : 
-                  opp.status === 'CONVERTIDA' ? 'bg-green-500' : 'bg-[#F291A3]/80'
+              <div className="flex flex-wrap gap-2">
+                <span className={`rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+                  opp.status === 'COMPLETADA' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20' :
+                  opp.status === 'EN_REVISION' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20' : 
+                  opp.status === 'CONVERTIDA' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
                 }`}>
                   {opp.status === 'COMPLETADA' ? 'Finalizada' :
                   opp.status === 'EN_REVISION' ? 'En Inspección' : 
@@ -283,54 +290,54 @@ function OPPCard({ opp }: { opp: any }) {
                 </span>
 
                 {opp.status === 'COMPLETADA' && (
-                  <div className="flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-lg border border-rose-100">
-                    <span className="text-[11px] font-bold text-[#b79ca5] uppercase">Calificación:</span>
+                  <div className="flex items-center gap-2 bg-white/50 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+                    <span className="text-[9px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Calificación:</span>
                     <StarRating rating={opp.id_purchase_order?.quality_rating || 5} size={3} />
                   </div>
                 )}
               </div>
             </div>
-            <div className="text-[12px] sm:text-sm text-[#9b8088] font-medium flex flex-wrap items-center gap-1">
-              <span>{opp.pre_order_number}</span>
-              <span className="mx-1 opacity-40">·</span>
-              <span className="text-[#594246] font-semibold">{opp.quotes?.length || 0} Proveedores</span>
-              <span className="mx-1 opacity-40">·</span>
-              <span>{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0) || 0} unidades</span>
+            <div className="text-[12px] sm:text-[13px] text-[#8C6B79] dark:text-gray-400 font-medium flex flex-wrap items-center gap-1.5">
+              <span className="font-bold">{opp.pre_order_number}</span>
+              <span className="mx-1 opacity-40">|</span>
+              <span className="text-[#40202D] dark:text-white font-black">{opp.quotes?.length || 0} Proveedores</span>
+              <span className="mx-1 opacity-40">|</span>
+              <span className="font-bold">{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0) || 0} uds</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between xl:justify-end gap-4 sm:gap-8 lg:gap-12 pt-4 xl:pt-0 border-t xl:border-t-0 border-rose-50">
-          <div className="space-y-1 sm:space-y-2 min-w-[120px]">
-            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-bold text-[#b79ca5] uppercase tracking-widest">
-              <span>Progreso</span>
-              <span className="text-[#F2778D]">{getProgress()}%</span>
+        <div className="flex flex-wrap items-center justify-between xl:justify-end gap-5 sm:gap-8 lg:gap-12 pt-5 xl:pt-0 border-t xl:border-t-0 border-[#EAE0E2] dark:border-white/10">
+          <div className="space-y-2 sm:space-y-3 min-w-[140px]">
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-black uppercase tracking-widest">
+              <span className="text-[#8C6B79] dark:text-gray-400">Progreso</span>
+              <span className="text-[#D6405F] dark:text-[#F8BBD0]">{getProgress()}%</span>
             </div>
-            <div className="h-2 w-32 sm:w-40 overflow-hidden rounded-full bg-rose-50">
-              <div className="h-full bg-[#F2778D] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
+            <div className="h-2.5 w-32 sm:w-48 overflow-hidden rounded-full bg-black/5 dark:bg-white/10 shadow-inner">
+              <div className="h-full bg-gradient-to-r from-[#D6405F] to-[#F23B69] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
             </div>
-            <p className="text-[10px] sm:text-xs text-[#b79ca5]">Creado: {formatDate(opp.created_at)}</p>
+            <p className="text-[10px] font-bold text-[#8C6B79] dark:text-gray-500 uppercase tracking-widest">Creado: {formatDate(opp.created_at)}</p>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="text-[20px] sm:text-[25px] text-[#F2778D] tracking-tighter font-medium">
+          <div className="flex items-center gap-5">
+            <div className="text-[20px] sm:text-[28px] text-[#D6405F] dark:text-[#F8BBD0] tracking-tight font-black">
               {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
             </div>
 
             <button 
               onClick={() => setIsOpen(!isOpen)}
-              className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl border border-rose-100 hover:bg-rose-50 transition-colors"
+              className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 hover:shadow-sm transition-all"
             >
-              <ChevronDown className={`h-6 w-6 sm:h-8 sm:w-8 text-[#9b8088] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`h-6 w-6 sm:h-7 sm:w-7 text-[#8C6B79] dark:text-gray-400 group-hover:text-[#D6405F] transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </button>
           </div>
         </div>
       </div>
 
       {/* STEPPER DE 3 PASOS ADAPTADO */}
-      <div className="mt-10 sm:mt-14 mb-6 px-2 sm:px-16 relative overflow-x-auto sm:overflow-visible no-scrollbar">
-        <div className="min-w-[400px] sm:min-w-0 pb-2">
-          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[#868686]/20 z-0" />
+      <div className="mt-12 sm:mt-16 mb-8 px-2 sm:px-16 relative overflow-x-auto sm:overflow-visible custom-scrollbar">
+        <div className="min-w-[400px] sm:min-w-0 pb-4">
+          <div className="absolute top-[26px] sm:top-[30px] left-[15%] right-[15%] h-[4px] sm:h-[6px] bg-[#EAE0E2] dark:bg-white/10 rounded-full z-0 shadow-inner" />
           
           <div className="grid grid-cols-3 relative z-10">
             <StepItem 
@@ -343,14 +350,14 @@ function OPPCard({ opp }: { opp: any }) {
             <StepItem 
               active={opp.status === "CONVERTIDA" || opp.status === "EN_REVISION"} 
               icon={<Truck className="h-5 w-5 sm:h-6 sm:w-6" />} 
-              label="En Transito" 
+              label="En Tránsito" 
               sub="Productos en camino" 
             />
 
             <StepItem 
               active={opp.status === "EN_REVISION"} 
               icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
-              label="Verificacion" 
+              label="Verificación" 
               sub="Control de calidad" 
             />
           </div>
@@ -363,58 +370,52 @@ function OPPCard({ opp }: { opp: any }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="mt-8 pt-8 border-t border-rose-50"
+            className="mt-8 pt-8 border-t border-[#EAE0E2] dark:border-white/10"
           >
-            <h4 className="text-lg font-medium text-[#594246] mb-4">Detalle de Variantes</h4>
+            <h4 className="text-[13px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-6">Detalle de Variantes</h4>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+            <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner bg-white/30 dark:bg-black/20">
+              <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[#9b8088] font-medium border-b border-rose-50">
-                    <th className="py-3 px-2">Talla</th>
-                    <th className="py-3 px-2">Color</th>
-                    <th className="py-3 px-2 text-center">Cantidad</th>
-                    <th className="py-3 px-2 text-center">Costo Unitario</th>
-                    <th className="py-3 px-2 text-right">Subtotal</th>
+                  <tr className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5">
+                    <th className="py-4 px-6">Talla</th>
+                    <th className="py-4 px-6">Color</th>
+                    <th className="py-4 px-6 text-center">Cantidad</th>
+                    <th className="py-4 px-6 text-center">Costo Unitario</th>
+                    <th className="py-4 px-6 text-right">Subtotal</th>
                   </tr>
                 </thead>
-                <tbody className="text-[#594246]">
+                <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[#40202D] dark:text-white">
 					{opp.base_items?.map((item: any, idx: number) => {
-						// 1. Buscamos el item correspondiente en la cotización seleccionada
-						// Comparamos los IDs de las variantes para encontrar el precio exacto
 						const quoteItem = selectedQuote?.items.find(
 						(qi: any) => (qi.id_variant?._id || qi.id_variant) === (item.id_variant?._id || item.id_variant)
 						);
-
-						// 2. Lógica de precio: Si es OC (CONVERTIDA), usamos el costo de la cotización.
-						// Si sigue en OPC, mostramos 0.00.
 						const unitPrice = (opp.status === 'CONVERTIDA' || opp.status === 'EN_REVISION') 
 						? (quoteItem?.unit_cost || 0) 
 						: 0;
 						const subtotal = item.quantity * unitPrice;
 
 						return (
-						<tr key={idx} className="border-b border-rose-50/50">
-							<td className="py-4 px-2">{item.id_variant?.size || item.size}</td>
-							<td className="py-4 px-2 flex items-center gap-2">
+						<tr key={idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+							<td className="py-5 px-6 font-bold text-[13px]">{item.id_variant?.size || item.size}</td>
+							<td className="py-5 px-6 flex items-center gap-3">
                 {item.id_variant?.color?.hex && (
                   <div 
-                    className="w-3 h-3 rounded-full border border-black/5 shrink-0" 
+                    className="w-4 h-4 rounded-full border border-[#EAE0E2] dark:border-white/10 shrink-0 shadow-sm" 
                     style={{ backgroundColor: item.id_variant.color.hex }} 
                   />
                 )}
-                <span>
+                <span className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300">
                   {item.id_variant?.color?.name || item.id_variant?.color || item.color || "-"}
                 </span>
               </td>
-							<td className="py-4 px-2 text-center font-bold">{item.quantity}</td>
+							<td className="py-5 px-6 text-center font-black text-[14px]">{item.quantity}</td>
 							
-							{/* Mostramos el costo unitario real solo si ya hay OC */}
-							<td className="py-4 px-2 text-center text-[#9b8088]">
+							<td className="py-5 px-6 text-center font-bold text-[13px] text-[#8C6B79] dark:text-gray-400">
 							S/ {unitPrice.toFixed(2)}
 							</td>
 							
-							<td className="py-4 px-2 text-right font-bold text-[#F2778D]">
+							<td className="py-5 px-6 text-right font-black text-[14px] text-[#D6405F] dark:text-[#F8BBD0]">
 							S/ {subtotal.toFixed(2)}
 							</td>
 						</tr>
@@ -422,15 +423,14 @@ function OPPCard({ opp }: { opp: any }) {
 					})}
 					
 					{/* Fila de Total */}
-					<tr className="font-bold text-lg">
-						<td className="py-6 px-2 uppercase">Total</td>
+					<tr className="bg-white/50 dark:bg-white/5">
+						<td className="py-6 px-6 font-black text-[12px] uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Total</td>
 						<td />
-						<td className="py-6 px-2 text-center">
+						<td className="py-6 px-6 text-center font-black text-[16px] text-[#40202D] dark:text-white">
 						{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0)}
 						</td>
 						<td />
-						<td className="py-6 px-2 text-right text-[#F2778D]">
-						{/* Usamos el totalAmount que calculaste arriba del componente */}
+						<td className="py-6 px-6 text-right font-black text-[18px] text-[#D6405F] dark:text-[#F8BBD0]">
 						{formatCurrency(totalAmount)}
 						</td>
 					</tr>
@@ -439,9 +439,9 @@ function OPPCard({ opp }: { opp: any }) {
             </div>
 
             {/* Cuadro de Observaciones */}
-            <div className="mt-6 p-4 rounded-2xl bg-[#F2D0D3]/30 border border-[#F2D0D3]/50">
-              <p className="text-xs font-bold text-[#b46a7c] uppercase mb-1">Observaciones:</p>
-              <p className="text-sm text-[#594246]">{opp.notes || "Sin observaciones adicionales."}</p>
+            <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md">
+              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Observaciones:</p>
+              <p className="text-[13px] font-medium text-[#40202D] dark:text-white leading-relaxed">{opp.notes || "Sin observaciones adicionales."}</p>
             </div>
 
             {/* Botones de Acción */}
@@ -452,19 +452,19 @@ function OPPCard({ opp }: { opp: any }) {
 				<>
 				<button 
 					onClick={() => setIsQuotationModalOpen(true)}
-					className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors"
+					className="px-8 py-4 rounded-2xl border border-[#D6405F] text-[#D6405F] dark:text-[#F8BBD0] dark:border-[#F8BBD0] bg-white/50 dark:bg-transparent backdrop-blur-md font-black text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-[#D6405F] hover:text-white dark:hover:bg-[#F8BBD0] dark:hover:text-black transition-all shadow-sm"
 				>
 					<Plus className="w-4 h-4" /> Registrar Cotización
 				</button>
 				
-				<button className="px-8 py-3 rounded-xl border border-[#594246] text-[#594246] font-bold text-sm hover:bg-gray-50 transition-colors">
+				<button className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm">
 					Rechazar Orden
 				</button>
 
 				<button 
 					disabled={opp.quotes?.every((q: any) => q.total_amount === 0)}
 					onClick={() => setIsWinnerModalOpen(true)}
-					className="px-8 py-3 rounded-xl bg-[#F2778D] text-white font-bold text-sm disabled:opacity-50 hover:bg-[#d9667a] transition-shadow shadow-md shadow-rose-100"
+					className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest disabled:opacity-50 hover:scale-[1.02] transition-all shadow-lg"
 				>
 					Marcar como En Camino
 				</button>
@@ -482,12 +482,12 @@ function OPPCard({ opp }: { opp: any }) {
 					// ✅ Pasamos el ID de la OC y el ID de la Pre-Orden (opp._id)
 					startInitalQualityCheck(purchaseOrderId, opp._id); 
 					}}
-					className={`px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
-					!purchaseOrderId ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#F2778D] text-white hover:bg-[#d9667a]'
+					className={`px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg ${
+					!purchaseOrderId ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white hover:scale-[1.02]'
 					}`}
 				>
-					<ClipboardCheck className="w-4 h-4" /> 
-					{purchaseOrderId ? 'Mercadería Recibida (Iniciar Control)' : 'OC no vinculada'}
+					<ClipboardCheck className="w-5 h-5" /> 
+					{purchaseOrderId ? 'Recibir (Control)' : 'OC no vinculada'}
 				</button>
 			)}
 
@@ -511,9 +511,9 @@ function OPPCard({ opp }: { opp: any }) {
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
 			<button 
         onClick={() => setIsDetailsModalOpen(true)}
-        className="px-8 py-3 rounded-xl border border-[#F2778D] text-[#F2778D] font-bold text-sm flex items-center gap-2 hover:bg-rose-50 transition-colors"
+        className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm"
       >
-        <Eye className="w-4 h-4" /> Ver Detalles Completos
+        <Eye className="w-4 h-4" /> Detalles Completos
       </button>
 
 			</div>
@@ -602,11 +602,11 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 
   return (
     <Modal open={isOpen} onClose={onClose} title="Registrar Cotización Recibida">
-      <div className="space-y-6 p-2">
+      <div className="space-y-6">
         <label className="block space-y-2">
-          <span className="text-sm font-bold text-[#594246]">Seleccionar Proveedor</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Seleccionar Proveedor</span>
           <select 
-            className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none"
+            className="w-full h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner appearance-none transition-all"
             value={selectedSupplier}
             onChange={(e) => setSelectedSupplier(e.target.value)}
           >
@@ -629,45 +629,56 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
         </label>
 
         {selectedSupplier && (
-          <div className="space-y-4">
-            <table className="w-full text-sm">
-              <thead><tr className="text-left text-[#9b8088]"><th>Variante</th><th>Cantidad</th><th>Costo Unitario</th></tr></thead>
-              <tbody>
+          <div className="space-y-6">
+            <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner bg-white/30 dark:bg-black/20">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5">
+                    <th className="py-4 px-6">Variante</th>
+                    <th className="py-4 px-6 text-center">Cantidad</th>
+                    <th className="py-4 px-6 text-center">Costo Unitario</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[#40202D] dark:text-white">
                 {items.map((it, idx) => (
-                  <tr key={idx} className="border-b border-rose-50/50">
-                    <td className="py-3 flex items-center gap-2">
-                      <span className="font-bold">{it.id_variant?.size}</span>
-                      <span className="text-gray-300">|</span>
+                  <tr key={idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                    <td className="py-5 px-6 flex items-center gap-3">
+                      <span className="font-bold text-[13px]">{it.id_variant?.size}</span>
+                      <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
                       {it.id_variant?.color?.hex && (
                         <div 
-                          className="w-3 h-3 rounded-full border border-black/5 shrink-0" 
+                          className="w-4 h-4 rounded-full border border-[#EAE0E2] dark:border-white/10 shrink-0 shadow-sm" 
                           style={{ backgroundColor: it.id_variant.color.hex }} 
                         />
                       )}
-                      <span className="text-[#9b8088]">
+                      <span className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300">
                         {it.id_variant?.color?.name || it.id_variant?.color || "-"}
                       </span>
                     </td>
-                    <td className="py-3 font-bold">{it.quantity}</td>
-                    <td className="py-3">
-                      <input 
-                        type="number" 
-                        value={it.unit_cost} 
-                        onChange={(e) => {
-                          const newItems = [...items];
-                          newItems[idx].unit_cost = Number(e.target.value);
-                          setItems(newItems);
-                        }}
-                        className="w-24 h-9 border border-rose-200 rounded-lg px-2 outline-none focus:border-[#F2778D]"
-                      />
+                    <td className="py-5 px-6 text-center font-black text-[14px]">{it.quantity}</td>
+                    <td className="py-5 px-6 text-center">
+                      <div className="relative inline-block">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[12px] font-bold text-[#8C6B79]">S/</span>
+                        <input 
+                          type="number" 
+                          value={it.unit_cost} 
+                          onChange={(e) => {
+                            const newItems = [...items];
+                            newItems[idx].unit_cost = Number(e.target.value);
+                            setItems(newItems);
+                          }}
+                          className="w-28 h-10 border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/30 rounded-xl pl-8 pr-3 outline-none focus:ring-2 focus:ring-[#D6405F]/50 text-[13px] font-black text-[#40202D] dark:text-white shadow-inner transition-all"
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
             <button 
               onClick={() => onSave(selectedSupplier, items)}
-              className="w-full py-4 bg-[#F2778D] text-white rounded-xl font-bold shadow-lg shadow-rose-100"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
             >
               Guardar Precios Negociados
             </button>
@@ -689,12 +700,13 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
       .filter(q => q.total_amount > 0)
       .sort((a, b) => b.ranking_score - a.ranking_score);
   }, [opp.quotes]);
+
   return (
     <Modal open={isOpen} onClose={onClose} title="Seleccionar Proveedor y Generar OC">
       <div className="space-y-6">
-        <p className="text-sm text-[#9b8088]">Compara las propuestas recibidas y elige al ganador para pasar la orden a estado <b>En Camino</b>.</p>
+        <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-400">Compara las propuestas recibidas y elige al ganador para pasar la orden a estado <b>En Camino</b>.</p>
         
-        <div className="space-y-3">
+        <div className="space-y-4">
           {sortedQuotes.map((q, idx) => {
             const agentId = typeof q.id_agent === 'string' ? q.id_agent : (q.id_agent?._id || Math.random().toString());
             const agentName = q.id_agent?.name_company || q.id_agent?.name || "Cargando...";
@@ -703,29 +715,35 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
               <div 
                 key={agentId}
                 onClick={() => setWinnerId(agentId)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between ${
-                  winnerId === agentId ? "border-[#F2778D] bg-rose-50" : "border-rose-50 bg-white"
+                className={`p-5 rounded-3xl border transition-all cursor-pointer flex items-center justify-between group hover:scale-[1.01] ${
+                  winnerId === agentId 
+                    ? "border-[#D6405F] bg-gradient-to-r from-[#D6405F]/5 to-[#F23B69]/5 dark:from-[#D6405F]/10 dark:to-[#F23B69]/10 shadow-sm" 
+                    : "border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md hover:border-[#8C6B79]/50"
                 }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${idx === 0 ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400"}`}>
-                    <Trophy className="w-5 h-5" />
+                <div className="flex items-center gap-5">
+                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shadow-inner ${idx === 0 ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20" : "bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79]"}`}>
+                    <Trophy className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-bold text-[#594246]">{agentName}</p>
-                    <div className="text-xs text-[#9b8088] flex items-center gap-2">
-                      Ranking Score: 
-                      <span className="text-[#F2778D] font-bold">
-                        {(q.ranking_score * 100).toFixed(0)}/100
-                      </span>
-                      <span className="text-[#ede8e9]">|</span>
+                    <p className={`text-[15px] font-black ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{agentName}</p>
+                    <div className="flex flex-wrap items-center gap-3 mt-1">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                        Score: 
+                        <span className="text-[#D6405F] dark:text-[#F8BBD0] ml-1">
+                          {(q.ranking_score * 100).toFixed(0)}/100
+                        </span>
+                      </p>
+                      <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
                       <StarRating rating={q.id_agent?.rating || 5} size={3} />
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-[#F2778D]">{formatCurrency(q.total_amount)}</p>
-                  {winnerId === agentId && <Check className="inline w-5 h-5 text-[#F2778D]" />}
+                <div className="text-right flex items-center gap-3">
+                  <p className={`text-[18px] font-black ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{formatCurrency(q.total_amount)}</p>
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center transition-all ${winnerId === agentId ? "bg-[#D6405F] text-white" : "border-2 border-[#EAE0E2] dark:border-white/10 text-transparent"}`}>
+                    <Check className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
             );
@@ -733,25 +751,24 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
         </div>
 
         {winnerId && (
-          <div className="pt-4 border-t border-rose-100 space-y-4">
-            {/* NUEVO CAMPO DE FECHA */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-[#594246]">Fecha Estimada de Entrega</label>
+          <div className="pt-6 border-t border-[#EAE0E2] dark:border-white/10 space-y-6">
+            <div className="space-y-3">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-1">Fecha Estimada de Entrega</label>
               <input 
                 type="date"
                 value={deliveryDate}
                 onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full h-12 rounded-xl border border-rose-100 px-4 outline-none focus:ring-1 focus:ring-[#F2778D]"
+                className="w-full h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
               />
             </div>
 
-            <p className="text-xs text-center text-[#9b8088] italic">
+            <p className="text-[12px] text-center font-medium text-[#8C6B79] dark:text-gray-400 italic px-4">
               Al confirmar, se creará la OC con fecha de llegada para el {formatDate(deliveryDate)}.
             </p>
             
             <button 
-              onClick={() => onConfirm(winnerId, deliveryDate)} // Enviamos ambos datos
-              className="w-full py-4 bg-[#F2778D] text-white rounded-xl font-bold"
+              onClick={() => onConfirm(winnerId, deliveryDate)} 
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
             >
               Confirmar Ganador y Generar OC
             </button>
@@ -764,15 +781,16 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
 
 function StepItem({ active, icon, label, sub }: { active: boolean; icon: React.ReactNode; label: string; sub: string }) {  return (
     <div className="flex flex-col items-center text-center space-y-3">
-      {/* El círculo tiene bg sólido y border-white para ocultar la línea detrás de él */}
-      <div className={`flex h-13 w-13 items-center justify-center rounded-full border-[6px] border-white shadow-lg transition-all z-10 ${
-        active ? "bg-[#F2778D] text-white" : "bg-[#ede8e9] text-[#b79ca5]"
+      <div className={`flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl shadow-inner transition-all z-10 backdrop-blur-md ${
+        active 
+          ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white border border-[#D6405F]/20" 
+          : "bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-500"
       }`}>
         {icon}
       </div>
       <div className="space-y-1">
-        <p className={`text-sm font-bold ${active ? "text-[#F2778D]" : "text-[#b79ca5]"}`}>{label}</p>
-        <p className="text-[11px] leading-tight text-[#9b8088] max-w-[140px] mx-auto">{sub}</p>
+        <p className={`text-[12px] font-black uppercase tracking-widest ${active ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#8C6B79] dark:text-gray-500"}`}>{label}</p>
+        <p className="text-[11px] font-medium leading-tight text-[#8C6B79] dark:text-gray-400 max-w-[140px] mx-auto">{sub}</p>
       </div>
     </div>
   );
