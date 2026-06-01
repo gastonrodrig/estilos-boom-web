@@ -9,14 +9,21 @@ export type StorekeeperModule = {
 
 export const storekeeperModules: StorekeeperModule[] = [
   {
-    label: "Dashboard",
-    href: "/storekeeper",
+    label: "Panel General",
     icon: "dashboard",
+    href: "storekeeper/warehouse/dashboard",
+    requiredRoles: ["Almacenero"],
   },
   {
-    label: "Almacén",
-    href: "/storekeeper/inventory",
+    label: "Recepciones",
     icon: "inventory",
+    href: "/storekeeper/warehouse/receptions",
     requiredRoles: ["Almacenero"],
-  }
+  },
+  {
+    label: "Movimientos de Prendas",
+    icon: "warehouse",
+    href: "/storekeeper/warehouse/transfers",
+    requiredRoles: ["Almacenero"],
+  },
 ];

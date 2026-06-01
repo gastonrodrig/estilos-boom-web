@@ -1,112 +1,127 @@
 "use client";
 
-import { useState } from 'react';
-import { DataTable, DataTableColumn, DataTableAction } from '@/components/organisms';
-import { Pencil } from 'lucide-react';
+import { useEffect, useMemo, useState } from "react";
+import { DataTable, DataTableColumn, DataTableAction, WorkerModal } from "@/components/organisms";
+import { Trash2, UserCheck } from "lucide-react";
+import { useManagementStore } from "@/hooks";
+import type { WorkerRow } from "@store";
 
-// 1. Agregamos 'worker_type' a nuestro molde
-interface WorkerData {
-  id_worker: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  document_type: string;
-  document_number: string;
-  worker_type: string; // 👈 NUEVA COLUMNA PARA EL ROL
-  status: string; 
-}
+const STATUS_BADGE: Record<string, string> = {
+  Activo:   "bg-emerald-50 text-emerald-700 border-emerald-100",
+  Inactivo: "bg-gray-50 text-gray-500 border-gray-100",
+};
 
 export default function TrabajadoresPage() {
-  const [isOpenModal, setIsModalOpen] = useState(false);
+  const {
+    workers,
+    loadingWorkers,
+    startLoadingWorkers,
+    startUpdateWorker,
+    startDeleteWorker,
+  } = useManagementStore();
 
-  // 2. Agregamos la columna a la tabla (la puse justo antes del Estado)
-  const columns: DataTableColumn<WorkerData>[] = [
-    { id: 'first_name', label: 'Nombre', sortable: true, width: '140px', truncate: true },
-    { id: 'last_name', label: 'Apellido', sortable: true, width: '140px', truncate: true },
-    { id: 'email', label: 'Correo', sortable: true, width: '140px', truncate: true },
-    { id: 'phone', label: '# Telefono', sortable: true, width: '140px', truncate: true },
-    { id: 'document_type', label: 'Tipo Doc', sortable: true, width: '120px', truncate: true },
-    { id: 'document_number', label: '# Documento', sortable: true, width: '140px', truncate: true },
-    { id: 'worker_type', label: 'Rol / Tipo', sortable: true, width: '140px', truncate: true }, // 👈 AQUÍ ESTÁ
-    { id: 'status', label: 'Estado', sortable: true, width: '140px', truncate: true }, 
+  const [modalOpen, setModalOpen]       = useState(false);
+  const [searchTerm, setSearchTerm]     = useState("");
+  const [currentPage, setCurrentPage]   = useState(0);
+  const [rowsPerPage, setRowsPerPage]   = useState(10);
+  const [orderBy, setOrderBy]           = useState("first_name");
+  const [order, setOrder]               = useState<"asc" | "desc">("asc");
+
+  useEffect(() => { void startLoadingWorkers(); }, [startLoadingWorkers]);
+
+  const filtered = useMemo(() => {
+    if (!searchTerm.trim()) return workers;
+    const q = searchTerm.toLowerCase();
+    return workers.filter((w) =>
+      [w.first_name, w.last_name, w.email, w.document_number, w.worker_role, w.system_role, w.employment_status]
+        .some((v) => v?.toLowerCase().includes(q))
+    );
+  }, [workers, searchTerm]);
+
+  const columns: DataTableColumn<WorkerRow>[] = [
+    { id: "first_name",        label: "Nombre",       sortable: true, width: "130px", truncate: true },
+    { id: "last_name",         label: "Apellido",      sortable: true, width: "130px", truncate: true },
+    { id: "email",             label: "Correo",        sortable: true, width: "200px", truncate: true },
+    { id: "phone",             label: "Teléfono",                       width: "120px", truncate: true },
+    { id: "document_type",     label: "Tipo Doc.",                      width: "90px",  truncate: true },
+    { id: "document_number",   label: "N° Documento",                   width: "130px", truncate: true },
+    
+    {
+      id: "system_role",
+      label: "Rol Sistema",
+      sortable: true,
+      width: "130px",
+      accessor: (row) => (
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-100">
+          {row.system_role}
+        </span>
+      ),
+    },
+    {
+      id: "employment_status",
+      label: "Estado",
+      sortable: true,
+      width: "100px",
+      accessor: (row) => (
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[row.employment_status] ?? "bg-gray-50 text-gray-400 border-gray-100"}`}>
+          {row.employment_status}
+        </span>
+      ),
+    },
+    { id: "hired_at", label: "Contratado", sortable: true, width: "110px", truncate: true },
   ];
 
-  const actions: DataTableAction<WorkerData>[] = [
+  const actions: DataTableAction<WorkerRow>[] = [
     {
-      label: "Editar",
-      icon: <Pencil className="h-4 w-4" />,
-      onClick: (row: WorkerData) => {
-        setIsModalOpen(true);
-        alert(`Abriendo edición para: ${row.first_name}`);
+      label: "Cambiar estado",
+      icon: <UserCheck className="h-4 w-4 text-blue-500" />,
+      onClick: async (row) => {
+        const makeActive = row.employment_status !== "Activo";
+        await startUpdateWorker(row._id, { is_active: makeActive });
+      },
+    },
+    {
+      label: "Eliminar",
+      icon: <Trash2 className="h-4 w-4 text-red-500" />,
+      onClick: async (row) => {
+        if (window.confirm(`¿Eliminar a ${row.first_name} ${row.last_name}?`)) {
+          await startDeleteWorker(row._id);
+        }
       },
     },
   ];
 
-  // 3. Actualizamos los datos de prueba para que incluyan el rol
-  const [datosDePrueba] = useState<WorkerData[]>([
-    { 
-      id_worker: 'WRK-001',
-      first_name: 'Juan',
-      last_name: 'Pérez',
-      email: 'juan.perez@gmail.com',
-      phone: '987654321',
-      document_type: 'DNI',
-      document_number: '76543210',
-      worker_type: 'Administrador', // 👈 DATO NUEVO
-      status: 'Activo', 
-    },
-    { 
-      id_worker: 'WRK-002',
-      first_name: 'María',
-      last_name: 'Gómez',
-      email: 'maria.gomez@gmail.com',
-      phone: '912345678',
-      document_type: 'CE',
-      document_number: '001122334',
-      worker_type: 'Vendedor', // 👈 DATO NUEVO
-      status: 'Inactivo', 
-    },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [orderBy, setOrderBy] = useState("");
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
-
   return (
     <>
       <DataTable
-        rows={datosDePrueba}
-        loading={false}
+        rows={filtered}
+        loading={loadingWorkers}
         title="Gestión de Trabajadores"
-        description="Administra el personal, filtra por cualquier campo y aplica acciones rápidas."
-        onAddClick={() => setIsModalOpen(true)}
-        
+        description="Administra el personal registrado. Filtra por nombre, correo, cargo o estado."
+        onAddClick={() => setModalOpen(true)}
         globalFilter={searchTerm}
-        onGlobalFilterChange={setSearchTerm}
-        
+        onGlobalFilterChange={(v) => { setSearchTerm(v); setCurrentPage(0); }}
         columns={columns}
         order={order}
         orderBy={orderBy}
         onRequestSort={(prop) => {
-          const isAsc = orderBy === prop && order === 'asc';
-          setOrder(isAsc ? 'desc' : 'asc');
+          const isAsc = orderBy === prop && order === "asc";
+          setOrder(isAsc ? "desc" : "asc");
           setOrderBy(prop);
         }}
-        
         page={currentPage}
         rowsPerPage={rowsPerPage}
-        total={datosDePrueba.length}
-        onPageChange={(_, newPage) => setCurrentPage(newPage)}
-        onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setCurrentPage(0);
-        }}
-        
+        total={filtered.length}
+        onPageChange={(_, p) => setCurrentPage(p)}
+        onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setCurrentPage(0); }}
         actions={actions}
         hasActions
+      />
+
+      <WorkerModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSaved={startLoadingWorkers}
       />
     </>
   );

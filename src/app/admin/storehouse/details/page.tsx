@@ -223,8 +223,7 @@ function OPPCard({ opp }: { opp: any }) {
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  const { startUpdateSupplierQuote, startSelectWinnerAndConvert, approveInventory, extendOCDate, loading } = useStorehouseStore();
-  const { startInitalQualityCheck } = useStorehouseStore();
+  const { startUpdateSupplierQuote, startSelectWinnerAndConvert, approveInventory, extendOCDate, startInitalQualityCheck, startLoadingPrePurchaseOrders, loading } = useStorehouseStore();
 
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
     ? opp.id_purchase_order?._id 
@@ -406,7 +405,7 @@ function OPPCard({ opp }: { opp: any }) {
                   />
                 )}
                 <span className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300">
-                  {item.id_variant?.color?.name || item.id_variant?.color || item.color || "-"}
+                  {item.id_variant?.color?.name ?? (typeof item.id_variant?.color === "string" ? item.id_variant.color : null) ?? item.color ?? "-"}
                 </span>
               </td>
 							<td className="py-5 px-6 text-center font-black text-[14px]">{item.quantity}</td>
@@ -439,9 +438,22 @@ function OPPCard({ opp }: { opp: any }) {
             </div>
 
             {/* Cuadro de Observaciones */}
-            <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md">
-              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Observaciones:</p>
-              <p className="text-[13px] font-medium text-[#40202D] dark:text-white leading-relaxed">{opp.notes || "Sin observaciones adicionales."}</p>
+            <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md space-y-3">
+              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Observaciones:</p>
+              {/* Observaciones de control de calidad (post-aprobación) */}
+              {opp.id_purchase_order?.quality_observations && (
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-500/20">
+                  <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Control de calidad:</p>
+                  <p className="text-[13px] font-medium text-[#40202D] dark:text-white leading-relaxed">{opp.id_purchase_order.quality_observations}</p>
+                </div>
+              )}
+              {/* Notas generales de la pre-orden */}
+              {opp.notes && !opp.notes.startsWith("Generada desde") && (
+                <p className="text-[13px] font-medium text-[#40202D] dark:text-white leading-relaxed">{opp.notes}</p>
+              )}
+              {!opp.id_purchase_order?.quality_observations && (!opp.notes || opp.notes.startsWith("Generada desde")) && (
+                <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-400 italic">Sin observaciones adicionales.</p>
+              )}
             </div>
 
             {/* Botones de Acción */}
@@ -473,14 +485,14 @@ function OPPCard({ opp }: { opp: any }) {
 
 			{/* FASE 2: TRÁNSITO (La OC ya se generó y viene en camino) */}
 			{opp.status === 'CONVERTIDA' && (
-				<button 
-					disabled={!purchaseOrderId}
-					onClick={() => {
+				<button
+					disabled={!purchaseOrderId || loading}
+					onClick={async () => {
 					if (!purchaseOrderId) {
 						return console.error("Error: ID de OC no encontrado.");
 					}
-					// ✅ Pasamos el ID de la OC y el ID de la Pre-Orden (opp._id)
-					startInitalQualityCheck(purchaseOrderId, opp._id); 
+					const ok = await startInitalQualityCheck(purchaseOrderId, opp._id);
+					if (ok) await startLoadingPrePurchaseOrders();
 					}}
 					className={`px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg ${
 					!purchaseOrderId ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white hover:scale-[1.02]'
@@ -554,9 +566,9 @@ function OPPCard({ opp }: { opp: any }) {
 		opp={opp}
 		// ✅ Agregamos 'deliveryDate' aquí
 		onConfirm={async (supplierId: any, deliveryDate: string) => {
-			// ✅ Ahora pasamos los 3 argumentos: ID de orden, ID de proveedor y la Fecha
 			await startSelectWinnerAndConvert(opp._id, supplierId, deliveryDate);
 			setIsWinnerModalOpen(false);
+			await startLoadingPrePurchaseOrders();
 		}}
 		/>
     
@@ -567,6 +579,7 @@ function OPPCard({ opp }: { opp: any }) {
       onConfirm={async (rating, notes, incidences) => {
         await approveInventory(purchaseOrderId, rating, notes, incidences);
         setIsApproveModalOpen(false);
+        await startLoadingPrePurchaseOrders();
       }}
       maxQuantity={totalItemsInOrder}
       isLoading={loading}
@@ -652,7 +665,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
                         />
                       )}
                       <span className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300">
-                        {it.id_variant?.color?.name || it.id_variant?.color || "-"}
+                        {it.id_variant?.color?.name ?? (typeof it.id_variant?.color === "string" ? it.id_variant.color : null) ?? "-"}
                       </span>
                     </td>
                     <td className="py-5 px-6 text-center font-black text-[14px]">{it.quantity}</td>

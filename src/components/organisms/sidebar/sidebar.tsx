@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, LayoutDashboard, Package, Store,Spool, ShoppingBag, BookText,NotepadText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory, ArrowLeftRight } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store, Spool, ShoppingBag, BookText, NotepadText, Banknote, Contact, Eye, Users, ShieldCheck, ClipboardList, Factory, ArrowLeftRight, Warehouse, Boxes, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuthStore } from "@/hooks";
 
@@ -36,6 +36,9 @@ const iconMap = {
     spool: Spool,
     "notepad-text": NotepadText,
     "arrow-right-left": ArrowLeftRight,
+    warehouse: Warehouse,
+    inventory: Boxes,
+    truck: Truck,
 } as const;
 
 export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
@@ -98,18 +101,18 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                 <div key={item.label}>
                     <button
                         onClick={() => handleToggleSection(item.label)}
-                        className={`group flex items-center justify-between w-full px-3 py-2.5 
-                            rounded-lg transition-colors duration-200 hover:cursor-pointer
+                        className={`group flex items-center justify-between w-full px-3 py-2.5
+                            rounded-lg transition-colors duration-200 hover:cursor-pointer overflow-hidden
                             ${hasActiveChild ? "font-semibold text-white bg-[#5B283A]" : "font-medium text-[#C4A9B5]"}
                             hover:bg-[#3D2330] hover:text-white`}
                     >
-                        <span className={`flex items-center gap-3 ${depth === 0 ? "text-[14px]" : "text-[13px]"} ${ItemIcon || depth > 0 ? "" : "pl-8"}`}>
+                        <span className={`flex items-center gap-3 min-w-0 flex-1 ${depth === 0 ? "text-[14px]" : "text-[13px]"} ${!ItemIcon && depth === 0 ? "pl-6" : ""}`}>
                             {ItemIcon ? <ItemIcon strokeWidth={1.5} className="w-5 h-5 shrink-0" /> : null}
-                            <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
+                            <span className="truncate leading-tight">
                                 {item.label}
                             </span>
                         </span>
-                        <ChevronDown strokeWidth={1.5} className={`w-4 h-4 text-[#A98495] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                        <ChevronDown strokeWidth={1.5} className={`w-4 h-4 shrink-0 text-[#A98495] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
 
                     <AnimatePresence>
@@ -137,13 +140,14 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
             <Link
                 key={item.label + (item.href || "")}
                 href={item.href || "#"}
-                className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200
+                className={`group flex items-center gap-3 px-3 rounded-lg transition-colors duration-200 overflow-hidden
                     ${depth === 0 ? "text-[14px] py-2.5" : "text-[13px] py-2"}
+                    ${!ItemIcon && depth === 0 ? "pl-[2.375rem]" : ""}
                     ${isItemActive ? "font-semibold text-white bg-[#5B283A]" : "font-medium text-[#C4A9B5]"}
                     hover:bg-[#3D2330] hover:text-white`}
             >
                 {ItemIcon ? <ItemIcon strokeWidth={1.5} className="w-5 h-5 shrink-0" /> : null}
-                <span className={depth === 0 ? "whitespace-nowrap" : "whitespace-normal leading-tight"}>
+                <span className="truncate leading-tight">
                     {item.label}
                 </span>
             </Link>

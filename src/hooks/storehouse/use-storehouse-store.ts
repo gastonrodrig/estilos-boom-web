@@ -458,6 +458,54 @@ const approveInventory = useCallback(async (
     }, "No se pudo recuperar la distribución de stock.");
   }, [executeRequest, getConfig]);
 
+  /**
+   * Carga el stock de un array de variantes en una sola pasada paralela.
+   * NO usa executeRequest para evitar el parpadeo de loading por cada llamada.
+   * Retorna un mapa { [variantId]: available_stock } con los resultados.
+   * Las variantes sin registro devuelven 0.
+   * GET /inventory/stock/:variantId  ×N  (Promise.allSettled en paralelo)
+   */
+  const startLoadingStockBatch = useCallback(
+    async (variantIds: string[]): Promise<Record<string, number>> => {
+      if (variantIds.length === 0) return {};
+
+      // Un solo dispatch de loading al inicio
+      dispatch(setLoadingStorehouse(true));
+
+      try {
+        const config = await getConfig();
+        const results = await Promise.allSettled(
+          variantIds.map((id) =>
+            storehouseApi
+              .get(`/inventory/stock/${id}`, config)
+              .then((r) => ({ id, data: r.data as any[] }))
+          )
+        );
+
+        const stockMap: Record<string, number> = {};
+        for (const result of results) {
+          if (result.status === "fulfilled") {
+            const { id, data } = result.value;
+            const available = Array.isArray(data)
+              ? data.reduce(
+                  (sum, s) => sum + Math.max(0, (s.physical_stock ?? 0) - (s.reserved_stock ?? 0)),
+                  0
+                )
+              : 0;
+            stockMap[id] = available;
+          }
+        }
+        return stockMap;
+      } catch {
+        return {};
+      } finally {
+        // Un solo dispatch de loading al final
+        dispatch(setLoadingStorehouse(false));
+      }
+    },
+    [dispatch, getConfig]
+  );
+
   // ─────────────────────────────────────────────────────────────────────────────
   // DOCUMENTOS DE ALMACÉN  (reemplazan el flujo obsoleto de /inventory/transfers)
   // ─────────────────────────────────────────────────────────────────────────────
@@ -591,6 +639,7 @@ const approveInventory = useCallback(async (
 
     startLoadingWarehouses,
     startLoadingStockByVariant,
+    startLoadingStockBatch,
     // Nuevos métodos de WarehouseDocuments
     startLoadingWarehouseDocuments,
     startCreateWarehouseDocument,

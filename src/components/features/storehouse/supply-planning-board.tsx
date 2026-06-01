@@ -68,10 +68,13 @@ const getSupplySuggestion = (variants: Product["variants"]) => {
 export const SupplyPlanningBoard = () => {
   const router = useRouter();
   const { products, loading: productsLoading, searchTerm, startLoadingProducts } = useProductStore();
-  const { purchaseOrders, startLoadingPurchaseOrders, loading: ordersLoading } = useStorehouseStore();
+  const { purchaseOrders, startLoadingPurchaseOrders, startLoadingStockByVariant, startLoadingStockBatch, loading: ordersLoading } = useStorehouseStore();
 
   const [expanded, setExpanded] = useState<string | null>(null);
   const [selected, setSelected] = useState<Record<string, SupplySelection>>({});
+  // Stock real por variante: { [variantId]: available_stock (physical - reserved) }
+  const [warehouseStock, setWarehouseStock] = useState<Record<string, number>>({});
+  const [loadingStock, setLoadingStock] = useState(false);
 
   useEffect(() => {
     void startLoadingProducts({ limit: 100 });
@@ -91,40 +94,46 @@ export const SupplyPlanningBoard = () => {
   }, [purchaseOrders]);
 
 
+  // Carga el stock real de WarehouseStock para TODAS las variantes al montar.
+  // Usa startLoadingStockBatch: llamadas paralelas + un solo dispatch de loading.
+  // Esto evita el parpadeo que causaba despachar loading true/false por cada variante.
   useEffect(() => {
-  if (products.length > 0) {
-    console.log("─── DEBUG DE INVENTARIO ───");
-    // Tomamos el primer producto que tenga variantes para inspeccionarlo
-    const productWithVariants = products.find(p => p.variants && p.variants.length > 0);
-    
-    if (productWithVariants) {
-      console.log(`Producto inspeccionado: ${productWithVariants.name}`);
-      console.table(productWithVariants.variants.map(v => ({
-        sku: v.sku_variant,
-        talla: v.size,
-        stock_real: v.stock,
-        min_alerta_recibido: v.min_stock_alert // 👈 Aquí verás si viene o es undefined
-      })));
-    } else {
-      console.warn("No se encontraron variantes en los productos cargados.");
-    }
-  }
-}, [products]);
+    if (products.length === 0) return;
+
+    const allVariantIds = products.flatMap(
+      (p) => (p.variants ?? []).map((v) => v.id_variant).filter(Boolean)
+    ) as string[];
+
+    if (allVariantIds.length === 0) return;
+
+    setLoadingStock(true);
+    startLoadingStockBatch(allVariantIds).then((stockMap) => {
+      setWarehouseStock((prev) => ({ ...prev, ...stockMap }));
+      setLoadingStock(false);
+    });
+  // Solo relanzar cuando cambie la lista de productos
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
 
   const alertProducts = useMemo(() => {
-  return products
-    .map((product) => {
+    // Todos los productos se muestran en el board de alertas.
+    // El stock real viene de WarehouseStock (cargado al expandir cada producto).
+    // Los filtros critical/low se evalúan con el stock disponible en warehouseStock;
+    // si no se cargó aún se usa 0 (lo que los marca como críticos hasta que se cargue).
+    return products.map((product) => {
       const variants = product.variants ?? [];
-      const critical = variants.filter((v) => Number(v.stock ?? 0) <= 0).length;
+      const critical = variants.filter((v) => {
+        const s = warehouseStock[v.id_variant] ?? 0;
+        return s <= 0;
+      }).length;
       const low = variants.filter((v) => {
-        const stock = Number(v.stock ?? 0);
-        const min = Number(v.min_stock_alert ?? 10); // 👈 Comparación real
-        return stock > 0 && stock < min;
+        const s = warehouseStock[v.id_variant] ?? 0;
+        const min = Number(v.min_stock_alert ?? 10);
+        return s > 0 && s < min;
       }).length;
       return { product, variants, critical, low };
-    })
-    .filter((item) => item.critical > 0 || item.low > 0);
-}, [products]);
+    });
+  }, [products, warehouseStock]);
 
   const filtered = useMemo(() => { 
     if (!searchTerm.trim()) return alertProducts;
@@ -145,6 +154,7 @@ export const SupplyPlanningBoard = () => {
   const criticalCount = alertProducts.filter((p) => p.critical > 0).length;
   const lowCount = alertProducts.filter((p) => p.critical === 0 && p.low > 0).length;
   const isLoading = productsLoading || ordersLoading;
+  const isLoadingAllStock = loadingStock && Object.keys(warehouseStock).length === 0;
 
   const toggleVariant = (next: SupplySelection) => {
     let changedProduct = false;
@@ -236,6 +246,14 @@ export const SupplyPlanningBoard = () => {
         </div>
       )}
 
+      {/* Banner de carga de stock — visible solo mientras se consulta WarehouseStock por primera vez */}
+      {!isLoading && isLoadingAllStock && (
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-100 dark:border-rose-500/20 bg-rose-50/50 dark:bg-rose-900/10 backdrop-blur-md px-5 py-3 text-sm font-medium text-rose-500 dark:text-rose-400 animate-pulse">
+          <span className="inline-block w-2 h-2 rounded-full bg-rose-400 animate-ping" />
+          Consultando stock real en almacén…
+        </div>
+      )}
+
       {/* ── Product list ── */}
       {!isLoading && filtered.length > 0 && (
         <div className="space-y-4">
@@ -248,8 +266,19 @@ export const SupplyPlanningBoard = () => {
             const isProductInTransit = variants.some(
               (v) => (pendingTransitByVariant[v.id_variant] || 0) > 0
             );
-            const { total: stockTotal, minTotal } = getProductStockSummary(variants);
-            const { deficit, avgMonthlySales } = getSupplySuggestion(variants);
+            // Stock real del almacén para las variantes de este producto
+            const stockTotal = variants.reduce(
+              (acc, v) => acc + (warehouseStock[v.id_variant] ?? 0), 0
+            );
+            const minTotal = variants.reduce(
+              (acc, v) => acc + Number(v.min_stock_alert ?? 10), 0
+            );
+            const deficit = variants.reduce((acc, v) => {
+              const s = warehouseStock[v.id_variant] ?? 0;
+              const min = Number(v.min_stock_alert ?? 10);
+              return acc + Math.max(0, min - s);
+            }, 0);
+            const avgMonthlySales = Math.max(1, Math.round(minTotal / 2));
 
             // Verificar si este producto específico tiene selecciones
             const selectedVariantsForThisProduct = Object.values(selected).filter(
@@ -266,7 +295,17 @@ export const SupplyPlanningBoard = () => {
                 {/* Cabecera Alineada */}
                 <button
                   type="button"
-                  onClick={() => setExpanded(isOpen ? null : product.id_product)}
+                  onClick={() => {
+                    const next = isOpen ? null : product.id_product;
+                    setExpanded(next);
+                    // Al expandir, refrescar el stock de este producto con batch
+                    if (next && variants.length > 0) {
+                      const ids = variants.map((v) => v.id_variant).filter(Boolean) as string[];
+                      startLoadingStockBatch(ids).then((stockMap) => {
+                        setWarehouseStock((prev) => ({ ...prev, ...stockMap }));
+                      });
+                    }
+                  }}
                   className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left hover:bg-white/50 dark:hover:bg-white/5 transition-colors group"
                 >
                   <div className="flex flex-1 items-center gap-5 min-w-0">
@@ -357,7 +396,9 @@ export const SupplyPlanningBoard = () => {
                         </thead>
                         <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
                           {variants.map((variant) => {
-                            const stock = Number(variant.stock ?? 0);
+                            // Usar stock real de WarehouseStock; mostrar "…" mientras carga
+                            const stockLoaded = warehouseStock[variant.id_variant] !== undefined;
+                            const stock = stockLoaded ? warehouseStock[variant.id_variant] : 0;
                             const key = `${product.id_product}-${variant.id_variant}`;
                             
                             // ✅ VINCULACIÓN DIRECTA:
@@ -380,7 +421,7 @@ export const SupplyPlanningBoard = () => {
                                   <span>{variant.color?.name || "-"}</span>
                                 </td>
                                 <td className={`px-4 py-5 text-[15px] font-black ${stock < minimum ? 'text-[#D6405F] dark:text-[#F8BBD0]' : 'text-[#40202D] dark:text-white'}`}>
-                                  {stock}
+                                  {stockLoaded ? stock : <span className="text-gray-300 animate-pulse">…</span>}
                                 </td>
                                 <td className="px-4 py-5">
                                   <div className="inline-flex min-w-[40px] items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-3 py-1 text-[12px] font-black text-[#8C6B79] dark:text-gray-400 shadow-inner">

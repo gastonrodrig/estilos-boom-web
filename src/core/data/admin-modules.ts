@@ -162,7 +162,7 @@ export const adminModules: SidebarModule[] = [
   },
   {
     label: "Gestionar Trabajadores",
-    icon: "briefcase", 
+    icon: "users", 
     children: [
       {
         label: "Trabajadores",
@@ -171,6 +171,12 @@ export const adminModules: SidebarModule[] = [
       {
         label: "Roles / Tipos",
         href: "/admin/workers/WorkerType",
+        requiredRoles: ["Administrador"],
+      },
+      {
+        label: "Usuarios",
+        href: "/admin/users-roles",
+        requiredRoles: ["Administrador"],
       },
     ],
   },
@@ -179,32 +185,5 @@ export const adminModules: SidebarModule[] = [
     href: "/admin/reviews",
     icon: "eye",
     requiredRoles: ["Administrador"],
-  },
-  {
-    label: "Usuarios",
-    href: "/admin/users-roles",
-    icon: "users",
-  },
-  {
-    label: "Gestionar Movimientos",
-    icon: "arrow-right-left",
-    children: [
-      {
-        label: "Panel General",
-        href: "/admin/warehouse/dashboard",
-      },
-      {
-        label: "Recepciones",
-        href: "/admin/warehouse/receptions",
-      },
-      {
-        label: "Movimientos de productos",
-        href: "/admin/warehouse/transfers",
-      },
-      {
-        label: "Historial",
-        href: "/admin/warehouse/history",
-      },
-    ],
   },
 ];

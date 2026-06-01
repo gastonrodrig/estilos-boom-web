@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, Fragment } from "react";
 import { useProductStore, useStorehouseStore,useSupplyStore } from "@/hooks";
-import { Search, ChevronDown, ChevronUp, X, MoveRight, AlertCircle, ArrowRightLeft, Sparkles } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, X, MoveRight, AlertCircle, ArrowRightLeft, Sparkles, Warehouse, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -22,6 +22,8 @@ export default function StockActualPage() {
   
   // Estado del panel lateral derecho (Carrito de movimiento)
   const [cartMovement, setCartMovement] = useState<Record<string, any>>({});
+  // Dirección de la transferencia: "to-store" = Almacén→Tienda, "to-warehouse" = Tienda→Almacén
+  const [transferDirection, setTransferDirection] = useState<"to-store" | "to-warehouse">("to-store");
 
   useEffect(() => {
     const initData = async () => {
@@ -114,11 +116,15 @@ export default function StockActualPage() {
   const handleAddProductToOrder = (product: any) => {
     const targetProductId = product.id_product || product._id;
 
-    // Enriquecemos cada variante con max_available (stock disponible en Almacén Central)
-    // para que el Wizard pueda leer el límite sin volver a pedir al backend
+    // max_available depende de la dirección elegida:
+    // "to-store"     → el stock disponible es el del ALMACÉN CENTRAL
+    // "to-warehouse" → el stock disponible es el de TIENDA PRINCIPAL
     const variantsWithStock = (product.variants || []).map((v: any) => ({
       ...v,
-      max_available: stocksByVariant[v._id]?.almacen ?? 0,
+      max_available:
+        transferDirection === "to-store"
+          ? (stocksByVariant[v._id]?.almacen ?? 0)
+          : (stocksByVariant[v._id]?.tienda ?? 0),
     }));
 
     setCartMovement(prev => ({
@@ -138,8 +144,8 @@ export default function StockActualPage() {
   const cartVariantsCount = Object.values(cartMovement).reduce((acc, curr) => acc + curr.variants.length, 0);
 
   const handleGoToWizard = () => {
-    // Serializamos el carrito para procesarlo en la siguiente pantalla del Wizard
     localStorage.setItem("estilos_boom_pending_transfer", JSON.stringify(cartMovement));
+    localStorage.setItem("estilos_boom_transfer_direction", transferDirection);
     router.push("/admin/movements/transfer/");
   };
 
@@ -301,8 +307,9 @@ export default function StockActualPage() {
         </div>
       </div>
 
-      {/* 🔴 SECCIÓN DERECHA: PANEL FLOTANTE "ORDEN DE MOVIMIENTO" (Imagen 4) */}
+      {/* SECCIÓN DERECHA: PANEL FLOTANTE "ORDEN DE MOVIMIENTO" */}
       <div className="w-full lg:w-80 bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl p-5 shadow-sm flex flex-col h-[calc(100vh-50px)] sticky top-6 z-10">
+        {/* Título */}
         <div className="flex items-center gap-2 border-b border-[#EAE0E2] dark:border-white/10 pb-4 mb-4">
           <div className="w-8 h-8 rounded-full bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 flex items-center justify-center shrink-0">
             <ArrowRightLeft className="text-[#D6405F] dark:text-[#F8BBD0]" size={16} />
@@ -310,15 +317,49 @@ export default function StockActualPage() {
           <h3 className="font-bold tracking-wide text-lg text-[#40202D] dark:text-white">Orden de movimiento</h3>
         </div>
 
+        {/* Selector de dirección */}
+        <div className="mb-4 space-y-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Dirección del movimiento</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => { setTransferDirection("to-store"); setCartMovement({}); }}
+              className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border text-[11px] font-bold tracking-wide transition-all ${
+                transferDirection === "to-store"
+                  ? "bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 border-[#D6405F]/30 dark:border-[#F8BBD0]/30 text-[#D6405F] dark:text-[#F8BBD0] shadow-sm"
+                  : "bg-white/30 dark:bg-white/5 border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10"
+              }`}
+            >
+              <Store className="w-5 h-5" />
+              <span>A Tienda</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setTransferDirection("to-warehouse"); setCartMovement({}); }}
+              className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border text-[11px] font-bold tracking-wide transition-all ${
+                transferDirection === "to-warehouse"
+                  ? "bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 border-[#D6405F]/30 dark:border-[#F8BBD0]/30 text-[#D6405F] dark:text-[#F8BBD0] shadow-sm"
+                  : "bg-white/30 dark:bg-white/5 border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10"
+              }`}
+            >
+              <Warehouse className="w-5 h-5" />
+              <span>A Almacén</span>
+            </button>
+          </div>
+          <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium leading-tight">
+            {transferDirection === "to-store"
+              ? "Almacén Central → Tienda Principal"
+              : "Tienda Principal → Almacén Central"}
+          </p>
+        </div>
+
         {/* Lista de productos seleccionados */}
         <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar">
           {Object.values(cartMovement).map((item: any, idx: number) => {
-            // ✅ LLAVE DE RESPALDO: Si id_product fallara por algún motivo, el índice salva la UI
             const cartItemKey = item.id_product ? `cart-item-${item.id_product}` : `cart-idx-${idx}`;
-
             return (
-              <div 
-                key={cartItemKey} // 🚀 Llave única y garantizada para React
+              <div
+                key={cartItemKey}
                 className="flex items-center justify-between p-3 hover:bg-white/50 dark:hover:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 relative group animate-in fade-in zoom-in-95 duration-150 transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -328,7 +369,7 @@ export default function StockActualPage() {
                     <p className="text-[10px] opacity-60 text-[#8C6B79] dark:text-gray-400 font-bold uppercase tracking-wider">{item.variants?.length} variantes</p>
                   </div>
                 </div>
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     const copy = { ...cartMovement };
@@ -342,7 +383,7 @@ export default function StockActualPage() {
               </div>
             );
           })}
-          
+
           {cartItemsCount === 0 && (
             <div className="text-center py-12 flex flex-col items-center justify-center opacity-40">
               <MoveRight className="w-8 h-8 mb-2 text-[#8C6B79] dark:text-gray-400" />
@@ -357,12 +398,13 @@ export default function StockActualPage() {
             <span>Resumen total:</span>
             <span className="text-[#D6405F] dark:text-[#F8BBD0]">{cartItemsCount} prod. • {cartVariantsCount} vars</span>
           </div>
-          <button 
+          <button
             disabled={cartItemsCount === 0}
             onClick={handleGoToWizard}
             className="w-full py-3.5 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#F2778D] dark:hover:bg-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-bold rounded-xl transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(242,119,141,0.2)] disabled:opacity-30 disabled:pointer-events-none disabled:hover:translate-y-0"
           >
-            Crear orden <ArrowRightLeft className="w-4 h-4" />
+            {transferDirection === "to-store" ? "Transferir a Tienda" : "Transferir a Almacén"}
+            <ArrowRightLeft className="w-4 h-4" />
           </button>
           {cartItemsCount > 0 && (
             <button onClick={() => setCartMovement({})} className="text-center w-full text-[11px] font-bold text-red-500 dark:text-red-400 hover:underline uppercase tracking-wider">

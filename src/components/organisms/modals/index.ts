@@ -11,3 +11,4 @@ export * from "./register-costs-modal/register-costs-modal";
 export * from "./technical-sheet-modal/technical-sheet-modal";
 export * from "./production-substate-modal/production-substate-modal";
 export * from "./update-phase-modal/update-phase-modal";
+export * from "./worker-modal";

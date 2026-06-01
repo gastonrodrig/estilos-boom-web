@@ -18,6 +18,8 @@ export default function CreateTransferWizard() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [warehouses, setWarehouses] = useState<any[]>([]);
+  // Dirección leída del localStorage (guardada por el Stock page)
+  const [direction, setDirection] = useState<"to-store" | "to-warehouse">("to-store");
 
   // Cargar almacenes al montar para obtener sus IDs reales
   useEffect(() => {
@@ -36,6 +38,9 @@ export default function CreateTransferWizard() {
       return;
     }
     setItemsToProcess(Object.values(JSON.parse(raw)));
+    // Leer dirección guardada por el Stock page
+    const dir = localStorage.getItem("estilos_boom_transfer_direction");
+    if (dir === "to-warehouse") setDirection("to-warehouse");
   }, [router]);
 
   if (itemsToProcess.length === 0) return null;
@@ -67,17 +72,21 @@ export default function CreateTransferWizard() {
     }
 
     // Buscar IDs reales de almacenes desde los datos cargados
-    const sourceWarehouse = warehouses.find((w) => w.code === ALMACEN_CENTRAL_CODE);
-    const targetWarehouse = warehouses.find((w) => w.code === TIENDA_PRINCIPAL_CODE);
+    const almacenCentral = warehouses.find((w) => w.code === ALMACEN_CENTRAL_CODE);
+    const tiendaPrincipal = warehouses.find((w) => w.code === TIENDA_PRINCIPAL_CODE);
 
-    if (!sourceWarehouse || !targetWarehouse) {
+    if (!almacenCentral || !tiendaPrincipal) {
       toast.error(
         "No se encontraron los almacenes. Verifica que estén sembrados en /inventory/warehouses/seed."
       );
       return;
     }
 
-    // ID del trabajador — en producción leer del estado de auth
+    // Dirección: quién es origen y quién es destino
+    const sourceWarehouse = direction === "to-store" ? almacenCentral : tiendaPrincipal;
+    const targetWarehouse = direction === "to-store" ? tiendaPrincipal : almacenCentral;
+    const dirLabel = direction === "to-store" ? "Almacén Central → Tienda Principal" : "Tienda Principal → Almacén Central";
+
     const senderId =
       (typeof window !== "undefined"
         ? localStorage.getItem("worker_id") ?? ""
@@ -91,12 +100,13 @@ export default function CreateTransferWizard() {
       id_source_warehouse: sourceWarehouse._id,
       id_target_warehouse: targetWarehouse._id,
       id_sender_worker: senderId,
-      notes: "Transferencia de almacén central a tienda generada desde el SGI.",
+      notes: `Transferencia ${dirLabel} generada desde el SGI.`,
       items: transferItems,
     });
 
     if (created) {
       localStorage.removeItem("estilos_boom_pending_transfer");
+      localStorage.removeItem("estilos_boom_transfer_direction");
       router.push("/admin/movements");
     }
   };
@@ -118,7 +128,7 @@ export default function CreateTransferWizard() {
           </p>
         </div>
         <span className="px-4 py-2 bg-rose-50 text-[#F2778D] font-black text-xs rounded-full uppercase tracking-wider">
-          Transferencia a tienda
+          {direction === "to-store" ? "Almacén → Tienda" : "Tienda → Almacén"}
         </span>
       </div>
 

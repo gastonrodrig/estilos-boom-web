@@ -9,3 +9,4 @@ export * from "./workshop";
 export * from "./supplie";
 export * from "./production";
 export * from "./payment";
+export * from "./worker";
