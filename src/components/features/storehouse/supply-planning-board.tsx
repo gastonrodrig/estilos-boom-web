@@ -119,15 +119,15 @@ export const SupplyPlanningBoard = () => {
     // Todos los productos se muestran en el board de alertas.
     // El stock real viene de WarehouseStock (cargado al expandir cada producto).
     // Los filtros critical/low se evalúan con el stock disponible en warehouseStock;
-    // si no se cargó aún se usa 0 (lo que los marca como críticos hasta que se cargue).
+    // si no se cargó aún se usa un valor alto por defecto para evitar marcar falsamente como crítico/bajo.
     return products.map((product) => {
       const variants = product.variants ?? [];
       const critical = variants.filter((v) => {
-        const s = warehouseStock[v.id_variant] ?? 0;
+        const s = warehouseStock[v.id_variant] !== undefined ? warehouseStock[v.id_variant] : 9999;
         return s <= 0;
       }).length;
       const low = variants.filter((v) => {
-        const s = warehouseStock[v.id_variant] ?? 0;
+        const s = warehouseStock[v.id_variant] !== undefined ? warehouseStock[v.id_variant] : 9999;
         const min = Number(v.min_stock_alert ?? 10);
         return s > 0 && s < min;
       }).length;
@@ -155,6 +155,7 @@ export const SupplyPlanningBoard = () => {
   const lowCount = alertProducts.filter((p) => p.critical === 0 && p.low > 0).length;
   const isLoading = productsLoading || ordersLoading;
   const isLoadingAllStock = loadingStock && Object.keys(warehouseStock).length === 0;
+  const isStockLoaded = Object.keys(warehouseStock).length > 0;
 
   const toggleVariant = (next: SupplySelection) => {
     let changedProduct = false;
@@ -224,7 +225,7 @@ export const SupplyPlanningBoard = () => {
       {/* ── Stat cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
-          <p className="text-5xl font-black text-[#D6405F] dark:text-[#F8BBD0]">{criticalCount}</p>
+          <p className="text-5xl font-black text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? criticalCount : "…"}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Alertas Críticas</p>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
             <AlertTriangle className="h-6 w-6 text-[#D6405F] dark:text-[#F8BBD0]" />
@@ -232,7 +233,7 @@ export const SupplyPlanningBoard = () => {
         </div>
 
         <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
-          <p className="text-5xl font-black text-[#40202D] dark:text-white">{lowCount}</p>
+          <p className="text-5xl font-black text-[#40202D] dark:text-white">{isStockLoaded ? lowCount : "…"}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Stock Bajo</p>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
             <TrendingDown className="h-6 w-6 text-[#8C6B79] dark:text-gray-400" />
@@ -261,20 +262,20 @@ export const SupplyPlanningBoard = () => {
             Productos que Requieren Atención
           </h2>
 
-          {filtered.map(({ product, variants, critical }) => {
+          {filtered.map(({ product, variants, critical, low }) => {
             const isOpen = expanded === product.id_product;
             const isProductInTransit = variants.some(
               (v) => (pendingTransitByVariant[v.id_variant] || 0) > 0
             );
             // Stock real del almacén para las variantes de este producto
             const stockTotal = variants.reduce(
-              (acc, v) => acc + (warehouseStock[v.id_variant] ?? 0), 0
+              (acc, v) => acc + (warehouseStock[v.id_variant] !== undefined ? warehouseStock[v.id_variant] : 0), 0
             );
             const minTotal = variants.reduce(
               (acc, v) => acc + Number(v.min_stock_alert ?? 10), 0
             );
             const deficit = variants.reduce((acc, v) => {
-              const s = warehouseStock[v.id_variant] ?? 0;
+              const s = warehouseStock[v.id_variant] !== undefined ? warehouseStock[v.id_variant] : 9999;
               const min = Number(v.min_stock_alert ?? 10);
               return acc + Math.max(0, min - s);
             }, 0);
@@ -333,17 +334,19 @@ export const SupplyPlanningBoard = () => {
                         <span className="rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 uppercase px-3 py-1 text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 shadow-sm">
                           {product.category?.name ?? product.gender}
                         </span>
-                        <span
-                          className={`rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
-                            critical > 0 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
-                          }`}
-                        >
-                          {critical > 0 ? "Crítico" : "Bajo"}
-                        </span>
+                        {isStockLoaded && (critical > 0 || low > 0) && (
+                          <span
+                            className={`rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
+                              critical > 0 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
+                            }`}
+                          >
+                            {critical > 0 ? "Crítico" : "Bajo"}
+                          </span>
+                        )}
                       </div>
 
                       <p className="mt-1 text-[13px] font-medium text-[#8C6B79] dark:text-gray-400">
-                        Stock: <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{stockTotal} uds</span>
+                        Stock: <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? `${stockTotal} uds` : "…"}</span>
                         <span className="mx-3 opacity-30">|</span>
                         Mínimo: <span className="font-black text-[#40202D] dark:text-white">{minTotal} uds</span>
                       </p>
@@ -351,7 +354,7 @@ export const SupplyPlanningBoard = () => {
                   </div>
 
                   <div className="flex items-center gap-6">
-                    {deficit > 0 && (
+                    {isStockLoaded && deficit > 0 && (
                       <div className="hidden md:block rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-4 py-2 shadow-inner">
                         <div className="flex items-center gap-1.5">
                           <Lightbulb className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
@@ -398,7 +401,7 @@ export const SupplyPlanningBoard = () => {
                           {variants.map((variant) => {
                             // Usar stock real de WarehouseStock; mostrar "…" mientras carga
                             const stockLoaded = warehouseStock[variant.id_variant] !== undefined;
-                            const stock = stockLoaded ? warehouseStock[variant.id_variant] : 0;
+                            const stock = stockLoaded ? warehouseStock[variant.id_variant] : (variant.stock ?? 0);
                             const key = `${product.id_product}-${variant.id_variant}`;
                             
                             // ✅ VINCULACIÓN DIRECTA:

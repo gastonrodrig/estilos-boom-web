@@ -11,7 +11,7 @@ export const storekeeperModules: StorekeeperModule[] = [
   {
     label: "Panel General",
     icon: "dashboard",
-    href: "storekeeper/warehouse/dashboard",
+    href: "/storekeeper/warehouse/dashboard",
     requiredRoles: ["Almacenero"],
   },
   {

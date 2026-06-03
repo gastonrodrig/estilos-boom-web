@@ -10,6 +10,7 @@ import { Payment, initMercadoPago } from '@mercadopago/sdk-react';
 import { mercadopagoApi } from '@/api/mercadopago/mercadopago.api';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { X } from 'lucide-react';
 
 const MP_PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 
@@ -33,6 +34,7 @@ const CheckoutPaymentForm: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'yape' | 'plin'>('yape');
   const [isGuideOpen, setIsGuideOpen] = useState(true);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const {
     register,
@@ -330,8 +332,18 @@ const CheckoutPaymentForm: React.FC = () => {
                             <li className="flex gap-2"><span className="w-5 h-5 rounded-full bg-[#F2B6C1] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">2</span> Ingresa el monto exacto S/ {totalAmount.toFixed(2)}</li>
                             <li className="flex gap-2"><span className="w-5 h-5 rounded-full bg-[#F2B6C1] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">3</span> Copia tu número de operación y pégalo en el campo de arriba</li>
                           </ol>
-                          <div className="bg-white p-2 rounded text-xs text-yellow-600 flex items-start gap-2 border border-yellow-100 mt-2">
-                            <span>💡</span> Tip: El número de operación aparece debajo del monto en la pantalla de confirmación de {activeTab === 'yape' ? 'Yape' : 'Plin'}.
+                          <div className="bg-white p-2 rounded text-xs text-yellow-600 flex flex-col gap-2 border border-yellow-100 mt-2">
+                            <div className="flex items-start gap-2">
+                              <span>💡</span>
+                              <span>Tip: El número de operación aparece debajo del monto en la pantalla de confirmación de {activeTab === 'yape' ? 'Yape' : 'Plin'}.</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setIsImageModalOpen(true)}
+                              className="text-[#F2778D] font-semibold hover:underline self-start text-xs ml-6"
+                            >
+                              Ver guía visual (captura de pantalla)
+                            </button>
                           </div>
                         </div>
                       )}
