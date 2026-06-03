@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@models";
 import { useAppSelector } from "@store";
+import { Eye, X } from "lucide-react";
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -22,6 +25,7 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
   const router = useRouter();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const isAuthenticated = Boolean(authUid) || authStatus === "authenticated";
 
@@ -43,24 +47,36 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
     <aside className="sticky top-28 bg-[#FCF5F5] border border-[#E5B3B8] rounded-sm p-6 text-[#594246] shadow-sm">
       <h3 className="text-[16px] font-medium text-[#632034] mb-6">Resumen del pedido</h3>
 
-      <div className="mt-4 pb-4 border-b border-[#E5B3B8]">
-        <p className="text-[12px] font-medium text-[#C5A059]">Boom Rewards</p>
-        <p className="mt-1 text-[13px] text-[#594246]/80">
-          Podrías ganar <span className="font-bold text-[#C5A059]">242 puntos</span> en esta compra.
-        </p>
-      </div>
+
 
       {!showButton && items.length > 0 && (
         <div className="mt-5 space-y-3">
           <p className="text-[13px] font-semibold text-[#594246] border-b border-[#F2B6C1] pb-2">Productos ({items.length})</p>
-          <ul className="space-y-3 max-h-48 overflow-y-auto pr-2">
+          <ul className="space-y-4 max-h-60 overflow-y-auto pr-2">
             {items.map((item) => (
-              <li key={`${item.productId}-${item.color}-${item.size}`} className="flex justify-between items-start text-[12px] text-[#594246]">
-                <div className="flex flex-col">
-                  <span className="font-medium line-clamp-1">{item.name}</span>
-                  <span className="text-[#827D7D] text-[11px]">Cant: {item.quantity} | Talla: {item.size}</span>
+              <li key={`${item.productId}-${item.color}-${item.size}`} className="flex gap-3 items-center text-[#594246]">
+                <div 
+                  className="w-16 h-20 flex-shrink-0 relative group cursor-pointer"
+                  onClick={() => setPreviewImage(item.image)}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                  <div className="absolute inset-0 bg-black/40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-                <span className="font-semibold whitespace-nowrap ml-2">{currency(item.price * item.quantity)}</span>
+                <div className="flex flex-col flex-1">
+                  <span className="text-[15px] font-serif text-[#632034]">{item.name}</span>
+                  <span className="text-[#3C739A] text-[12px] mt-1">Color : {item.color}</span>
+                  <span className="text-[#3C739A] text-[12px]">Talla : {item.size}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold whitespace-nowrap text-[13px]">{currency(item.price * item.quantity)}</span>
+                  <span className="text-[#827D7D] text-[11px] mt-1">Cant: {item.quantity}</span>
+                </div>
               </li>
             ))}
           </ul>
@@ -108,6 +124,29 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
             Pago 100% seguro y protegido
           </p>
         </>
+      )}
+
+      {previewImage && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] overflow-y-auto bg-black/90 backdrop-blur-sm p-4 sm:p-8 animate-in fade-in duration-200 flex items-center justify-center"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative w-full max-w-2xl flex flex-col items-center">
+            <button 
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-12 right-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors z-[10000]"
+            >
+              <X size={24} />
+            </button>
+            <img 
+              src={previewImage} 
+              alt="Vista previa" 
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>,
+        document.body
       )}
     </aside>
   );

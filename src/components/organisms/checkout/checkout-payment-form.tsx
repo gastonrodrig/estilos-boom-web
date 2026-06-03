@@ -40,7 +40,7 @@ const CheckoutPaymentForm: React.FC = () => {
     register,
     watch,
     control,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     trigger,
   } = useFormContext<CheckoutFormValues>();
 
@@ -125,6 +125,19 @@ const CheckoutPaymentForm: React.FC = () => {
     fetchPreference();
   }, [items, selectedDeliveryMethod]);
 
+  // Auto-scroll to the selected payment method
+  useEffect(() => {
+    if (paymentMethod) {
+      setTimeout(() => {
+        const el = document.getElementById(`payment-block-${paymentMethod}`);
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.scrollY - 120; // 120px offset for navbar/header
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 150);
+    }
+  }, [paymentMethod]);
+
   const handleNext = async () => {
     const fieldsToValidate: any[] = ['paymentMethod'];
     if (!billingSameAsShipping) {
@@ -174,19 +187,19 @@ const CheckoutPaymentForm: React.FC = () => {
     });
   };
 
-  const initialization = {
+  const initialization = React.useMemo(() => ({
     amount: totalAmount,
     preferenceId: preferenceId || undefined,
-  };
+  }), [totalAmount, preferenceId]);
 
-  const customization = {
+  const customization = React.useMemo(() => ({
     paymentMethods: {
       mercadoPago: 'all',
       creditCard: 'all',
       debitCard: 'all',
       ticket: 'all',
     }
-  };
+  }), []);
 
   return (
     <div className="border-[#594246]/30 rounded-sm p-8 space-y-8 border border-[#EBEAE8] shadow-sm">
@@ -197,7 +210,7 @@ const CheckoutPaymentForm: React.FC = () => {
       {/* 💳 SELECCIÓN DE MÉTODO */}
       <div className="grid grid-cols-1 gap-3">
         {PAYMENT_METHODS.map((method) => (
-          <div key={method.id}>
+          <div key={method.id} id={`payment-block-${method.id}`}>
             <label
               className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
                 paymentMethod === method.id 
@@ -242,6 +255,7 @@ const CheckoutPaymentForm: React.FC = () => {
                       </div>
                     ) : preferenceId ? (
                       <Payment
+                        key={preferenceId}
                         initialization={initialization}
                         customization={customization as any}
                         onSubmit={onSubmitPayment}
@@ -256,134 +270,171 @@ const CheckoutPaymentForm: React.FC = () => {
 
                 {/* 📱 YAPE / PLIN */}
                 {method.id === 'qr' && (
-                  <div className="p-6 rounded-lg bg-white border border-[#EBEAE8] space-y-6">
-                    {/* TABS YAPE/PLIN */}
-                    <div className="flex bg-gray-100 rounded-full p-1">
-                      <button 
+                  <div className="space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 rounded-lg p-6 bg-[#FAF9F6]">
+                    
+                    {/* Tabs Yape / Plin */}
+                    <div className="flex rounded-full border border-gray-200 p-1 bg-white">
+                      <button
                         type="button"
                         onClick={() => setActiveTab('yape')}
                         className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                          activeTab === 'yape' ? 'bg-[#742284] text-white' : 'text-gray-500 hover:text-gray-700'
+                          activeTab === 'yape' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
                         }`}
+                        style={activeTab === 'yape' ? { backgroundColor: '#742365', color: 'white' } : {}}
                       >
                         Yape
                       </button>
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setActiveTab('plin')}
                         className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                          activeTab === 'plin' ? 'bg-[#FF1C44] text-white' : 'text-gray-500 hover:text-gray-700'
+                          activeTab === 'plin' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
                         }`}
+                        style={activeTab === 'plin' ? { backgroundColor: '#00E4A4', color: 'white' } : {}}
                       >
                         Plin
                       </button>
                     </div>
 
-                    {/* QR INFO YAPE */}
-                    <div className="flex gap-6 items-start">
-                      <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200">
-                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-400 text-xs px-2 text-center">QR de<br/>{activeTab === 'yape' ? 'Yape' : 'Plin'}</span>
-                         </div>
+                    <div className="flex flex-col md:flex-row gap-6 items-center md:items-start bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                      {/* QR Code */}
+                      <div className="bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
+                        <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-lg">
+                          <span className="text-gray-400 text-xs text-center px-2">[QR {activeTab === 'yape' ? 'Yape' : 'Plin'}]</span>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-sm text-gray-500">O {activeTab === 'yape' ? 'yapea' : 'plinea'} a este número</p>
-                        <p className="text-2xl font-bold text-gray-800 tracking-wider">999 888 777</p>
-                        <p className="text-sm text-gray-500">A nombre de: Estilos Boom</p>
+
+                      {/* Info */}
+                      <div className="text-left flex-1 space-y-1 w-full">
+                        <p className="text-xs text-[#827D7D]">O {activeTab === 'yape' ? 'yapea' : 'plinea'} a este número</p>
+                        <p className="text-2xl font-bold tracking-widest text-[#594246]">999 888 777</p>
+                        <p className="text-xs font-medium text-[#827D7D]">A nombre de: Estilos Boom</p>
                         <p className="text-xl font-bold text-[#594246] mt-2">S/ {totalAmount.toFixed(2)}</p>
                       </div>
                     </div>
 
-                    {/* INPUT NÚMERO DE OPERACIÓN */}
-                    <div>
-                      <label className="block text-xs font-bold text-[#594246] mb-2 uppercase">Número de operación</label>
-                      <input 
-                        type="text" 
-                        {...register('operationNumber')}
+                    {/* Número de operación */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                      <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
+                      <input
+                        type="text"
+                        {...register('operationNumber', { required: 'Ingresa el número de operación' })}
                         placeholder="Ej: 20250523001234"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#F2B6C1]"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
                       />
-                      <p className="text-[11px] text-gray-400 mt-2">
+                      <p className="text-[11px] text-[#827D7D] mt-2">
                         Encuéntralo en la pantalla de confirmación de tu app {activeTab === 'yape' ? 'Yape' : 'Plin'}.
                       </p>
-                    </div>
-
-                    {/* ACORDEÓN GUÍA */}
-                    <div className="bg-[#FFF0F2] rounded-lg overflow-hidden border border-[#FAD9DE]">
-                      <button 
-                        type="button"
-                        onClick={() => setIsGuideOpen(!isGuideOpen)}
-                        className="w-full px-4 py-3 flex justify-between items-center text-sm font-semibold text-[#594246]"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>✨</span> Guía para {activeTab === 'yape' ? 'Yapear' : 'Plinear'} correctamente
-                        </div>
-                        <span className={`transform transition-transform ${isGuideOpen ? 'rotate-180' : ''}`}>
-                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1.5L6 6.5L11 1.5" stroke="#F2778D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </span>
-                      </button>
-                      
-                      {isGuideOpen && (
-                        <div className="px-4 pb-4 space-y-3">
-                          <ol className="text-sm text-[#594246] space-y-2 ml-2">
-                            <li className="flex gap-2"><span className="w-5 h-5 rounded-full bg-[#F2B6C1] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">1</span> Abre {activeTab === 'yape' ? 'Yape' : 'Plin'} y busca el número 999 888 777</li>
-                            <li className="flex gap-2"><span className="w-5 h-5 rounded-full bg-[#F2B6C1] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">2</span> Ingresa el monto exacto S/ {totalAmount.toFixed(2)}</li>
-                            <li className="flex gap-2"><span className="w-5 h-5 rounded-full bg-[#F2B6C1] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">3</span> Copia tu número de operación y pégalo en el campo de arriba</li>
-                          </ol>
-                          <div className="bg-white p-2 rounded text-xs text-yellow-600 flex flex-col gap-2 border border-yellow-100 mt-2">
-                            <div className="flex items-start gap-2">
-                              <span>💡</span>
-                              <span>Tip: El número de operación aparece debajo del monto en la pantalla de confirmación de {activeTab === 'yape' ? 'Yape' : 'Plin'}.</span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setIsImageModalOpen(true)}
-                              className="text-[#F2778D] font-semibold hover:underline self-start text-xs ml-6"
-                            >
-                              Ver guía visual (captura de pantalla)
-                            </button>
-                          </div>
-                        </div>
+                      {errors.operationNumber && (
+                        <p className="text-xs text-red-500 mt-1">{errors.operationNumber?.message as string}</p>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                      ¿Necesitas ayuda? Llámanos al 999 888 777
+                    {/* Guía con Imagen */}
+                    <div className="rounded-xl border border-[#F2D0D3]/50 overflow-hidden bg-[#FAF9F6] shadow-sm">
+                      <div className="bg-[#F2D0D3]/20 px-5 py-3 border-b border-[#F2D0D3]/50">
+                        <h3 className="text-sm font-bold text-[#594246] flex items-center gap-2">
+                          ✨ Guía para {activeTab === 'yape' ? 'Yapear' : 'Plinear'} correctamente
+                        </h3>
+                      </div>
+                      <div className="p-4 bg-white">
+                        <div 
+                          className="relative w-full h-[250px] overflow-hidden rounded-lg border border-gray-100 cursor-pointer group shadow-sm bg-gray-50"
+                          onClick={() => setIsImageModalOpen(true)}
+                        >
+                          <Image 
+                            src="/assets/GuiaYapearV2.png" 
+                            alt="Guía paso a paso" 
+                            width={600} 
+                            height={1200} 
+                            className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          
+                          {/* Degradado blanco en la parte inferior para dar a entender que sigue */}
+                          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                          
+                          <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                            <span className="bg-white text-[#594246] px-5 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                              Ampliar guía completa
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ayuda Telefónica */}
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                      <div className="w-8 h-8 rounded-full bg-[#F2D0D3]/30 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#594246" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#827D7D]">¿Necesitas ayuda o prefieres asistencia por teléfono?</p>
+                        <p className="text-sm font-bold text-[#594246]">Llámanos al 999 888 777</p>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* 🏦 TRANSFERENCIA */}
                 {method.id === 'transfer' && (
-                  <div className="p-6 rounded-lg bg-white border border-[#EBEAE8] space-y-4">
-                    <h3 className="text-sm font-bold text-[#594246] uppercase">Cuentas Bancarias</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm border-b border-gray-100 pb-2">
-                        <span className="text-[#827D7D]">BCP (Soles):</span>
-                        <span className="font-mono font-bold text-[#594246]">193-XXXXXX-X-XX</span>
+                  <div className="space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 rounded-lg p-6 bg-[#FAF9F6]">
+                    {/* Guía/Tips para transferencias */}
+                    <div className="rounded-xl border border-[#F2D0D3]/50 overflow-hidden bg-white shadow-sm">
+                      <div className="bg-[#F2D0D3]/20 px-5 py-3 border-b border-[#F2D0D3]/50">
+                        <h3 className="text-sm font-bold text-[#594246] flex items-center gap-2">
+                          💡 Recomendaciones importantes
+                        </h3>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-[#827D7D]">CCI:</span>
-                        <span className="font-mono font-bold text-[#594246]">002-193XXXXXXXXX-XX</span>
+                      <div className="p-5 space-y-3">
+                        <p className="text-xs text-[#594246] flex items-start gap-2">
+                          <span className="text-[#F2778D] font-bold">1.</span> Si transfieres desde otro banco (Interbancario), el pago puede demorar hasta 24h hábiles en reflejarse.
+                        </p>
+                        <p className="text-xs text-[#594246] flex items-start gap-2">
+                          <span className="text-[#F2778D] font-bold">2.</span> Es obligatorio ingresar el Número de Operación abajo para poder rastrear tu pago rápidamente.
+                        </p>
+                        <p className="text-xs text-[#594246] flex items-start gap-2">
+                          <span className="text-[#F2778D] font-bold">3.</span> Envíanos la captura o foto del voucher por WhatsApp para agilizar la validación.
+                        </p>
                       </div>
                     </div>
-                    <p className="text-[11px] text-[#F2778D] italic">* El pedido se procesará una vez confirmada la transferencia.</p>
-                    
-                    {/* INPUT NÚMERO DE OPERACIÓN */}
-                    <div className="pt-2 border-t border-gray-100">
-                      <label className="block text-xs font-bold text-[#594246] mb-2 uppercase">Número de operación</label>
-                      <input 
-                        type="text" 
-                        {...register('operationNumber', { required: 'Ingresa el número de operación para validar tu transferencia' })}
-                        placeholder="Ej: 00123456"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#F2B6C1]"
+
+                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
+                      <h3 className="text-sm font-bold text-[#594246] uppercase mb-4">Cuentas Bancarias Disponibles</h3>
+                      <div className="space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between text-sm border-b border-gray-100 pb-3 gap-1">
+                          <span className="text-[#827D7D] flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-[#002A8D]"></div>
+                            BCP (Soles):
+                          </span>
+                          <span className="font-mono font-bold text-[#594246] tracking-wide">193-XXXXXX-X-XX</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:justify-between text-sm pb-1 gap-1">
+                          <span className="text-[#827D7D] flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-[#E5E7EB]"></div>
+                            CCI (Interbancario):
+                          </span>
+                          <span className="font-mono font-bold text-[#594246] tracking-wide">002-193XXXXXXXXX-XX</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Número de operación */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                      <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
+                      <input
+                        type="text"
+                        {...register('operationNumber', { required: 'Ingresa el número de operación del voucher' })}
+                        placeholder="Ej: 0123456"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
                       />
-                      <p className="text-[11px] text-gray-400 mt-2">
-                        Ingresa el código de confirmación o número de operación de tu voucher.
+                      <p className="text-[11px] text-[#827D7D] mt-2">
+                        Lo encuentras en el voucher físico o captura de pantalla de tu transferencia.
                       </p>
+                      {errors.operationNumber && (
+                        <p className="text-xs text-red-500 mt-1">{errors.operationNumber?.message as string}</p>
+                      )}
                     </div>
                   </div>
                 )}
