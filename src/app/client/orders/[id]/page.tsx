@@ -1,37 +1,116 @@
 'use client';
 
-import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Package, Shirt, Truck, Check, Clock, AlertCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Package, Shirt, Truck, Check, Clock, AlertCircle, XCircle, FileWarning } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { OrderInvoiceModal } from '@/components/features/admin/orders/order-invoice-modal';
+import { ordersApi } from '@/api/orders/orders-api';
+import { manualPaymentApi } from '@/api/payment/payment-api';
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
 
 export default function OrderDetailsPage() {
   const params = useParams();
   const orderId = params.id as string; // Usually '0042' etc
 
-  // Simulated data based on orderId
-  const isPending = orderId === '0042';
-  const isObserved = orderId === '0043';
-  const currentStep = orderId === '0041' ? 3 : 1; // Assuming 0041 is at step 3, 0042 at step 1
-  const isEnCaminoOrDelivered = currentStep >= 4;
-
+  const [orderData, setOrderData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [newOperationNumber, setNewOperationNumber] = useState('');
   const [hasSubmittedCorrection, setHasSubmittedCorrection] = useState(false);
 
-  const dummyOrderData: any = {
-    id: `#ORD-${orderId}`,
-    date: "15 May 2026, 14:30",
-    client: "Ana de Armas",
-    amount: 189.90,
-    status: isPending ? "Verificación de Pago" : isObserved ? "Observado" : "Finalizado",
-    deliveryMethod: "motorized"
+  useEffect(() => {
+    const fetchOrder = async () => {
+      // FALLBACK PARA MOCKS: Si es 0041 o 0042, mostrar data mockeada directamente sin llamar a la API
+      if (orderId === '0041' || orderId === '0042') {
+        setOrderData({
+          orderNumber: orderId,
+          createdAt: new Date().toISOString(),
+          clientName: "Cliente de Prueba",
+          amount: orderId === '0041' ? 95.00 : 189.90,
+          status: orderId === '0041' ? "CONFIRMED" : "PRE_ORDER",
+          paymentMethod: "Yape",
+          deliveryMethod: "DELIVERY",
+          items: [
+            { productId: "1", name: "Producto de Prueba", size: "M", color: "Azul", quantity: 1, price: orderId === '0041' ? 95.00 : 189.90, image: "https://placehold.co/100x100?text=Mock" }
+          ]
+        });
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await ordersApi.get(`/client/${orderId}`, getAuthConfig({ token }));
+        setOrderData(data);
+      } catch (err) {
+        console.error("Error fetching order details:", err);
+        setError('No se pudo cargar el pedido. Por favor intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrder();
+  }, [orderId]);
+
+  // Derived state from real order data
+  const isPending = orderData?.status === 'PRE_ORDER';
+  const isConfirmed = orderData?.status === 'CONFIRMED';
+  const isObserved = orderData?.status === 'OBSERVED';
+  const currentStep = isConfirmed ? 2 : 1; 
+  const isEnCaminoOrDelivered = currentStep >= 4;
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubsanar = async () => {
+    if (!newOperationNumber.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const token = await getFirebaseAuthToken();
+      await manualPaymentApi.patch(`/resubmit-by-order/${orderId}`, {
+        newOperationNumber
+      }, getAuthConfig({ token }));
+      
+      setHasSubmittedCorrection(true);
+      // Opcional: Recargar la data de la orden para que vuelva a mostrar "En validación"
+      // window.location.reload(); 
+    } catch (err) {
+      console.error("Error resubmitting operation number:", err);
+      setError("No se pudo enviar el nuevo número de operación. Intenta de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSubsanar = () => {
-    if (!newOperationNumber.trim()) return;
-    setHasSubmittedCorrection(true);
+  if (loading) {
+    return <div className="p-8 text-center text-[#594246]/50">Cargando detalles del pedido...</div>;
+  }
+
+  if (error || !orderData) {
+    return (
+      <div className="p-8 text-center text-red-500">
+        <FileWarning className="w-12 h-12 mx-auto mb-4 opacity-50" />
+        {error || 'Pedido no encontrado'}
+        <Link href="/client/orders/active" className="block mt-4 text-[#F2778D] font-bold underline">
+          Volver a mis pedidos
+        </Link>
+      </div>
+    );
+  }
+
+  const dateStr = new Date(orderData.createdAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  
+  const dummyOrderData: any = {
+    id: `#${orderData.orderNumber}`,
+    date: dateStr,
+    client: orderData.clientName || "Cliente",
+    amount: orderData.amount,
+    status: isPending ? "Verificación de Pago" : isObserved ? "Observado" : "Finalizado",
+    deliveryMethod: orderData.deliveryMethod,
+    items: orderData.items || []
   };
 
   return (
@@ -54,9 +133,9 @@ export default function OrderDetailsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
         <div>
           <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">
-            Detalle del Pedido #{orderId}
+            Detalle del Pedido {orderData.orderNumber}
           </h1>
-          <p className="text-[#594246]/50 text-sm mt-1 font-medium">Realizado el 15 de mayo, 2026</p>
+          <p className="text-[#594246]/50 text-sm mt-1 font-medium">Realizado el {dateStr}</p>
         </div>
 
         {isPending || hasSubmittedCorrection ? (
@@ -90,38 +169,34 @@ export default function OrderDetailsPage() {
             </h2>
 
             <div className="space-y-6">
-              {/* Product Item 1 */}
-              <div className="flex gap-4 items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 border border-[#EBEAE8] flex items-center justify-center shrink-0">
-                  <Shirt className="w-8 h-8 text-[#F2778D]/40" />
+              {orderData.items && orderData.items.map((item: any, i: number) => (
+                <div key={i}>
+                  <div className="flex gap-4 items-center">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 border border-[#EBEAE8] flex items-center justify-center shrink-0 overflow-hidden">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Shirt className="w-8 h-8 text-[#F2778D]/40" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-[#594246] font-bold text-lg">{item.name}</h3>
+                      <p className="text-[#594246]/60 text-sm">
+                        {item.size ? `Talla: ${item.size}` : ''} {item.color ? `| Color: ${item.color}` : ''}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#594246] font-bold">S/ {item.price.toFixed(2)}</p>
+                      <p className="text-[#594246]/50 text-sm">Cant: {item.quantity}</p>
+                    </div>
+                  </div>
+                  {i < orderData.items.length - 1 && <div className="w-full h-px bg-[#EBEAE8] mt-6"></div>}
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-[#594246] font-bold text-lg">Blusa Lara</h3>
-                  <p className="text-[#594246]/60 text-sm">Talla: M | Color: Blanco</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[#594246] font-bold">S/ 89.90</p>
-                  <p className="text-[#594246]/50 text-sm">Cant: 1</p>
-                </div>
-              </div>
-
-              {/* Separator */}
-              <div className="w-full h-px bg-[#EBEAE8]"></div>
-
-              {/* Product Item 2 */}
-              <div className="flex gap-4 items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 border border-[#EBEAE8] flex items-center justify-center shrink-0">
-                  <Shirt className="w-8 h-8 text-[#F2778D]/40" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-[#594246] font-bold text-lg">Vestido Floral</h3>
-                  <p className="text-[#594246]/60 text-sm">Talla: S | Color: Rosado</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[#594246] font-bold">S/ 50.00</p>
-                  <p className="text-[#594246]/50 text-sm">Cant: 2</p>
-                </div>
-              </div>
+              ))}
+              
+              {!orderData.items?.length && (
+                 <p className="text-[#594246]/50 text-sm italic">Los productos de este pedido se encuentran en preparación.</p>
+              )}
             </div>
           </div>
 
@@ -134,10 +209,9 @@ export default function OrderDetailsPage() {
               <h3 className="text-sm font-bold text-[#594246]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
                 <MapPin className="w-4 h-4" /> Dirección de envío
               </h3>
-              <p className="text-[#594246] font-bold relative z-10">Ana de Armas</p>
-              <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Av. Los Rosales 123, Dpto 402</p>
-              <p className="text-[#594246]/80 text-sm relative z-10">Miraflores, Lima, Perú</p>
-              <p className="text-[#594246]/80 text-sm mt-2 relative z-10">Ref: Frente al parque central.</p>
+              <p className="text-[#594246] font-bold relative z-10">{orderData.clientName || 'Cliente'}</p>
+              <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
+              <p className="text-[#594246]/80 text-sm relative z-10">Lima, Perú</p>
             </div>
 
             {/* Payment Method */}
@@ -149,8 +223,8 @@ export default function OrderDetailsPage() {
 
               {isObserved && !hasSubmittedCorrection ? (
                 <div className="relative z-10 flex flex-col gap-3">
-                  <p className="text-[#594246] font-bold">Yape / Plin</p>
-                  <p className="text-[#594246]/80 text-sm">Operación registrada: <span className="line-through text-gray-400">#4981249</span></p>
+                  <p className="text-[#594246] font-bold uppercase">{orderData.paymentMethod}</p>
+                  <p className="text-[#594246]/80 text-sm">Operación registrada: <span className="line-through text-gray-400">Desconocida</span></p>
 
                   <div className="bg-orange-100/50 border border-orange-200 p-3 rounded-xl mt-1">
                     <p className="text-orange-800 text-xs font-semibold uppercase tracking-wider mb-1">Motivo de observación:</p>
@@ -179,14 +253,19 @@ export default function OrderDetailsPage() {
                 </div>
               ) : isPending || hasSubmittedCorrection ? (
                 <>
-                  <p className="text-[#594246] font-bold relative z-10">Yape / Plin</p>
-                  <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">{hasSubmittedCorrection ? newOperationNumber : '#4981249'}</span></p>
-                  <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Validación manual pendiente.</p>
+                  <p className="text-[#594246] font-bold relative z-10 uppercase">{orderData.paymentMethod}</p>
+                  {orderData.paymentMethod?.toLowerCase() === 'mercadopago' ? (
+                    <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Procesando pago con Mercado Pago...</p>
+                  ) : (
+                    <>
+                      <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">{hasSubmittedCorrection ? newOperationNumber : 'Enviada'}</span></p>
+                      <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Validación manual pendiente.</p>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
-                  <p className="text-[#594246] font-bold relative z-10">Tarjeta de Crédito</p>
-                  <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Visa terminada en **** 4567</p>
+                  <p className="text-[#594246] font-bold relative z-10 uppercase">{orderData.paymentMethod}</p>
                   <p className="text-slate-600 text-sm mt-2 relative z-10 font-medium">Cobro realizado exitosamente.</p>
                 </>
               )}
@@ -205,23 +284,19 @@ export default function OrderDetailsPage() {
 
             <div className="space-y-4">
               <div className="flex justify-between text-[#594246]/80 text-sm font-medium">
-                <span>Subtotal (3 artículos)</span>
-                <span>S/ 189.90</span>
+                <span>Subtotal ({orderData.items?.length || 0} artículos)</span>
+                <span>S/ {(orderData.amount - (orderData.deliveryMethod === 'motorized' ? 10 : 0)).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[#594246]/80 text-sm font-medium">
                 <span>Costo de envío</span>
-                <span>S/ 10.00</span>
-              </div>
-              <div className="flex justify-between text-[#F2778D] text-sm font-medium">
-                <span>Descuento (Verano)</span>
-                <span>- S/ 10.00</span>
+                <span>S/ {orderData.deliveryMethod === 'motorized' ? '10.00' : '0.00'}</span>
               </div>
 
               <div className="w-full h-px bg-[#EBEAE8] my-2"></div>
 
               <div className="flex justify-between text-[#594246] text-xl font-bold">
                 <span>Total</span>
-                <span>S/ 189.90</span>
+                <span>S/ {orderData.amount.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -231,17 +306,17 @@ export default function OrderDetailsPage() {
             {/* Descargar Boleta */}
             <button
               onClick={() => setIsInvoiceOpen(true)}
-              disabled={isPending || (isObserved && !hasSubmittedCorrection)}
-              title={(isPending || (isObserved && !hasSubmittedCorrection)) ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
+              disabled={!isConfirmed}
+              title={!isConfirmed ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
               className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 
-                ${(isPending || (isObserved && !hasSubmittedCorrection))
+                ${!isConfirmed
                   ? "bg-[#EBEAE8] text-[#594246]/40 cursor-not-allowed"
                   : "bg-[#594246] text-white hover:bg-[#F2778D] shadow-md"}
               `}
             >
               <Download className="w-5 h-5" />
               Descargar Boleta (PDF)
-              {(isPending || (isObserved && !hasSubmittedCorrection)) && <span className="text-[10px] absolute mt-12 font-medium">(Requiere confirmación)</span>}
+              {!isConfirmed && <span className="text-[10px] absolute mt-12 font-medium">(Requiere confirmación)</span>}
             </button>
 
             {/* Necesito Ayuda */}

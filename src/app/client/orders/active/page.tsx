@@ -3,6 +3,10 @@
 import { Check, Clock, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { ordersApi } from '@/api/orders/orders-api';
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
 
 const steps = [
   "Inicio de pedido",
@@ -12,7 +16,7 @@ const steps = [
   "Entregado"
 ];
 
-function OrderTimeline({ currentStep }: { currentStep: number }) {
+function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObserved?: boolean }) {
   const progressPercent = ((currentStep - 1) / (steps.length - 1)) * 100;
 
   return (
@@ -34,7 +38,9 @@ function OrderTimeline({ currentStep }: { currentStep: number }) {
               width: { duration: 1.5, ease: "easeInOut", delay: 0.2 },
               backgroundPosition: { duration: 3, repeat: Infinity, ease: "linear" }
             }}
-            className="h-full bg-gradient-to-r from-[#F2778D] via-[#F2B6C1] to-[#F2778D] bg-[length:200%_auto] rounded-full shadow-[0_0_15px_rgba(242,119,141,0.6)]"
+            className={`h-full bg-[length:200%_auto] rounded-full bg-gradient-to-r from-[#F2778D] via-[#F2B6C1] to-[#F2778D] ${
+              isObserved ? 'shadow-sm' : 'shadow-[0_0_15px_rgba(242,119,141,0.6)]'
+            }`}
           ></motion.div>
         </div>
 
@@ -74,8 +80,8 @@ function OrderTimeline({ currentStep }: { currentStep: number }) {
                   )}
                 </motion.div>
                 
-                {/* Magical Breathing Aura for current step */}
-                {isCurrent && (
+                {/* Magical Breathing Aura for current step (Only if NOT observed) */}
+                {isCurrent && !isObserved && (
                   <>
                     <motion.div 
                       animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
@@ -97,7 +103,9 @@ function OrderTimeline({ currentStep }: { currentStep: number }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
                 className={`mt-4 text-[12px] text-center leading-tight transition-colors duration-300
-                  ${isCurrent ? "text-[#594246] font-bold text-[13px]" : "text-[#594246]/60 font-medium"}
+                  ${isCurrent && isObserved ? "text-red-600 font-bold text-[13px]" : ""}
+                  ${isCurrent && !isObserved ? "text-[#594246] font-bold text-[13px]" : ""}
+                  ${!isCurrent ? "text-[#594246]/60 font-medium" : ""}
                 `}
               >
                 {step}
@@ -111,6 +119,24 @@ function OrderTimeline({ currentStep }: { currentStep: number }) {
 }
 
 export default function ActiveOrdersPage() {
+  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await ordersApi.get('/client/active', getAuthConfig({ token }));
+        setActiveOrders(data);
+      } catch (error) {
+        console.error("Error fetching active orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
   return (
     <div className="space-y-8 w-full">
       {/* Header */}
@@ -120,6 +146,95 @@ export default function ActiveOrdersPage() {
 
       {/* Order Cards */}
       <div className="space-y-8">
+        
+        {/* Render Real Orders */}
+        {loading && <p className="text-center text-[#594246]/50">Cargando tus pedidos...</p>}
+        {!loading && activeOrders.map((order) => {
+          const isConfirmed = order.status === 'CONFIRMED';
+          const isObserved = order.status === 'OBSERVED';
+          const step = isConfirmed ? 2 : 1;
+          const statusText = isConfirmed ? 'Pago confirmado' : isObserved ? 'Pago Observado' : 'Verificación de Pago';
+          const dateStr = new Date(order.createdAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+
+          return (
+            <div key={order._id} className={`bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 ${isConfirmed ? 'border-t-[#594246]/60' : isObserved ? 'border-t-red-500' : 'border-t-amber-300'} flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300`}>
+              {/* Top Section */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-bold text-[#594246]">Pedido {order.orderNumber}</h2>
+                  <p className="text-[#594246]/50 text-sm mt-1 font-medium">{dateStr}</p>
+                </div>
+                {/* Status Pill */}
+                {isConfirmed ? (
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
+                    <Check className="w-4 h-4 text-slate-600" />
+                    <span className="text-slate-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
+                  </div>
+                ) : isObserved ? (
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border border-red-200 shadow-sm">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-red-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
+                    <Clock className="w-4 h-4 text-amber-600" />
+                    <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Alert */}
+              {isObserved ? (
+                <div className="flex flex-col gap-2 p-5 rounded-2xl bg-red-50 border border-red-200 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="w-6 h-6 text-red-500 shrink-0" />
+                    <p className="text-red-900 font-bold">Tu pago ha sido observado.</p>
+                  </div>
+                  <p className="text-red-800 text-sm ml-9">Por favor ingresa al detalle del pedido para revisar el motivo y corregir tu número de operación.</p>
+                </div>
+              ) : !isConfirmed && (
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-50/50 border border-amber-100">
+                  <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
+                  <p className="text-amber-800 text-sm font-medium">Estamos verificando tu pago por {order.paymentMethod}. Te avisaremos cuando se confirme.</p>
+                </div>
+              )}
+
+              {/* Product Details */}
+              <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-[#EBEAE8]/50 mt-2">
+                <p className="text-[#594246]/60 text-xs font-bold uppercase tracking-wider mb-3">Productos</p>
+                <div className="space-y-2">
+                  {order.items && order.items.length > 0 ? (
+                    order.items.map((item: any, i: number) => (
+                      <p key={i} className="text-[#594246] text-sm font-medium">{item.name} {item.size ? `- Talla ${item.size}` : ''} <span className="text-[#594246]/40 ml-2">x {item.quantity}</span></p>
+                    ))
+                  ) : (
+                    <p className="text-[#594246]/50 text-sm italic">Cargando productos del carrito...</p>
+                  )}
+                </div>
+                <div className="mt-4 pt-4 border-t border-[#EBEAE8]">
+                  <p className="text-lg font-medium text-[#594246] flex justify-between items-center">
+                    <span>Total pagado:</span> 
+                    <span className="text-[#F2778D] font-bold text-xl">S/ {order.amount.toFixed(2)}</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <OrderTimeline currentStep={step} isObserved={isObserved} />
+
+              {/* Action Button */}
+              <Link href={`/client/orders/${order._id}`} className="block w-full">
+                <button className="w-full py-4 mt-2 rounded-2xl border-2 border-[#EBEAE8] text-[#594246] font-bold hover:bg-[#FAF9F6] hover:border-[#594246]/30 transition-all duration-300">
+                  Ver detalle completo del pedido
+                </button>
+              </Link>
+            </div>
+          );
+        })}
+
+        {/* MOCKS ORIGINALES (No borrarlos a pedido del usuario) */}
+        <div className="w-full border-t border-dashed border-gray-300 my-8"></div>
+        <p className="text-center text-xs text-gray-400 mb-4">-- Ejemplos Visuales (Mocks) --</p>
         
         {/* Order 1: Pago Pendiente */}
         <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 border-t-amber-300 flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300">
