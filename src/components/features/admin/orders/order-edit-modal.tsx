@@ -26,7 +26,7 @@ export function OrderEditModal({ open, order, onClose, onSave }: OrderEditModalP
     }
   };
 
-  const statuses: OrderStatus[] = ['Pendiente', 'En Progreso', 'Finalizado', 'Cancelado'];
+  const statuses: OrderStatus[] = ['Pendiente', 'Preparando', 'En camino', 'Entregado', 'Cancelado'];
 
   return (
     <Transition show={open} as={Fragment}>

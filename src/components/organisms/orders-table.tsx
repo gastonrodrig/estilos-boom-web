@@ -10,15 +10,17 @@ import { OrderEditModal } from "../features/admin/orders/order-edit-modal";
 import { OrderInvoiceModal } from "../features/admin/orders/order-invoice-modal";
 
 export type DeliveryMethodId = 'store' | 'point' | 'motorized' | 'province';
-export type OrderStatus = 'Pendiente' | 'En Progreso' | 'Finalizado' | 'Cancelado';
+export type OrderStatus = 'Pendiente' | 'Preparando' | 'En camino' | 'Entregado' | 'Cancelado';
 
 export interface OrderData {
   id: string;
+  dbId?: string; // Real backend ID
   date: string;
   client: string;
   amount: number;
   status: OrderStatus;
   deliveryMethod: DeliveryMethodId;
+  items?: any[];
 }
 
 interface OrdersTableProps {
@@ -26,6 +28,7 @@ interface OrdersTableProps {
   description: string;
   data: OrderData[];
   baseHref?: string;
+  onStatusChange?: (orderId: string, newStatus: OrderStatus) => void;
 }
 
 const TABS = [
@@ -42,7 +45,7 @@ const DELIVERY_FILTERS = [
   { id: 'province', label: 'Provincia (Shalom)' },
 ];
 
-export function OrdersTable({ title, description, data: initialData, baseHref = "/admin/orders" }: OrdersTableProps) {
+export function OrdersTable({ title, description, data: initialData, baseHref = "/admin/orders", onStatusChange }: OrdersTableProps) {
   const [data, setData] = useState<OrderData[]>(initialData);
   const [activeTab, setActiveTab] = useState<string>('Recientes');
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,6 +63,9 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
 
   const handleSaveStatus = (id: string, newStatus: OrderStatus) => {
     setData(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+    if (onStatusChange) {
+      onStatusChange(id, newStatus);
+    }
   };
 
   // Derivar origen (Virtual/Física) del método de entrega
@@ -88,8 +94,9 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
       case 'Pendiente': return "bg-yellow-50 text-yellow-700 border-yellow-200";
-      case 'En Progreso': return "bg-blue-50 text-blue-700 border-blue-200";
-      case 'Finalizado': return "bg-green-50 text-green-700 border-green-200";
+      case 'Preparando': return "bg-orange-50 text-orange-700 border-orange-200";
+      case 'En camino': return "bg-blue-50 text-blue-700 border-blue-200";
+      case 'Entregado': return "bg-green-50 text-green-700 border-green-200";
       case 'Cancelado': return "bg-gray-100 text-gray-700 border-gray-300";
       default: return "bg-gray-50 text-gray-800 border-gray-200";
     }
@@ -99,8 +106,8 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
     return data.filter(order => {
       // 1. Filtrar por Tab (Estado)
       if (activeTab === 'Recientes' && order.status !== 'Pendiente') return false;
-      if (activeTab === 'En Progreso' && order.status !== 'En Progreso') return false;
-      if (activeTab === 'Finalizadas' && (order.status !== 'Finalizado' && order.status !== 'Cancelado')) return false;
+      if (activeTab === 'En Progreso' && (order.status !== 'Preparando' && order.status !== 'En camino')) return false;
+      if (activeTab === 'Finalizadas' && (order.status !== 'Entregado' && order.status !== 'Cancelado')) return false;
 
       // 2. Filtrar por Método de Entrega
       if (selectedDelivery !== 'all' && order.deliveryMethod !== selectedDelivery) return false;
@@ -144,7 +151,7 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
               <span className="text-xs font-medium text-gray-500">En Progreso</span>
             </div>
             <p className="text-2xl font-bold text-gray-800">
-              {data.filter(o => o.status === 'En Progreso').length}
+              {data.filter(o => o.status === 'Preparando' || o.status === 'En camino').length}
             </p>
           </div>
           <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
@@ -153,7 +160,7 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
               <span className="text-xs font-medium text-gray-500">Finalizadas</span>
             </div>
             <p className="text-2xl font-bold text-gray-800">
-              {data.filter(o => o.status === 'Finalizado').length}
+              {data.filter(o => o.status === 'Entregado').length}
             </p>
           </div>
           <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
@@ -162,7 +169,7 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
               <span className="text-xs font-medium text-gray-500">Monto Finalizado</span>
             </div>
             <p className="text-2xl font-bold text-gray-800">
-              S/ {data.filter(o => o.status === 'Finalizado').reduce((acc, o) => acc + o.amount, 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+              S/ {data.filter(o => o.status === 'Entregado').reduce((acc, o) => acc + o.amount, 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
