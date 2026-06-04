@@ -33,7 +33,7 @@ export interface PaymentApi {
   operationNumber: string;
   status: PaymentStatus;
   transactionType: "MANUAL" | "MERCADO_PAGO";
-  observation_message?: string;
+  observationMessage?: string;
   createdAt: string;
 }
 

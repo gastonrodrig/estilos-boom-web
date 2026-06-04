@@ -26,18 +26,47 @@ const CheckoutReviewStep: React.FC = () => {
     displayDepartment,
   } = useOrderSubmission();
 
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const handleConfirmOrder = async () => {
     setIsConfirming(true);
     const success = await submitOrder();
     setIsConfirming(false);
     if(success) {
       setIsModalOpen(false);
-      // router.push('/checkout/success'); ( handled by submitOrder or store in real app )
+      setIsSuccess(true);
     }
   };
 
   const paymentLabel = formData.paymentMethod === 'card' ? 'Mercado Pago' : formData.paymentMethod === 'transfer' ? 'Transferencia Bancaria' : 'Yape / Plin';
   const paymentIconSrc = formData.paymentMethod === 'card' ? '/assets/visaymaster.png' : formData.paymentMethod === 'transfer' ? '/assets/bank.png' : '/assets/yapeyplin.png';
+
+  if (isSuccess) {
+    return (
+      <div className="space-y-6 animate-in zoom-in-95 duration-500 rounded-2xl p-10 shadow-lg relative overflow-hidden bg-gradient-to-br from-[#F2778D] to-[#632034] text-white flex flex-col items-center justify-center min-h-[400px]">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+        
+        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-inner animate-bounce">
+          <svg className="w-10 h-10 text-[#F2778D]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <h2 className="text-3xl font-serif font-bold mb-2">¡Pedido Confirmado!</h2>
+        <p className="text-white/80 text-center max-w-md mb-8">
+          Tu orden ha sido registrada con el estado <strong className="text-white bg-white/20 px-2 py-1 rounded-md">Verificación de Pago</strong>. Procederemos a verificar tu pago en breve.
+        </p>
+
+        <button 
+          onClick={() => window.location.href = '/client/orders'}
+          className="px-8 py-4 bg-white text-[#632034] rounded-full font-bold shadow-xl hover:bg-gray-50 transition-all active:scale-95"
+        >
+          Ver pedido en mi panel
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 border-[#594246]/30 rounded-sm p-8 border border-[#EBEAE8] shadow-sm relative">
@@ -52,12 +81,12 @@ const CheckoutReviewStep: React.FC = () => {
             <h3 className="font-bold text-[#594246] uppercase text-[15px]">Envío</h3>
             <button onClick={handleGoToDelivery} className="text-[#F2778D] text-xs underline">Editar</button>
           </div>
-          
+
           {isLoadingAddresses ? (
-             <div className="flex items-center gap-2 py-2">
-               <Loader2 size={14} className="animate-spin text-[#F2778D]" />
-               <span className="text-xs text-gray-400">Cargando datos...</span>
-             </div>
+            <div className="flex items-center gap-2 py-2">
+              <Loader2 size={14} className="animate-spin text-[#F2778D]" />
+              <span className="text-xs text-gray-400">Cargando datos...</span>
+            </div>
           ) : (
             <>
               <p className="text-sm text-[#594246] font-medium capitalize">
@@ -91,7 +120,7 @@ const CheckoutReviewStep: React.FC = () => {
         <p className="text-[11px] text-gray-400 text-center max-w-md">
           Al hacer clic en "Finalizar Compra", aceptarás nuestros términos y condiciones. Tu pago será procesado de forma segura.
         </p>
-        
+
         <button
           onClick={() => setIsModalOpen(true)}
           disabled={isLoadingAddresses}
@@ -99,7 +128,7 @@ const CheckoutReviewStep: React.FC = () => {
         >
           Finalizar Compra
         </button>
-        
+
         <button onClick={handleGoToPayment} className="text-[#594246] text-sm font-medium hover:underline opacity-70">
           Regresar a Pago
         </button>
@@ -109,14 +138,14 @@ const CheckoutReviewStep: React.FC = () => {
       {isModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
-            <button 
+            <button
               onClick={() => setIsModalOpen(false)}
               disabled={isConfirming}
               className="absolute top-4 right-4 text-[#827D7D] hover:text-[#594246] transition-colors z-10 disabled:opacity-50"
             >
               <X size={24} />
             </button>
-            
+
             <div className="p-8 text-center space-y-6">
               <h2 className="text-2xl font-serif text-[#594246] font-bold">¿Estás segura?</h2>
               <p className="text-[#827D7D] text-sm px-4">
@@ -132,13 +161,13 @@ const CheckoutReviewStep: React.FC = () => {
                         <img src={items[0]?.image} alt={items[0]?.name} className="w-full h-full object-cover rounded-md" />
                       </div>
                       <div className="flex-1">
-                         <p className="text-sm font-bold text-[#594246] leading-tight">{items[0]?.name}</p>
-                         <p className="text-xs text-[#827D7D]">{items[0]?.color} | {items[0]?.size}</p>
-                         {items.length > 1 && <p className="text-[10px] text-[#F2778D] font-bold mt-1">Y {items.length - 1} artículo(s) más...</p>}
+                        <p className="text-sm font-bold text-[#594246] leading-tight">{items[0]?.name}</p>
+                        <p className="text-xs text-[#827D7D]">{items[0]?.color} | {items[0]?.size}</p>
+                        {items.length > 1 && <p className="text-[10px] text-[#F2778D] font-bold mt-1">Y {items.length - 1} artículo(s) más...</p>}
                       </div>
                       <div className="text-right shrink-0">
-                         <p className="text-sm font-bold text-[#594246]">S/ {items[0]?.price?.toFixed(2)}</p>
-                         <p className="text-xs text-[#827D7D]">Cant: {items[0]?.quantity}</p>
+                        <p className="text-sm font-bold text-[#594246]">S/ {items[0]?.price?.toFixed(2)}</p>
+                        <p className="text-xs text-[#827D7D]">Cant: {items[0]?.quantity}</p>
                       </div>
                     </div>
                   )}

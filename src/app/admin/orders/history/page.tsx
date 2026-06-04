@@ -13,8 +13,8 @@ export default function AdminOrdersHistoryPage() {
   ];
 
   return (
-    <OrdersTable 
-      title="Órdenes de Venta" 
+    <OrdersTable
+      title="Órdenes de Venta"
       description="Visualiza y gestiona todas las ventas realizadas, su método de entrega y estado."
       data={dummyData}
     />

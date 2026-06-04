@@ -132,7 +132,7 @@ export default function ActiveOrdersPage() {
             {/* Elegant Amber Pending Pill */}
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
               <Clock className="w-4 h-4 text-amber-600" />
-              <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">Pago pendiente</span>
+              <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">Verificación de Pago</span>
             </div>
           </div>
 

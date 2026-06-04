@@ -15,14 +15,14 @@ export interface ShippingFormValues {
   lastName: string;
   email: string;
   phone: string;
-  
+
   // 👇 AGREGAMOS LOS CAMPOS MANUALES DE INVITADO COMO OPCIONALES
   address?: string;
   apartment?: string;
   district?: string;
   department?: string;
   postalCode?: string;
-  
+
   selectedAddressId?: string;
   wantsNews: boolean;
   trainStation?: string;

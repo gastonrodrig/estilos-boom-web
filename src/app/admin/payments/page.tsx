@@ -268,13 +268,13 @@ export default function AdminPaymentsPage() {
 
   const handleActionConfirm = async (message?: string) => {
     if (!selectedPayment || !actionType) return;
-    
+
     if (actionType === "confirm") {
       await startConfirmPayment(selectedPayment.id);
     } else if (actionType === "observe") {
-      await startRejectPayment(selectedPayment.id);
+      await startRejectPayment(selectedPayment.id, message);
     }
-    
+
     setIsActionOpen(false);
     // Don't clear selectedPayment or actionType here, let them persist during fade out.
   };
@@ -317,9 +317,9 @@ export default function AdminPaymentsPage() {
           dotColor="bg-green-500"
         />
         <StatCard
-          label="Rechazados"
+          label="Observados"
           value={displayMetrics.rejected}
-          dotColor="bg-red-400"
+          dotColor="bg-orange-400"
         />
         <StatCard
           label="Monto total verificado"

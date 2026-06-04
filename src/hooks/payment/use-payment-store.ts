@@ -73,12 +73,12 @@ export const usePaymentStore = () => {
     }
   };
 
-  const startRejectPayment = async (id: string): Promise<boolean> => {
+  const startRejectPayment = async (id: string, observationMessage?: string): Promise<boolean> => {
     dispatch(setLoading(true));
     try {
       const token = await getFirebaseAuthToken();
-      await paymentApi.patch(`/manual/${id}/reject`, {}, getAuthConfig({ token }));
-      toast.success("Pago rechazado correctamente.");
+      await paymentApi.patch(`/manual/${id}/reject`, { observationMessage }, getAuthConfig({ token }));
+      toast.success("Pago observado correctamente.");
       await startLoadingPayments(); // reload all payments
       return true;
     } catch (error: unknown) {

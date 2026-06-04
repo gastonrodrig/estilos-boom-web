@@ -50,20 +50,20 @@ const CheckoutPaymentForm: React.FC = () => {
   const paymentMethod = watch('paymentMethod');
 
   const PAYMENT_METHODS = [
-    { 
-      id: 'card', 
-      label: 'Mercado Pago (Tarjetas / Efectivo)', 
+    {
+      id: 'card',
+      label: 'Mercado Pago (Tarjetas / Efectivo)',
       icon: { src: "/assets/visaymaster.png", alt: 'Mercado Pago', width: 60 }
     },
-    { 
-      id: 'qr', 
-      label: 'Yape / Plin', 
-      icon: { src: "/assets/yapeyplin.png", alt: 'Yape y Plin', width: 60 } 
+    {
+      id: 'qr',
+      label: 'Yape / Plin',
+      icon: { src: "/assets/yapeyplin.png", alt: 'Yape y Plin', width: 60 }
     },
-    { 
-      id: 'transfer', 
-      label: 'Transferencia Bancaria', 
-      icon: { src: "/assets/bank.png", alt: 'Transferencia Bancaria', width: 35 } 
+    {
+      id: 'transfer',
+      label: 'Transferencia Bancaria',
+      icon: { src: "/assets/bank.png", alt: 'Transferencia Bancaria', width: 35 }
     },
   ];
 
@@ -144,16 +144,16 @@ const CheckoutPaymentForm: React.FC = () => {
       fieldsToValidate.push('billingAddress.firstName', 'billingAddress.lastName', 'billingAddress.address', 'billingAddress.district', 'billingAddress.department');
     }
     if (paymentMethod === 'qr' || paymentMethod === 'transfer') {
-       fieldsToValidate.push('operationNumber');
+      fieldsToValidate.push('operationNumber');
     }
 
     const isValid = await trigger(fieldsToValidate);
-    
+
     if (isValid) {
       if (paymentMethod === 'card') {
-         toast('Por favor completa el pago con Mercado Pago arriba primero.', { icon: 'ℹ️' });
+        toast('Por favor completa el pago con Mercado Pago arriba primero.', { icon: 'ℹ️' });
       } else {
-         handleGoToReview();
+        handleGoToReview();
       }
     }
   };
@@ -163,21 +163,21 @@ const CheckoutPaymentForm: React.FC = () => {
       mercadopagoApi.processPayment({ ...param.formData, orderId: `ORD-${Date.now()}` })
         .then(async (response) => {
           if (response.status === 'approved') {
-             toast.success('¡Pago aprobado!');
-             const success = await submitOrder();
-             if (success) {
-               router.push('/checkout/success');
-               resolve(true);
-             } else {
-               reject();
-             }
+            toast.success('¡Pago aprobado!');
+            const success = await submitOrder();
+            if (success) {
+              router.push('/checkout/success');
+              resolve(true);
+            } else {
+              reject();
+            }
           } else if (response.status === 'pending') {
-             toast('Pago pendiente.', { icon: '⏳' });
-             handleGoToReview();
-             resolve(true);
+            toast('Pago pendiente.', { icon: '⏳' });
+            handleGoToReview();
+            resolve(true);
           } else {
-             toast.error('Pago rechazado o con errores.');
-             reject();
+            toast.error('Pago rechazado o con errores.');
+            reject();
           }
         })
         .catch((error) => {
@@ -212,11 +212,10 @@ const CheckoutPaymentForm: React.FC = () => {
         {PAYMENT_METHODS.map((method) => (
           <div key={method.id} id={`payment-block-${method.id}`}>
             <label
-              className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
-                paymentMethod === method.id 
-                  ? 'border-[#F291A3] bg-[#F2D0D3]/10' 
+              className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${paymentMethod === method.id
+                  ? 'border-[#F291A3] bg-[#F2D0D3]/10'
                   : 'border-gray-100 hover:border-[#594246]'
-              }`}
+                }`}
             >
               <input
                 type="radio"
@@ -224,17 +223,17 @@ const CheckoutPaymentForm: React.FC = () => {
                 value={method.id}
                 className="w-4 h-4 accent-[#F2778D]"
               />
-              
+
               <span className="ml-3 font-semibold text-[#594246] flex-1">
                 {method.label}
               </span>
 
               {method.icon && (
                 <div className="flex items-center justify-end w-[80px]">
-                  <Image 
+                  <Image
                     src={method.icon.src}
-                    alt={method.icon.alt} 
-                    width={method.icon.width} 
+                    alt={method.icon.alt}
+                    width={method.icon.width}
                     height={25}
                     className="object-contain"
                   />
@@ -271,15 +270,14 @@ const CheckoutPaymentForm: React.FC = () => {
                 {/* 📱 YAPE / PLIN */}
                 {method.id === 'qr' && (
                   <div className="space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 rounded-lg p-6 bg-[#FAF9F6]">
-                    
+
                     {/* Tabs Yape / Plin */}
                     <div className="flex rounded-full border border-gray-200 p-1 bg-white">
                       <button
                         type="button"
                         onClick={() => setActiveTab('yape')}
-                        className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                          activeTab === 'yape' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
-                        }`}
+                        className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${activeTab === 'yape' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
+                          }`}
                         style={activeTab === 'yape' ? { backgroundColor: '#742365', color: 'white' } : {}}
                       >
                         Yape
@@ -287,9 +285,8 @@ const CheckoutPaymentForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setActiveTab('plin')}
-                        className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                          activeTab === 'plin' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
-                        }`}
+                        className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${activeTab === 'plin' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
+                          }`}
                         style={activeTab === 'plin' ? { backgroundColor: '#00E4A4', color: 'white' } : {}}
                       >
                         Plin
@@ -338,21 +335,21 @@ const CheckoutPaymentForm: React.FC = () => {
                         </h3>
                       </div>
                       <div className="p-4 bg-white">
-                        <div 
+                        <div
                           className="relative w-full h-[250px] overflow-hidden rounded-lg border border-gray-100 cursor-pointer group shadow-sm bg-gray-50"
                           onClick={() => setIsImageModalOpen(true)}
                         >
-                          <Image 
-                            src="/assets/GuiaYapearV2.png" 
-                            alt="Guía paso a paso" 
-                            width={600} 
-                            height={1200} 
+                          <Image
+                            src="/assets/GuiaYapearV2.png"
+                            alt="Guía paso a paso"
+                            width={600}
+                            height={1200}
                             className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                           />
-                          
+
                           {/* Degradado blanco en la parte inferior para dar a entender que sigue */}
                           <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-                          
+
                           <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
                             <span className="bg-white text-[#594246] px-5 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-all">
                               Ampliar guía completa
@@ -460,7 +457,7 @@ const CheckoutPaymentForm: React.FC = () => {
 
         {!billingSameAsShipping && (
           <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-             <p className="col-span-2 text-xs text-gray-400 italic">Ingresa los datos para tu comprobante de pago.</p>
+            <p className="col-span-2 text-xs text-gray-400 italic">Ingresa los datos para tu comprobante de pago.</p>
           </div>
         )}
       </div>
@@ -488,23 +485,23 @@ const CheckoutPaymentForm: React.FC = () => {
 
       {/* 🖼️ MODAL DE IMAGEN AMPLIADA */}
       {isImageModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] overflow-y-auto bg-black/90 backdrop-blur-sm p-2 sm:p-8 animate-in fade-in duration-200"
           onClick={() => setIsImageModalOpen(false)}
         >
           <div className="min-h-full flex items-center justify-center py-10">
             <div className="relative w-full max-w-[1400px] flex flex-col items-center">
-              <button 
+              <button
                 onClick={() => setIsImageModalOpen(false)}
                 className="absolute -top-12 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors z-10"
               >
                 <X size={24} />
               </button>
-              <Image 
-                src="/assets/GuiaYapearV2.png" 
-                alt="Guía paso a paso Ampliada" 
-                width={2500} 
-                height={2500} 
+              <Image
+                src="/assets/GuiaYapearV2.png"
+                alt="Guía paso a paso Ampliada"
+                width={2500}
+                height={2500}
                 className="w-full h-auto object-contain rounded-lg shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               />
