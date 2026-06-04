@@ -288,9 +288,6 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white/50 dark:bg-white/5 flex items-center justify-center shrink-0 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                          <span className="text-[11px] font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.client.charAt(0)}</span>
-                        </div>
                         <span className="font-bold text-[#40202D] dark:text-white text-[13px]">{order.client}</span>
                       </div>
                     </td>
