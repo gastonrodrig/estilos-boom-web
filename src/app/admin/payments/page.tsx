@@ -206,23 +206,6 @@ const mockPaymentRows: PaymentRowState[] = [
     },
     formatStatus: "format_ok",
     canConfirm: true,
-  },
-  {
-    payment: {
-      id: "mock-3",
-      orderNumber: "EB-0040",
-      idClient: "cli-3",
-      clientName: "María Quispe",
-      method: "Mercado Pago",
-      amount: 89.00,
-      operationNumber: "MP-123456789",
-      status: PaymentStatus.VERIFICADO,
-      transactionType: "MERCADO_PAGO",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    formatStatus: "format_ok",
-    canConfirm: false,
   }
 ];
 
@@ -279,7 +262,7 @@ export default function AdminPaymentsPage() {
     // Don't clear selectedPayment or actionType here, let them persist during fade out.
   };
 
-  const displayRows = paymentRows.length > 0 ? paymentRows : mockPaymentRows;
+  const displayRows = [...paymentRows, ...mockPaymentRows];
 
   // Derivar métricas si estamos usando mocks o si metrics vienen en 0 desde el backend
   const displayMetrics = {

@@ -45,13 +45,25 @@ export const createPaymentToApi = (data: {
   yape_operation_number: data.yapeOperationNumber,
 });
 
-const YAPE_OPERATION_REGEX = /^\d{14}$/;
+const YAPE_OPERATION_REGEX = /^\d{6,}$/;
+const TRANSFER_OPERATION_REGEX = /^[0-9A-Za-z]{4,}$/;
 
-export const getYapeFormatStatus = (
+export const getFormatStatus = (
+  paymentMethod: string,
   operationNumber: string,
   allOperationNumbers: string[]
 ): YapeFormatStatus => {
-  if (!YAPE_OPERATION_REGEX.test(operationNumber)) return "invalid_format";
+  let isValid = false;
+  
+  if (paymentMethod.toLowerCase().includes("transferencia")) {
+    isValid = TRANSFER_OPERATION_REGEX.test(operationNumber);
+  } else {
+    // Para Yape / Plin
+    isValid = YAPE_OPERATION_REGEX.test(operationNumber);
+  }
+
+  if (!isValid) return "invalid_format";
+  
   const count = allOperationNumbers.filter((n) => n === operationNumber).length;
   if (count > 1) return "duplicate";
   return "format_ok";
@@ -60,8 +72,9 @@ export const getYapeFormatStatus = (
 export const buildPaymentRows = (payments: Payment[]): PaymentRowState[] => {
   const operationNumbers = payments.map((p) => p.operationNumber);
   return payments.map((payment) => {
-    // Solo validamos formato Yape para los métodos MANUAL
-    const formatStatus = payment.transactionType === "MANUAL" ? getYapeFormatStatus(
+    // Solo validamos formato Yape/Transferencia para los métodos MANUAL
+    const formatStatus = payment.transactionType === "MANUAL" ? getFormatStatus(
+      payment.method,
       payment.operationNumber,
       operationNumbers
     ) : "format_ok"; // Para MP siempre asumimos ok

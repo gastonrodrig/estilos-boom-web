@@ -103,15 +103,29 @@ export function OrderInvoiceModal({ open, order, onClose }: OrderInvoiceModalPro
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-100">
-                    <td className="py-5">
-                      <p className="text-sm font-bold text-gray-800">Múltiples Artículos</p>
-                      <p className="text-xs text-gray-400 mt-1">Referencia a compra del carrito</p>
-                    </td>
-                    <td className="py-5 text-center text-sm font-medium text-gray-600">1</td>
-                    <td className="py-5 text-right text-sm font-medium text-gray-600">S/ {subtotal.toFixed(2)}</td>
-                    <td className="py-5 text-right text-sm font-bold text-gray-800">S/ {subtotal.toFixed(2)}</td>
-                  </tr>
+                  {(displayData as any)?.items?.length ? (
+                    (displayData as any).items.map((item: any, i: number) => (
+                      <tr key={i} className="border-b border-gray-100">
+                        <td className="py-5">
+                          <p className="text-sm font-bold text-gray-800">{item.name}</p>
+                          <p className="text-xs text-gray-400 mt-1">{item.size ? `Talla: ${item.size}` : ''}</p>
+                        </td>
+                        <td className="py-5 text-center text-sm font-medium text-gray-600">{item.quantity}</td>
+                        <td className="py-5 text-right text-sm font-medium text-gray-600">S/ {(item.price / 1.18).toFixed(2)}</td>
+                        <td className="py-5 text-right text-sm font-bold text-gray-800">S/ {(item.price * item.quantity / 1.18).toFixed(2)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="border-b border-gray-100">
+                      <td className="py-5">
+                        <p className="text-sm font-bold text-gray-800">Múltiples Artículos</p>
+                        <p className="text-xs text-gray-400 mt-1">Referencia a compra del carrito</p>
+                      </td>
+                      <td className="py-5 text-center text-sm font-medium text-gray-600">1</td>
+                      <td className="py-5 text-right text-sm font-medium text-gray-600">S/ {subtotal.toFixed(2)}</td>
+                      <td className="py-5 text-right text-sm font-bold text-gray-800">S/ {subtotal.toFixed(2)}</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
 

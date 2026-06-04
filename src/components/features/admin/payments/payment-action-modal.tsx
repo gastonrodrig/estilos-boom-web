@@ -12,22 +12,34 @@ interface PaymentActionModalProps {
   onConfirm: (message?: string) => Promise<void>;
 }
 
+const PREDEFINED_REASONS = [
+  "El número de operación no se encuentra registrado.",
+  "El monto transferido no coincide con el total del pedido.",
+  "La fecha de la operación no coincide con la fecha del pedido.",
+  "El pago fue realizado a una cuenta incorrecta.",
+  "Otros..."
+];
+
 export function PaymentActionModal({ open, action, paymentId, onClose, onConfirm }: PaymentActionModalProps) {
-  const [message, setMessage] = useState("");
+  const [selectedReason, setSelectedReason] = useState("");
+  const [customMessage, setCustomMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setMessage("");
+      setSelectedReason("");
+      setCustomMessage("");
       setIsSubmitting(false);
     }
   }, [open]);
 
+  const finalMessage = selectedReason === "Otros..." ? customMessage : selectedReason;
+
   const handleConfirm = async () => {
-    if (action === "observe" && !message.trim()) return;
+    if (action === "observe" && !finalMessage.trim()) return;
     setIsSubmitting(true);
     try {
-      await onConfirm(action === "observe" ? message : undefined);
+      await onConfirm(action === "observe" ? finalMessage : undefined);
       onClose();
     } catch (e) {
       console.error(e);
@@ -89,14 +101,32 @@ export function PaymentActionModal({ open, action, paymentId, onClose, onConfirm
                 </p>
 
                 {isObserve && (
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[13px] font-semibold text-neutral-800">Motivo de la observación <span className="text-red-500">*</span></label>
-                    <textarea 
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Ej. El número de operación no coincide con el monto o no se encuentra registrado."
-                      className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#F59CAE] focus:ring-1 focus:ring-[#F59CAE] min-h-[100px] resize-none text-[13px] text-neutral-700 transition-colors"
-                    />
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] font-semibold text-neutral-800">Motivo de la observación <span className="text-red-500">*</span></label>
+                      <select
+                        value={selectedReason}
+                        onChange={(e) => setSelectedReason(e.target.value)}
+                        className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#F59CAE] focus:ring-1 focus:ring-[#F59CAE] text-[13px] text-neutral-700 transition-colors"
+                      >
+                        <option value="" disabled>Selecciona un motivo...</option>
+                        {PREDEFINED_REASONS.map((reason, idx) => (
+                          <option key={idx} value={reason}>{reason}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {selectedReason === "Otros..." && (
+                      <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="text-[13px] font-semibold text-neutral-800">Especificar motivo <span className="text-red-500">*</span></label>
+                        <textarea 
+                          value={customMessage}
+                          onChange={(e) => setCustomMessage(e.target.value)}
+                          placeholder="Escribe el motivo detallado..."
+                          className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#F59CAE] focus:ring-1 focus:ring-[#F59CAE] min-h-[100px] resize-none text-[13px] text-neutral-700 transition-colors"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -112,10 +142,10 @@ export function PaymentActionModal({ open, action, paymentId, onClose, onConfirm
                 </button>
                 <button 
                   onClick={handleConfirm}
-                  disabled={isSubmitting || (isObserve && !message.trim())}
+                  disabled={isSubmitting || (isObserve && !finalMessage.trim())}
                   className={`px-7 py-2.5 text-[14px] font-medium rounded-full transition-all duration-300 shadow-sm disabled:cursor-not-allowed
                     ${isObserve 
-                      ? message.trim() 
+                      ? finalMessage.trim() 
                         ? "bg-[#594246] text-white hover:bg-[#4a3e3e]" 
                         : "bg-white border border-[#EBEAE8] text-[#594246]/50"
                       : "bg-[#F59CAE] hover:bg-[#eb8c9f] text-white disabled:opacity-50"}`}

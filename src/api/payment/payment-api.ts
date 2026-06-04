@@ -8,3 +8,4 @@ export const paymentApi = axios.create({
 export const manualPaymentApi = axios.create({
   baseURL: `${serverEnv.BASE_URL}/payment-manual`,
 });
+
