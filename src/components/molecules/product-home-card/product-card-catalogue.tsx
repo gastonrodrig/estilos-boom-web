@@ -97,16 +97,16 @@ export const ProductCardCatalogue = ({ product }: Props) => {
         </div>
         
         <Link href={`/product/${product.id_product}`}>
-          <h3 className="text-[#594246] font-serif text-[17px] leading-tight tracking-wide line-clamp-1 group-hover:text-[#632034] transition-colors">
+          <h3 className="text-[#594246] dark:text-white font-serif text-[17px] leading-tight tracking-wide line-clamp-1 group-hover:text-[#632034] dark:group-hover:text-[#F3E5AB] transition-colors">
             {product.name}
           </h3>
         </Link>
 
         <div className="flex items-center gap-2 mt-0.5">
-          <p className="text-[#632034] font-medium text-sm tracking-wide">
+          <p className="text-[#632034] dark:text-[#D4AF37] font-medium text-sm tracking-wide">
             S/ {product.base_price.toFixed(2)}
           </p>
-          <span className="text-[#594246]/60 text-[10px] font-bold tracking-widest">-20%</span>
+          <span className="text-[#594246]/60 dark:text-gray-400 text-[10px] font-bold tracking-widest">-20%</span>
         </div>
 
         {/* Círculos de Colores sutiles */}

@@ -4,7 +4,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { RoleGuard } from "@/guards/role-guard";
 import { UserFlowGuard } from "@/guards/user-flow-guard";
-import { Montserrat, Vidaloka, Inter } from "next/font/google";
+import { Montserrat, Vidaloka, Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
 
@@ -34,6 +34,11 @@ const vidaloka = Vidaloka({
   variable: "--font-vidaloka",
 });
 
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+});
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -46,7 +51,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`min-h-screen flex flex-col bg-background text-foreground ${montserrat.variable} ${vidaloka.variable} ${inter.variable}`}>
+      <body className={`min-h-screen flex flex-col bg-background text-foreground transition-colors duration-500 ease-in-out ${montserrat.variable} ${vidaloka.variable} ${inter.variable} ${playfair.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ReduxProvider>
             <AuthProvider>
