@@ -59,7 +59,7 @@ const CheckoutReviewStep: React.FC = () => {
         </p>
 
         <button 
-          onClick={() => window.location.href = '/client/orders'}
+          onClick={() => window.location.href = '/client/orders/active'}
           className="px-8 py-4 bg-white text-[#632034] rounded-full font-bold shadow-xl hover:bg-gray-50 transition-all active:scale-95"
         >
           Ver pedido en mi panel

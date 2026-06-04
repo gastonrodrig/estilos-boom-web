@@ -8,9 +8,12 @@ import { CheckoutFormValues } from '@/core/models/checkout';
 import { useRouter } from 'next/navigation';
 import { Payment, initMercadoPago } from '@mercadopago/sdk-react';
 import { mercadopagoApi } from '@/api/mercadopago/mercadopago.api';
+import { manualPaymentApi } from '@/api/payment/payment-api';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { X } from 'lucide-react';
+import { getAuthConfig } from '@/core/utils';
+import { getFirebaseAuthToken } from '@/core/helpers';
 
 const MP_PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 
@@ -153,7 +156,22 @@ const CheckoutPaymentForm: React.FC = () => {
       if (paymentMethod === 'card') {
         toast('Por favor completa el pago con Mercado Pago arriba primero.', { icon: 'ℹ️' });
       } else {
-        handleGoToReview();
+        // Enviar pago manual al backend
+        try {
+          const operationNumber = watch('operationNumber');
+          const token = await getFirebaseAuthToken();
+          
+          await manualPaymentApi.post('/process', {
+            operationNumber,
+            amount: totalAmount,
+            paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia'
+          }, getAuthConfig({ token }));
+          
+          handleGoToReview();
+        } catch(error) {
+          toast.error('Error al enviar el pago manual al servidor.');
+          console.error(error);
+        }
       }
     }
   };

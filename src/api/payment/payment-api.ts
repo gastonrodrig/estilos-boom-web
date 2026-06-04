@@ -6,5 +6,5 @@ export const paymentApi = axios.create({
 });
 
 export const manualPaymentApi = axios.create({
-  baseURL: `${serverEnv.BASE_URL}/api/v1/payment-manual`,
+  baseURL: `${serverEnv.BASE_URL}/payment-manual`,
 });
