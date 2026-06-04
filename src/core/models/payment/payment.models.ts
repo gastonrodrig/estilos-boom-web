@@ -2,6 +2,7 @@ export enum PaymentStatus {
   PENDIENTE = "PENDIENTE",
   VERIFICADO = "VERIFICADO",
   RECHAZADO = "RECHAZADO",
+  OBSERVADO = "OBSERVADO",
 }
 
 // Shape del recurso para uso interno del frontend (camelCase)
@@ -17,6 +18,7 @@ export interface Payment {
   transactionType: "MANUAL" | "MERCADO_PAGO";
   verifiedAt?: string;
   rejectedAt?: string;
+  observationMessage?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +33,7 @@ export interface PaymentApi {
   operationNumber: string;
   status: PaymentStatus;
   transactionType: "MANUAL" | "MERCADO_PAGO";
+  observation_message?: string;
   createdAt: string;
 }
 

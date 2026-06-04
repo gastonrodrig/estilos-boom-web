@@ -19,6 +19,7 @@ export const paymentFromApi = (raw: PaymentApi): Payment => ({
   operationNumber: raw.operationNumber,
   status: raw.status,
   transactionType: raw.transactionType,
+  observationMessage: raw.observation_message,
   createdAt: raw.createdAt,
   updatedAt: raw.createdAt, // fallback if needed
 });

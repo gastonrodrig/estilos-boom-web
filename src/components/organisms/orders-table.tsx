@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Eye, Edit2, Search, SlidersHorizontal, Package, Store, Train, Bike, Truck, ChevronDown, Check } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Eye, Edit2, Search, SlidersHorizontal, Package, Store, Train, Bike, Truck, ChevronDown, Check, FileText } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+
+import { OrderDetailModal } from "../features/admin/orders/order-detail-modal";
+import { OrderEditModal } from "../features/admin/orders/order-edit-modal";
+import { OrderInvoiceModal } from "../features/admin/orders/order-invoice-modal";
 
 export type DeliveryMethodId = 'store' | 'point' | 'motorized' | 'province';
 export type OrderStatus = 'Pendiente' | 'En Progreso' | 'Finalizado' | 'Cancelado';
@@ -38,11 +42,25 @@ const DELIVERY_FILTERS = [
   { id: 'province', label: 'Provincia (Shalom)' },
 ];
 
-export function OrdersTable({ title, description, data, baseHref = "/admin/orders" }: OrdersTableProps) {
+export function OrdersTable({ title, description, data: initialData, baseHref = "/admin/orders" }: OrdersTableProps) {
+  const [data, setData] = useState<OrderData[]>(initialData);
   const [activeTab, setActiveTab] = useState<string>('Recientes');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDelivery, setSelectedDelivery] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
+
+  useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  const handleSaveStatus = (id: string, newStatus: OrderStatus) => {
+    setData(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+  };
 
   // Derivar origen (Virtual/Física) del método de entrega
   const getOrigin = (method: DeliveryMethodId) => {
@@ -69,11 +87,11 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
 
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case 'Pendiente': return "bg-[#FDF1F3] dark:bg-[#D6405F]/15 text-[#D6405F] dark:text-[#F2b6c1] border-[#F2DEE4] dark:border-[#D6405F]/30";
-      case 'En Progreso': return "bg-[#FFF9EB] dark:bg-[#EBB559]/15 text-[#B87C14] dark:text-[#EBB559] border-[#F7EAC4] dark:border-[#EBB559]/30";
-      case 'Finalizado': return "bg-[#F0FDF4] dark:bg-[#4ADE80]/15 text-[#166534] dark:text-[#4ADE80] border-[#DCFCE7] dark:border-[#4ADE80]/30";
-      case 'Cancelado': return "bg-[#F3F4F6] dark:bg-white/10 text-[#4B5563] dark:text-[#9CA3AF] border-[#E5E7EB] dark:border-white/20";
-      default: return "bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-300 border-transparent dark:border-white/10";
+      case 'Pendiente': return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case 'En Progreso': return "bg-blue-50 text-blue-700 border-blue-200";
+      case 'Finalizado': return "bg-green-50 text-green-700 border-green-200";
+      case 'Cancelado': return "bg-gray-100 text-gray-700 border-gray-300";
+      default: return "bg-gray-50 text-gray-800 border-gray-200";
     }
   };
 
@@ -100,13 +118,53 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
   }, [data, activeTab, selectedDelivery, searchQuery]);
 
   return (
-    <div className="w-full min-h-[calc(100vh-100px)] bg-[#F7EEF1] dark:bg-transparent font-sans transition-colors duration-300 relative">
-      <div className="max-w-[1400px] mx-auto relative z-10">
+    <div className="w-full font-sans transition-colors duration-300 relative space-y-6">
+      <div className="w-full relative z-10 space-y-6">
         
         {/* HEADER */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">{title}</h1>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">{description}</p>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+          <p className="text-sm font-medium text-gray-500 mt-1">{description}</p>
+        </div>
+
+        {/* STAT CARDS */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
+          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+              <span className="text-xs font-medium text-gray-500">Pendientes</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800">
+              {data.filter(o => o.status === 'Pendiente').length}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-400" />
+              <span className="text-xs font-medium text-gray-500">En Progreso</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800">
+              {data.filter(o => o.status === 'En Progreso').length}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+              <span className="text-xs font-medium text-gray-500">Finalizadas</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800">
+              {data.filter(o => o.status === 'Finalizado').length}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-700" />
+              <span className="text-xs font-medium text-gray-500">Monto Finalizado</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800">
+              S/ {data.filter(o => o.status === 'Finalizado').reduce((acc, o) => acc + o.amount, 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
+            </p>
+          </div>
         </div>
 
         {/* CONTROLS (TABS + SEARCH + FILTERS) */}
@@ -197,22 +255,22 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
         </div>
 
         {/* TABLE CARD */}
-        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden transition-all duration-300">
+        <div className="bg-[#fffcfd] rounded-2xl border border-pink-100 shadow-sm overflow-hidden transition-all duration-300">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full min-w-[1000px] text-left border-collapse">
               <thead>
-                <tr className="bg-white/30 dark:bg-white/5 border-b border-[#EAE0E2] dark:border-white/10">
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">ID Orden</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Fecha</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Cliente</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Origen</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Entrega</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Monto Total</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Estado</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+                <tr className="bg-[#dfa6b6] text-xs font-semibold uppercase text-white">
+                  <th className="py-3 px-6">ID Orden</th>
+                  <th className="py-3 px-6">Fecha</th>
+                  <th className="py-3 px-6">Cliente</th>
+                  <th className="py-3 px-6">Origen</th>
+                  <th className="py-3 px-6">Entrega</th>
+                  <th className="py-3 px-6">Monto Total</th>
+                  <th className="py-3 px-6">Estado</th>
+                  <th className="py-3 px-6 text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
+              <tbody className="divide-y divide-pink-50">
                 {filteredData.map((order) => (
                   <tr key={order.id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
                     <td className="py-4 px-6">
@@ -245,20 +303,35 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="font-black text-[13px] text-[#40202D] dark:text-white">S/ {order.amount.toFixed(2)}</span>
+                      <span className="font-medium text-sm text-gray-800">S/ {order.amount.toFixed(2)}</span>
                     </td>
                     <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${getStatusColor(order.status)} shadow-sm`}>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.status)}`}>
                         {order.status}
                       </span>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-end gap-2">
-                        <Link href={`${baseHref}/${order.id.toLowerCase().replace('#', '')}`} className="p-2 text-[#8C6B79] dark:text-gray-400 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 rounded-full transition-colors border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                        <button 
+                          onClick={() => { setSelectedOrder(order); setIsDetailOpen(true); }}
+                          className="p-2 text-gray-400 hover:text-[#D6405F] bg-white hover:bg-pink-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          title="Ver detalle"
+                        >
                           <Eye className="w-4 h-4" />
-                        </Link>
-                        <button className="p-2 text-[#8C6B79] dark:text-gray-400 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 rounded-full transition-colors border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedOrder(order); setIsEditOpen(true); }}
+                          className="p-2 text-gray-400 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          title="Editar estado"
+                        >
                           <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => { setSelectedOrder(order); setIsInvoiceOpen(true); }}
+                          className="p-2 text-gray-400 hover:text-emerald-600 bg-white hover:bg-emerald-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          title="Ver comprobante"
+                        >
+                          <FileText className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -282,16 +355,35 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
           
           {/* Pagination Footer */}
           {filteredData.length > 0 && (
-            <div className="px-6 py-4 bg-white/30 dark:bg-white/5 border-t border-[#EAE0E2] dark:border-white/10 flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Mostrando <strong className="text-[#40202D] dark:text-white">{filteredData.length}</strong> órdenes</span>
+            <div className="px-6 py-4 bg-gray-50 border-t border-pink-100 flex items-center justify-between">
+              <span className="text-sm text-gray-500">Mostrando <strong className="text-gray-800 font-semibold">{filteredData.length}</strong> órdenes</span>
               <div className="flex gap-2">
-                <button className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border border-[#EAE0E2] dark:border-white/20 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 transition-colors shadow-sm">Anterior</button>
-                <button className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border border-[#EAE0E2] dark:border-white/20 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 transition-colors shadow-sm">Siguiente</button>
+                <button className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-100 transition-colors bg-white shadow-sm">Anterior</button>
+                <button className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-100 transition-colors bg-white shadow-sm">Siguiente</button>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      <OrderDetailModal 
+        open={isDetailOpen} 
+        order={selectedOrder} 
+        onClose={() => { setIsDetailOpen(false); setSelectedOrder(null); }} 
+      />
+
+      <OrderEditModal 
+        open={isEditOpen} 
+        order={selectedOrder} 
+        onClose={() => { setIsEditOpen(false); setSelectedOrder(null); }} 
+        onSave={handleSaveStatus}
+      />
+
+      <OrderInvoiceModal 
+        open={isInvoiceOpen} 
+        order={selectedOrder} 
+        onClose={() => { setIsInvoiceOpen(false); setSelectedOrder(null); }} 
+      />
     </div>
   );
 }

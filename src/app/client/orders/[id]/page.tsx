@@ -3,6 +3,8 @@
 import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Package, Shirt, Truck, Check, Clock, AlertCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
+import { OrderInvoiceModal } from '@/components/features/admin/orders/order-invoice-modal';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -10,8 +12,27 @@ export default function OrderDetailsPage() {
 
   // Simulated data based on orderId
   const isPending = orderId === '0042';
+  const isObserved = orderId === '0043';
   const currentStep = orderId === '0041' ? 3 : 1; // Assuming 0041 is at step 3, 0042 at step 1
   const isEnCaminoOrDelivered = currentStep >= 4;
+
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [newOperationNumber, setNewOperationNumber] = useState('');
+  const [hasSubmittedCorrection, setHasSubmittedCorrection] = useState(false);
+
+  const dummyOrderData: any = {
+    id: `#ORD-${orderId}`,
+    date: "15 May 2026, 14:30",
+    client: "Ana de Armas",
+    amount: 189.90,
+    status: isPending ? "Pendiente" : isObserved ? "Observado" : "Finalizado",
+    deliveryMethod: "motorized"
+  };
+
+  const handleSubsanar = () => {
+    if (!newOperationNumber.trim()) return;
+    setHasSubmittedCorrection(true);
+  };
 
   return (
     <div className="space-y-8 w-full pb-10">
@@ -38,10 +59,15 @@ export default function OrderDetailsPage() {
           <p className="text-[#594246]/50 text-sm mt-1 font-medium">Realizado el 15 de mayo, 2026</p>
         </div>
         
-        {isPending ? (
+        {isPending || hasSubmittedCorrection ? (
           <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
             <Clock className="w-4 h-4 text-amber-600" />
             <span className="text-amber-700 text-sm font-bold tracking-wide uppercase">Pago pendiente</span>
+          </div>
+        ) : isObserved ? (
+          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-50 border border-orange-200 shadow-sm">
+            <AlertCircle className="w-4 h-4 text-orange-600" />
+            <span className="text-orange-700 text-sm font-bold tracking-wide uppercase">Pago Observado</span>
           </div>
         ) : (
           <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
@@ -115,15 +141,46 @@ export default function OrderDetailsPage() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-[#FAF9F6] p-6 rounded-3xl border border-[#EBEAE8]/50 shadow-sm relative overflow-hidden">
+            <div className={`bg-[#FAF9F6] p-6 rounded-3xl border border-[#EBEAE8]/50 shadow-sm relative overflow-hidden ${isObserved && !hasSubmittedCorrection ? 'ring-2 ring-orange-200 bg-orange-50/30' : ''}`}>
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#F2D0D3]/20 rounded-bl-full -z-0"></div>
               <h3 className="text-sm font-bold text-[#594246]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
                 <CreditCard className="w-4 h-4" /> Método de pago
               </h3>
-              {isPending ? (
+              
+              {isObserved && !hasSubmittedCorrection ? (
+                <div className="relative z-10 flex flex-col gap-3">
+                  <p className="text-[#594246] font-bold">Yape / Plin</p>
+                  <p className="text-[#594246]/80 text-sm">Operación registrada: <span className="line-through text-gray-400">#4981249</span></p>
+                  
+                  <div className="bg-orange-100/50 border border-orange-200 p-3 rounded-xl mt-1">
+                    <p className="text-orange-800 text-xs font-semibold uppercase tracking-wider mb-1">Motivo de observación:</p>
+                    <p className="text-orange-900 text-sm font-medium">El número de operación no coincide con nuestros registros. Por favor verifica y vuelve a ingresarlo.</p>
+                  </div>
+                  
+                  <div className="mt-2 space-y-2">
+                    <label className="text-[11px] font-bold text-[#594246]/60 uppercase tracking-widest">Subsanar Operación</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={newOperationNumber}
+                        onChange={(e) => setNewOperationNumber(e.target.value)}
+                        placeholder="Nuevo N° Operación"
+                        className="flex-1 bg-white border border-[#EBEAE8] rounded-xl px-3 py-2 text-sm text-[#594246] font-medium focus:outline-none focus:border-[#F2D0D3] focus:ring-1 focus:ring-[#F2D0D3]"
+                      />
+                      <button 
+                        onClick={handleSubsanar}
+                        disabled={!newOperationNumber.trim()}
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Enviar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : isPending || hasSubmittedCorrection ? (
                 <>
                   <p className="text-[#594246] font-bold relative z-10">Yape / Plin</p>
-                  <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">#4981249</span></p>
+                  <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">{hasSubmittedCorrection ? newOperationNumber : '#4981249'}</span></p>
                   <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Validación manual pendiente.</p>
                 </>
               ) : (
@@ -173,17 +230,18 @@ export default function OrderDetailsPage() {
           <div className="flex flex-col gap-3">
             {/* Descargar Boleta */}
             <button 
-              disabled={isPending}
-              title={isPending ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
+              onClick={() => setIsInvoiceOpen(true)}
+              disabled={isPending || (isObserved && !hasSubmittedCorrection)}
+              title={(isPending || (isObserved && !hasSubmittedCorrection)) ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
               className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 
-                ${isPending 
+                ${(isPending || (isObserved && !hasSubmittedCorrection))
                   ? "bg-[#EBEAE8] text-[#594246]/40 cursor-not-allowed" 
                   : "bg-[#594246] text-white hover:bg-[#F2778D] shadow-md"}
               `}
             >
               <Download className="w-5 h-5" />
               Descargar Boleta (PDF)
-              {isPending && <span className="text-[10px] absolute mt-12 font-medium">(Requiere validación)</span>}
+              {(isPending || (isObserved && !hasSubmittedCorrection)) && <span className="text-[10px] absolute mt-12 font-medium">(Requiere confirmación)</span>}
             </button>
             
             {/* Necesito Ayuda */}
@@ -210,6 +268,12 @@ export default function OrderDetailsPage() {
         </div>
 
       </div>
+
+      <OrderInvoiceModal 
+        open={isInvoiceOpen} 
+        order={dummyOrderData} 
+        onClose={() => setIsInvoiceOpen(false)} 
+      />
     </div>
   );
 }

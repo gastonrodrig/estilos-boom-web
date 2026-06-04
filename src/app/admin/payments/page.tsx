@@ -5,6 +5,7 @@ import { CreditCard, AlertTriangle, CheckCircle2, XCircle, Info } from "lucide-r
 import { usePaymentStore } from "@hooks";
 import { PaymentRowState, YapeFormatStatus, PaymentStatus, Payment } from "@models";
 import { PaymentDetailModal } from "@/components/features/admin/payments/payment-detail-modal";
+import { PaymentActionModal, PaymentActionType } from "@/components/features/admin/payments/payment-action-modal";
 
 // ─── Stat card ───────────────────────────────────────────────────────────────
 
@@ -83,6 +84,13 @@ function StatusBadge({
       </span>
     );
   }
+  if (status === PaymentStatus.OBSERVADO) {
+    return (
+      <span className="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-600">
+        Observado
+      </span>
+    );
+  }
   return null;
 }
 
@@ -91,8 +99,8 @@ function StatusBadge({
 interface PaymentRowProps {
   row: PaymentRowState;
   isOdd: boolean;
-  onConfirm: (id: string) => Promise<boolean>;
-  onReject: (id: string) => Promise<boolean>;
+  onConfirmClick: (id: string) => void;
+  onObserveClick: (id: string) => void;
   onViewDetail: (payment: Payment) => void;
   isActioning: boolean;
 }
@@ -100,8 +108,8 @@ interface PaymentRowProps {
 function PaymentTableRow({
   row,
   isOdd,
-  onConfirm,
-  onReject,
+  onConfirmClick,
+  onObserveClick,
   onViewDetail,
   isActioning,
 }: PaymentRowProps) {
@@ -134,24 +142,24 @@ function PaymentTableRow({
           {payment.transactionType === "MANUAL" && payment.status === PaymentStatus.PENDIENTE ? (
             <>
               <button
-                onClick={() => void onConfirm(payment.id)}
+                onClick={() => onConfirmClick(payment.id)}
                 disabled={!canConfirm || isActioning}
-                className="rounded-full bg-green-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                className="rounded-full bg-[#594246] border border-[#594246] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#D6405F] hover:border-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isActioning ? "..." : "Confirmar"}
+                Aceptar
               </button>
               <button
-                onClick={() => void onReject(payment.id)}
+                onClick={() => onObserveClick(payment.id)}
                 disabled={isActioning}
-                className="rounded-full bg-red-500 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                className="rounded-full bg-white border border-[#EBEAE8] px-4 py-1.5 text-xs font-semibold text-[#594246] transition hover:bg-[#FAF9F6] hover:border-[#F2D0D3] hover:text-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isActioning ? "..." : "Rechazar"}
+                Observar
               </button>
             </>
           ) : (
             <button
               onClick={() => onViewDetail(payment)}
-              className="rounded-full border border-gray-300 bg-white px-4 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+              className="rounded-full border border-gray-200 bg-neutral-50 px-4 py-1.5 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100"
             >
               Ver detalle
             </button>
@@ -232,6 +240,8 @@ export default function AdminPaymentsPage() {
 
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isActionOpen, setIsActionOpen] = useState(false);
+  const [actionType, setActionType] = useState<PaymentActionType | null>(null);
 
   useEffect(() => {
     void startLoadingPayments();
@@ -247,7 +257,37 @@ export default function AdminPaymentsPage() {
     setSelectedPayment(null);
   };
 
+  const handleOpenAction = (id: string, type: PaymentActionType) => {
+    const p = paymentRows.find(r => r.payment.id === id) || mockPaymentRows.find(r => r.payment.id === id);
+    if (p) {
+      setSelectedPayment(p.payment);
+      setActionType(type);
+      setIsActionOpen(true);
+    }
+  };
+
+  const handleActionConfirm = async (message?: string) => {
+    if (!selectedPayment || !actionType) return;
+    
+    if (actionType === "confirm") {
+      await startConfirmPayment(selectedPayment.id);
+    } else if (actionType === "observe") {
+      await startRejectPayment(selectedPayment.id);
+    }
+    
+    setIsActionOpen(false);
+    // Don't clear selectedPayment or actionType here, let them persist during fade out.
+  };
+
   const displayRows = paymentRows.length > 0 ? paymentRows : mockPaymentRows;
+
+  // Derivar métricas si estamos usando mocks o si metrics vienen en 0 desde el backend
+  const displayMetrics = {
+    pending: displayRows.filter(r => r.payment.status === PaymentStatus.PENDIENTE).length,
+    verifiedToday: displayRows.filter(r => r.payment.status === PaymentStatus.VERIFICADO).length,
+    rejected: displayRows.filter(r => r.payment.status === PaymentStatus.RECHAZADO).length,
+    totalVerifiedAmount: displayRows.filter(r => r.payment.status === PaymentStatus.VERIFICADO).reduce((acc, r) => acc + r.payment.amount, 0)
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -268,22 +308,22 @@ export default function AdminPaymentsPage() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Pendientes"
-          value={metrics?.pending ?? 0}
+          value={displayMetrics.pending}
           dotColor="bg-yellow-400"
         />
         <StatCard
           label="Verificados hoy"
-          value={metrics?.verifiedToday ?? 0}
+          value={displayMetrics.verifiedToday}
           dotColor="bg-green-500"
         />
         <StatCard
           label="Rechazados"
-          value={metrics?.rejected ?? 0}
+          value={displayMetrics.rejected}
           dotColor="bg-red-400"
         />
         <StatCard
           label="Monto total verificado"
-          value={`S/ ${(metrics?.totalVerifiedAmount ?? 0).toLocaleString("es-PE", {
+          value={`S/ ${displayMetrics.totalVerifiedAmount.toLocaleString("es-PE", {
             minimumFractionDigits: 2,
           })}`}
           dotColor="bg-rose-700"
@@ -337,8 +377,8 @@ export default function AdminPaymentsPage() {
                     key={row.payment.id}
                     row={row}
                     isOdd={idx % 2 !== 0}
-                    onConfirm={startConfirmPayment}
-                    onReject={startRejectPayment}
+                    onConfirmClick={(id) => handleOpenAction(id, "confirm")}
+                    onObserveClick={(id) => handleOpenAction(id, "observe")}
                     onViewDetail={handleOpenDetail}
                     isActioning={loading}
                   />
@@ -362,6 +402,14 @@ export default function AdminPaymentsPage() {
         open={isDetailOpen}
         payment={selectedPayment}
         onClose={handleCloseDetail}
+      />
+
+      <PaymentActionModal
+        open={isActionOpen}
+        action={actionType}
+        paymentId={selectedPayment?.id}
+        onClose={() => setIsActionOpen(false)}
+        onConfirm={handleActionConfirm}
       />
     </div>
   );
