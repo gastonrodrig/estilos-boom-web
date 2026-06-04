@@ -1,5 +1,6 @@
 import { Modal } from "@/components/atoms";
 import { useEffect } from "react";
+import { FileText, ExternalLink } from "lucide-react";
 
   export function OrderDetailsModal({ isOpen, onClose, opp }: any) {
   const oc = opp.id_purchase_order; // Datos de la Orden de Compra (si existe)
@@ -68,20 +69,37 @@ useEffect(() => {
                   <th className="p-4 text-right">Costo Est.</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
-                {opp.base_items?.map((item: any, i: number) => (
-                  <tr key={i} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
-                    <td className="p-4 flex items-center gap-3">
-                      <span className="font-bold text-[#40202D] dark:text-white">{item.id_variant?.size}</span>
-                      <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
-                      <span className="font-medium text-[#8C6B79] dark:text-gray-300">{item.id_variant?.color}</span>
-                    </td>
-                    <td className="p-4 text-center font-black text-[#40202D] dark:text-white">{item.quantity}</td>
-                    <td className="p-4 text-right font-bold text-[#D6405F] dark:text-[#F8BBD0]">
-                      {isConverted ? formatCurrency(oc?.items?.[i]?.unit_cost || 0) : <span className="text-[#8C6B79] font-medium text-[11px] uppercase tracking-widest">Pendiente</span>}
-                    </td>
-                  </tr>
-                ))}
+              <tbody>
+                {opp.base_items?.map((item: any, i: number) => {
+                  const matchingPoItem = oc?.items?.find(
+                    (poItem: any) =>
+                      (poItem.id_variant?._id || poItem.id_variant) ===
+                      (item.id_variant?._id || item.id_variant)
+                  );
+                  const unitCost = matchingPoItem?.unit_cost || 0;
+                  const colorHex = item.id_variant?.color?.hex;
+                  const colorName = item.id_variant?.color?.name ?? (typeof item.id_variant?.color === 'string' ? item.id_variant.color : null) ?? item.color ?? '—';
+
+                  return (
+                    <tr key={i} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                      <td className="p-4 flex items-center gap-3">
+                        <span className="font-bold text-[#40202D] dark:text-white">{item.id_variant?.size || item.size}</span>
+                        <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
+                        {colorHex && (
+                          <div 
+                            className="w-3.5 h-3.5 rounded-full border border-[#EAE0E2] dark:border-white/10 shrink-0 shadow-sm" 
+                            style={{ backgroundColor: colorHex }} 
+                          />
+                        )}
+                        <span className="font-medium text-[#8C6B79] dark:text-gray-300">{colorName}</span>
+                      </td>
+                      <td className="p-4 text-center font-black text-[#40202D] dark:text-white">{item.quantity}</td>
+                      <td className="p-4 text-right font-bold text-[#D6405F] dark:text-[#F8BBD0]">
+                        {isConverted ? formatCurrency(unitCost) : <span className="text-[#8C6B79] font-medium text-[11px] uppercase tracking-widest">Pendiente</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -94,6 +112,31 @@ useEffect(() => {
             {opp.notes || "No se registraron observaciones adicionales para este seguimiento."}
           </p>
         </section>
+
+        {/* --- DOCUMENTOS ADJUNTOS --- */}
+        {oc?.attachments && oc.attachments.length > 0 && (
+          <section className="space-y-4">
+            <h5 className="text-[12px] font-black text-[#40202D] dark:text-white border-b border-[#EAE0E2] dark:border-white/10 pb-2 tracking-wide">Documentos Adjuntos (PDF)</h5>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white/30 dark:bg-black/20 p-5 rounded-2xl border border-[#EAE0E2] dark:border-white/10">
+              {oc.attachments.map((url: string, index: number) => {
+                const filename = url.split('/').pop()?.split('-').slice(1).join('-') || `Documento_${index + 1}.pdf`;
+                return (
+                  <a 
+                    key={index} 
+                    href={url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] hover:bg-white dark:hover:bg-white/10 transition-all text-xs font-bold text-[#40202D] dark:text-white"
+                  >
+                    <FileText className="w-5 h-5 text-red-500 shrink-0" />
+                    <span className="truncate flex-1">{filename}</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-55" />
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         <button 
           onClick={onClose}

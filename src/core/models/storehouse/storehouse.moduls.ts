@@ -106,3 +106,15 @@ export interface StorehouseState {
 	loading: boolean;
 	error: string | null;
 }
+
+export interface WarehouseStockApi {
+	id_warehouse: {
+		_id: string;
+		name: string;
+		code: string;
+	} | string;
+	id_variant: string;
+	physical_stock: number;
+	reserved_stock: number;
+}
+
