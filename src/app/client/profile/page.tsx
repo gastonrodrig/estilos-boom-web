@@ -1,18 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Camera, Flower2, Plus, MapPin, Edit2, Trash2, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '@/hooks/auth/use-auth-store';
+import { useClientPersonStore } from '@/hooks/client/use-client-person-store';
+import { AddressInput } from '@/core/models';
 
 export default function ProfilePage() {
+  const { startPasswordReset, email, firstName, lastName, phone } = useAuthStore();
+  const { startLoadingMyAddresses } = useClientPersonStore();
+  
+  const [myAddresses, setMyAddresses] = useState<AddressInput[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
+
   // --- Personal Info State ---
   const initialPersonalData = {
-    fullName: "María González",
-    email: "maria.gonzalez@email.com",
-    phone: "+51 987 654 321",
-    birthdate: "1995-03-15",
+    fullName: (firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : "Usuario",
+    email: email || "",
+    phone: phone || "",
+    birthdate: "", // TODO: Add birthdate to auth store if needed
   };
   const [personalData, setPersonalData] = useState(initialPersonalData);
+
+  // Sync state if auth store loads data later
+  useEffect(() => {
+    setPersonalData({
+      fullName: (firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : "Usuario",
+      email: email || "",
+      phone: phone || "",
+      birthdate: "",
+    });
+  }, [firstName, lastName, email, phone]);
+
+  // Load addresses on mount
+  useEffect(() => {
+    const loadAddresses = async () => {
+      setIsLoadingAddresses(true);
+      const addresses = await startLoadingMyAddresses();
+      setMyAddresses(addresses);
+      setIsLoadingAddresses(false);
+    };
+    loadAddresses();
+  }, []);
 
   const isPersonalInfoChanged = 
     personalData.fullName !== initialPersonalData.fullName ||
@@ -21,16 +51,21 @@ export default function ProfilePage() {
     personalData.birthdate !== initialPersonalData.birthdate;
 
   // --- Security State ---
-  const [securityData, setSecurityData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  // MOCK: Esto vendría del contexto de autenticación real
+  const authProvider: 'LOCAL' | 'GOOGLE' = 'LOCAL'; 
+  const [isResetEmailSent, setIsResetEmailSent] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
-  const isSecurityReady = 
-    securityData.currentPassword.length > 0 &&
-    securityData.newPassword.length > 0 &&
-    securityData.newPassword === securityData.confirmPassword;
+  const handleResetPassword = async () => {
+    setIsSendingReset(true);
+    const success = await startPasswordReset({ email: personalData.email });
+    setIsSendingReset(false);
+    
+    if (success) {
+      setIsResetEmailSent(true);
+      setTimeout(() => setIsResetEmailSent(false), 5000);
+    }
+  };
 
   return (
     <div className="space-y-10 w-full pb-10">
@@ -81,8 +116,8 @@ export default function ProfilePage() {
             <input 
               type="email"
               value={personalData.email}
-              onChange={(e) => setPersonalData({...personalData, email: e.target.value})}
-              className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner"
+              readOnly
+              className="w-full bg-[#EBEAE8]/40 border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#594246]/70 font-medium cursor-not-allowed shadow-inner"
             />
           </div>
           <div>
@@ -121,55 +156,29 @@ export default function ProfilePage() {
       </div>
 
       {/* 2. Seguridad Card */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.12)] border border-[#EBEAE8] p-6 lg:p-10">
-        <h2 className="text-xl font-bold text-[#632034] mb-6">Seguridad</h2>
-        <div className="space-y-6 max-w-xl">
-          <div>
-            <label className="block text-[#632034] font-bold text-sm mb-2">Contraseña actual</label>
-            <input 
-              type="password"
-              value={securityData.currentPassword}
-              onChange={(e) => setSecurityData({...securityData, currentPassword: e.target.value})}
-              placeholder="••••••••"
-              className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium placeholder:text-[#594246]/30 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner"
-            />
-          </div>
-          <div>
-            <label className="block text-[#632034] font-bold text-sm mb-2">Nueva contraseña</label>
-            <input 
-              type="password"
-              value={securityData.newPassword}
-              onChange={(e) => setSecurityData({...securityData, newPassword: e.target.value})}
-              placeholder="••••••••"
-              className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium placeholder:text-[#594246]/30 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner"
-            />
-          </div>
-          <div>
-            <label className="block text-[#632034] font-bold text-sm mb-2">Confirmar nueva contraseña</label>
-            <input 
-              type="password"
-              value={securityData.confirmPassword}
-              onChange={(e) => setSecurityData({...securityData, confirmPassword: e.target.value})}
-              placeholder="••••••••"
-              className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium placeholder:text-[#594246]/30 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner"
-            />
+      {authProvider === 'LOCAL' && (
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.12)] border border-[#EBEAE8] p-6 lg:p-10">
+          <h2 className="text-xl font-bold text-[#632034] mb-6">Seguridad</h2>
+          <div className="max-w-xl">
+            <p className="text-[#594246]/70 text-sm font-medium mb-6">
+              Para proteger tu cuenta, te enviaremos un enlace seguro a tu correo electrónico registrado ({personalData.email}) para que puedas restablecer tu contraseña.
+            </p>
+            
+            <button 
+              onClick={handleResetPassword}
+              disabled={isResetEmailSent || isSendingReset}
+              className={`px-8 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm
+                ${isResetEmailSent 
+                  ? 'bg-green-50 border-2 border-green-200 text-green-700 cursor-default shadow-none' 
+                  : 'bg-transparent border-2 border-[#632034] text-[#632034] hover:bg-[#632034] hover:text-white hover:shadow-md'}
+                ${isSendingReset ? 'opacity-70 cursor-not-allowed' : ''}
+              `}
+            >
+              {isSendingReset ? 'Enviando enlace...' : isResetEmailSent ? 'Enlace enviado al correo' : 'Restablecer contraseña'}
+            </button>
           </div>
         </div>
-
-        {/* Action Button */}
-        <div className="mt-8">
-          <button 
-            disabled={!isSecurityReady}
-            className={`px-8 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm
-              ${isSecurityReady 
-                ? 'bg-transparent border-2 border-[#632034] text-[#632034] hover:bg-[#632034] hover:text-white hover:shadow-md' 
-                : 'bg-transparent border-2 border-[#EBEAE8] text-[#594246]/40 cursor-not-allowed shadow-none'}
-            `}
-          >
-            Actualizar contraseña
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* 3. Mis Direcciones Card */}
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.12)] border border-[#EBEAE8] p-6 lg:p-10">
@@ -182,54 +191,53 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-4">
-          {/* Address 1 */}
-          <div className="bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 transition-colors hover:border-[#F2D0D3]/50">
-            <div className="flex items-start gap-4">
-              <div className="mt-1">
-                <MapPin className="w-5 h-5 text-[#F2778D]" />
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="font-bold text-[#632034]">Casa</h3>
-                  <span className="px-3 py-1 bg-[#F2D0D3]/40 text-[#632034] text-[10px] font-bold rounded-full uppercase tracking-wider">
-                    Predeterminada
-                  </span>
+          {isLoadingAddresses ? (
+            <div className="flex items-center justify-center py-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F2778D]"></div>
+            </div>
+          ) : myAddresses.length === 0 ? (
+            <div className="text-center py-10 bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl">
+              <MapPin className="w-8 h-8 text-[#594246]/20 mx-auto mb-3" />
+              <p className="text-[#594246]/60 font-medium">Aún no tienes direcciones guardadas.</p>
+            </div>
+          ) : (
+            myAddresses.map((address, index) => (
+              <div key={index} className="bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 transition-colors hover:border-[#F2D0D3]/50">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1">
+                    <MapPin className={`w-5 h-5 ${address.is_default ? 'text-[#F2778D]' : 'text-[#594246]/40'}`} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-bold text-[#632034]">Dirección {index + 1}</h3>
+                      {address.is_default && (
+                        <span className="px-3 py-1 bg-[#F2D0D3]/40 text-[#632034] text-[10px] font-bold rounded-full uppercase tracking-wider">
+                          Predeterminada
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[#594246]/70 text-sm font-medium">
+                      {address.address_line}
+                      {address.district && `, ${address.district}`}
+                      {address.province && `, ${address.province}`}
+                      {address.department && `, ${address.department}`}
+                    </p>
+                    {address.reference && (
+                      <p className="text-[#594246]/50 text-xs mt-1">Ref: {address.reference}</p>
+                    )}
+                  </div>
                 </div>
-                <p className="text-[#594246]/70 text-sm font-medium">Av. Larco 1234, Miraflores. Lima</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-              <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-white hover:text-[#632034] transition-colors bg-transparent">
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-[#ffebee] hover:border-[#ffcdd2] hover:text-red-500 transition-colors bg-transparent">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Address 2 */}
-          <div className="bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 transition-colors hover:border-[#F2D0D3]/50">
-            <div className="flex items-start gap-4">
-              <div className="mt-1">
-                <MapPin className="w-5 h-5 text-[#594246]/40" />
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="font-bold text-[#632034]">Trabajo</h3>
+                <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+                  <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-white hover:text-[#632034] transition-colors bg-transparent">
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-[#ffebee] hover:border-[#ffcdd2] hover:text-red-500 transition-colors bg-transparent">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <p className="text-[#594246]/70 text-sm font-medium">Jr. De la Unión 456, Cercado de Lima</p>
               </div>
-            </div>
-            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-              <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-white hover:text-[#632034] transition-colors bg-transparent">
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button className="w-10 h-10 rounded-full border border-[#EBEAE8] flex items-center justify-center text-[#594246]/50 hover:bg-[#ffebee] hover:border-[#ffcdd2] hover:text-red-500 transition-colors bg-transparent">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+            ))
+          )}
         </div>
       </div>
 
