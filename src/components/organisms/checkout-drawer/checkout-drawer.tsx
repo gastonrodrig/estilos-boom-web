@@ -84,7 +84,7 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
           >
             <div className="flex shrink-0 items-center justify-between border-b border-[#EBEAE8] px-5 py-4">
               <h2 className="text-[18px] font-serif uppercase tracking-widest text-[#632034]">
-                {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado
+                {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado{itemCount !== 1 ? "s" : ""}
               </h2>
               <button onClick={onClose} aria-label="Cerrar" className="transition hover:text-[#C5A059]">
                 <X className="h-5 w-5 text-[#594246] hover:text-[#C5A059] transition-colors" />

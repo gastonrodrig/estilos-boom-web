@@ -10,6 +10,7 @@ import {
   UpdateQuantityPayload,
 } from "@models";
 import { setCart, useAppDispatch, useAppSelector } from "@store";
+import { toast } from "react-hot-toast";
 
 type CartItemWithStock = CartItem & { stock?: number };
 
@@ -148,8 +149,10 @@ export const useCartStore = () => {
 
         const { data } = await cartApi.post<CartResponse>("/items", payload, config);
         setReduxCart((data.items ?? []) as CartItemWithStock[]);
-      } catch {
-        // no-op
+      } catch (err: any) {
+        setReduxCart(items); // Rollback
+        const msg = err.response?.data?.message || "No se pudo agregar al carrito";
+        toast.error(msg);
       }
     },
     [getAuthConfig, isAuth, setReduxCart],
@@ -204,8 +207,10 @@ export const useCartStore = () => {
 
         const { data } = await cartApi.patch<CartResponse>("/items", payload, config);
         setReduxCart((data.items ?? []) as CartItemWithStock[]);
-      } catch {
-        // no-op
+      } catch (err: any) {
+        setReduxCart(items); // Rollback
+        const msg = err.response?.data?.message || "No se pudo actualizar la cantidad";
+        toast.error(msg);
       }
     },
     [getAuthConfig, isAuth, items, setReduxCart],

@@ -164,7 +164,17 @@ const CheckoutPaymentForm: React.FC = () => {
           await manualPaymentApi.post('/process', {
             operationNumber,
             amount: totalAmount,
-            paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia'
+            paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia',
+            items: items.map(item => ({
+              id: item.id,
+              name: item.name,
+              size: item.size,
+              price: item.price,
+              quantity: item.quantity,
+              color: item.color,
+              image: item.image
+            })),
+            deliveryMethod: selectedDeliveryMethod?.id
           }, getAuthConfig({ token }));
 
           handleGoToReview();
@@ -176,9 +186,31 @@ const CheckoutPaymentForm: React.FC = () => {
     }
   };
 
+  const itemsRef = useRef(items);
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
+  const deliveryMethodRef = useRef(selectedDeliveryMethod);
+  useEffect(() => {
+    deliveryMethodRef.current = selectedDeliveryMethod;
+  }, [selectedDeliveryMethod]);
+
   const onSubmitPayment = async (param: any) => {
     return new Promise((resolve, reject) => {
-      mercadopagoApi.processPayment({ ...param.formData, orderId: `ORD-${Date.now()}` })
+      mercadopagoApi.processPayment({ 
+        ...param.formData, 
+        orderId: `ORD-${Date.now()}`,
+        items: itemsRef.current.map(item => ({
+          id: item.id,
+          name: item.name,
+          size: item.size,
+          price: item.price,
+          quantity: item.quantity,
+          color: item.color
+        })),
+        deliveryMethod: deliveryMethodRef.current?.id
+      })
         .then(async (response) => {
           if (response.status === 'approved') {
             toast.success('¡Pago aprobado!');
@@ -333,7 +365,17 @@ const CheckoutPaymentForm: React.FC = () => {
                       <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
                       <input
                         type="text"
-                        {...register('operationNumber', { required: 'Ingresa el número de operación' })}
+                        {...register('operationNumber', { 
+                          required: 'Ingresa el número de operación',
+                          pattern: {
+                            value: /^[0-9]+$/,
+                            message: 'El número de operación solo debe contener números'
+                          },
+                          minLength: {
+                            value: 6,
+                            message: 'Debe tener al menos 6 dígitos'
+                          }
+                        })}
                         placeholder="Ej: 20250523001234"
                         className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
                       />
@@ -440,7 +482,17 @@ const CheckoutPaymentForm: React.FC = () => {
                       <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
                       <input
                         type="text"
-                        {...register('operationNumber', { required: 'Ingresa el número de operación del voucher' })}
+                        {...register('operationNumber', { 
+                          required: 'Ingresa el número de operación del voucher',
+                          pattern: {
+                            value: /^[0-9A-Za-z]+$/,
+                            message: 'El número de operación solo debe contener letras o números'
+                          },
+                          minLength: {
+                            value: 4,
+                            message: 'Debe tener al menos 4 caracteres'
+                          }
+                        })}
                         placeholder="Ej: 0123456"
                         className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
                       />

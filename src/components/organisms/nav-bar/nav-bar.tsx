@@ -495,25 +495,26 @@ export const Navbar = ({
             )}
           </AnimatePresence>
 
-          <NavDrawer
-            open={mobileDrawerOpen}
-            onClose={() => setMobileDrawerOpen(false)}
-            items={drawerItems}
-            title={isAdminRoute ? "Panel Admin" : isStorekeeperRoute ? "Panel Almacén" : "Panel Cliente"}
-            widthClass="max-w-[320px]"
-            side="left"
-          />
-
-          {!onSearchOpen && (
-            <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
-          )}
-
-          <CheckoutDrawer
-            open={cartDrawerOpen}
-            onClose={() => setCartDrawerOpen(false)}
-          />
         </motion.div>
       </header>
+
+      <NavDrawer
+        open={mobileDrawerOpen}
+        onClose={() => setMobileDrawerOpen(false)}
+        items={drawerItems}
+        title={isAdminRoute ? "Panel Admin" : isStorekeeperRoute ? "Panel Almacén" : "Panel Cliente"}
+        widthClass="max-w-[320px]"
+        side="left"
+      />
+
+      {!onSearchOpen && (
+        <SearchDrawer open={searchOpen} onClose={() => setSearchOpen(false)} />
+      )}
+
+      <CheckoutDrawer
+        open={cartDrawerOpen}
+        onClose={() => setCartDrawerOpen(false)}
+      />
     </>
   );
 };
