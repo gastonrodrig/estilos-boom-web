@@ -101,13 +101,17 @@ export const Navbar = ({
     user: User,
   };
 
-  const bgClass = isHome
+  const bgClass = isBackofficeRoute
+    ? "bg-transparent"
+    : isHome
     ? scrolled
       ? "bg-gradient-to-r from-[#FAF9F6]/90 via-white/80 to-[#FAF9F6]/90 dark:from-[#0A0508]/70 dark:via-[#40202D]/40 dark:to-[#0A0508]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/5 shadow-inner"
       : "bg-transparent"
     : "bg-gradient-to-r from-[#FAF9F6]/90 via-white/80 to-[#FAF9F6]/90 dark:from-[#0A0508]/70 dark:via-[#40202D]/40 dark:to-[#0A0508]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/5 shadow-inner";
 
-  const textClass = isHome
+  const textClass = isBackofficeRoute
+    ? "text-[#40202D] dark:text-gray-200"
+    : isHome
     ? scrolled
       ? "text-[#594246] dark:text-gray-200"
       : "text-white"
@@ -118,14 +122,19 @@ export const Navbar = ({
   const iconClass =
     "w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110";
 
-  const iconButtonClass =
-    "group flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#D6405F]/10 dark:hover:bg-[#F8BBD0]/10 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] hover:cursor-pointer";
+  const adminFloatingButtonClass = 
+    "group flex w-[38px] h-[38px] items-center justify-center rounded-full bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.1)] backdrop-blur-[8px] transition-all duration-300 hover:bg-[rgba(196,96,127,0.2)] hover:border-[rgba(196,96,127,0.4)] text-[#8B3A52] dark:text-[#ddc0c8] hover:text-[#D6405F] dark:hover:text-[#ffffff] cursor-pointer";
 
-  const adminUserButtonClass =
-    "group flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 border border-transparent dark:border-white/10 transition-all duration-300 hover:bg-gray-200 dark:hover:bg-[#D6405F]/20 dark:hover:border-[#D6405F]/40 hover:cursor-pointer shadow-sm";
+  const iconButtonClass = isBackofficeRoute
+    ? adminFloatingButtonClass
+    : "group flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-[#D6405F]/10 dark:hover:bg-[#F8BBD0]/10 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] hover:cursor-pointer";
+
+  const adminUserButtonClass = isBackofficeRoute 
+    ? adminFloatingButtonClass
+    : "group flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 border border-transparent dark:border-white/10 transition-all duration-300 hover:bg-gray-200 dark:hover:bg-[#D6405F]/20 dark:hover:border-[#D6405F]/40 hover:cursor-pointer shadow-sm";
 
   const adminUserIconClass =
-    "h-[18px] w-[18px] text-gray-600 dark:text-gray-300 transition-transform duration-200 group-hover:scale-110 group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0]";
+    "h-[18px] w-[18px] transition-transform duration-200 group-hover:scale-110";
 
   const menuLinkClass = (href: string) =>
     `transition-all duration-300 ${
@@ -238,7 +247,7 @@ export const Navbar = ({
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50">
+      <header className={`${isBackofficeRoute ? "sticky" : "fixed"} top-0 left-0 w-full z-50`}>
 
         {/* Navbar */}
         <motion.div
@@ -246,10 +255,10 @@ export const Navbar = ({
             scrolled ? "shadow-md backdrop-blur-md" : ""
           } transition-all duration-300`}
         >
-          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-16 flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              {showLeftMenuButton && (
+          <nav className="max-w-7xl mx-auto px-4 min-[1135px]:px-6 py-3 min-h-16 flex items-center justify-between relative">
+            {/* Left Button */}
+            {showLeftMenuButton && (
+              <div className="flex items-center">
                 <button
                   onClick={() => {
                     setMobileDrawerOpen((prev) => !prev);
@@ -259,18 +268,24 @@ export const Navbar = ({
                 >
                   <Menu className={iconClass} />
                 </button>
-              )}
-              <Link href="/">
-                {useCompactMobileLogo ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={compactLogoSrc} alt="Logo" className="h-7 w-auto object-contain" />
-                  </>
-                ) : (
-                  <Logo width={135} height={30} isHome={isHome} />
-                )}
-              </Link>
-            </div>
+              </div>
+            )}
+
+            {/* Logo */}
+            {!isBackofficeRoute && (
+              <div className="flex items-center gap-2">
+                <Link href="/">
+                  {useCompactMobileLogo ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={compactLogoSrc} alt="Logo" className="h-7 w-auto object-contain" />
+                    </>
+                  ) : (
+                    <Logo width={isHome ? 135 : 135} height={isHome ? 30 : 30} isHome={isHome} />
+                  )}
+                </Link>
+              </div>
+            )}
 
             {/* Menu Desktop */}
             <ul
@@ -286,7 +301,7 @@ export const Navbar = ({
             </ul>
 
             {/* Icons */}
-            <div className={`flex items-center gap-2 ${textClass}`}>
+            <div className={`flex items-center ${isBackofficeRoute ? "w-full justify-end gap-[10px] pr-[24px]" : "gap-2"} ${textClass}`}>
               {!isBackofficeRole && (
                 <button
                   aria-label="Buscar"
@@ -297,14 +312,10 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* Theme Switcher Button (only for admin/backoffice for now) */}
-              {isBackofficeRole && (
-                <div className="flex items-center justify-center mr-1">
-                  <ThemeSwitcher />
-                </div>
-              )}
+              {/* Theme Switcher and Admin User logic moved to data-table.tsx via AdminHeaderActions */}
 
-              <div className="relative" ref={userMenuRef}>
+              {!isBackofficeRoute && (
+                <div className="relative" ref={userMenuRef}>
                 {isAuthenticated ? (
                   <button
                     aria-label="Abrir menú de usuario"
@@ -394,6 +405,7 @@ export const Navbar = ({
                   )}
                 </AnimatePresence>
               </div>
+              )}
 
               {!isBackofficeRole && (
                 <Link href="/wishlist" className={iconButtonClass}>

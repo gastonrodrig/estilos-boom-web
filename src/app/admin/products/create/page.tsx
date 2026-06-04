@@ -233,33 +233,43 @@ export default function CreateProductPage() {
     if (result) router.push("/admin/products");
   };
 
+  const inputClass = "w-full bg-[#fdf8f9] dark:bg-[#1a0e14] border border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.1)] rounded-[10px] outline-none focus:border-[rgba(139,58,82,0.5)] dark:focus:border-[rgba(160,80,104,0.5)] transition-[background-color,border-color] duration-[600ms] text-[#2d1f25] dark:text-[#e8d8dc] placeholder-[#2d1f25]/30 dark:placeholder-white/30 p-[12px_16px] text-[0.85rem]";
+  
+  const sectionClass = "space-y-[16px] bg-[#faf5f0] dark:bg-[#2e1d27] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.08)] rounded-[16px] p-[28px] transition-[background-color,border-color] duration-[600ms]";
+  const titleClass = "text-[0.72rem] tracking-[0.15em] text-[#8B3A52] dark:text-[#a05068] uppercase font-semibold mb-[16px]";
+  const labelClass = "text-[0.7rem] tracking-[0.1em] text-[#8B3A52] dark:text-[#a05068] uppercase mb-[6px] block font-medium";
+
+  const getSelectableBtnClass = (isSelected: boolean, extraClasses: string = "p-4") => 
+    `${extraClasses} text-center transition-all text-[0.82rem] font-medium border rounded-[8px] ${isSelected ? 'bg-[rgba(139,58,82,0.3)] border-[#8B3A52] text-white' : 'bg-transparent border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.1)] text-[#8B3A52]/60 dark:text-[#a08088] hover:text-[#8B3A52] dark:hover:text-white hover:border-[#8B3A52]/40 dark:hover:border-[rgba(255,255,255,0.2)]'}`;
+
   return (
-    <div className="min-h-screen p-8 text-[#40202D] dark:text-white transition-colors duration-500">
+    <div className="min-h-screen p-8 text-[#2d1f25] dark:text-[#e8d8dc] bg-[#f5efe8] dark:bg-[#1e1018] relative z-10 transition-[background-color,border-color] duration-[600ms]">
       {/* Header */}
-      <div className="max-w-5xl mx-auto mb-8 flex justify-between items-center bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-        <Link href="/admin/products" className="flex items-center gap-2 text-sm font-bold opacity-70 hover:opacity-100 transition-opacity uppercase tracking-wider">
+      <div className="max-w-5xl mx-auto mb-8 flex justify-between items-center py-4">
+        <Link href="/admin/products" className="flex items-center gap-2 font-medium opacity-60 hover:opacity-100 transition-opacity uppercase" style={{ fontSize: '0.78rem', letterSpacing: '0.08em' }}>
           <ArrowLeft size={16} /> Volver a Productos
         </Link>
         <div className="flex gap-3">
           <button 
             disabled={loadingProducts} 
             onClick={handleSubmit} 
-            className="px-6 py-2.5 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] rounded-xl flex items-center gap-2 disabled:opacity-50 hover:scale-[1.02] shadow-lg transition-all font-bold tracking-wide"
+            className="text-white flex items-center gap-2 disabled:opacity-50 transition-all font-medium"
+            style={{ background: '#8B3A52', borderRadius: '10px', fontSize: '0.82rem', padding: '10px 24px', letterSpacing: '0.05em' }}
           >
             {loadingProducts ? 'Guardando...' : <><Save size={18} /> Guardar producto</>}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-[24px] max-w-5xl mx-auto">
         {/* COLUMNA IZQUIERDA: IMÁGENES */}
-        <div className="md:col-span-4 space-y-4">
-          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-            <h3 className="font-black mb-4 tracking-wide uppercase text-sm">Imágenes ({selectedImages.length}/5)</h3>
+        <div className="md:col-span-4 flex flex-col gap-[24px]">
+          <div className={sectionClass}>
+            <h3 className={titleClass}>Imágenes ({selectedImages.length}/5)</h3>
             <input type="file" id="file-upload" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
-            <label htmlFor="file-upload" className="border-2 border-dashed border-[#EAE0E2] dark:border-white/20 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] rounded-2xl p-8 flex flex-col items-center justify-center bg-white/50 dark:bg-white/5 cursor-pointer transition-colors group">
-              <Upload className="text-[#D6405F] dark:text-[#F8BBD0] mb-2 group-hover:scale-110 transition-transform" size={32} />
-              <p className="text-xs text-center opacity-60 group-hover:opacity-100 font-bold uppercase tracking-wider">Haz clic para subir fotos</p>
+            <label htmlFor="file-upload" className="border-[2px] border-dashed border-[rgba(139,58,82,0.2)] dark:border-[rgba(160,80,104,0.3)] rounded-[12px] p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group hover:border-[rgba(139,58,82,0.5)] dark:hover:border-[rgba(160,80,104,0.6)] hover:bg-[rgba(139,58,82,0.02)] dark:hover:bg-[rgba(160,80,104,0.05)]">
+              <Upload className="text-[#8B3A52] dark:text-[#a05068] mb-2 group-hover:scale-110 transition-transform" size={32} />
+              <p className="text-xs text-center opacity-60 group-hover:opacity-100 font-bold uppercase tracking-wider text-[#2d1f25] dark:text-[#e8d8dc]">Haz clic para subir fotos</p>
             </label>
             <div className="grid grid-cols-3 gap-2 mt-4">
               {selectedImages.map((file, idx) => (
@@ -275,25 +285,25 @@ export default function CreateProductPage() {
         </div>
 
         {/* COLUMNA DERECHA: INFORMACIÓN */}
-        <div className="md:col-span-8 space-y-6">
+        <div className="md:col-span-8 flex flex-col gap-[24px]">
           
           {/* Selector de Origen */}
-          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-            <h3 className="font-bold mb-3 flex items-center gap-2 text-xs uppercase tracking-wider opacity-70">
-              <Layers size={16} className="text-[#D6405F] dark:text-[#F8BBD0]"/> Tipo de Origen de Prenda *
+          <div className={sectionClass}>
+            <h3 className={`${titleClass} flex items-center gap-2`}>
+              <Layers size={16} /> Tipo de Origen de Prenda *
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => handleOriginChange('RETAIL')}
-                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'RETAIL' ? 'border-[#D6405F] dark:border-[#F8BBD0] bg-white/80 dark:bg-white/10 font-bold text-[#D6405F] dark:text-[#F8BBD0] shadow-sm' : 'border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-black/30 opacity-60 hover:opacity-100'}`}
+                className={getSelectableBtnClass(formData.origin_type === 'RETAIL')}
               >
                 Flujo Comercial (Retail)
               </button>
               <button
                 type="button"
                 onClick={() => handleOriginChange('PRODUCCION')}
-                className={`p-4 rounded-xl border text-center transition-all text-sm ${formData.origin_type === 'PRODUCCION' ? 'border-[#D6405F] dark:border-[#F8BBD0] bg-white/80 dark:bg-white/10 font-bold text-[#D6405F] dark:text-[#F8BBD0] shadow-sm' : 'border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-black/30 opacity-60 hover:opacity-100'}`}
+                className={getSelectableBtnClass(formData.origin_type === 'PRODUCCION')}
               >
                 Orden de Producción Propia
               </button>
@@ -301,53 +311,53 @@ export default function CreateProductPage() {
           </div>
 
           {/* Información General */}
-          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-4">
-            <h3 className="font-bold text-lg border-b border-[#EAE0E2] dark:border-white/10 pb-2">Información general</h3>
-            <div className="grid grid-cols-2 gap-4">
+          <div className={sectionClass}>
+            <h3 className={titleClass}>Información general</h3>
+            <div className="grid grid-cols-2 gap-[16px]">
               <div className="col-span-2">
-                <label className="text-xs font-bold uppercase opacity-50">Nombre del producto *</label>
-                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: Vestido Gala" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                <label className={labelClass}>Nombre del producto *</label>
+                <input type="text" className={inputClass} placeholder="Ej: Vestido Gala" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase opacity-50">Precio Base (S/.) *</label>
-                <input type="number" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="0.00" value={formData.base_price || ''} onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })} />
+                <label className={labelClass}>Precio Base (S/.) *</label>
+                <input type="number" className={inputClass} placeholder="0.00" value={formData.base_price || ''} onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })} />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase opacity-50">Material / Tela</label>
-                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: 95% Algodón, 5% Elastano" value={formData.composition} onChange={(e) => setFormData({ ...formData, composition: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold uppercase opacity-50">Categoría *</label>
-                <select className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" value={formData.id_category} onChange={(e) => setFormData({...formData, id_category: e.target.value})}>
-                  <option value="" className="dark:bg-[#1A0B11]">Selecciona una categoría</option>
-                  {categories.map(cat => <option key={cat._id} value={cat._id} className="dark:bg-[#1A0B11]">{cat.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold uppercase opacity-50">Temporada</label>
-                <select className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" value={formData.season} onChange={(e) => setFormData({...formData, season: e.target.value})}>
-                  <option value="" className="dark:bg-[#1A0B11]">Selecciona temporada</option>
-                  <option value="PRIMAVERA 2026" className="dark:bg-[#1A0B11]">Primavera 2026</option>
-                  <option value="VERANO 2026" className="dark:bg-[#1A0B11]">Verano 2026</option>
-                  <option value="OTOÑO / INVIERNO" className="dark:bg-[#1A0B11]">Otoño / Invierno</option>
-                  <option value="TODO EL AÑO" className="dark:bg-[#1A0B11]">Todo el año</option>
-                </select>
+                <label className={labelClass}>Material / Tela</label>
+                <input type="text" className={inputClass} placeholder="Ej: 95% Algodón, 5% Elastano" value={formData.composition} onChange={(e) => setFormData({ ...formData, composition: e.target.value })} />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-[16px]">
               <div>
-                <label className="text-xs font-bold uppercase opacity-50">SKU Base *</label>
-                <input type="text" className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
+                <label className={labelClass}>Categoría *</label>
+                <select className={inputClass} value={formData.id_category} onChange={(e) => setFormData({...formData, id_category: e.target.value})}>
+                  <option value="" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Selecciona una categoría</option>
+                  {categories.map(cat => <option key={cat._id} value={cat._id} className="bg-[#fdf8f9] dark:bg-[#1a0e14]">{cat.name}</option>)}
+                </select>
               </div>
               <div>
-                <label className="text-xs font-bold uppercase opacity-50">Género *</label>
-                <div className="flex p-1 bg-white/30 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl mt-1 shadow-inner">
+                <label className={labelClass}>Temporada</label>
+                <select className={inputClass} value={formData.season} onChange={(e) => setFormData({...formData, season: e.target.value})}>
+                  <option value="" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Selecciona temporada</option>
+                  <option value="PRIMAVERA 2026" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Primavera 2026</option>
+                  <option value="VERANO 2026" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Verano 2026</option>
+                  <option value="OTOÑO / INVIERNO" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Otoño / Invierno</option>
+                  <option value="TODO EL AÑO" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Todo el año</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-[16px]">
+              <div>
+                <label className={labelClass}>SKU Base *</label>
+                <input type="text" className={inputClass} placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
+              </div>
+              <div>
+                <label className={labelClass}>Género *</label>
+                <div className="flex gap-[16px]">
                   {['MUJER', 'HOMBRE', 'UNISEX'].map((g) => (
-                    <button key={g} type="button" onClick={() => setFormData({...formData, gender: g})} className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${formData.gender === g ? 'bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] shadow-sm' : 'opacity-40 hover:opacity-100'}`}>
+                    <button key={g} type="button" onClick={() => setFormData({...formData, gender: g})} className={getSelectableBtnClass(formData.gender === g, "flex-1 py-2")}>
                       {g}
                     </button>
                   ))}
@@ -355,40 +365,40 @@ export default function CreateProductPage() {
               </div>
             </div>
             <div>
-              <label className="text-xs font-bold uppercase opacity-50">Descripción</label>
-              <textarea className="w-full p-3 mt-1 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl h-20 outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors shadow-sm" placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
+              <label className={labelClass}>Descripción</label>
+              <textarea className={`${inputClass} h-[80px]`} placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
             </div>
           </div>
 
           {/* 🧵 FICHA TÉCNICA DE INSUMOS DINÁMICA CONECTADA A TU BASE DE DATOS */}
           {formData.origin_type === 'PRODUCCION' && (
-            <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-              <h3 className="font-bold text-lg border-b border-[#EAE0E2] dark:border-white/10 pb-2 flex items-center gap-2">
+            <div className={sectionClass}>
+              <h3 className={`${titleClass} flex items-center gap-2`}>
                 Ficha técnica de insumos
               </h3>
-              <div className="flex flex-col sm:flex-row sm:items-end gap-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 p-4 rounded-2xl shadow-inner">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-[16px] bg-[#fdf8f9] dark:bg-[#1a0e14] border border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.08)] p-4 rounded-2xl shadow-inner">
                 <div className="flex-1">
-                  <label className="text-[10px] font-bold uppercase opacity-50">Seleccionar Insumo Real</label>
+                  <label className={labelClass}>Seleccionar Insumo Real</label>
                   <select 
-                    className="w-full p-2.5 mt-1 bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-medium shadow-sm"
+                    className={inputClass}
                     value={selectedInsumoId}
                     onChange={(e) => setSelectedInsumoId(e.target.value)}
                   >
-                    <option value="" className="dark:bg-[#1A0B11]">Selecciona materia prima del catálogo...</option>
+                    <option value="" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Selecciona materia prima del catálogo...</option>
                     {/* Filtramos para renderizar solo los insumos que estén ACTIVOS */}
                     {supplies.filter(s => s.is_active).map((ins) => (
-                      <option key={ins._id || ins.id} value={ins._id || ins.id} className="dark:bg-[#1A0B11]">
+                      <option key={ins._id || ins.id} value={ins._id || ins.id} className="bg-[#fdf8f9] dark:bg-[#1a0e14]">
                         {ins.name} ({ins.unit})
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="w-full sm:w-28">
-                  <label className="text-[10px] font-bold uppercase opacity-50">Cantidad</label>
+                  <label className={labelClass}>Cantidad</label>
                   <input 
                     type="number" 
                     min={1} 
-                    className="w-full p-2.5 mt-1 bg-white/80 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl text-sm text-center outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-bold shadow-sm"
+                    className={`${inputClass} text-center font-bold`}
                     value={insumoQuantity}
                     onChange={(e) => setInsumoQuantity(Math.max(1, Number(e.target.value)))}
                   />
@@ -438,15 +448,22 @@ export default function CreateProductPage() {
           )}
 
           {/* Variantes: Tallas y Colores */}
-          <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm space-y-6">
+          <div className={sectionClass}>
             {/* SECCIÓN TALLAS */}
             <div>
-              <h3 className="font-bold mb-4 flex items-center gap-2"><Ruler size={18} /> Tallas *</h3>
-              <div className="flex flex-wrap gap-2">
+              <h3 className={`${titleClass} flex items-center gap-2`}><Ruler size={18} /> Tallas *</h3>
+              <div className="flex flex-wrap gap-[16px]">
                 {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => {
                   const isSelected = selectedSizes.includes(size);
                   return (
-                    <button key={size} type="button" onClick={() => toggleSize(size)} className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] border-[#D6405F] dark:border-[#F8BBD0] shadow-md scale-110' : 'border-[#EAE0E2] dark:border-white/20 bg-white/50 dark:bg-black/50 hover:bg-[#D6405F]/10 dark:hover:bg-[#F8BBD0]/10 text-[#40202D] dark:text-white'}`}>
+                    <button key={size} type="button" onClick={() => toggleSize(size)} 
+                      className={`transition-all flex items-center justify-center font-medium cursor-pointer
+                        ${isSelected ? 'bg-[rgba(139,58,82,0.3)] border-[#8B3A52] text-white' : 'bg-transparent border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.15)] text-[#8B3A52]/70 dark:text-[#c4a0ae] hover:border-[#8B3A52]/50'}`}
+                      style={{ 
+                        width: '40px', height: '40px', borderRadius: '8px',
+                        borderWidth: '1px', fontSize: '0.82rem'
+                      }}
+                    >
                       {size}
                     </button>
                   );
@@ -456,7 +473,7 @@ export default function CreateProductPage() {
 
             {/* SECCIÓN COLORES */}
             <div className="space-y-4">
-              <h3 className="font-bold flex items-center gap-2">
+              <h3 className={`${titleClass} flex items-center gap-2`}>
                 <Palette size={18} /> Colores *
               </h3>
               
@@ -466,7 +483,7 @@ export default function CreateProductPage() {
                     <div className="relative">
                       <input
                         type="text"
-                        className="w-full p-3 bg-white/50 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl pl-10 text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-all shadow-sm"
+                        className={`${inputClass} pl-10`}
                         placeholder="Buscar color en español o inglés... (ej: azul, rosa, blue)"
                         value={colorSearch}
                         onFocus={() => setShowColorDropdown(true)}

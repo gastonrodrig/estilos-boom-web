@@ -9,23 +9,23 @@ export interface Benefit {
 export const BenefitCard = ({ benefit }: { benefit: Benefit }) => {
   return (
     <motion.div
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -3 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="flex flex-col items-center text-center space-y-4 py-4 px-2 group"
+      className="flex flex-col items-center justify-center text-center space-y-3 py-2 group w-full transition-colors duration-500 ease-in-out"
     >
       <motion.div
         whileHover={{ scale: 1.1 }}
         transition={{ duration: 0.4 }}
-        className="mb-2"
+        className="mb-1"
       >
-        <benefit.icon className="w-10 h-10 text-[#632034]" strokeWidth={1} />
+        <benefit.icon className="w-7 h-7 text-[#f2b6c1] dark:text-[#e8829a] transition-colors duration-500" strokeWidth={1.5} />
       </motion.div>
 
-      <h3 className="text-[#632034] font-bold text-xs sm:text-sm uppercase tracking-[0.15em]">
+      <h3 className="text-[#632034] dark:text-white font-bold text-[0.75rem] sm:text-[0.8rem] uppercase tracking-[0.1em] whitespace-nowrap transition-colors duration-500">
         {benefit.title}
       </h3>
 
-      <p className="text-[#594246]/70 text-xs sm:text-sm font-medium">
+      <p className="text-[#594246]/70 dark:text-gray-400 text-xs sm:text-[0.75rem] font-medium">
         {benefit.subtitle}
       </p>
     </motion.div>

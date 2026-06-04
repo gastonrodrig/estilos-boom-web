@@ -15,13 +15,22 @@ export const Hero = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
-        <Image
-          src="/assets/chicaRosa.png"
-          alt="Nueva colección Estilos Boom"
-          fill
-          priority
-          className="object-cover"
-        />
+        <>
+          <Image
+            src="/assets/chicaLight.png"
+            alt="Nueva colección Estilos Boom"
+            fill
+            priority
+            className="object-cover transition-opacity duration-500 ease-in-out opacity-100 dark:opacity-0"
+          />
+          <Image
+            src="/assets/darkModeChica.jpg"
+            alt="Nueva colección Estilos Boom Dark"
+            fill
+            priority
+            className="object-cover transition-opacity duration-500 ease-in-out opacity-0 dark:opacity-100"
+          />
+        </>
       </motion.div>
 
       {/* Overlay */}

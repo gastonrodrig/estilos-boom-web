@@ -20,9 +20,9 @@ type CTAProps =
     }
 
 const baseClasses =`
-  inline-flex items-center justify-center gap-2 rounded-sm 
-  px-8 py-[14px] text-sm font-semibold tracking-widest uppercase transition-all duration-300
-  bg-[#632034] text-white shadow-sm hover:bg-[#4a1827] hover:shadow-lg active:scale-[0.98]
+  inline-flex items-center justify-center gap-2 rounded-full 
+  px-10 py-[16px] text-sm font-semibold tracking-widest uppercase transition-all duration-300
+  bg-[#9d4863] text-white shadow-sm hover:bg-[#8B3A52] hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(232,130,154,0.4)] active:scale-[0.98]
   hover:cursor-pointer
 `
 

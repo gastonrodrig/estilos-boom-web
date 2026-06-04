@@ -22,21 +22,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <motion.article
-      className="overflow-hidden rounded-lg bg-white shadow-md"
+      className="overflow-hidden rounded-2xl bg-white shadow-[0_4px_20px_rgba(0,0,0,0.07)] dark:bg-white/5 dark:backdrop-blur-[10px] dark:border dark:border-white/[0.08] dark:shadow-none transition-all duration-500 ease-in-out"
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.35 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       whileHover={{
-        scale: 1.03,
-        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)",
+        y: -4,
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
       <Link href={product.href}>
         {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+        <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-transparent">
           <Image
             src={product.image}
             alt={product.name}
@@ -68,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           transition={{ duration: 0.3 }}
         >
           <motion.h3
-            className="mb-2 font-light text-gray-900"
+            className="mb-2 font-light text-gray-900 dark:text-gray-100"
             animate={{ scale: isHovered ? 1.05 : 1 }}
             transition={{ duration: 0.2 }}
           >
@@ -76,9 +76,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </motion.h3>
 
           <motion.p
-            className="font-semibold text-gray-600"
+            className={`font-semibold transition-colors duration-200 ${isHovered ? "text-[#f2b6c1] dark:text-[#ffb3c6]" : "text-gray-600 dark:text-[#e8829a]"}`}
             animate={{
-              color: isHovered ? "#f2b6c1" : "#4b5563",
               scale: isHovered ? 1.1 : 1,
             }}
             transition={{ duration: 0.2 }}
