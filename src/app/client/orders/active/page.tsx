@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 const steps = [
-  "Recibido",
+  "Inicio de pedido",
   "Pago confirmado",
   "Preparando",
   "En camino",

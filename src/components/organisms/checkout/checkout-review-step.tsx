@@ -1,16 +1,20 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useCheckoutStore, useOrderSubmission } from '@/hooks/extra';
+import { useCartStore } from '@/hooks';
 import { CheckoutFormValues } from '@/core/models/checkout';
 import { AddressInput } from '@models';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import Image from 'next/image';
 
 const CheckoutReviewStep: React.FC = () => {
-  const { handleGoToPayment } = useCheckoutStore();
+  const { handleGoToPayment, handleGoToDelivery } = useCheckoutStore();
+  const { items } = useCartStore();
   const { watch } = useFormContext<CheckoutFormValues>();
   const formData = watch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const {
     submitOrder,
@@ -22,15 +26,21 @@ const CheckoutReviewStep: React.FC = () => {
     displayDepartment,
   } = useOrderSubmission();
 
-  const onSubmitOrder = async () => {
+  const handleConfirmOrder = async () => {
+    setIsConfirming(true);
     const success = await submitOrder();
-    // 🔴 PRÓXIMO PASO:
-    // if(success) router.push('/checkout/success');
+    setIsConfirming(false);
+    if(success) {
+      setIsModalOpen(false);
+      // router.push('/checkout/success'); ( handled by submitOrder or store in real app )
+    }
   };
 
+  const paymentLabel = formData.paymentMethod === 'card' ? 'Mercado Pago' : formData.paymentMethod === 'transfer' ? 'Transferencia Bancaria' : 'Yape / Plin';
+  const paymentIconSrc = formData.paymentMethod === 'card' ? '/assets/visaymaster.png' : formData.paymentMethod === 'transfer' ? '/assets/bank.png' : '/assets/yapeyplin.png';
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 border-[#594246]/30 rounded-sm p-8 border border-[#EBEAE8] shadow-sm">
-      {/* ... (El resto del JSX se mantiene exactamente igual que en la respuesta anterior) ... */}
+    <div className="space-y-6 animate-in fade-in duration-500 border-[#594246]/30 rounded-sm p-8 border border-[#EBEAE8] shadow-sm relative">
       <header>
         <h2 className="text-[25px] font-semibold text-[#594246] pb-3">Revisa tu Pedido</h2>
         <p className="text-sm text-[#827D7D]">Confirmar que todo esté correcto antes de finalizar.</p>
@@ -40,7 +50,7 @@ const CheckoutReviewStep: React.FC = () => {
         <div className="p-5 border border-[#EBEAE8] rounded-sm bg-white">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-[#594246] uppercase text-[15px]">Envío</h3>
-            <button className="text-[#F2778D] text-xs underline">Editar</button>
+            <button onClick={handleGoToDelivery} className="text-[#F2778D] text-xs underline">Editar</button>
           </div>
           
           {isLoadingAddresses ? (
@@ -65,9 +75,12 @@ const CheckoutReviewStep: React.FC = () => {
 
         <div className="p-5 border border-[#EBEAE8] rounded-sm bg-white">
           <h3 className="font-bold text-[#594246] uppercase text-[15px] mb-3">Método de Pago</h3>
-          <p className="text-sm text-[#594246]">
-            {formData.paymentMethod === 'card' ? '💳 Tarjeta de Crédito / Débito' : '📱 Pago QR / Transferencia'}
-          </p>
+          <div className="flex items-center gap-2">
+            <Image src={paymentIconSrc} alt={paymentLabel} width={35} height={20} className="object-contain" />
+            <p className="text-sm text-[#594246]">
+              {paymentLabel}
+            </p>
+          </div>
           <p className="text-xs text-[#827D7D] mt-2 font-medium">
             Envío: {formData.selectedDeliveryMethod?.name} - S/ {formData.selectedDeliveryMethod?.price}
           </p>
@@ -76,21 +89,95 @@ const CheckoutReviewStep: React.FC = () => {
 
       <div className="pt-6 flex flex-col items-center gap-4">
         <p className="text-[11px] text-gray-400 text-center max-w-md">
-          Al hacer clic en "Finalizar Compra", aceptas nuestros términos y condiciones. Tu pago será procesado de forma segura.
+          Al hacer clic en "Finalizar Compra", aceptarás nuestros términos y condiciones. Tu pago será procesado de forma segura.
         </p>
         
         <button
-          onClick={onSubmitOrder}
+          onClick={() => setIsModalOpen(true)}
           disabled={isLoadingAddresses}
           className="w-full md:w-2/3 py-5 bg-[#F2778D] text-white rounded-full font-bold text-lg hover:bg-[#F2778D]/90 shadow-lg transition-all active:scale-95 disabled:opacity-50"
         >
-          Finalizar Compra y Pagar
+          Finalizar Compra
         </button>
         
         <button onClick={handleGoToPayment} className="text-[#594246] text-sm font-medium hover:underline opacity-70">
           Regresar a Pago
         </button>
       </div>
+
+      {/* MODAL DE CONFIRMACIÓN */}
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              disabled={isConfirming}
+              className="absolute top-4 right-4 text-[#827D7D] hover:text-[#594246] transition-colors z-10 disabled:opacity-50"
+            >
+              <X size={24} />
+            </button>
+            
+            <div className="p-8 text-center space-y-6">
+              <h2 className="text-2xl font-serif text-[#594246] font-bold">¿Estás segura?</h2>
+              <p className="text-[#827D7D] text-sm px-4">
+                Por favor verifica que la información de tu pedido sea correcta.
+              </p>
+
+              <div className="bg-[#FAF9F6] p-5 rounded-2xl text-left border border-[#EBEAE8] space-y-4">
+                <div>
+                  <p className="text-[11px] text-[#827D7D] font-bold uppercase tracking-wider mb-2">Resumen de Pedido</p>
+                  {items.length > 0 && (
+                    <div className="flex gap-3 items-center bg-white p-2 rounded-lg border border-[#EBEAE8]">
+                      <div className="w-12 h-16 shrink-0">
+                        <img src={items[0]?.image} alt={items[0]?.name} className="w-full h-full object-cover rounded-md" />
+                      </div>
+                      <div className="flex-1">
+                         <p className="text-sm font-bold text-[#594246] leading-tight">{items[0]?.name}</p>
+                         <p className="text-xs text-[#827D7D]">{items[0]?.color} | {items[0]?.size}</p>
+                         {items.length > 1 && <p className="text-[10px] text-[#F2778D] font-bold mt-1">Y {items.length - 1} artículo(s) más...</p>}
+                      </div>
+                      <div className="text-right shrink-0">
+                         <p className="text-sm font-bold text-[#594246]">S/ {items[0]?.price?.toFixed(2)}</p>
+                         <p className="text-xs text-[#827D7D]">Cant: {items[0]?.quantity}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-[11px] text-[#827D7D] font-bold uppercase tracking-wider">Dirección de envío</p>
+                  <p className="text-[#594246] font-medium text-sm mt-1 capitalize truncate">{displayAddress}, {displayDistrict}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-[#827D7D] font-bold uppercase tracking-wider">Método de pago</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Image src={paymentIconSrc} alt={paymentLabel} width={25} height={15} className="object-contain" />
+                    <p className="text-[#594246] font-medium text-sm">{paymentLabel}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  disabled={isConfirming}
+                  className="flex-1 py-3.5 rounded-full font-bold text-[#594246] border-2 border-[#EBEAE8] hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Cerrar
+                </button>
+                <button
+                  onClick={handleConfirmOrder}
+                  disabled={isConfirming}
+                  className="flex-1 py-3.5 rounded-full font-bold text-white bg-[#594246] hover:bg-[#F2778D] transition-colors shadow-md disabled:opacity-50 flex justify-center items-center gap-2"
+                >
+                  {isConfirming ? <Loader2 size={18} className="animate-spin" /> : null}
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

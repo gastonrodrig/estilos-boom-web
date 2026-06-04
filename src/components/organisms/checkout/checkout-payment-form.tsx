@@ -52,13 +52,13 @@ const CheckoutPaymentForm: React.FC = () => {
   const PAYMENT_METHODS = [
     { 
       id: 'card', 
-      label: 'Tarjeta de Crédito / Débito', 
-      icon: { src: "/assets/visaymaster.png", alt: 'Visa y Mastercard', width: 60 }
+      label: 'Mercado Pago (Tarjetas / Efectivo)', 
+      icon: { src: "/assets/visaymaster.png", alt: 'Mercado Pago', width: 60 }
     },
     { 
       id: 'qr', 
-      label: 'Yape / Plin / QR', 
-      icon: { src: "/assets/yapeyplin.png", alt: 'Pago QR', width: 60 } 
+      label: 'Yape / Plin', 
+      icon: { src: "/assets/yapeyplin.png", alt: 'Yape y Plin', width: 60 } 
     },
     { 
       id: 'transfer', 
