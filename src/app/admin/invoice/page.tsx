@@ -50,22 +50,22 @@ export default function AdminInvoicePage() {
       </div>
 
       {/* Table */}
-      <main className="overflow-hidden rounded-[2rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md shadow-sm">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-white/30 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                <th className="px-6 py-5">Comprobante</th>
-                <th className="px-6 py-5">Cliente</th>
-                <th className="px-6 py-5">Fecha Emisión</th>
-                <th className="px-6 py-5">Monto Total</th>
-                <th className="px-6 py-5">Estado</th>
-                <th className="px-6 py-5 text-right">Descargar</th>
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Comprobante</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cliente</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha Emisión</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto Total</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-right">Descargar</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[13px]">
-              {dummyInvoices.map((inv) => (
-                <tr key={inv.id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+              {dummyInvoices.map((inv, idx) => (
+                <tr key={inv.id} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                   <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
                     {inv.id}
                   </td>

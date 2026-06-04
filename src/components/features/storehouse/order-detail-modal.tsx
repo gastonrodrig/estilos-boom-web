@@ -70,7 +70,7 @@ useEffect(() => {
               </thead>
               <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
                 {opp.base_items?.map((item: any, i: number) => (
-                  <tr key={i} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                  <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     <td className="p-4 flex items-center gap-3">
                       <span className="font-bold text-[#40202D] dark:text-white">{item.id_variant?.size}</span>
                       <span className="text-[#EAE0E2] dark:text-gray-600">|</span>

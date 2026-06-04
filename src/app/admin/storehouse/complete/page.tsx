@@ -90,27 +90,27 @@ export default function CompletedOrdersPage() {
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-[2rem] border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md shadow-sm">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-white/30 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                <th className="px-6 py-5">Código OC</th>
-                <th className="px-6 py-5">Proveedor</th>
-                <th className="px-6 py-5">Fecha Llegada</th>
-                <th className="px-6 py-5 text-center">Items</th>
-                <th className="px-6 py-5">Inversión</th>
-                <th className="px-6 py-5">Calidad</th>
-                <th className="px-6 py-5 text-right">Acciones</th>
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Código OC</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Proveedor</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha Llegada</th>
+                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Items</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Inversión</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Calidad</th>
+                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[13px]">
-              {completedOCs.map((oc) => {
+              {completedOCs.map((oc, idx) => {
                 // ✅ CORRECCIÓN SEGÚN LOG: id_supplier y name_company
                 const supplierName = oc.id_supplier?.name_company || "Proveedor Desconocido";
 
                 return (
-                  <tr key={oc._id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+                  <tr key={oc._id} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
                       {oc.order_number}
                     </td>

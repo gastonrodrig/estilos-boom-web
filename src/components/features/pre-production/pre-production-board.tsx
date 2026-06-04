@@ -312,18 +312,18 @@ export const PreProductionBoard = () => {
                       </h3>
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-separate border-spacing-y-2">
-                        <thead>
-                          <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#b79ca5]">
-                            <th className="px-4 pb-2">Talla</th>
-                            <th className="px-4 pb-2">Color</th>
-                            <th className="px-4 pb-2">Stock Actual</th>
-                            <th className="px-4 pb-2">Mínimo</th>
-                            <th className="px-4 pb-2">Nivel</th>
-                            <th className="px-4 pb-2">Estado</th>
-                            <th className="px-4 pb-2">Métricas</th>
-                            <th className="px-4 pb-2 text-center">Acción</th>
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Stock Actual</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Mínimo</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Nivel</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Métricas</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-center">Acción</th>
                           </tr>
                         </thead>
                         <tbody>

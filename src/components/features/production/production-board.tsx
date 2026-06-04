@@ -15,7 +15,9 @@ import {
   Eye, 
   ArrowUp,
   FilePlus2,
-  Trash2
+  Trash2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Product } from "@/core/models";
@@ -127,6 +129,19 @@ export const ProductionBoard = () => {
   const lowCount = alertProducts.filter((p) => p.critical === 0 && p.low > 0).length;
   const isLoading = productsLoading || ordersLoading;
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, currentPage]);
+
   const toggleVariant = (next: SupplySelection) => {
     let changedProduct = false;
     setSelected((current) => {
@@ -176,7 +191,7 @@ export const ProductionBoard = () => {
   };
 
   return (
-    <section className="mx-auto max-w-6xl px-4 space-y-6 pb-24 transition-colors duration-500">
+    <section className="mx-auto max-w-7xl px-4 py-8 font-sans transition-colors duration-500">
       {/* ── Header ── */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
         <div>
@@ -195,19 +210,19 @@ export const ProductionBoard = () => {
       </header>
 
       {/* ── Stat cards ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="relative overflow-hidden rounded-[1.5rem] bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl px-8 py-6 border border-pink-100 dark:border-white/5 shadow-sm transition-all hover:scale-[1.02]">
           <p className="text-5xl font-black text-[#D6405F] dark:text-[#F8BBD0]">{criticalCount}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Alertas Críticas</p>
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-pink-100 dark:border-white/10 shadow-inner">
             <AlertTriangle className="h-6 w-6 text-[#D6405F] dark:text-[#F8BBD0]" />
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
+        <div className="relative overflow-hidden rounded-[1.5rem] bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl px-8 py-6 border border-pink-100 dark:border-white/5 shadow-sm transition-all hover:scale-[1.02]">
           <p className="text-5xl font-black text-[#40202D] dark:text-white">{lowCount}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Stock Bajo</p>
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-pink-100 dark:border-white/10 shadow-inner">
             <TrendingDown className="h-6 w-6 text-[#8C6B79] dark:text-gray-400" />
           </div>
         </div>
@@ -222,11 +237,16 @@ export const ProductionBoard = () => {
       {/* ── Product list ── */}
       {!isLoading && filtered.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-black text-[#40202D] dark:text-white tracking-wide px-2">
-            Productos para Producción
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
+            <h2 className="text-xl font-black text-[#40202D] dark:text-white tracking-wide">
+              Productos para Producción
+            </h2>
+            <div className="text-sm font-medium text-[#8C6B79] dark:text-gray-400">
+              Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, filtered.length)} - {Math.min(currentPage * itemsPerPage, filtered.length)} de {filtered.length}
+            </div>
+          </div>
 
-          {filtered.map(({ product, variants, critical }) => {
+          {paginatedItems.map(({ product, variants, critical }) => {
             const isOpen = expanded === product.id_product;
             const isProductInTransit = variants.some(
               (v) => (pendingTransitByVariant[v.id_variant] || 0) > 0
@@ -243,7 +263,7 @@ export const ProductionBoard = () => {
             return (
               <article
                 key={product.id_product}
-                className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm transition-all duration-300"
+                className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl shadow-sm transition-all duration-300"
               >
                 <button
                   type="button"
@@ -277,7 +297,7 @@ export const ProductionBoard = () => {
                         </span>
                         <span
                           className={`rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
-                            critical > 0 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
+                            critical > 0 ? "bg-rose-500/15 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 border border-rose-500/30" : "bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-500/30"
                           }`}
                         >
                           {critical > 0 ? "Crítico" : "Bajo"}
@@ -314,29 +334,29 @@ export const ProductionBoard = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 px-6 py-8 transition-all">
+                  <div className="border-t border-pink-100 dark:border-white/5 bg-white/50 dark:bg-black/20 px-6 py-8 transition-all">
                     <div className="mb-6 flex items-center justify-between">
                       <h3 className="text-[11px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">
                         Detalle por variante
                       </h3>
                     </div>
 
-                    <div className="overflow-x-auto custom-scrollbar">
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
                       <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                            <th className="px-4 py-4">Talla</th>
-                            <th className="px-4 py-4">Color</th>
-                            <th className="px-4 py-4">Stock</th>
-                            <th className="px-4 py-4">Mínimo</th>
-                            <th className="px-4 py-4">Nivel</th>
-                            <th className="px-4 py-4">Estado</th>
-                            <th className="px-4 py-4">Métricas</th>
-                            <th className="px-4 py-4 text-center">Acción</th>
+                        <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Stock</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Mínimo</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Nivel</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Métricas</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-center">Acción</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
-                          {variants.map((variant) => {
+                          {variants.map((variant, idx) => {
                             const stock = Number(variant.stock ?? 0);
                             const key = `${product.id_product}-${variant.id_variant}`;
                             const minimum = selected[key]?.minimum ?? minimumForStock(stock);
@@ -346,7 +366,7 @@ export const ProductionBoard = () => {
                             const checked = Boolean(selected[key]);
 
                             return (
-                              <tr key={key} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group/row">
+                              <tr key={key} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                                 <td className="px-4 py-5 text-[13px] font-black text-[#40202D] dark:text-white">
                                   {variant.size || "-"}
                                 </td>
@@ -440,7 +460,8 @@ export const ProductionBoard = () => {
                           </button>
                           <button
                             onClick={startProduction}
-                            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-8 py-3 text-[12px] font-black uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto"
+                            className="flex items-center justify-center gap-2 bg-[#8B3A52] hover:bg-[#a04060] text-white shadow-md transition-all font-medium w-full md:w-auto"
+                            style={{ borderRadius: "8px", fontSize: "0.8rem", letterSpacing: "0.05em", padding: "10px 20px" }}
                           >
                             <Factory className="h-4 w-4" /> Crear Orden
                           </button>
@@ -452,11 +473,63 @@ export const ProductionBoard = () => {
               </article>
             );
           })}
+          
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-2 pb-4">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 disabled:opacity-50 disabled:pointer-events-none transition-all shadow-sm"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              
+              <div className="flex items-center gap-1.5 bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md rounded-[999px] px-3 py-1.5 border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.05)] shadow-sm">
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const page = i + 1;
+                  // Logica simple para mostrar un rango si hay muchas paginas
+                  if (
+                    totalPages > 5 &&
+                    page !== 1 &&
+                    page !== totalPages &&
+                    Math.abs(currentPage - page) > 1
+                  ) {
+                    if (page === 2 || page === totalPages - 1) {
+                      return <span key={page} className="text-[#8C6B79] dark:text-gray-500 text-xs px-1">...</span>;
+                    }
+                    return null;
+                  }
+
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-bold transition-all
+                        ${currentPage === page 
+                          ? "bg-[#8B3A52] text-white shadow-md shadow-[#8B3A52]/20 border border-[#8B3A52]" 
+                          : "text-[#8C6B79] dark:text-gray-400 hover:bg-white dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white"
+                        }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 disabled:opacity-50 disabled:pointer-events-none transition-all shadow-sm"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {!isLoading && filtered.length === 0 && (
-        <div className="rounded-3xl border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-6 py-12 text-center shadow-sm">
+        <div className="rounded-[1.5rem] border border-pink-100 dark:border-white/10 bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl px-6 py-12 text-center shadow-sm">
           <Package2 className="h-12 w-12 text-[#8C6B79] dark:text-gray-500 mx-auto mb-4 opacity-50" />
           <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-400 tracking-wide">No hay productos con alertas de stock o coincidiendo con tu búsqueda.</p>
         </div>

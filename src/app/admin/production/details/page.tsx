@@ -222,8 +222,10 @@ export default function ProductionOrderTracking() {
   }), [orders]);
 
   return (
-    <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
+    <>
+      <div className="fixed inset-0 hidden dark:block bg-[#1e1018] pointer-events-none -z-10" />
+      <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 font-sans transition-colors duration-500 relative min-h-screen">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
         <div>
           <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
             Inicio / Producción / Seguimiento
@@ -248,26 +250,26 @@ export default function ProductionOrderTracking() {
         </button>
       </header>
 
-      <div className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] rounded-[2rem] p-4 mb-6 shadow-sm flex flex-col md:flex-row gap-4 items-center transition-[background-color,border-color] duration-[600ms]">
-        <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/40" size={16} />
+      <div className="flex flex-col lg:flex-row gap-[12px] items-center mb-6 w-full">
+        <div className="relative w-full lg:w-80 shrink-0">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a08088] pointer-events-none" size={16} />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por taller, producto o N° de orden..."
-            className="w-full rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md py-2.5 pl-11 pr-4 text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-white/30"
+            className="w-full rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] py-[10px] pl-[44px] pr-[16px] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-[#a08088]"
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+        <div className="flex flex-1 gap-[12px] overflow-x-auto custom-scrollbar items-center w-full lg:w-auto">
           <div className="relative shrink-0">
             <select 
               value={selectedWorkshop}
               onChange={(e) => setSelectedWorkshop(e.target.value)}
-              className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer min-w-[200px]"
+              className="appearance-none pl-[16px] pr-[44px] py-[10px] rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all cursor-pointer min-w-[200px]"
             >
-              {workshops.map(w => <option key={w} value={w} className="dark:bg-[#1A0B11]">{w}</option>)}
+              {workshops.map(w => <option key={w} value={w} className="dark:bg-[#1e1018]">{w}</option>)}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C6B79] pointer-events-none opacity-50" size={16} />
           </div>
@@ -276,9 +278,9 @@ export default function ProductionOrderTracking() {
             <select 
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer min-w-[180px]"
+              className="appearance-none pl-[16px] pr-[44px] py-[10px] rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all cursor-pointer min-w-[180px]"
             >
-              {months.map(m => <option key={m} value={m} className="dark:bg-[#1A0B11]">{m}</option>)}
+              {months.map(m => <option key={m} value={m} className="dark:bg-[#1e1018]">{m}</option>)}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C6B79] pointer-events-none opacity-50" size={16} />
           </div>
@@ -293,7 +295,7 @@ export default function ProductionOrderTracking() {
             className={`flex items-center gap-2 whitespace-nowrap rounded-[999px] px-5 py-2.5 text-[10px] font-bold transition-all uppercase tracking-widest ${
               filter === key 
                 ? "bg-[#8B3A52] text-white shadow-md shadow-[#8B3A52]/20 border border-[#8B3A52]" 
-                : "bg-white/50 dark:bg-white/5 border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 shadow-sm"
+                : "bg-white/80 dark:bg-[rgba(255,255,255,0.03)] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] text-[#8C6B79] dark:text-[#c4a0ae] hover:bg-white hover:border-[#D6405F] dark:hover:border-[#8B3A52] dark:hover:bg-[rgba(255,255,255,0.08)] shadow-sm hover:shadow-md"
             }`}
           >
             {key === "CONTROL CALIDAD" ? <ClipboardCheck className="w-4 h-4" /> : key === "EN PRODUCCIÓN" ? <Factory className="w-4 h-4" /> : key === "RECHAZADAS" ? <XCircle className="w-4 h-4" /> : <Package className="w-4 h-4" />}
@@ -336,7 +338,7 @@ export default function ProductionOrderTracking() {
 
           if (filtered.length === 0) {
             return (
-              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[40px] bg-white/30 dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
+              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[1.5rem] bg-[#fffcfd] dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
                 <div className="bg-white/50 dark:bg-white/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                   <Package className="h-12 w-12 text-[#8C6B79] dark:text-gray-500" />
                 </div>
@@ -359,10 +361,11 @@ export default function ProductionOrderTracking() {
               qualityRating={qualityRating}
               setQualityRating={setQualityRating}
             />
-          ));
+          ))
         })()}
       </div>
     </section>
+    </>
   );
 }
 
@@ -484,7 +487,7 @@ function ProductionCard({
 
 
   return (
-    <article className="rounded-[1.5rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-[background-color,border-color,box-shadow] duration-[600ms] overflow-hidden relative group hover:shadow-md">
+    <article className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative group hover:shadow-md">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
@@ -498,12 +501,14 @@ function ProductionCard({
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <h3 className="text-xl sm:text-2xl font-black text-[#40202D] dark:text-white leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               <div className="flex flex-wrap gap-1.5">
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-sm ${
-                  order.status === 'CONTROL_CALIDAD' ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] dark:from-[#F8BBD0] dark:to-[#F48FB1] dark:text-[#1A0B11]'
+                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                  order.status === 'CONTROL_CALIDAD' 
+                    ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 text-white' 
+                    : 'bg-[#D6405F] dark:bg-[rgba(80,180,120,0.15)] text-white dark:text-[#6dba8a] border border-transparent dark:border-[rgba(80,180,120,0.25)]'
                   }`}>
                   {order.status === 'CONTROL_CALIDAD' ? 'Control Calidad' : 'En Proceso'}
                 </span>
-                <span className="rounded-full bg-white/50 dark:bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-300 border border-[#EAE0E2] dark:border-white/10 flex items-center gap-2 shadow-sm">
+                <span className="rounded-full bg-[rgba(139,58,82,0.12)] dark:bg-[rgba(160,80,104,0.15)] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#6b3a48] dark:text-[#c4a0ae] border border-[rgba(139,58,82,0.25)] dark:border-[rgba(160,80,104,0.2)] flex items-center gap-2 shadow-sm">
                   {workshopName}
                   {order.status === 'COMPLETADA' && (
                     <div className="flex gap-0.5 ml-1 border-l border-[#EAE0E2] dark:border-white/10 pl-2">
@@ -525,17 +530,17 @@ function ProductionCard({
                 })()}
               </div>
             </div>
-            <p className="text-xs text-[#8C6B79] dark:text-gray-400 font-medium">
-              <span className="font-bold text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</span> · <span className="font-bold text-[#40202D] dark:text-white">{order.base_items?.length || 0}</span> Variantes · <span className="font-bold text-[#40202D] dark:text-white">{order.base_items?.reduce((acc:any, i:any) => acc + i.quantity, 0)}</span> uds.
+            <p className="text-xs text-[#6b3a48] dark:text-[#c4a0ae] font-medium opacity-100">
+              <span className="font-bold text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</span> · <span className="font-bold text-[#6b3a48] dark:text-[#c4a0ae]">{order.base_items?.length || 0}</span> Variantes · <span className="font-bold text-[#6b3a48] dark:text-[#c4a0ae]">{order.base_items?.reduce((acc:any, i:any) => acc + i.quantity, 0)}</span> uds.
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-2">
-              <p className="text-xs text-[#8C6B79] dark:text-gray-400 font-medium flex items-center gap-1.5 bg-white/30 dark:bg-white/5 px-3 py-1.5 rounded-full border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+              <p className="text-xs text-[#6b3a48] dark:text-[#c4a0ae] font-medium flex items-center gap-1.5 bg-white/30 dark:bg-white/5 px-3 py-1.5 rounded-full border border-[#EAE0E2] dark:border-white/10 shadow-sm opacity-100">
                 <CalendarClock className="w-3.5 h-3.5 text-[#D6405F] dark:text-[#F8BBD0]" />
-                Entrega estimada: <span className="text-[#40202D] dark:text-white font-black">{formatDate(localEstimatedDate)}</span>
+                Entrega estimada: <span className="text-[#6b3a48] dark:text-[#c4a0ae] font-black">{formatDate(localEstimatedDate)}</span>
               </p>
               <button 
                 onClick={() => setActiveModal("DATE")} 
-                className="flex items-center gap-1 text-[10px] text-[#D6405F] dark:text-[#F8BBD0] font-black uppercase tracking-wider bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 px-3 py-1.5 rounded-full hover:bg-[#D6405F] dark:hover:bg-[#F8BBD0] hover:text-white dark:hover:text-[#1A0B11] transition-colors shadow-sm"
+                className="flex items-center gap-1 text-[10px] text-[#D6405F] dark:text-[#c4a0ae] font-black uppercase tracking-wider bg-[#D6405F]/10 dark:bg-transparent border border-transparent dark:border-[rgba(139,58,82,0.4)] px-3 py-1.5 rounded-full dark:rounded-[8px] hover:bg-[#D6405F] dark:hover:bg-[rgba(139,58,82,0.2)] hover:text-white dark:hover:text-[#e8d8dc] transition-colors shadow-sm"
               >
                 <Plus className="w-3 h-3" />
                 Prolongar
@@ -546,18 +551,18 @@ function ProductionCard({
 
         <div className="flex flex-wrap items-center justify-between xl:justify-end gap-4 sm:gap-8 lg:gap-12 pt-4 xl:pt-0 border-t xl:border-t-0 border-[#EAE0E2] dark:border-white/10">
           <div className="space-y-1 sm:space-y-2 min-w-[120px]">
-            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">
+            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-black text-[#8B3A52] dark:text-[#c4a0ae] uppercase tracking-widest opacity-70">
               <span>Progreso</span>
               <span className="text-[#D6405F] dark:text-[#F8BBD0]">{getProgress()}%</span>
             </div>
             <div className="h-2 w-32 sm:w-40 overflow-hidden rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
               <div className="h-full bg-gradient-to-r from-[#D6405F] to-[#F23B69] dark:from-[#F8BBD0] dark:to-[#F48FB1] transition-all duration-700" style={{ width: `${getProgress()}%` }} />
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-500">Iniciado: {formatDate(order.created_at)}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-[#c4a0ae] opacity-70">Iniciado: {formatDate(order.created_at)}</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="text-2xl sm:text-3xl font-black text-[#D6405F] dark:text-[#F8BBD0] tracking-tighter drop-shadow-sm">
+            <div className="text-2xl sm:text-[1.3rem] font-semibold text-[#2d1f25] dark:text-[#e8d8dc] tracking-tighter drop-shadow-sm">
               {formatCurrency(actualTotal)}
             </div>
 
@@ -574,11 +579,10 @@ function ProductionCard({
       {/* STEPPER DE PRODUCCIÓN */}
       <div className="mt-10 sm:mt-14 mb-6 px-2 sm:px-4 relative overflow-x-auto sm:overflow-visible no-scrollbar">
         <div className="min-w-[600px] sm:min-w-0 pb-2">
-          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[#868686]/20 z-0" />
-          
+          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[rgba(139,58,82,0.2)] dark:bg-[rgba(255,255,255,0.1)] z-0" />
           <div className="grid grid-cols-3 relative z-10">
             <StepItem 
-              active={true} 
+              state="completed" 
               icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Contacto Inicial" 
               sub="Orden confirmada" 
@@ -586,7 +590,7 @@ function ProductionCard({
             />
 
             <StepItem 
-              active={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"} 
+              state={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" ? "active" : (order.status === "CONTROL_CALIDAD" ? "completed" : "pending")} 
               icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="En Preparación" 
               sub="Corte y Confección" 
@@ -598,10 +602,10 @@ function ProductionCard({
             />
 
             <StepItem 
-              active={order.status === "CONTROL_CALIDAD"} 
+              state={order.status === "CONTROL_CALIDAD" ? "active" : "pending"} 
               icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />} 
               label="Control Calidad" 
-              sub="Revision y acabados" 
+              sub="Revisión y acabados" 
               date={order.status === "CONTROL_CALIDAD" ? (getStepDate("CONTROL_CALIDAD") || undefined) : undefined}
             />
           </div>
@@ -635,15 +639,15 @@ function ProductionCard({
                       </h4>
                     </div>
                     
-                    <div className="overflow-x-auto rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 backdrop-blur-md shadow-sm">
-                      <table className="w-full text-left text-sm">
-                        <thead>
-                          <tr className="text-[#8C6B79] dark:text-gray-400 font-black uppercase tracking-widest text-[10px] border-b border-[#EAE0E2] dark:border-white/10">
-                            <th className="py-4 px-4">Talla</th>
-                            <th className="py-4 px-4">Color</th>
-                            <th className="py-4 px-4 text-center">Cantidad</th>
-                            <th className="py-4 px-4 text-center">Costo Unit.</th>
-                            <th className="py-4 px-4 text-right">Subtotal</th>
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+                      <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
+                        <thead className={`relative transition-[background-color,border-color] duration-[600ms]`}>
+                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
+                            <th className="px-6 py-4 text-left border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] border-l dark:border-l-0 text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">Talla</th>
+                            <th className="px-6 py-4 text-left border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">Color</th>
+                            <th className="px-6 py-4 text-center border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">Cantidad</th>
+                            <th className="px-6 py-4 text-center border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">Costo Unit.</th>
+                            <th className="px-6 py-4 text-right border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] border-r dark:border-r-0 text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">Subtotal</th>
                           </tr>
                         </thead>
                         <tbody className="text-[#40202D] dark:text-gray-300">
@@ -667,18 +671,24 @@ function ProductionCard({
                             }
 
                             return (
-                              <tr key={idx} className="border-b border-[#EAE0E2]/50 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors last:border-0">
-                                <td className="py-4 px-4 font-bold">{item.id_variant?.size}</td>
-                                <td className="py-4 px-4">{item.id_variant?.color?.name || item.id_variant?.color}</td>
-                                <td className="py-4 px-4 text-center font-black">{item.quantity}</td>
-                                <td className="py-4 px-4 text-center text-[#8C6B79] dark:text-gray-400 font-medium">
+                              <tr key={idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 border-l dark:border-l-0 text-[#2d1f25] dark:text-[#e8d8dc] font-bold" style={{ fontSize: "0.85rem" }}>
+                                  {item.id_variant?.size}
+                                </td>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc]" style={{ fontSize: "0.85rem" }}>
+                                  {item.id_variant?.color?.name || item.id_variant?.color}
+                                </td>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-center font-black" style={{ fontSize: "0.85rem" }}>
+                                  {item.quantity}
+                                </td>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-center" style={{ fontSize: "0.85rem" }}>
                                   {isPending && unitCost === 0 ? (
                                     <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black italic">Pendiente</span>
                                   ) : (
                                     `S/ ${unitCost.toFixed(2)}`
                                   )}
                                 </td>
-                                <td className="py-4 px-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-right font-black" style={{ fontSize: "0.85rem" }}>
                                   {isPending && unitCost === 0 ? (
                                     <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black italic opacity-50">S/ 0.00</span>
                                   ) : (
@@ -1276,22 +1286,36 @@ function ProductionCard({
   );
 }
 
-function StepItem({ active, icon, label, sub, date, onClick, interactive }: { active: boolean; icon: any; label: string; sub: string; date?: string; onClick?: () => void; interactive?: boolean }) {
+function StepItem({ state, icon, label, sub, date, onClick, interactive }: { state: "completed" | "active" | "pending"; icon: any; label: string; sub: string; date?: string; onClick?: () => void; interactive?: boolean }) {
+  const isCompleted = state === "completed";
+  const isActive = state === "active";
+  
+  let circleClasses = "";
+  let borderClasses = "border-2 border-[rgba(139,58,82,0.25)] dark:border-[rgba(255,255,255,0.15)]";
+  
+  if (isCompleted) {
+    circleClasses = "bg-[rgba(139,58,82,0.15)] text-[#8B3A52] dark:bg-[rgba(139,58,82,0.3)] dark:text-[#c4a0ae]";
+    borderClasses = "border-2 border-[#8B3A52] dark:border-[#8B3A52]";
+  } else if (isActive) {
+    circleClasses = "bg-[#8B3A52] text-white dark:bg-[#8B3A52] dark:text-white";
+    borderClasses = "border-0 dark:border-2 dark:border-[#c4607f]";
+  } else {
+    circleClasses = "bg-transparent text-[#a08088] dark:bg-transparent dark:text-[#a08088]";
+  }
+
   return (
     <div 
       className={`flex flex-col items-center text-center space-y-3 ${interactive ? "cursor-pointer hover:scale-105 transition-transform" : ""}`}
       onClick={interactive ? onClick : undefined}
     >
-      <div className={`flex h-13 w-13 items-center justify-center rounded-full border-[6px] border-white shadow-lg transition-all z-10 ${
-        active ? "bg-[#F2778D] text-white" : "bg-[#ede8e9] text-[#b79ca5]"
-      } ${interactive ? "ring-2 ring-offset-2 ring-[#F2778D] hover:shadow-xl hover:bg-[#F2778D] hover:text-white" : ""}`}>
+      <div className={`flex h-13 w-13 sm:h-14 sm:w-14 items-center justify-center rounded-full transition-all z-10 ${borderClasses} ${circleClasses} ${interactive ? "hover:shadow-md ring-0" : ""}`}>
         {icon}
       </div>
-      <div className="space-y-1">
-        <p className={`text-sm font-bold ${active ? "text-[#F2778D]" : "text-[#b79ca5]"}`}>{label}</p>
-        <p className="text-[11px] leading-tight text-[#9b8088] max-w-[140px] mx-auto">{sub}</p>
-        {active && date && (
-          <p className="text-[10px] font-bold text-[#F2778D] mt-1 animate-pulse-slow">
+      <div className="space-y-1 mt-2">
+        <p className={`text-sm font-bold ${isActive || isCompleted ? "text-[#F2778D] dark:text-[#c4a0ae]" : "text-[#b79ca5] dark:text-[#a08088]"}`}>{label}</p>
+        <p className="text-[11px] leading-tight text-[#9b8088] dark:text-[rgba(255,255,255,0.4)] max-w-[140px] mx-auto">{sub}</p>
+        {(isActive || isCompleted) && date && (
+          <p className={`text-[10px] font-bold ${isActive ? "text-[#D6405F] dark:text-[#e8d8dc] animate-pulse-slow" : "text-[#F2778D] dark:text-[#a08088]"} mt-1`}>
             {new Date(date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} · {new Date(date).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
           </p>
         )}

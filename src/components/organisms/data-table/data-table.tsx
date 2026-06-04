@@ -429,10 +429,10 @@ export function DataTable<T extends object>({
   };
 
   return (
-    <div className={containerClassName || "w-full bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2rem] shadow-sm transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!"}>
+    <div className={containerClassName || "w-full transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!"}>
 
       {(title || description || onAddClick || onGlobalFilterChange) && (
-        <div className="flex flex-col gap-4 px-6 pt-8 pb-2">
+        <div className="flex flex-col gap-4 pt-8 pb-6">
           <div>
             {breadcrumb && <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium">{breadcrumb}</div>}
             
@@ -458,13 +458,13 @@ export function DataTable<T extends object>({
 
           {onGlobalFilterChange && (
             <div className="relative w-full sm:w-80 mt-2">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-white/40" />
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#a08088]" />
               <input
                 type="text"
                 value={globalFilter}
                 onChange={(e) => onGlobalFilterChange(e.target.value)}
                 placeholder="Buscar..."
-                className="w-full rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md py-2.5 pl-11 pr-4 text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-white/30"
+                className="w-full rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] py-[10px] pl-[44px] pr-[16px] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-[#a08088]"
               />
             </div>
           )}
@@ -473,7 +473,7 @@ export function DataTable<T extends object>({
 
       {useCardsLayout ? (
         <div
-          className={`mt-4 grid gap-4 px-6 pb-2 ${isMd ? "grid-cols-2" : "grid-cols-1"
+          className={`mt-4 grid gap-4 pb-2 ${isMd ? "grid-cols-2" : "grid-cols-1"
             } ${shouldEnableMobileCardsScroll ? "overflow-y-auto" : "overflow-y-visible"}`}
           style={{ maxHeight: shouldEnableMobileCardsScroll ? "550px" : undefined }}
         >
@@ -563,19 +563,19 @@ export function DataTable<T extends object>({
               })}
         </div>
       ) : (
-        <div className="mt-4 overflow-x-auto px-6">
+        <div className="mt-4 overflow-x-auto">
           <div
-            className={`border border-[rgba(139,58,82,0.08)] shadow-[0_2px_16px_rgba(139,58,82,0.06)] bg-[#faf5f0] dark:shadow-none dark:border-[rgba(255,255,255,0.04)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "max-h-95 overflow-y-auto" : "overflow-y-visible"}`}
+            className={`border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "max-h-95 overflow-y-auto" : "overflow-y-visible"}`}
           >
             <table className="min-w-full border-separate border-spacing-0">
               <thead
-                className={`bg-[#f0e8e2] dark:bg-[#3a2430] transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "sticky top-0 z-20" : ""}`}
+                className={`relative transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "sticky top-0 z-20" : ""}`}
               >
-                <tr className="bg-[#f0e8e2] dark:bg-transparent backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
+                <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
                   {columnsArr.map((column, index) => (
                     <th
                       key={String(column.id)}
-                      className={`group px-6 py-4 text-left hover:cursor-pointer border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(255,255,255,0.06)] ${index === 0 ? "border-l dark:border-l-0" : ""} ${index === columnsArr.length - 1 && !hasActions ? "border-r dark:border-r-0" : ""} text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#c4a0ae] transition-[background-color,border-color] duration-[600ms]`}
+                      className={`group px-6 py-4 text-left hover:cursor-pointer border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] ${index === 0 ? "border-l dark:border-l-0" : ""} ${index === columnsArr.length - 1 && !hasActions ? "border-r dark:border-r-0" : ""} text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]`}
                       style={{
                         maxWidth: column.width || "auto",
                       }}
@@ -698,13 +698,13 @@ export function DataTable<T extends object>({
         </div>
       )}
 
-      <div className="mt-4 flex flex-col items-center justify-between gap-4 border-t border-[#EAE0E2] dark:border-white/10 px-8 pb-8 pt-6 md:flex-row rounded-b-[2rem]">
+      <div className="mt-4 flex flex-col items-center justify-between gap-4 border-t border-[#EAE0E2] dark:border-[rgba(255,255,255,0.04)] pb-8 pt-6 md:flex-row">
         <div className="flex h-9 w-full items-center justify-center gap-3 text-sm font-medium text-[#8C6B79] dark:text-gray-400 md:w-auto md:justify-start">
           <span>Mostrar</span>
           <select
             value={safeRowsPerPage}
             onChange={(e) => onRowsPerPageChange?.(e)}
-            className="h-10 rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-md px-4 text-sm font-bold text-[#40202D] dark:text-white shadow-sm hover:cursor-pointer focus:border-[#D6405F] dark:focus:border-[#F8BBD0] focus:outline-none transition-colors"
+            className="h-10 rounded-xl border border-[#EAE0E2] dark:border-[rgba(212,175,55,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] backdrop-blur-md px-4 text-sm font-bold text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-[0_2px_8px_rgba(212,175,55,0.03)] hover:cursor-pointer focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-colors"
           >
             {[5, 10, 25, 50].map((value) => (
               <option key={value} value={value} className="dark:bg-[#1A0B11]">
@@ -731,7 +731,7 @@ export function DataTable<T extends object>({
             type="button"
             onClick={(e) => onPageChange?.(e, safePage - 1)}
             disabled={loading || safePage === 0}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.1)] bg-white/50 dark:bg-transparent backdrop-blur-md text-[#40202D] dark:text-white transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-[#8B3A52] hover:border-[#D6405F] dark:hover:border-[#8B3A52] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-[rgba(212,175,55,0.15)] bg-white/50 dark:bg-[rgba(255,255,255,0.03)] backdrop-blur-md text-[#40202D] dark:text-[#e8d8dc] shadow-sm dark:shadow-[0_2px_8px_rgba(212,175,55,0.03)] transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-[rgba(255,255,255,0.08)] hover:border-[#D6405F] dark:hover:border-[rgba(212,175,55,0.3)] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Anterior"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -741,7 +741,7 @@ export function DataTable<T extends object>({
             type="button"
             onClick={(e) => onPageChange?.(e, safePage + 1)}
             disabled={loading || safePage >= totalPages - 1}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.1)] bg-white/50 dark:bg-transparent backdrop-blur-md text-[#40202D] dark:text-white transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-[#8B3A52] hover:border-[#D6405F] dark:hover:border-[#8B3A52] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-[rgba(212,175,55,0.15)] bg-white/50 dark:bg-[rgba(255,255,255,0.03)] backdrop-blur-md text-[#40202D] dark:text-[#e8d8dc] shadow-sm dark:shadow-[0_2px_8px_rgba(212,175,55,0.03)] transition-colors hover:cursor-pointer hover:bg-white/80 dark:hover:bg-[rgba(255,255,255,0.08)] hover:border-[#D6405F] dark:hover:border-[rgba(212,175,55,0.3)] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Siguiente"
           >
             <ChevronRight className="h-5 w-5" />

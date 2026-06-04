@@ -166,17 +166,17 @@ export default function CompletedProductionOrders() {
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-[2rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl shadow-sm transition-[background-color,border-color] duration-[600ms]">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#f0e8e2] dark:bg-transparent backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Código OP</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Taller</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Fecha Término</th>
-                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Unidades</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Inversión</th>
-                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Acciones</th>
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Código OP</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Taller</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha Término</th>
+                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidades</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Inversión</th>
+                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(139,58,82,0.06)] dark:divide-[rgba(255,255,255,0.06)] text-sm">
@@ -347,7 +347,7 @@ export default function CompletedProductionOrders() {
                       </thead>
                       <tbody className="text-[#40202D] dark:text-gray-300">
                          {selectedOrder.base_items?.map((item: any, idx: number) => (
-                           <tr key={idx} className="border-b border-[#EAE0E2]/50 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors last:border-0">
+                           <tr key={idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)] border-b border-[#EAE0E2]/50 dark:border-[rgba(255,255,255,0.04)] last:border-0`}>
                               <td className="p-4 font-bold">Lote A-{idx + 1}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.size || "M"}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.color || "N/A"}</td>
@@ -367,14 +367,14 @@ export default function CompletedProductionOrders() {
   );
 }
 
-function CompletedOrderRow({ order, onOpenTech, onOpenObs }: { order: any; onOpenTech: () => void; onOpenObs: () => void; }) {
+function CompletedOrderRow({ order, idx, onOpenTech, onOpenObs }: { order: any; idx: number; onOpenTech: () => void; onOpenObs: () => void; }) {
   const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
   const workshopName = selectedQuote?.id_agent?.name_company || selectedQuote?.id_supplier?.name_company || selectedQuote?.id_agent?.name || selectedQuote?.id_supplier?.name || "Taller finalizado";
   const totalAmount = selectedQuote?.total_amount || 0;
   const totalUnits = order.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
 
   return (
-    <tr className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+    <tr className={`transition-colors group ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
       <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</td>
       <td className="px-6 py-5">
           <p className="font-bold text-[#40202D] dark:text-white">{workshopName}</p>

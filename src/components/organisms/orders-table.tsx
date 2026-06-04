@@ -197,24 +197,24 @@ export function OrdersTable({ title, description, data, baseHref = "/admin/order
         </div>
 
         {/* TABLE CARD */}
-        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden transition-all duration-300">
+        <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[32px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full min-w-[1000px] text-left border-collapse">
-              <thead>
-                <tr className="bg-white/30 dark:bg-white/5 border-b border-[#EAE0E2] dark:border-white/10">
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">ID Orden</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Fecha</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Cliente</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Origen</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Entrega</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Monto Total</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Estado</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+              <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-[background-color,border-color] duration-[600ms]">
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">ID Orden</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cliente</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Origen</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Entrega</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto Total</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
-                {filteredData.map((order) => (
-                  <tr key={order.id} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
+                {filteredData.map((order, idx) => (
+                  <tr key={order.id} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     <td className="py-4 px-6">
                       <span className="font-black text-[12px] text-[#D6405F] dark:text-[#F8BBD0]">{order.id}</span>
                     </td>
