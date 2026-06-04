@@ -28,6 +28,20 @@ const CheckoutReviewStep: React.FC = () => {
 
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Scroll to top when this step mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    // Si llegamos a este paso y el método fue Mercado Pago (card), 
+    // significa que el pago ya fue aprobado por el Brick. 
+    // Por lo tanto, mostramos la tarjeta de éxito directamente.
+    if (formData.paymentMethod === 'card') {
+      setIsSuccess(true);
+    }
+  }, [formData.paymentMethod]);
+
   const handleConfirmOrder = async () => {
     setIsConfirming(true);
     const success = await submitOrder();
@@ -55,7 +69,11 @@ const CheckoutReviewStep: React.FC = () => {
 
         <h2 className="text-3xl font-serif font-bold mb-2">¡Pedido Confirmado!</h2>
         <p className="text-white/80 text-center max-w-md mb-8">
-          Tu orden ha sido registrada con el estado <strong className="text-white bg-white/20 px-2 py-1 rounded-md">Verificación de Pago</strong>. Procederemos a verificar tu pago en breve.
+          {formData.paymentMethod === 'card' ? (
+            <>Tu orden ha sido registrada y tu pago fue <strong className="text-white bg-white/20 px-2 py-1 rounded-md">Aprobado</strong> exitosamente con Mercado Pago.</>
+          ) : (
+            <>Tu orden ha sido registrada con el estado <strong className="text-white bg-white/20 px-2 py-1 rounded-md">Verificación de Pago</strong>. Procederemos a verificar tu pago en breve.</>
+          )}
         </p>
 
         <button 

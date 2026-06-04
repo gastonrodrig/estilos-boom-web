@@ -106,7 +106,7 @@ const CheckoutPaymentForm: React.FC = () => {
         const response = await mercadopagoApi.createPreference({
           items: mpItems,
           orderId: `ORD-${Date.now()}`,
-          payerEmail: 'test_user@testuser.com'
+          payerEmail: watch('email') || 'cliente@estilosboom.com'
         });
 
         console.log('✅ [MP_PREFERENCE] Respuesta del backend:', response);
@@ -160,15 +160,15 @@ const CheckoutPaymentForm: React.FC = () => {
         try {
           const operationNumber = watch('operationNumber');
           const token = await getFirebaseAuthToken();
-          
+
           await manualPaymentApi.post('/process', {
             operationNumber,
             amount: totalAmount,
             paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia'
           }, getAuthConfig({ token }));
-          
+
           handleGoToReview();
-        } catch(error) {
+        } catch (error) {
           toast.error('Error al enviar el pago manual al servidor.');
           console.error(error);
         }
@@ -184,7 +184,7 @@ const CheckoutPaymentForm: React.FC = () => {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
-              router.push('/checkout/success');
+              handleGoToReview();
               resolve(true);
             } else {
               reject();
@@ -231,8 +231,8 @@ const CheckoutPaymentForm: React.FC = () => {
           <div key={method.id} id={`payment-block-${method.id}`}>
             <label
               className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${paymentMethod === method.id
-                  ? 'border-[#F291A3] bg-[#F2D0D3]/10'
-                  : 'border-gray-100 hover:border-[#594246]'
+                ? 'border-[#F291A3] bg-[#F2D0D3]/10'
+                : 'border-gray-100 hover:border-[#594246]'
                 }`}
             >
               <input
