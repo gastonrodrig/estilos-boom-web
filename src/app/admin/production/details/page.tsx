@@ -223,52 +223,65 @@ export default function ProductionOrderTracking() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
-      <header className="space-y-2 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
         <div>
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">Seguimiento de Producción</h1>
-            <button 
-              onClick={() => {
-                localStorage.removeItem("mocked_created_orders");
-                window.location.reload();
-              }}
-              className="text-[10px] text-rose-400 dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase"
-            >
-              Limpiar simulador
-            </button>
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
+            Inicio / Producción / Seguimiento
           </div>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">{counts.TODAS} procesos en curso</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+            <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
+              Seguimiento de Producción
+            </h1>
+          </div>
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+            {counts.TODAS} procesos en curso
+          </p>
         </div>
+        <button 
+          onClick={() => {
+            localStorage.removeItem("mocked_created_orders");
+            window.location.reload();
+          }}
+          className="text-[10px] text-[#8B3A52] dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase transition-colors"
+        >
+          Limpiar simulador
+        </button>
       </header>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center">
+      <div className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] rounded-[2rem] p-4 mb-6 shadow-sm flex flex-col md:flex-row gap-4 items-center transition-[background-color,border-color] duration-[600ms]">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400 transition-colors group-focus-within:text-[#D6405F] dark:group-focus-within:text-[#F8BBD0]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/40" size={16} />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por taller, producto o N° de orden..."
-            className="h-14 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md pl-14 pr-4 text-sm font-bold text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500 outline-none shadow-inner focus:ring-2 focus:ring-[#D6405F]/20 dark:focus:ring-[#F8BBD0]/20 transition-all"
+            className="w-full rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md py-2.5 pl-11 pr-4 text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-white/30"
           />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <select 
-            value={selectedWorkshop}
-            onChange={(e) => setSelectedWorkshop(e.target.value)}
-            className="h-14 px-5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-sm font-bold text-[#40202D] dark:text-white outline-none shadow-inner cursor-pointer min-w-[200px]"
-          >
-            {workshops.map(w => <option key={w} value={w}>{w}</option>)}
-          </select>
+          <div className="relative shrink-0">
+            <select 
+              value={selectedWorkshop}
+              onChange={(e) => setSelectedWorkshop(e.target.value)}
+              className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer min-w-[200px]"
+            >
+              {workshops.map(w => <option key={w} value={w} className="dark:bg-[#1A0B11]">{w}</option>)}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C6B79] pointer-events-none opacity-50" size={16} />
+          </div>
 
-          <select 
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="h-14 px-5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md text-sm font-bold text-[#40202D] dark:text-white outline-none shadow-inner cursor-pointer min-w-[180px]"
-          >
-            {months.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
+          <div className="relative shrink-0">
+            <select 
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer min-w-[180px]"
+            >
+              {months.map(m => <option key={m} value={m} className="dark:bg-[#1A0B11]">{m}</option>)}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8C6B79] pointer-events-none opacity-50" size={16} />
+          </div>
         </div>
       </div>
 
@@ -277,10 +290,10 @@ export default function ProductionOrderTracking() {
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-5 py-2.5 text-[10px] font-black transition-all uppercase tracking-widest ${
+            className={`flex items-center gap-2 whitespace-nowrap rounded-[999px] px-5 py-2.5 text-[10px] font-bold transition-all uppercase tracking-widest ${
               filter === key 
-                ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] dark:from-[#F8BBD0] dark:to-[#F48FB1] text-white dark:text-[#1A0B11] shadow-md shadow-[#D6405F]/20" 
-                : "bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-300 hover:bg-white/80 dark:hover:bg-white/10 shadow-sm"
+                ? "bg-[#8B3A52] text-white shadow-md shadow-[#8B3A52]/20 border border-[#8B3A52]" 
+                : "bg-white/50 dark:bg-white/5 border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 shadow-sm"
             }`}
           >
             {key === "CONTROL CALIDAD" ? <ClipboardCheck className="w-4 h-4" /> : key === "EN PRODUCCIÓN" ? <Factory className="w-4 h-4" /> : key === "RECHAZADAS" ? <XCircle className="w-4 h-4" /> : <Package className="w-4 h-4" />}
@@ -471,7 +484,7 @@ function ProductionCard({
 
 
   return (
-    <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all overflow-hidden relative group">
+    <article className="rounded-[1.5rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-[background-color,border-color,box-shadow] duration-[600ms] overflow-hidden relative group hover:shadow-md">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">

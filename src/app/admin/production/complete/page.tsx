@@ -138,55 +138,48 @@ export default function CompletedProductionOrders() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
         <div>
-          <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0] mb-2">
-            <History className="h-5 w-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Producción</span>
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
+            Inicio / Producción / Finalizadas
           </div>
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">Órdenes Finalizadas</h1>
-            <button 
-              onClick={() => {
-                localStorage.removeItem("mocked_created_orders");
-                window.location.reload();
-              }}
-              className="text-[10px] text-rose-400 dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase"
-            >
-              Limpiar simulador
-            </button>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+            <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
+              Órdenes Finalizadas
+            </h1>
           </div>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Historial de prendas producidas ingresadas al inventario.</p>
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+            Historial de prendas producidas ingresadas al inventario.
+          </p>
         </div>
-
-        <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto">
-          <div className="rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 p-5 shadow-inner min-w-[200px] flex-1">
+        
+        <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto items-end">
+          <div className="rounded-[1rem] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[160px] flex-1">
             <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
-            <p className="text-2xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
+            <p className="text-xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-[#40202D] to-[#2D161F] dark:from-[#1A0B11] dark:to-black border border-[#594246] dark:border-white/10 p-5 shadow-lg min-w-[160px] flex-1">
-            <p className="text-[10px] font-black text-[#EAE0E2] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
-            <p className="text-2xl font-black text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
+          <div className="rounded-[1rem] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[120px] flex-1">
+            <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
+            <p className="text-xl font-black text-[#40202D] dark:text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
           </div>
         </div>
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm transition-all">
+      <main className="overflow-hidden rounded-[2rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl shadow-sm transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/30 dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                <th className="px-6 py-5">Código OP</th>
-                <th className="px-6 py-5">Taller</th>
-                <th className="px-6 py-5">Fecha Término</th>
-                <th className="px-6 py-5 text-center">Unidades</th>
-                <th className="px-6 py-5">Inversión</th>
-                <th className="px-6 py-5 text-right">Acciones</th>
+              <tr className="bg-[#f0e8e2] dark:bg-transparent backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Código OP</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Taller</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Fecha Término</th>
+                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Unidades</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Inversión</th>
+                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-sm">
+            <tbody className="divide-y divide-[rgba(139,58,82,0.06)] dark:divide-[rgba(255,255,255,0.06)] text-sm">
               {filteredOrders.map((order: any) => (
                 <CompletedOrderRow 
                   key={order._id} 

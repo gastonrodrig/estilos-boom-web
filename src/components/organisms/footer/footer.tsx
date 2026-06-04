@@ -1,139 +1,111 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { FacebookIcon, InstagramIcon, Logo, TiktokIcon } from "@/components/atoms";
-import { MailIcon, MapIcon, MapPinIcon, PhoneIcon } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
 export const Footer = () => {
+  const TopSeparator = () => (
+    <div className="w-full h-[1px]" style={{ background: "linear-gradient(90deg, transparent, rgba(180,60,100,0.4), transparent)" }} />
+  );
+
+  const AnimatedLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
+    <Link href={href} className="group relative inline-block opacity-60 hover:opacity-100 transition-opacity duration-300" style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+      {children}
+      <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full" />
+    </Link>
+  );
+
   return (
-    <footer className="relative w-full border-t border-[#EBEAE8] dark:border-white/5 bg-[#FAF9F6] dark:bg-background text-[#594246] dark:text-gray-300">
-      <div className="relative mx-auto max-w-6xl px-6 py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+    <footer className="relative w-full bg-[#faf7f4] dark:bg-[#0e080c] text-[#1a1018] dark:text-white transition-colors duration-500 overflow-hidden">
+      {/* Dark mode noise texture (terciopelo sutil) */}
+      <div className="absolute inset-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-500" 
+           style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E\")" }} 
+      />
+
+      {/* Separador Superior */}
+      <TopSeparator />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-20">
+        <div className="grid grid-cols-1 gap-16 md:grid-cols-12">
+          
           {/* Marca + Social */}
-          <div className="space-y-6 md:col-span-12 lg:col-span-3">
-            <div className="flex justify-start">
-              <Logo width={160} isHome={false} />
-            </div>
-            <p className="text-sm leading-relaxed text-[#594246]/80 dark:text-gray-400 font-medium max-w-sm">
-              Ropa femenina moderna y cómoda, pensada para mujeres que valoran la
-              elegancia y la simplicidad.
+          <div className="md:col-span-12 lg:col-span-4 flex flex-col items-start">
+            <Logo width={160} isHome={false} />
+            <p className="mt-8 italic opacity-70" style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "1rem", lineHeight: 1.8 }}>
+              Ropa femenina moderna y cómoda, pensada para mujeres que valoran la elegancia y la simplicidad.
             </p>
-            <div className="mt-8 flex items-center gap-4">
-              <Link
-                href="https://www.facebook.com/estilo.boom.online"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#594246] dark:text-gray-400 hover:text-[#632034] dark:hover:text-white transition-colors"
-              >
-                <FacebookIcon size={24} color="currentColor" />
+            <div className="mt-10 flex items-center gap-[20px]">
+              <Link href="https://www.facebook.com/estilo.boom.online" target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 hover:-translate-y-[2px] transition-all duration-300">
+                <FacebookIcon size={22} color="currentColor" />
               </Link>
-              <Link
-                href="https://www.instagram.com/estilo_boom_"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#594246] dark:text-gray-400 hover:text-[#632034] dark:hover:text-white transition-colors"
-              >
-                <InstagramIcon size={24} color="currentColor" />
+              <Link href="https://www.instagram.com/estilo_boom_" target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 hover:-translate-y-[2px] transition-all duration-300">
+                <InstagramIcon size={22} color="currentColor" />
               </Link>
-              <Link
-                href="https://tiktok.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#594246] dark:text-gray-400 hover:text-[#632034] dark:hover:text-white transition-colors"
-              >
-                <TiktokIcon size={24} color="currentColor" />
+              <Link href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 hover:-translate-y-[2px] transition-all duration-300">
+                <TiktokIcon size={22} color="currentColor" />
               </Link>
             </div>
           </div>
 
-          {/* Enlaces rápidos */}
-          <div className="md:col-span-4 lg:col-span-2">
-            <h3 className="text-sm font-bold text-[#632034] dark:text-[#f2b6c1] uppercase tracking-wider mb-6">Explorar</h3>
-            <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <Link href="/catalogue" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Nueva Colección</Link>
-              </li>
-              <li>
-                <Link href="/catalogue" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Lo Más Vendido</Link>
-              </li>
-              <li>
-                <Link href="/catalogue" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Vestidos</Link>
-              </li>
+          {/* Enlaces Rápidos */}
+          <div className="md:col-span-4 lg:col-span-2 lg:col-start-6">
+            <h3 className="uppercase" style={{ fontFamily: "var(--font-cormorant), serif", fontWeight: 400, letterSpacing: "0.25em", fontSize: "0.75rem" }}>
+              Explorar
+            </h3>
+            <div className="w-[24px] h-[1px] bg-[#8B3A52] mt-3 mb-6" />
+            <ul className="space-y-4">
+              <li><AnimatedLink href="/catalogue">Nueva Colección</AnimatedLink></li>
+              <li><AnimatedLink href="/catalogue">Lo Más Vendido</AnimatedLink></li>
+              <li><AnimatedLink href="/catalogue">Vestidos</AnimatedLink></li>
             </ul>
           </div>
 
           {/* Información */}
           <div className="md:col-span-4 lg:col-span-2">
-            <h3 className="text-sm font-bold text-[#632034] dark:text-[#f2b6c1] uppercase tracking-wider mb-6">Información</h3>
-            <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <Link href="/shipping" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Envíos y entregas</Link>
-              </li>
-              <li>
-                <Link href="/payment" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Medios de pago</Link>
-              </li>
-              <li>
-                <Link href="/pickup" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Puntos de recojo</Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Términos y condiciones</Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Política de privacidad</Link>
-              </li>
-              <li>
-                <Link href="/refund" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Política de reembolso</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Nosotros */}
-          <div className="md:col-span-4 lg:col-span-2">
-            <h3 className="text-sm font-bold text-[#632034] dark:text-[#f2b6c1] uppercase tracking-wider mb-6">Nosotros</h3>
-            <ul className="space-y-4 text-sm font-medium">
-              <li>
-                <Link href="/about" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Quiénes somos</Link>
-              </li>
-              <li>
-                <Link href="/reviews" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Reseñas de clientes</Link>
-              </li>
-              <li>
-                <Link href="/stores" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Nuestra tienda</Link>
-              </li>
-              <li>
-                <Link href="/wholesale" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Ventas mayoristas</Link>
-              </li>
-              <li>
-                <Link href="/jobs" className="text-[#594246]/80 dark:text-gray-400 hover:text-[#632034] dark:hover:text-[#f2b6c1] transition-colors">Trabaja con nosotros</Link>
-              </li>
+            <h3 className="uppercase" style={{ fontFamily: "var(--font-cormorant), serif", fontWeight: 400, letterSpacing: "0.25em", fontSize: "0.75rem" }}>
+              Información
+            </h3>
+            <div className="w-[24px] h-[1px] bg-[#8B3A52] mt-3 mb-6" />
+            <ul className="space-y-4">
+              <li><AnimatedLink href="/shipping">Envíos y Entregas</AnimatedLink></li>
+              <li><AnimatedLink href="/payment">Medios de Pago</AnimatedLink></li>
+              <li><AnimatedLink href="/terms">Términos Legales</AnimatedLink></li>
+              <li><AnimatedLink href="/refund">Devoluciones</AnimatedLink></li>
             </ul>
           </div>
 
           {/* Contacto */}
-          <div className="md:col-span-12 lg:col-span-3">
-            <h3 className="text-sm font-bold text-[#632034] dark:text-[#f2b6c1] uppercase tracking-wider mb-6">Contacto</h3>
-            <ul className="space-y-4 text-sm font-medium text-[#594246] dark:text-gray-300">
-              <li className="flex items-start gap-3">
-                <PhoneIcon size={18} className="flex-shrink-0 text-[#632034] dark:text-[#f2b6c1] mt-0.5"/>
+          <div className="md:col-span-4 lg:col-span-2">
+            <h3 className="uppercase" style={{ fontFamily: "var(--font-cormorant), serif", fontWeight: 400, letterSpacing: "0.25em", fontSize: "0.75rem" }}>
+              Contacto
+            </h3>
+            <div className="w-[24px] h-[1px] bg-[#8B3A52] mt-3 mb-6" />
+            <ul className="space-y-5" style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+              <li className="flex items-start gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                <Phone size={16} className="text-[#8B3A52] flex-shrink-0 mt-0.5" />
                 <span>+51 987 654 321</span>
               </li>
-              <li className="flex items-start gap-3">
-                <MailIcon size={18} className="flex-shrink-0 text-[#632034] dark:text-[#f2b6c1] mt-0.5"/>
+              <li className="flex items-start gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                <Mail size={16} className="text-[#8B3A52] flex-shrink-0 mt-0.5" />
                 <span>estiloboom.oficial@gmail.com</span>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPinIcon size={18} className="flex-shrink-0 text-[#632034] dark:text-[#f2b6c1] mt-0.5"/>
-                <span className="leading-tight">C. Campanillas 135-101,<br/>Ate 15022, Perú</span>
+              <li className="flex items-start gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                <MapPin size={16} className="text-[#8B3A52] flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">C. Campanillas 135-101,<br/>Ate 15022, Perú</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 w-full border-t border-[#EBEAE8] dark:border-white/10" />
+        <div className="mt-24 mb-8">
+          <TopSeparator />
+        </div>
 
-        <div className="mt-8 flex flex-col gap-4 text-xs font-medium text-[#594246]/60 dark:text-gray-500 md:flex-row md:items-center md:justify-between tracking-wide">
-          <p>© {new Date().getFullYear()} ESTILOS BOOM. TODOS LOS DERECHOS RESERVADOS.</p>
+        <div className="flex justify-center text-center">
+          <p className="uppercase" style={{ fontSize: "0.7rem", letterSpacing: "0.15em", opacity: 0.35 }}>
+            © {new Date().getFullYear()} ESTILOS BOOM. TODOS LOS DERECHOS RESERVADOS.
+          </p>
         </div>
       </div>
     </footer>

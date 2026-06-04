@@ -4,7 +4,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { RoleGuard } from "@/guards/role-guard";
 import { UserFlowGuard } from "@/guards/user-flow-guard";
-import { Montserrat, Vidaloka, Inter, Playfair_Display } from "next/font/google";
+import { Montserrat, Vidaloka, Inter, Playfair_Display, Raleway, Cormorant_Garamond } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
 
@@ -44,6 +44,19 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-raleway",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
+});
+
 export default function RootLayout({
   children,
 }: {
@@ -51,7 +64,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`min-h-screen flex flex-col bg-background text-foreground transition-colors duration-500 ease-in-out ${montserrat.variable} ${vidaloka.variable} ${inter.variable} ${playfair.variable}`}>
+      <body className={`min-h-screen flex flex-col bg-background text-foreground transition-colors duration-500 ease-in-out ${montserrat.variable} ${vidaloka.variable} ${inter.variable} ${playfair.variable} ${raleway.variable} ${cormorant.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ReduxProvider>
             <AuthProvider>

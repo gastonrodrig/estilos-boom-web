@@ -60,6 +60,7 @@ export default function AdminCategoriesPage() {
       <DataTable
         rows={filteredCategories}
         loading={loading}
+        breadcrumb="Inicio / Gestionar Productos / Categorías"
         title="Categorías de Prendas"
         description="Gestiona las categorías del catálogo textil de Estilos Boom. Asigna nombres y descripciones precisas para los filtros de la tienda."
         onAddClick={() => {

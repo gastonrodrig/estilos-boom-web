@@ -178,15 +178,17 @@ export const ProductionBoard = () => {
   return (
     <section className="mx-auto max-w-6xl px-4 space-y-6 pb-24 transition-colors duration-500">
       {/* ── Header ── */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-2">
-            Planeamiento de Producción
-          </p>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
-            Crear Órdenes de Producción
-          </h1>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
+            Inicio / Producción / Planeamiento
+          </div>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+            <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
+              Crear Órdenes de Producción
+            </h1>
+          </div>
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
             Sistema de planeamiento para órdenes de producción basado en alertas de stock.
           </p>
         </div>
