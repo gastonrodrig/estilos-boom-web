@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { useCheckoutStore, useCartStore } from '@/hooks';
+import { useCheckoutStore, useCartStore, useAuthStore } from '@/hooks';
 import { useOrderSubmission } from '@/hooks/extra';
 import { CheckoutFormValues } from '@/core/models/checkout';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,7 @@ const CheckoutPaymentForm: React.FC = () => {
   const { handleGoToReview, handleGoToDelivery } = useCheckoutStore();
   const { submitOrder } = useOrderSubmission();
   const { items } = useCartStore();
+  const { firstName, lastName } = useAuthStore();
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [loadingPreference, setLoadingPreference] = useState(true);
   const fetchedRef = useRef(false);
@@ -156,15 +157,16 @@ const CheckoutPaymentForm: React.FC = () => {
       if (paymentMethod === 'card') {
         toast('Por favor completa el pago con Mercado Pago arriba primero.', { icon: 'ℹ️' });
       } else {
-        // Enviar pago manual al backend
         try {
           const operationNumber = watch('operationNumber');
           const token = await getFirebaseAuthToken();
+          const clientNameStr = (firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : 'Cliente Web';
 
           await manualPaymentApi.post('/process', {
             operationNumber,
             amount: totalAmount,
             paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia',
+            clientName: clientNameStr || 'Cliente Web',
             items: items.map(item => ({
               id: item.id,
               name: item.name,
