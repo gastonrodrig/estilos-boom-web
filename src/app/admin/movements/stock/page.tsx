@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, Fragment } from "react";
 import { useProductStore, useStorehouseStore,useSupplyStore } from "@/hooks";
-import { Search, ChevronDown, ChevronUp, X, MoveRight, AlertCircle, ArrowRightLeft, Sparkles, Warehouse, Store } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X, MoveRight, AlertCircle, ArrowRightLeft, Sparkles, Warehouse, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 export default function StockActualPage() {
   const router = useRouter();
   const { products, startLoadingProducts } = useProductStore(); // Tu hook de productos base
-  const { startLoadingStockByVariant, loading } = useStorehouseStore();
+  const { startLoadingStockBatchDetailed, loading } = useStorehouseStore();
   const { startLoadingSupplies } = useSupplyStore();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,45 +25,67 @@ export default function StockActualPage() {
   // Dirección de la transferencia: "to-store" = Almacén→Tienda, "to-warehouse" = Tienda→Almacén
   const [transferDirection, setTransferDirection] = useState<"to-store" | "to-warehouse">("to-store");
 
+  // Estados de paginación
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     const initData = async () => {
-      await startLoadingProducts({});
+      await startLoadingProducts({ limit: 200 });
       await startLoadingSupplies();
     };
     initData();
   }, [startLoadingProducts, startLoadingSupplies]);
 
-  // Carga el stock real de WarehouseStock para TODOS los productos al montar
-  // (no espera a que el usuario expanda una fila)
-  useEffect(() => {
-    if (!products || !Array.isArray(products) || products.length === 0) return;
+  // Filtro y búsqueda local de productos
+  const filteredProducts = useMemo(() => {
+    if (!products || !Array.isArray(products)) return [];
+    return products.filter((prod: any) => {
+      const q = searchTerm.toLowerCase().trim();
+      const matchSearch = !q || [
+        prod.name,
+        prod.sku,
+        prod.id_category?.name ?? ""
+      ].join(" ").toLowerCase().includes(q);
 
-    const loadAllStocks = async () => {
-      for (const prod of products as any[]) {
-        for (const variant of prod.variants ?? []) {
-          if (!variant._id) continue;
-          const res = await startLoadingStockByVariant(variant._id);
-          if (Array.isArray(res) && res.length > 0) {
-            const findAvailable = (code: string) => {
-              const entry = res.find(
-                (s: any) => s.id_warehouse?.code === code || s.id_warehouse?.name === code
-              );
-              return entry ? (entry.physical_stock ?? 0) - (entry.reserved_stock ?? 0) : 0;
-            };
-            setStocksByVariant((prev) => ({
-              ...prev,
-              [variant._id]: {
-                almacen: findAvailable("ALM-CEN"),
-                tienda: findAvailable("TND-PRI"),
-              },
-            }));
-          }
-        }
-      }
+      const matchSize = selectedSizeFilter === "Todos" || prod.variants?.some((v: any) => v.size === selectedSizeFilter);
+
+      return matchSearch && matchSize;
+    });
+  }, [products, searchTerm, selectedSizeFilter]);
+
+  // Paginación de productos
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
+  }, [filteredProducts, page, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  // Reiniciar a la primera página al buscar o filtrar
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedSizeFilter]);
+
+  // Carga el stock real de WarehouseStock para los productos de la página actual en lote (batch)
+  useEffect(() => {
+    if (!paginatedProducts || paginatedProducts.length === 0) return;
+
+    const visibleVariantIds = paginatedProducts.flatMap(
+      (prod: any) => (prod.variants ?? []).map((v: any) => v._id).filter(Boolean)
+    );
+
+    if (visibleVariantIds.length === 0) return;
+
+    const loadStockBatch = async () => {
+      const stockMap = await startLoadingStockBatchDetailed(visibleVariantIds);
+      setStocksByVariant((prev) => ({
+        ...prev,
+        ...stockMap,
+      }));
     };
-    void loadAllStocks();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products]);
+    void loadStockBatch();
+  }, [paginatedProducts, startLoadingStockBatchDetailed]);
 
   // Inicializa nuevas variantes en 0 preservando las ya cargadas
   useEffect(() => {
@@ -81,34 +103,19 @@ export default function StockActualPage() {
     });
   }, [products]);
 
-  // Al expandir un producto cargamos en caliente la distribución real desde WarehouseStock
+  // Al expandir un producto cargamos en caliente la distribución real desde WarehouseStock en lote (batch)
   const toggleExpandProduct = async (productId: string, productVariants: any[]) => {
     const isExpanding = !expandedProducts[productId];
     setExpandedProducts(prev => ({ ...prev, [productId]: isExpanding }));
 
     if (isExpanding && productVariants) {
-      for (const variant of productVariants) {
-        // Siempre recargamos para tener datos frescos de WarehouseStock
-        const res = await startLoadingStockByVariant(variant._id);
-        if (Array.isArray(res)) {
-          // WarehouseStock retorna: { id_warehouse: { name, code }, physical_stock, reserved_stock }
-          // available_stock = physical_stock - reserved_stock (virtual del schema)
-          const findAvailable = (warehouseCode: string) => {
-            const entry = res.find(
-              (s: any) => s.id_warehouse?.code === warehouseCode || s.id_warehouse?.name === warehouseCode
-            );
-            if (!entry) return 0;
-            return (entry.physical_stock ?? 0) - (entry.reserved_stock ?? 0);
-          };
-
-          setStocksByVariant(prev => ({
-            ...prev,
-            [variant._id]: {
-              almacen: findAvailable("ALM-CEN"),
-              tienda: findAvailable("TND-PRI"),
-            }
-          }));
-        }
+      const variantIds = productVariants.map((v: any) => v._id).filter(Boolean);
+      if (variantIds.length > 0) {
+        const stockMap = await startLoadingStockBatchDetailed(variantIds);
+        setStocksByVariant(prev => ({
+          ...prev,
+          ...stockMap
+        }));
       }
     }
   };
@@ -203,7 +210,7 @@ export default function StockActualPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
-              {products?.map((prod: any, index: number) => {
+              {paginatedProducts?.map((prod: any, index: number) => {
                 // ✅ CORRECCIÓN: Buscamos dinámicamente el ID real que use tu backend (id_product o _id)
                 const productId = prod.id_product || prod._id || `fallback-id-${index}`;
                 
@@ -269,7 +276,9 @@ export default function StockActualPage() {
                     </tr>
 
                     {/* FILAS DE VARIANTES (HIJOS) */}
-                    {isExpanded && prod.variants?.map((variant: any, vIndex: number) => {
+                    {isExpanded && prod.variants
+                      ?.filter((v: any) => selectedSizeFilter === "Todos" || v.size === selectedSizeFilter)
+                      ?.map((variant: any, vIndex: number) => {
                       const variantKey = variant._id ? `sub-${productKey}-${variant._id}` : `sub-${productKey}-v-${vIndex}`;
                       const hasStockData = stocksByVariant[variant._id] !== undefined;
 
@@ -304,6 +313,54 @@ export default function StockActualPage() {
               })}
             </tbody>
           </table>
+
+          {/* ── Paginación de Productos ── */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 border-t border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30">
+              <span className="text-xs font-bold text-[#8C6B79] dark:text-gray-400 uppercase tracking-wider">
+                Mostrando {Math.min(filteredProducts.length, (page - 1) * itemsPerPage + 1)}-
+                {Math.min(filteredProducts.length, page * itemsPerPage)} de {filteredProducts.length} productos
+              </span>
+
+              <div className="flex items-center gap-1 bg-white/50 dark:bg-black/30 backdrop-blur-md p-1.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pNum = idx + 1;
+                  return (
+                    <button
+                      key={pNum}
+                      type="button"
+                      onClick={() => setPage(pNum)}
+                      className={`min-w-[36px] h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer
+                        ${page === pNum
+                          ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white shadow-md"
+                          : "text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10"
+                        }`}
+                    >
+                      {pNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

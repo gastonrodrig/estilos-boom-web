@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { DataTable, DataTableAction, DataTableColumn } from "@/components/organisms";
 import { useStorehouseStore } from "@/hooks";
-import { CheckCircle, FileText, Eye, Activity } from "lucide-react";
+import { CheckCircle, FileText, Eye, Activity, Paperclip, AlertTriangle, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Modal } from "@/components/atoms";
 
 type ActiveTab = "documentos" | "kardex";
 
@@ -56,6 +57,8 @@ export default function AdminMovementsPage() {
   const [tableLoading, setTableLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // ── Carga inicial ──────────────────────────────────────────────────────────
   const loadData = async () => {
@@ -259,6 +262,37 @@ export default function AdminMovementsPage() {
       ),
     },
     {
+      id: "attachments",
+      label: "Adjuntos",
+      width: "110px",
+      accessor: (row) => {
+        const atts = row.attachments || [];
+        if (atts.length === 0) return <span className="text-gray-300 text-xs italic block text-center">—</span>;
+        return (
+          <div className="flex items-center justify-center gap-1 flex-wrap">
+            {atts.map((url: string, index: number) => {
+              const parts = url.split("?")[0].split("/");
+              const rawName = parts[parts.length - 1];
+              const decodedName = decodeURIComponent(rawName);
+              const cleanName = decodedName.split("-").slice(1).join("-") || decodedName || `Adjunto ${index + 1}`;
+              return (
+                <a
+                  key={index}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1 bg-rose-50 text-[#D6405F] hover:bg-rose-100 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10 rounded border border-[#EEDCE1] dark:border-white/10 transition-colors"
+                  title={cleanName}
+                >
+                  <Paperclip className="w-3.5 h-3.5" />
+                </a>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+    {
       id: "sender",
       label: "Creado por",
       width: "130px",
@@ -310,11 +344,10 @@ export default function AdminMovementsPage() {
     {
       label: "Ver detalle",
       icon: <Eye className="h-4 w-4 text-purple-500" />,
-      onClick: (row) =>
-        toast(`Documento: ${row.document_number}`, {
-          icon: "🔍",
-          style: { borderRadius: "12px", background: "#594246", color: "#fff" },
-        }),
+      onClick: (row) => {
+        setSelectedDoc(row);
+        setIsDetailOpen(true);
+      },
       show: () => true,
     },
   ];
@@ -517,6 +550,219 @@ export default function AdminMovementsPage() {
           hasActions={false}
         />
       )}
+
+      {/* Modal de Detalles del Documento */}
+      {selectedDoc && (
+        <MovementDetailsModal
+          isOpen={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedDoc(null);
+          }}
+          doc={selectedDoc}
+        />
+      )}
     </div>
+  );
+}
+
+// ── SUBCOMPONENTE: MODAL DE DETALLES DEL DOCUMENTO ─────────────────────────────
+function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClose: () => void; doc: any }) {
+  const formatDate = (date?: string) =>
+    date
+      ? new Date(date).toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" })
+      : "Fecha no disponible";
+
+  const sourceName = doc.id_source_warehouse?.name?.replace(/_/g, " ") ?? "Proveedor externo";
+  const targetName = doc.id_target_warehouse?.name?.replace(/_/g, " ") ?? "—";
+  
+  const workerName = (worker: any) => {
+    if (!worker) return "Sistema / Admin";
+    if (typeof worker === "string") return worker;
+    return `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || worker.email || "Usuario";
+  };
+
+  const senderName = workerName(doc.id_sender_worker);
+  const receiverName = workerName(doc.id_receiver_worker);
+
+  const DOC_TYPE_LABELS: Record<string, string> = {
+    INGRESO_COMPRA: "📥 Ingreso compra",
+    SALIDA_VENTA: "📤 Salida venta",
+    TRANSFERENCIA: "⇄ Transferencia",
+    AJUSTE: "⚖️ Ajuste",
+  };
+
+  return (
+    <Modal open={isOpen} onClose={onClose} title={`Expediente de Movimiento: ${doc.document_number}`}>
+      <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar text-left font-sans">
+        {/* Cabecera de Estados y Tipo */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-sm backdrop-blur-md">
+            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Tipo Documento</p>
+            <p className="text-[13px] font-bold text-[#40202D] dark:text-white mt-1">
+              {DOC_TYPE_LABELS[doc.type] || doc.type}
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-sm backdrop-blur-md">
+            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Estado actual</p>
+            <p className="text-[13px] font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 uppercase">
+              {doc.status}
+            </p>
+          </div>
+        </div>
+
+        {/* Información general */}
+        <section className="space-y-3">
+          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+            Información del Movimiento
+          </h5>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-5 text-[12px] bg-white/30 dark:bg-black/25 p-4 rounded-xl border border-[#EAE0E2] dark:border-white/5">
+            <div>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Fecha Creación:</p>
+              <p className="font-bold text-[#40202D] dark:text-white">{formatDate(doc.created_at)}</p>
+            </div>
+            <div>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Ruta de Inventario:</p>
+              <p className="font-bold text-[#40202D] dark:text-white">
+                <span className="text-gray-600 dark:text-gray-300">{sourceName}</span>
+                <span className="mx-1 text-rose-400">➔</span>
+                <span className="text-[#D6405F] dark:text-[#F8BBD0]">{targetName}</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Despachado / Creado por:</p>
+              <p className="font-semibold text-gray-700 dark:text-gray-200">{senderName}</p>
+            </div>
+            <div>
+              <p className="text-[#8C6B79] dark:text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Procesado / Conformado por:</p>
+              <p className="font-semibold text-gray-700 dark:text-gray-200">{receiverName || "—"}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Listado de Ítems */}
+        <section className="space-y-3">
+          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+            Detalle de Prendas ({doc.items?.length || 0})
+          </h5>
+          <div className="rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 overflow-hidden text-[12px] shadow-inner">
+            <table className="w-full">
+              <thead className="bg-white/50 dark:bg-white/5">
+                <tr className="text-[9px] font-bold text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/5">
+                  <th className="p-3 text-left">SKU / Producto</th>
+                  <th className="p-3 text-center">Talla / Color</th>
+                  <th className="p-3 text-center">Esperado</th>
+                  <th className="p-3 text-center">Recibido</th>
+                  <th className="p-3 text-left">Observación / Incidencia</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                {doc.items?.map((item: any, idx: number) => {
+                  const v = item.id_variant;
+                  const sku = typeof v === "object" ? v.sku_variant : `SKU-${idx}`;
+                  const productName = typeof v === "object" ? v.id_product?.name : "Prenda";
+                  const size = typeof v === "object" ? v.size : "—";
+                  const colorName = typeof v === "object" ? v.color?.name : "—";
+                  
+                  return (
+                    <tr key={idx} className="hover:bg-white/30 dark:hover:bg-white/5 transition-colors">
+                      <td className="p-3">
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[10px] text-gray-400">{sku}</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-200">{productName}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 text-center font-medium text-gray-600 dark:text-gray-300">
+                        {size} / {colorName}
+                      </td>
+                      <td className="p-3 text-center font-bold text-gray-600 dark:text-gray-300">
+                        {item.quantity_expected}
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className={`font-bold ${item.quantity_received < item.quantity_expected ? 'text-amber-500 font-black' : 'text-[#D6405F] dark:text-[#F8BBD0]'}`}>
+                          {item.quantity_received}
+                        </span>
+                      </td>
+                      <td className="p-3 text-left">
+                        {item.incidence_note ? (
+                          <div className="flex items-start gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                            <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                            <span className="text-[11px] leading-tight">{item.incidence_note}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-300 italic">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Log/Notas del Proceso */}
+        {doc.notes && (
+          <section className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/5 shadow-inner">
+            <h5 className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase mb-1.5">Notas adicionales:</h5>
+            <p className="text-[12px] text-gray-600 dark:text-gray-200 font-medium italic leading-relaxed">
+              {doc.notes}
+            </p>
+          </section>
+        )}
+
+        {/* Documentos Adjuntos (Evidencias y Guías) */}
+        <section className="space-y-3">
+          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+            Evidencias y Guías Documentales ({doc.attachments?.length || 0})
+          </h5>
+          {doc.attachments && doc.attachments.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {doc.attachments.map((url: string, index: number) => {
+                const parts = url.split("?")[0].split("/");
+                const rawName = parts[parts.length - 1];
+                const decodedName = decodeURIComponent(rawName);
+                const cleanName = decodedName.split("-").slice(1).join("-") || decodedName || `Evidencia_${index + 1}`;
+                const ext = cleanName.split(".").pop()?.toLowerCase();
+                const isPdf = ext === "pdf";
+
+                return (
+                  <a
+                    key={index}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl transition-all shadow-sm group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0">
+                      <FileText className={`w-4 h-4 ${isPdf ? "text-red-500" : "text-[#D6405F] dark:text-[#F2778D]"}`} />
+                    </div>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="text-[11px] font-bold text-gray-700 dark:text-gray-200 truncate group-hover:text-[#D6405F] dark:group-hover:text-[#F2778D]">
+                        {cleanName}
+                      </span>
+                      <span className="text-[9px] text-gray-400 font-medium">Ver adjunto</span>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-gray-400 opacity-60 shrink-0" />
+                  </a>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-4 bg-white/50 dark:bg-black/10 rounded-xl border border-dashed border-[#EAE0E2] dark:border-white/5 text-center">
+              <p className="text-[11px] text-gray-400 italic">No se han subido evidencias o guías físicas para este documento.</p>
+            </div>
+          )}
+        </section>
+
+        {/* Botón de Cierre */}
+        <button
+          onClick={onClose}
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] hover:from-[#5B283A] hover:to-[#40202D] text-white font-bold text-[11px] uppercase tracking-widest shadow-md hover:shadow-lg transition-all"
+        >
+          Cerrar Detalle
+        </button>
+      </div>
+    </Modal>
   );
 }

@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { 
   Search, ChevronDown, Package, Truck, 
   ClipboardCheck, CheckCircle2, XCircle, 
   Eye,
   Trophy,
   Check,
-  Plus,CalendarClock, Star
+  Plus, CalendarClock, Star,
+  FileText, Paperclip, ExternalLink
 } from "lucide-react";
 import { useStorehouseStore } from "@/hooks";
 import { AnimatePresence, motion } from "framer-motion";
@@ -223,7 +225,7 @@ function OPPCard({ opp }: { opp: any }) {
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  const { startUpdateSupplierQuote, startSelectWinnerAndConvert, approveInventory, extendOCDate, startInitalQualityCheck, startLoadingPrePurchaseOrders, loading } = useStorehouseStore();
+  const { startUpdateSupplierQuote, startSelectWinnerAndConvert, approveInventory, extendOCDate, startInitalQualityCheck, startLoadingPrePurchaseOrders, startUploadPoAttachment, loading } = useStorehouseStore();
 
   const purchaseOrderId = typeof opp.id_purchase_order === 'object' 
     ? opp.id_purchase_order?._id 
@@ -456,6 +458,66 @@ function OPPCard({ opp }: { opp: any }) {
               )}
             </div>
 
+            {/* Adjuntos (PDFs) */}
+            <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md space-y-4">
+              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Documentos Adjuntos (PDF):</p>
+              
+              {opp.id_purchase_order?.attachments && opp.id_purchase_order.attachments.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {opp.id_purchase_order.attachments.map((url: string, index: number) => {
+                    const filename = url.split('/').pop()?.split('-').slice(1).join('-') || `Documento_${index + 1}.pdf`;
+                    return (
+                      <a 
+                        key={index} 
+                        href={url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] hover:bg-white dark:hover:bg-white/10 transition-all text-xs font-bold text-[#40202D] dark:text-white"
+                      >
+                        <FileText className="w-5 h-5 text-red-500 shrink-0" />
+                        <span className="truncate flex-1">{filename}</span>
+                        <ExternalLink className="w-3.5 h-3.5 opacity-55" />
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-[13px] text-[#8C6B79] dark:text-gray-400 italic">No hay archivos adjuntos en esta orden.</p>
+              )}
+
+              {purchaseOrderId && (opp.status === 'CONVERTIDA' || opp.status === 'EN_REVISION') && (
+                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                  <label className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-[#8C6B79]/50 hover:border-[#D6405F] bg-white/30 dark:bg-white/5 text-[#8C6B79] hover:text-[#D6405F] cursor-pointer transition-all text-xs font-bold uppercase tracking-wider">
+                    <Paperclip className="w-4 h-4" />
+                    <span>Seleccionar PDF</span>
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      multiple
+                      className="hidden" 
+                      onChange={async (e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          const files = Array.from(e.target.files);
+                          const isPdf = files.every(f => f.type === 'application/pdf');
+                          if (!isPdf) {
+                            toast.error("Por favor, selecciona únicamente archivos PDF.");
+                            return;
+                          }
+                          toast.loading("Subiendo archivo(s)...");
+                          const res = await startUploadPoAttachment(purchaseOrderId, files);
+                          toast.dismiss();
+                          if (res) {
+                            // Listo
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                  <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium">Sube facturas, guías de remisión o reportes de calidad en formato PDF.</p>
+                </div>
+              )}
+            </div>
+
             {/* Botones de Acción */}
             <div className="mt-8 flex flex-wrap justify-end gap-4">
 			
@@ -503,22 +565,7 @@ function OPPCard({ opp }: { opp: any }) {
 				</button>
 			)}
 
-			{/* FASE 3: INSPECCIÓN (Control de calidad y decisiones) */}
-			
-
-      {opp.status === 'EN_REVISION' && (
-        <>
-          {/* ✅ CORRECCIÓN DE TESIS: Se elimina el botón 'Prolongar Fecha' de esta etapa.
-            La mercadería ya se encuentra físicamente en el establecimiento anexo para control de calidad.
-          */}
-          <button 
-            onClick={() => setIsApproveModalOpen(true)}
-            className="px-8 py-3 rounded-xl bg-[#4CAF50] text-white font-bold text-sm flex items-center gap-2 hover:bg-[#43a047] transition-all shadow-md shadow-green-100"
-          >
-            <CheckCircle2 className="w-4 h-4" /> Aprobar e Ingresar a Inventario
-          </button>
-        </>
-      )}
+			{/* FASE 3: INSPECCIÓN (Control de calidad y decisiones - El ingreso físico es realizado por el Almacenero) */}
 
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
 			<button 

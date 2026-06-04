@@ -8,6 +8,8 @@ import {
   TrendingDown, 
   ChevronDown, 
   ChevronUp, 
+  ChevronLeft,
+  ChevronRight,
   Package2, 
   Truck, 
   Lightbulb, 
@@ -75,6 +77,10 @@ export const SupplyPlanningBoard = () => {
   // Stock real por variante: { [variantId]: available_stock (physical - reserved) }
   const [warehouseStock, setWarehouseStock] = useState<Record<string, number>>({});
   const [loadingStock, setLoadingStock] = useState(false);
+
+  // Estados de paginación
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 8;
 
   useEffect(() => {
     void startLoadingProducts({ limit: 100 });
@@ -150,6 +156,18 @@ export const SupplyPlanningBoard = () => {
       return hay.includes(q);
     });
   }, [alertProducts, searchTerm]);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, page, itemsPerPage]);
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  // Reiniciar a la primera página al buscar
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const criticalCount = alertProducts.filter((p) => p.critical > 0).length;
   const lowCount = alertProducts.filter((p) => p.critical === 0 && p.low > 0).length;
@@ -262,7 +280,7 @@ export const SupplyPlanningBoard = () => {
             Productos que Requieren Atención
           </h2>
 
-          {filtered.map(({ product, variants, critical, low }) => {
+          {paginatedProducts.map(({ product, variants, critical, low }) => {
             const isOpen = expanded === product.id_product;
             const isProductInTransit = variants.some(
               (v) => (pendingTransitByVariant[v.id_variant] || 0) > 0
@@ -523,6 +541,54 @@ export const SupplyPlanningBoard = () => {
               </article>
             );
           })}
+
+          {/* ── Paginación de Productos ── */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 px-2">
+              <span className="text-xs font-bold text-[#8C6B79] dark:text-gray-400 uppercase tracking-wider">
+                Mostrando {Math.min(filtered.length, (page - 1) * itemsPerPage + 1)}-
+                {Math.min(filtered.length, page * itemsPerPage)} de {filtered.length} productos
+              </span>
+
+              <div className="flex items-center gap-1 bg-white/50 dark:bg-black/30 backdrop-blur-md p-1.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pNum = idx + 1;
+                  return (
+                    <button
+                      key={pNum}
+                      type="button"
+                      onClick={() => setPage(pNum)}
+                      className={`min-w-[36px] h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer
+                        ${page === pNum
+                          ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white shadow-md"
+                          : "text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10"
+                        }`}
+                    >
+                      {pNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

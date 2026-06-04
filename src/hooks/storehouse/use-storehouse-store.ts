@@ -27,6 +27,7 @@ import {
   mapInventoryMovement,
   mapPurchaseOrder,
   mapSupplier,
+  WarehouseStockApi,
 } from "@models";
 import { getAuthConfig, getAuthConfigWithParams } from "@utils";
 import { getFirebaseAuthToken } from "@helpers";
@@ -474,32 +475,87 @@ const approveInventory = useCallback(async (
 
       try {
         const config = await getConfig();
-        const results = await Promise.allSettled(
-          variantIds.map((id) =>
-            storehouseApi
-              .get(`/inventory/stock/${id}`, config)
-              .then((r) => ({ id, data: r.data as any[] }))
-          )
+        const { data } = await storehouseApi.post<WarehouseStockApi[]>(
+          "/inventory/stock/batch",
+          { variant_ids: variantIds },
+          config
         );
 
         const stockMap: Record<string, number> = {};
-        for (const result of results) {
-          if (result.status === "fulfilled") {
-            const { id, data } = result.value;
-            const available = Array.isArray(data)
-              ? data.reduce(
-                  (sum, s) => sum + Math.max(0, (s.physical_stock ?? 0) - (s.reserved_stock ?? 0)),
-                  0
-                )
-              : 0;
-            stockMap[id] = available;
+        for (const id of variantIds) {
+          stockMap[id] = 0;
+        }
+
+        if (Array.isArray(data)) {
+          for (const item of data) {
+            const variantId = typeof item.id_variant === "object" && item.id_variant !== null
+              ? (item.id_variant as any)._id || (item.id_variant as any).id_variant
+              : item.id_variant;
+            if (variantId) {
+              const available = Math.max(0, (item.physical_stock ?? 0) - (item.reserved_stock ?? 0));
+              stockMap[variantId] = (stockMap[variantId] ?? 0) + available;
+            }
           }
         }
         return stockMap;
-      } catch {
+      } catch (error) {
+        console.error("Error al cargar stock en lote:", error);
         return {};
       } finally {
         // Un solo dispatch de loading al final
+        dispatch(setLoadingStorehouse(false));
+      }
+    },
+    [dispatch, getConfig]
+  );
+
+  const startLoadingStockBatchDetailed = useCallback(
+    async (variantIds: string[]): Promise<Record<string, { almacen: number; tienda: number }>> => {
+      if (variantIds.length === 0) return {};
+
+      dispatch(setLoadingStorehouse(true));
+
+      try {
+        const config = await getConfig();
+        const { data } = await storehouseApi.post<WarehouseStockApi[]>(
+          "/inventory/stock/batch",
+          { variant_ids: variantIds },
+          config
+        );
+
+        const stockMap: Record<string, { almacen: number; tienda: number }> = {};
+        for (const id of variantIds) {
+          stockMap[id] = { almacen: 0, tienda: 0 };
+        }
+
+        if (Array.isArray(data)) {
+          for (const item of data) {
+            const variantId = typeof item.id_variant === "object" && item.id_variant !== null
+              ? (item.id_variant as any)._id || (item.id_variant as any).id_variant
+              : item.id_variant;
+            if (variantId) {
+              const available = Math.max(0, (item.physical_stock ?? 0) - (item.reserved_stock ?? 0));
+              const warehouseCode = typeof item.id_warehouse === "object" && item.id_warehouse !== null
+                ? item.id_warehouse.code
+                : item.id_warehouse;
+              
+              if (!stockMap[variantId]) {
+                stockMap[variantId] = { almacen: 0, tienda: 0 };
+              }
+
+              if (warehouseCode === "ALM-CEN" || warehouseCode === "ALMACEN_CENTRAL") {
+                stockMap[variantId].almacen = available;
+              } else if (warehouseCode === "TND-PRI" || warehouseCode === "TIENDA_PRINCIPAL") {
+                stockMap[variantId].tienda = available;
+              }
+            }
+          }
+        }
+        return stockMap;
+      } catch (error) {
+        console.error("Error al cargar stock detallado en lote:", error);
+        return {};
+      } finally {
         dispatch(setLoadingStorehouse(false));
       }
     },
@@ -591,6 +647,71 @@ const approveInventory = useCallback(async (
     return startProcessWarehouseDocument(id, workerId, []);
   }, [startProcessWarehouseDocument]);
 
+  const startUploadPoAttachment = useCallback(async (
+    purchaseOrderId: string,
+    files: FileList | File[]
+  ) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const formData = new FormData();
+      if (files instanceof FileList) {
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i]);
+        }
+      } else {
+        files.forEach((file) => formData.append("files", file));
+      }
+
+      const { data } = await storehouseApi.patch(
+        `/purchase-orders/${purchaseOrderId}/attachments`,
+        formData,
+        {
+          headers: {
+            ...(config?.headers || {}),
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      await startLoadingPrePurchaseOrders();
+      toast.success("¡Archivo(s) adjuntado(s) correctamente!");
+      return data;
+    }, "Error al adjuntar archivo.");
+  }, [executeRequest, getConfig, startLoadingPrePurchaseOrders]);
+
+  const startUploadWarehouseDocAttachments = useCallback(async (
+    documentId: string,
+    files: FileList | File[],
+  ) => {
+    return await executeRequest(async () => {
+      const config = await getConfig();
+      const formData = new FormData();
+      
+      if (files instanceof FileList) {
+        Array.from(files).forEach(file => {
+          formData.append('files', file);
+        });
+      } else {
+        files.forEach(file => {
+          formData.append('files', file);
+        });
+      }
+
+      const { data } = await storehouseApi.patch(
+        `/inventory/documents/${documentId}/attachments`,
+        formData,
+        {
+          headers: {
+            ...(config?.headers || {}),
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      toast.success("¡Evidencia subida correctamente!");
+      return data;
+    }, "Error al subir archivos de evidencia.");
+  }, [executeRequest, getConfig]);
+
   return {
     purchaseOrders,
     prePurchaseOrders,
@@ -640,6 +761,7 @@ const approveInventory = useCallback(async (
     startLoadingWarehouses,
     startLoadingStockByVariant,
     startLoadingStockBatch,
+    startLoadingStockBatchDetailed,
     // Nuevos métodos de WarehouseDocuments
     startLoadingWarehouseDocuments,
     startCreateWarehouseDocument,
@@ -648,5 +770,7 @@ const approveInventory = useCallback(async (
     startLoadingTransfers,
     startCreateTransfer,
     startCompleteTransfer,
+    startUploadPoAttachment,
+    startUploadWarehouseDocAttachments,
   };
 };
