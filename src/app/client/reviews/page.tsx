@@ -189,19 +189,27 @@ function ReviewCard({ product }: { product: any }) {
           />
         </div>
 
-        {/* Action Buttons: Photo Upload & Submit */}
+        {/* Action Buttons: Submit */}
         <div className="flex flex-col sm:flex-row gap-4 mt-auto">
           
-          {/* Add Photo Button */}
-          <button className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl border-2 border-dashed border-[#594246]/30 text-[#632034] font-bold hover:bg-[#FAF9F6] hover:border-[#F2D0D3] hover:text-[#F2778D] transition-colors duration-300">
-            <Camera className="w-5 h-5" />
-            Subir foto (opcional)
-          </button>
-
           {/* Submit Button */}
           <button 
             disabled={rating === 0}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm
+            onClick={async () => {
+              try {
+                // await axios.post('http://localhost:4000/reviews', {
+                //   productId: product.id,
+                //   orderId: product.orderId,
+                //   rating: rating,
+                //   comment: reviewText
+                // });
+                console.log(`API Call: Enviando reseña de ${rating} estrellas para el producto ${product.id}...`);
+                alert('¡Reseña publicada con éxito!');
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm
               ${rating > 0 
                 ? 'bg-[#632034] text-white hover:bg-[#F2778D] hover:shadow-md' 
                 : 'bg-[#EBEAE8] text-[#594246]/50 cursor-not-allowed shadow-none border border-[#EBEAE8]'}
