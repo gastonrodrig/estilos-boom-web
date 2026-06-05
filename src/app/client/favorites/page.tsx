@@ -58,10 +58,30 @@ export default function FavoritesPage() {
     MOCK_FAVORITES.map(item => item.id)
   );
 
-  const toggleFavorite = (id: number) => {
+  const toggleFavorite = async (id: number) => {
+    const isCurrentlyFavorited = favoritedIds.includes(id);
+    
+    // Optimistic UI update
     setFavoritedIds(prev => 
-      prev.includes(id) ? prev.filter(fId => fId !== id) : [...prev, id]
+      isCurrentlyFavorited ? prev.filter(fId => fId !== id) : [...prev, id]
     );
+
+    // Simulate Axios/Fetch connection
+    try {
+      if (isCurrentlyFavorited) {
+        // await axios.delete(`http://localhost:4000/favorites/${id}`);
+        console.log(`API Call: Eliminando producto ${id} de favoritos...`);
+      } else {
+        // await axios.post('http://localhost:4000/favorites', { productId: id });
+        console.log(`API Call: Agregando producto ${id} a favoritos...`);
+      }
+    } catch (error) {
+      console.error(error);
+      // Revert optimistic update on error
+      setFavoritedIds(prev => 
+        isCurrentlyFavorited ? [...prev, id] : prev.filter(fId => fId !== id)
+      );
+    }
   };
 
   const filteredProducts = MOCK_FAVORITES.filter(item => {
