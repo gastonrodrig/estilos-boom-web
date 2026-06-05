@@ -37,26 +37,26 @@ const ProductManagement: React.FC = () => {
       </header>
 
       {/* Barra de Filtros y Acción */}
-      <div className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] rounded-[2rem] p-4 mb-6 shadow-sm flex flex-col lg:flex-row gap-4 items-center transition-[background-color,border-color] duration-[600ms]">
+      <div className="flex flex-col lg:flex-row gap-[12px] items-center mb-6 w-full">
         
         {/* Buscador */}
         <div className="relative w-full lg:w-80 shrink-0">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/40"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/40 pointer-events-none"
             size={16}
           />
           <input
             type="text"
             placeholder="Buscar por nombre, código..."
-            className="w-full rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md py-2.5 pl-11 pr-4 text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-white/30"
+            className="w-full rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] py-[10px] pl-[44px] pr-[16px] text-sm text-[#40202D] dark:text-white shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-[#a08088]"
           />
         </div>
 
         {/* Contenedor de Filtros */}
-        <div className="flex flex-1 gap-3 overflow-x-auto pb-2 lg:pb-0 custom-scrollbar items-center w-full lg:w-auto">
+        <div className="flex flex-1 gap-[12px] overflow-x-auto custom-scrollbar items-center w-full lg:w-auto">
           
           <div className="relative shrink-0">
-            <select className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer">
+            <select className="appearance-none pl-[16px] pr-[44px] py-[10px] rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-sm text-[#40202D] dark:text-white shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all cursor-pointer">
               <option value="" className="dark:bg-[#1A0B11]">Géneros</option>
               <option value="MUJER" className="dark:bg-[#1A0B11]">Mujer</option>
               <option value="HOMBRE" className="dark:bg-[#1A0B11]">Hombre</option>
@@ -65,7 +65,7 @@ const ProductManagement: React.FC = () => {
           </div>
 
           <div className="relative shrink-0">
-            <select className="appearance-none pl-5 pr-11 py-2.5 rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] bg-white/50 dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md text-sm text-[#40202D] dark:text-white shadow-sm focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all cursor-pointer">
+            <select className="appearance-none pl-[16px] pr-[44px] py-[10px] rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-sm text-[#40202D] dark:text-white shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all cursor-pointer">
               <option value="" className="dark:bg-[#1A0B11]">Estación</option>
               <option value="PV" className="dark:bg-[#1A0B11]">Pri / Verano</option>
               <option value="OI" className="dark:bg-[#1A0B11]">Oto / Invierno</option>
@@ -74,24 +74,24 @@ const ProductManagement: React.FC = () => {
           </div>
 
           {/* Selector de Vistas */}
-          <div className="flex bg-white/50 dark:bg-[rgba(255,255,255,0.04)] rounded-[999px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.08)] p-1 shrink-0 ml-auto shadow-sm">
+          <div className="flex gap-[8px] shrink-0 lg:ml-auto ml-2">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-full transition-colors ${viewMode === "grid" ? "bg-white dark:bg-[rgba(255,255,255,0.1)] text-[#D6405F] shadow-sm" : "text-gray-400 dark:text-white/40 hover:text-[#40202D] dark:hover:text-white"}`}
+              className={`p-[8px] rounded-[8px] border transition-all ${viewMode === "grid" ? "border-[#8B3A52] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-[#D6405F] dark:text-white shadow-md dark:shadow-none" : "border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/50 dark:bg-[rgba(255,255,255,0.03)] text-gray-400 dark:text-[#a08088] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 hover:dark:bg-[rgba(255,255,255,0.08)] shadow-sm hover:shadow-md dark:shadow-none"}`}
               title="Vista Cuadrícula"
             >
               <LayoutGrid size={16} />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2 rounded-full transition-colors ${viewMode === "list" ? "bg-white dark:bg-[rgba(255,255,255,0.1)] text-[#D6405F] shadow-sm" : "text-gray-400 dark:text-white/40 hover:text-[#40202D] dark:hover:text-white"}`}
+              className={`p-[8px] rounded-[8px] border transition-all ${viewMode === "list" ? "border-[#8B3A52] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-[#D6405F] dark:text-white shadow-md dark:shadow-none" : "border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/50 dark:bg-[rgba(255,255,255,0.03)] text-gray-400 dark:text-[#a08088] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 hover:dark:bg-[rgba(255,255,255,0.08)] shadow-sm hover:shadow-md dark:shadow-none"}`}
               title="Vista Lista"
             >
               <ListIcon size={16} />
             </button>
             <button
               onClick={() => setViewMode("compact")}
-              className={`p-2 rounded-full transition-colors ${viewMode === "compact" ? "bg-white dark:bg-[rgba(255,255,255,0.1)] text-[#D6405F] shadow-sm" : "text-gray-400 dark:text-white/40 hover:text-[#40202D] dark:hover:text-white"}`}
+              className={`p-[8px] rounded-[8px] border transition-all ${viewMode === "compact" ? "border-[#8B3A52] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] text-[#D6405F] dark:text-white shadow-md dark:shadow-none" : "border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/50 dark:bg-[rgba(255,255,255,0.03)] text-gray-400 dark:text-[#a08088] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 hover:dark:bg-[rgba(255,255,255,0.08)] shadow-sm hover:shadow-md dark:shadow-none"}`}
               title="Vista Compacta"
             >
               <AlignJustify size={16} />
@@ -101,8 +101,8 @@ const ProductManagement: React.FC = () => {
 
         <Link
           href="/admin/products/create"
-          className="shrink-0 flex items-center justify-center gap-2 bg-[#8B3A52] hover:bg-[#a04060] text-white shadow-md transition-all font-medium w-full lg:w-auto"
-          style={{ borderRadius: "8px", fontSize: "0.78rem", letterSpacing: "0.08em", padding: "10px 20px" }}
+          className="shrink-0 flex items-center justify-center gap-2 bg-[#8B3A52] hover:bg-[#a04060] text-white shadow-md transition-all font-medium w-full lg:w-auto lg:ml-0"
+          style={{ borderRadius: "8px", fontSize: "0.8rem", letterSpacing: "0.05em", padding: "10px 20px" }}
         >
           <Plus size={16} />
           Nuevo Producto
@@ -152,7 +152,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-md rounded-[1.5rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] overflow-hidden shadow-sm hover:shadow-md transition-all duration-[600ms] flex flex-col sm:flex-row items-center p-3 gap-4 group"
+        className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-md transition-colors duration-500 flex flex-col sm:flex-row items-center p-3 gap-4 group"
       >
         <div className="relative h-14 w-14 shrink-0 bg-gray-100 dark:bg-white/5 rounded-xl overflow-hidden border border-[#EAE0E2] dark:border-white/5">
           {product.images?.[0] ? (
@@ -175,14 +175,20 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
           <div className="flex items-center gap-6 shrink-0">
              <div className="text-right">
                <p className="text-[14px] font-black text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
-               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${product.is_active ? "bg-emerald-500/10 text-emerald-600" : "bg-gray-500/10 text-gray-500"}`}>{product.is_active ? "Activo" : "Inactivo"}</span>
+               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>{product.is_active ? "Activo" : "Inactivo"}</span>
              </div>
              <div className="flex items-center gap-2">
-                <Link href={`/admin/products/${product.id_product}`} className="p-2 bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:bg-[#D6405F]/10 hover:border-[#D6405F]/30 text-[#40202D] dark:text-white hover:text-[#D6405F] transition-all">
-                  <Eye size={16} />
+                <Link
+                  href={`/admin/products/${product.id_product}`}
+                  className="p-[6px] bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-pink-50 dark:hover:bg-white/10 text-[#40202D] dark:text-white hover:text-[#8B3A52] transition-colors"
+                >
+                  <Eye size={14} />
                 </Link>
-                <button type="button" className="p-2 bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:bg-rose-500/10 hover:border-rose-500/30 text-gray-400 hover:text-rose-500 transition-all">
-                  <Power size={16} />
+                <button
+                  type="button"
+                  className="p-[6px] bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-600 transition-colors"
+                >
+                  <Power size={14} />
                 </button>
              </div>
           </div>
@@ -200,7 +206,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ duration: 0.2 }}
-        className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-xl rounded-[1.5rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-white/5 transition-all duration-[600ms] flex flex-col sm:flex-row group"
+        className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col sm:flex-row group"
       >
         <div className="relative h-48 sm:h-auto sm:w-56 shrink-0 bg-gray-100 dark:bg-white/5 border-b sm:border-b-0 sm:border-r border-[#EAE0E2] dark:border-white/10 overflow-hidden">
           {product.images?.[0] ? (
@@ -209,7 +215,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
             <div className="w-full h-full flex flex-col items-center justify-center text-[#8C6B79]/40"><Package size={32} className="mb-2" /><span className="text-[9px] font-black uppercase tracking-widest">Sin Foto</span></div>
           )}
           <div className="absolute top-3 left-3">
-             <span className={`inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm backdrop-blur-md ${product.is_active ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/20 text-gray-700 dark:text-gray-300 border border-gray-500/30"}`}>
+             <span className={`inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm backdrop-blur-md ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>
                {product.is_active ? "Activo" : "Inactivo"}
              </span>
           </div>
@@ -230,10 +236,10 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
                 <p className="text-2xl font-black text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
              </div>
              <div className="flex gap-2">
-                <Link href={`/admin/products/${product.id_product}`} className="flex items-center gap-2 px-5 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:border-[#D6405F] bg-white/80 dark:bg-white/5 hover:bg-white transition-all text-[11px] font-black uppercase tracking-widest text-[#40202D] dark:text-white shadow-sm">
+                <Link href={`/admin/products/${product.id_product}`} className="flex items-center gap-2 px-5 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:border-pink-200 bg-white/80 dark:bg-white/5 hover:bg-pink-50 transition-colors text-[11px] font-black uppercase tracking-widest text-[#40202D] dark:text-white hover:text-[#8B3A52] shadow-sm">
                   <Eye size={16} /> Detalles
                 </Link>
-                <button type="button" className="px-4 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:bg-rose-500/10 hover:border-rose-500/30 text-[#8C6B79] hover:text-rose-500 transition-colors bg-white/80 dark:bg-white/5 shadow-sm">
+                <button type="button" className="px-4 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/30 text-[#8C6B79] hover:text-red-600 transition-colors bg-white/80 dark:bg-white/5 shadow-sm">
                   <Power size={16} />
                 </button>
              </div>
@@ -251,7 +257,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
-      className="bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl rounded-[1.5rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] overflow-hidden shadow-sm hover:shadow-xl dark:hover:shadow-white/5 transition-all duration-[600ms] flex flex-col group"
+      className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-xl dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col group"
     >
       {/* Imagen Superior */}
       <div className="relative h-[140px] w-full bg-gray-100 dark:bg-white/5 overflow-hidden border-b border-[#EAE0E2] dark:border-white/10">
@@ -283,9 +289,9 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
               className={`inline-flex uppercase`}
               style={{ 
                 fontSize: '0.6rem', padding: '2px 8px', borderRadius: '999px',
-                background: product.is_active ? 'rgba(80,180,120,0.15)' : 'rgba(120,120,120,0.15)',
-                color: product.is_active ? '#6dba8a' : '#888888',
-                border: product.is_active ? '1px solid rgba(80,180,120,0.25)' : '1px solid rgba(120,120,120,0.25)'
+                background: product.is_active ? 'rgba(16, 185, 129, 0.15)' : 'rgba(107, 114, 128, 0.15)',
+                color: product.is_active ? 'var(--tw-colors-emerald-700, #047857)' : 'var(--tw-colors-gray-700, #374151)',
+                border: product.is_active ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(107, 114, 128, 0.3)'
               }}
             >
               {product.is_active ? "Activo" : "Inactivo"}
@@ -324,7 +330,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         <div className="mt-4 flex gap-2">
           <Link
             href={`/admin/products/${product.id_product}`}
-            className="flex-1 flex items-center justify-center gap-2 py-2 transition-all text-[#40202D] dark:text-white shadow-sm bg-black/5 dark:bg-[rgba(255,255,255,0.05)] border border-black/10 dark:border-[rgba(255,255,255,0.1)] hover:bg-black/10 dark:hover:bg-[rgba(255,255,255,0.1)]"
+            className="flex-1 flex items-center justify-center gap-2 py-2 transition-colors text-[#40202D] dark:text-white shadow-sm bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 hover:bg-pink-50 dark:hover:bg-white/10 hover:text-[#8B3A52] hover:border-pink-200 dark:hover:border-white/20"
             style={{ borderRadius: '8px', fontSize: '0.75rem' }}
           >
             <Eye size={16} />
@@ -333,7 +339,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
 
           <button
             type="button"
-            className="px-3 py-2 border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.1)] hover:bg-rose-500/10 hover:border-rose-500/30 text-[#8C6B79] hover:text-rose-500 transition-colors bg-white/50 dark:bg-[rgba(255,255,255,0.02)] shadow-sm"
+            className="w-10 flex items-center justify-center text-gray-400 dark:text-white/40 bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 transition-colors hover:border-red-200 dark:hover:border-red-500/30"
             style={{ borderRadius: '8px' }}
             title={product.is_active ? "Desactivar" : "Activar"}
           >

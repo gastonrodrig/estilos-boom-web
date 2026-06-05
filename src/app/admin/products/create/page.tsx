@@ -413,19 +413,19 @@ export default function CreateProductPage() {
               </div>
 
               {technicalSheet.length > 0 ? (
-                <div className="border rounded-2xl overflow-hidden border-[#EAE0E2] dark:border-white/10 shadow-sm bg-white/30 dark:bg-white/5 backdrop-blur-md">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-white/50 dark:bg-black/30 border-b border-[#EAE0E2] dark:border-white/10 text-xs font-bold uppercase tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
-                      <tr>
-                        <th className="p-4">Insumo</th>
-                        <th className="p-4">Unidad</th>
-                        <th className="p-4">Cantidad</th>
-                        <th className="p-4 text-center">Acción</th>
+                <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+                  <table className="w-full text-sm text-left border-collapse">
+                    <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                      <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Insumo</th>
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidad</th>
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
+                        <th className="p-4 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acción</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                       {technicalSheet.map((item, index) => (
-                        <tr key={index} className="hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
+                        <tr key={index} className={`transition-colors group/row ${index % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                           <td className="p-4 font-bold text-[#40202D] dark:text-white">{item.name}</td>
                           <td className="p-4 text-xs opacity-70 uppercase">{item.unit}</td>
                           <td className="p-4 font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity}</td>
@@ -599,7 +599,7 @@ export default function CreateProductPage() {
                     </thead>
                     <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                       {variants.map((v, i) => (
-                        <tr key={i} className="hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
+                        <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                           <td className="p-4 font-black text-[#40202D] dark:text-white">{v.size}</td>
                           <td className="p-4 font-bold text-[#40202D] dark:text-white">
                             <div className="flex items-center gap-2">

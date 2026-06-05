@@ -117,8 +117,8 @@ function PaymentTableRow({
   const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white";
 
   return (
-    <tr className={`${bgClass} transition-colors hover:bg-[#f7f1f4]`}>
-      <td className="px-6 py-4 text-sm font-medium text-gray-800">
+    <tr className={`transition-colors group/row ${index % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+      <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
         {payment.orderNumber}
       </td>
       <td className="px-6 py-4 text-sm text-gray-700">{payment.clientName}</td>
@@ -314,30 +314,29 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-pink-100 bg-[#fffcfd] shadow-sm">
-        <div className="flex items-center justify-between border-b border-pink-100 px-6 py-4">
-          <h2 className="text-sm font-semibold text-gray-700">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+        <div className="flex items-center justify-between border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] px-6 py-5">
+          <h2 className="text-[14px] font-black text-[#40202D] dark:text-white tracking-wide">
             Pagos pendientes de verificación
           </h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#dfa6b6] text-xs font-semibold uppercase text-white">
-                <th className="px-6 py-3">Pedido</th>
-                <th className="px-6 py-3">Clienta</th>
-                <th className="px-6 py-3">Método</th>
-                <th className="px-6 py-3">Monto</th>
-                <th className="px-6 py-3">Número de operación</th>
-                <th className="px-6 py-3">Estado</th>
-                <th className="px-6 py-3">Acciones</th>
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left border-collapse">
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Pedido</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Clienta</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto pedido</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">N° Operación</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 Array.from({ length: 3 }).map((_, i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[#fff1f3]"}>
+                  <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     {Array.from({ length: 6 }).map((__, j) => (
                       <td key={j} className="px-6 py-4">
                         <div className="h-4 animate-pulse rounded bg-gray-100" />

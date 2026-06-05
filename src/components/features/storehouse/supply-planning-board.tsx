@@ -401,18 +401,18 @@ export const SupplyPlanningBoard = () => {
                       </h3>
                     </div>
 
-                    <div className="overflow-x-auto custom-scrollbar">
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
                       <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                            <th className="px-4 py-4">Talla</th>
-                            <th className="px-4 py-4">Color</th>
-                            <th className="px-4 py-4">Stock</th>
-                            <th className="px-4 py-4">Mínimo</th>
-                            <th className="px-4 py-4">Nivel</th>
-                            <th className="px-4 py-4">Estado</th>
-                            <th className="px-4 py-4">Métricas</th>
-                            <th className="px-4 py-4 text-center">Acción</th>
+                        <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Stock</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Mínimo</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Nivel</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Métricas</th>
+                            <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-center">Acción</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
@@ -431,7 +431,7 @@ export const SupplyPlanningBoard = () => {
                             const checked = Boolean(selected[key]);
 
                             return (
-                              <tr key={key} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group/row">
+                              <tr key={key} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                                 <td className="px-4 py-5 text-[13px] font-black text-[#40202D] dark:text-white">
                                   {variant.size || "-"}
                                 </td>

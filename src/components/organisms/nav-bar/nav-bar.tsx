@@ -312,7 +312,13 @@ export const Navbar = ({
                 </button>
               )}
 
-              {/* Theme Switcher and Admin User logic moved to data-table.tsx via AdminHeaderActions */}
+              {/* Theme Switcher for public Navbar */}
+              {!isBackofficeRoute && (
+                <ThemeSwitcher 
+                  className={iconButtonClass} 
+                  iconClassName={iconClass} 
+                />
+              )}
 
               {!isBackofficeRoute && (
                 <div className="relative" ref={userMenuRef}>
