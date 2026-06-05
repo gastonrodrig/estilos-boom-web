@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, CheckCircle2, Sparkles, MessageSquare, ChevronDown } from 'lucide-react';
+import { Send, CheckCircle2, Sparkles, MessageSquare, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock Data
@@ -18,7 +18,11 @@ const MOCK_PRODUCTS = [
   "Vestido Floral Primavera",
   "Vestido Escote V",
   "Vestido Elegante Encaje",
-  "Pantalón Wide Leg"
+  "Pantalón Wide Leg",
+  "Falda Midi Plisada",
+  "Chaqueta Denim Clásica",
+  "Top Cruzado Satén",
+  "Vestido Boho Chic"
 ];
 
 const SIZES = ["XS", "S", "M", "L", "XL"];
@@ -52,6 +56,11 @@ export default function SuggestionsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [suggestionsHistory, setSuggestionsHistory] = useState(INITIAL_SUGGESTIONS);
+  
+  // Custom Dropdown State
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownPage, setDropdownPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
 
   const isFormValid = () => {
     if (selectedCategory === "Pedir una talla") return selectedProduct !== "" && selectedSize !== "";
@@ -67,11 +76,25 @@ export default function SuggestionsPage() {
     return suggestionText; // Text libre
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid()) return;
 
     setIsSubmitting(true);
+    
+    // Simulate Axios/Fetch connection to new routes
+    try {
+      // await axios.post('http://localhost:4000/suggestions', {
+      //   category: selectedCategory,
+      //   productId: selectedProduct ? 'mock-id' : undefined,
+      //   sizeRequested: selectedSize,
+      //   colorSuggested: suggestedColor,
+      //   message: suggestionText
+      // });
+      console.log('API Call: Enviando sugerencia al backend...');
+    } catch (error) {
+      console.error(error);
+    }
     
     setTimeout(() => {
       setIsSubmitting(false);
@@ -194,17 +217,67 @@ export default function SuggestionsPage() {
                   <div>
                     <label className="block text-[#632034] font-bold text-sm mb-3">¿Para qué producto es tu sugerencia?</label>
                     <div className="relative">
-                      <select 
-                        value={selectedProduct}
-                        onChange={(e) => setSelectedProduct(e.target.value)}
-                        className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner cursor-pointer"
+                      {/* Custom Dropdown Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner text-left"
                       >
-                        <option value="" disabled>Selecciona un producto de la lista...</option>
-                        {MOCK_PRODUCTS.map(prod => (
-                          <option key={prod} value={prod}>{prod}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#594246]/40 pointer-events-none" />
+                        <span className={selectedProduct ? "" : "text-[#594246]/40"}>
+                          {selectedProduct || "Selecciona un producto de la lista..."}
+                        </span>
+                        <ChevronDown className={`w-5 h-5 text-[#594246]/40 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {/* Custom Dropdown Menu */}
+                      <AnimatePresence>
+                        {isDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="absolute z-20 top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.15)] border border-[#EBEAE8] overflow-hidden"
+                          >
+                            <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                              {/* Paginated mock display */}
+                              {MOCK_PRODUCTS.slice((dropdownPage - 1) * ITEMS_PER_PAGE, dropdownPage * ITEMS_PER_PAGE).map(prod => (
+                                <button
+                                  key={prod}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedProduct(prod);
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${selectedProduct === prod ? 'bg-[#F2D0D3]/30 text-[#632034]' : 'text-[#594246]/80 hover:bg-[#FAF9F6] hover:text-[#632034]'}`}
+                                >
+                                  {prod}
+                                </button>
+                              ))}
+                            </div>
+                            
+                            {/* Pagination Controls */}
+                            <div className="border-t border-[#EBEAE8] p-2 flex justify-between items-center bg-[#FAF9F6]/50">
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.max(1, dropdownPage - 1)); }}
+                                disabled={dropdownPage === 1}
+                                className="p-1.5 rounded-lg hover:bg-[#EBEAE8] disabled:opacity-30 transition-colors"
+                              >
+                                <ChevronLeft className="w-4 h-4 text-[#632034]" />
+                              </button>
+                              <span className="text-xs font-bold text-[#632034]/60">Pág {dropdownPage} de {Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}</span>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.min(Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE), dropdownPage + 1)); }}
+                                disabled={dropdownPage === Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}
+                                className="p-1.5 rounded-lg hover:bg-[#EBEAE8] disabled:opacity-30 transition-colors"
+                              >
+                                <ChevronRight className="w-4 h-4 text-[#632034]" />
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 )}
