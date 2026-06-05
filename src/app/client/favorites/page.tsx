@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
+import { favoritesApi } from '../../../api/favorites/favorites-api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock Data
@@ -69,11 +72,9 @@ export default function FavoritesPage() {
     // Simulate Axios/Fetch connection
     try {
       if (isCurrentlyFavorited) {
-        // await axios.delete(`http://localhost:4000/favorites/${id}`);
-        console.log(`API Call: Eliminando producto ${id} de favoritos...`);
+        await favoritesApi.delete(`/${id}`);
       } else {
-        // await axios.post('http://localhost:4000/favorites', { productId: id });
-        console.log(`API Call: Agregando producto ${id} a favoritos...`);
+        await favoritesApi.post('/', { productId: id.toString() });
       }
     } catch (error) {
       console.error(error);

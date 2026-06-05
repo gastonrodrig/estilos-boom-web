@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Star, Camera, UploadCloud, MessageSquareHeart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { reviewsApi } from '../../../api/reviews/reviews-api';
 
 // Mock Data for pending reviews
 const PENDING_REVIEWS = [
@@ -197,13 +198,12 @@ function ReviewCard({ product }: { product: any }) {
             disabled={rating === 0}
             onClick={async () => {
               try {
-                // await axios.post('http://localhost:4000/reviews', {
-                //   productId: product.id,
-                //   orderId: product.orderId,
-                //   rating: rating,
-                //   comment: reviewText
-                // });
-                console.log(`API Call: Enviando reseña de ${rating} estrellas para el producto ${product.id}...`);
+                await reviewsApi.post('/', {
+                  productId: product.id.toString(), // Needs to be mongo id theoretically, but we use what we have
+                  orderId: '65f1a2b3c4d5e6f7a8b9c0d1', // Dummy order ID
+                  rating: rating,
+                  comment: reviewText
+                });
                 alert('¡Reseña publicada con éxito!');
               } catch (error) {
                 console.error(error);

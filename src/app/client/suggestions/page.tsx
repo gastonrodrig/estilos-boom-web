@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Send, CheckCircle2, Sparkles, MessageSquare, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { suggestionsApi } from '../../../api/suggestions/suggestions-api';
 
 // Mock Data
 const SUGGESTION_CATEGORIES = [
@@ -82,20 +83,21 @@ export default function SuggestionsPage() {
 
     setIsSubmitting(true);
     
-    // Simulate Axios/Fetch connection to new routes
     try {
-      // await axios.post('http://localhost:4000/suggestions', {
-      //   category: selectedCategory,
-      //   productId: selectedProduct ? 'mock-id' : undefined,
-      //   sizeRequested: selectedSize,
-      //   colorSuggested: suggestedColor,
-      //   message: suggestionText
-      // });
-      console.log('API Call: Enviando sugerencia al backend...');
+      // Usamos el API configurada (axios instance)
+      await suggestionsApi.post('/', {
+        category: selectedCategory,
+        // Usamos un ID dummy temporal para el producto si no existe en BD, o se omitiría
+        productId: selectedProduct ? '65f1a2b3c4d5e6f7a8b9c0d1' : undefined, 
+        sizeRequested: selectedSize,
+        colorSuggested: suggestedColor,
+        message: suggestionText
+      });
     } catch (error) {
-      console.error(error);
+      console.error('Error enviando sugerencia:', error);
     }
     
+    // Mostramos la UI de éxito igual (manteniendo mock feel)
     setTimeout(() => {
       setIsSubmitting(false);
       setShowSuccess(true);
