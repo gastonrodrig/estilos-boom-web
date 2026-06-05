@@ -180,10 +180,11 @@ export default function CompletedProductionOrders() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(139,58,82,0.06)] dark:divide-[rgba(255,255,255,0.06)] text-sm">
-              {filteredOrders.map((order: any) => (
+              {filteredOrders.map((order: any, idx: number) => (
                 <CompletedOrderRow 
                   key={order._id} 
                   order={order} 
+                  idx={idx}
                   onOpenTech={() => handleOpenModal("TECH", order)} 
                   onOpenObs={() => handleOpenModal("OBS", order)} 
                 />
