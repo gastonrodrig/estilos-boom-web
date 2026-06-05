@@ -9,14 +9,14 @@ import { getUserMenuItems, UserMenuRole } from "@data";
 import { ThemeSwitcher } from "../theme-switcher/theme-switcher";
 
 const userMenuIconMap: Record<string, React.ElementType> = {
-  LayoutDashboard,
-  Package,
-  LogOut,
-  User,
+  dashboard: LayoutDashboard,
+  package: Package,
+  logout: LogOut,
+  user: User,
 };
 
 export function AdminHeaderActions() {
-  const { user, logout, permissions } = useAuthStore();
+  const { role, onLogout: logoutUser } = useAuthStore();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -35,11 +35,22 @@ export function AdminHeaderActions() {
 
   const adminUserIconClass = "h-[18px] w-[18px] transition-transform duration-200 group-hover:scale-110";
 
-  const userRole = (user?.role?.toLowerCase() as UserMenuRole) || "client";
+  const isAdmin = role === "Administrador";
+  const isClient = role === "Cliente";
+  const isStorekeeper = role === "Almacenero";
+
+  const userRole: UserMenuRole | null = isAdmin
+    ? "admin"
+    : isClient
+    ? "client"
+    : isStorekeeper
+    ? "storekeeper"
+    : null;
+
   const userMenuItems = getUserMenuItems(userRole);
 
   const onLogout = async () => {
-    await logout();
+    await logoutUser();
     setUserMenuOpen(false);
   };
 
@@ -70,8 +81,8 @@ export function AdminHeaderActions() {
               className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[rgba(255,255,255,0.1)] bg-[#ffffff] dark:bg-[#1a0e14] shadow-xl text-[#364152] dark:text-[#ddc0c8] md:mt-3 md:w-60 md:rounded-2xl z-50"
             >
               <div className="py-1.5 md:py-2">
-                {userMenuItems.map(({ label, href, icon, requiredPermission }) => {
-                  if (requiredPermission && !permissions.includes(requiredPermission)) return null;
+                {userMenuItems.map(({ label, href, icon, requiredRoles }) => {
+                  if (requiredRoles && role && !requiredRoles.includes(role)) return null;
                   const ItemIcon = userMenuIconMap[icon];
 
                   return (

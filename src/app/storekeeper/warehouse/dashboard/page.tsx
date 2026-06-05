@@ -216,7 +216,7 @@ export default function WarehouseDashboardPage() {
                     
                     <div className="flex flex-col gap-2 mb-4 mt-1">
                       {(doc.items || []).slice(0, 2).map((item: any, idx: number) => {
-                        const variantName = typeof item.id_variant === "object" 
+                        const variantName = (item.id_variant && typeof item.id_variant === "object") 
                           ? `${item.id_variant.id_product?.name || "Prenda"} (${item.id_variant.size}/${item.id_variant.color?.name || ""})`
                           : "Variante";
                         return (

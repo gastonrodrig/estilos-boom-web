@@ -61,8 +61,8 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
           const initialCustom: Record<string, string> = {};
           const initialQtyInc: Record<string, number> = {};
 
-          (found.items ?? []).forEach((item: any) => {
-            const vId = typeof item.id_variant === "object" ? item.id_variant._id : item.id_variant;
+          (found.items ?? []).forEach((item: any, idx: number) => {
+            const vId = (item.id_variant && typeof item.id_variant === "object") ? item.id_variant._id : (item.id_variant || item._id || idx.toString());
             initialQty[vId] = item.quantity_expected ?? 0;
             initialInc[vId] = false;
             initialReason[vId] = "";
@@ -108,8 +108,8 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
       (typeof window !== "undefined" ? localStorage.getItem("worker_id") ?? "" : "") ||
       "000000000000000000000001";
 
-    const items = (doc.items ?? []).map((item: any) => {
-      const vId = typeof item.id_variant === "object" ? item.id_variant._id : item.id_variant;
+    const items = (doc.items ?? []).map((item: any, idx: number) => {
+      const vId = (item.id_variant && typeof item.id_variant === "object") ? item.id_variant._id : (item.id_variant || item._id || idx.toString());
       const isIncident = incidents[vId];
       let note = "";
       if (isIncident) {
@@ -159,8 +159,8 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
   const srcName = doc.id_source_warehouse?.name?.replace(/_/g, " ") ?? "Proveedor externo";
   const tgtName = doc.id_target_warehouse?.name?.replace(/_/g, " ") ?? "Almacén Principal";
   const totalExpected = (doc.items ?? []).reduce((acc: number, item: any) => acc + (item.quantity_expected ?? 0), 0);
-  const totalReceived = (doc.items ?? []).reduce((acc: number, item: any) => {
-    const vId = typeof item.id_variant === "object" ? item.id_variant._id : item.id_variant;
+  const totalReceived = (doc.items ?? []).reduce((acc: number, item: any, idx: number) => {
+    const vId = (item.id_variant && typeof item.id_variant === "object") ? item.id_variant._id : (item.id_variant || item._id || idx.toString());
     return acc + (quantities[vId] ?? item.quantity_expected ?? 0);
   }, 0);
 
@@ -282,9 +282,9 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
                 <ul className="space-y-3 text-[14px] text-[#40202D] dark:text-[#EAE0E2] font-medium">
                   {(doc.items ?? []).map((item: any, idx: number) => {
                     const variant = item.id_variant;
-                    const productName = typeof variant === "object" ? variant.id_product?.name : "Prenda";
-                    const size = typeof variant === "object" ? variant.size : "—";
-                    const colorName = typeof variant === "object" ? variant.color?.name : "—";
+                    const productName = (variant && typeof variant === "object") ? variant.id_product?.name : "Prenda";
+                    const size = (variant && typeof variant === "object") ? variant.size : "—";
+                    const colorName = (variant && typeof variant === "object") ? variant.color?.name : "—";
                     return (
                       <li key={idx} className="flex justify-between items-center border-b border-[#EEDCE1] dark:border-white/5 pb-3 last:border-0 last:pb-0">
                         <span className="flex items-center gap-2">
@@ -307,12 +307,12 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         <div className="space-y-5 mb-12">
           {(doc.items ?? []).map((item: any, idx: number) => {
             const variant = item.id_variant;
-            const vId = typeof variant === "object" ? variant._id : variant;
-            const sku = typeof variant === "object" ? variant.sku_variant : vId;
-            const size = typeof variant === "object" ? variant.size : "—";
-            const colorName = typeof variant === "object" ? variant.color?.name : "—";
-            const colorHex = typeof variant === "object" ? variant.color?.hex : "#ccc";
-            const productName = typeof variant === "object" ? variant.id_product?.name : "Prenda";
+            const vId = (variant && typeof variant === "object") ? variant._id : (variant || item._id || idx.toString());
+            const sku = (variant && typeof variant === "object") ? variant.sku_variant : vId;
+            const size = (variant && typeof variant === "object") ? variant.size : "—";
+            const colorName = (variant && typeof variant === "object") ? variant.color?.name : "—";
+            const colorHex = (variant && typeof variant === "object") ? variant.color?.hex : "#ccc";
+            const productName = (variant && typeof variant === "object") ? variant.id_product?.name : "Prenda";
 
             const hasIncidence = incidents[vId] || false;
             const currentQtyReceived = quantities[vId] ?? item.quantity_expected ?? 0;
