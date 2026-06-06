@@ -117,7 +117,7 @@ function PaymentTableRow({
   const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white";
 
   return (
-    <tr className={`transition-colors group/row ${index % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+    <tr className={`transition-colors group/row ${!isOdd ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
       <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
         {payment.orderNumber}
       </td>
@@ -378,7 +378,7 @@ export default function AdminPaymentsPage() {
             operación existe antes de confirmar.
           </p>
         </div>
-      </div>
+      </main>
 
       <PaymentDetailModal
         open={isDetailOpen}

@@ -22,6 +22,7 @@ export interface WorkerRow {
 }
 
 export interface RoleRow {
+    id: string;
     name: string;
     user_count: number;
     is_active: boolean;

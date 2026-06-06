@@ -168,7 +168,7 @@ const CheckoutPaymentForm: React.FC = () => {
             paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia',
             clientName: clientNameStr || 'Cliente Web',
             items: items.map(item => ({
-              id: item.id,
+              id: item.productId,
               name: item.name,
               size: item.size,
               price: item.price,
@@ -204,7 +204,7 @@ const CheckoutPaymentForm: React.FC = () => {
         ...param.formData, 
         orderId: `ORD-${Date.now()}`,
         items: itemsRef.current.map(item => ({
-          id: item.id,
+          id: item.productId,
           name: item.name,
           size: item.size,
           price: item.price,

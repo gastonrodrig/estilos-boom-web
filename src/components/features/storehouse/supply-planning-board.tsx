@@ -416,7 +416,7 @@ export const SupplyPlanningBoard = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
-                          {variants.map((variant) => {
+                          {variants.map((variant, idx) => {
                             // Usar stock real de WarehouseStock; mostrar "…" mientras carga
                             const stockLoaded = warehouseStock[variant.id_variant] !== undefined;
                             const stock = stockLoaded ? warehouseStock[variant.id_variant] : (variant.stock ?? 0);

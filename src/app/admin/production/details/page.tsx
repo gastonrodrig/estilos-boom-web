@@ -18,10 +18,13 @@ import { CTA } from "@/components/atoms";
 // ==========================================
 import { ProductionTrackingView } from "@/components/organisms/production-tracking-view";
 import { ConfirmWorkshopModal } from "@/components/organisms";
-import { ExtendDeadlineModal } from "@/components/organisms/modals";
-import { RegisterCostsModal } from "@/components/organisms/modals";
-import { TechnicalSheetModal } from "@/components/organisms/modals";
-import { UpdatePhaseModal } from "@/components/organisms/modals";
+import { 
+  ExtendDeadlineModal, 
+  RegisterCostsModal, 
+  TechnicalSheetModal, 
+  UpdatePhaseModal,
+  ProductionSubStateModal
+} from "@/components/organisms/modals";
 import { TrackingOrder } from "@/components/organisms/production-tracking-view/production-tracking.types";
 
 // --- HELPERS ---
@@ -50,7 +53,7 @@ const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating
 // COMPONENTE PRINCIPAL DE LA PÁGINA
 // ==========================================
 export default function ProductionOrderTracking() {
-const { orders, startLoadingProductionOrders, startUpdateProductionStatus, startConfirmWorkshop, startUpdateWorkshopQuote } = useProductionStore();
+  const { orders, startLoadingProductionOrders, startUpdateProductionStatus, startConfirmWorkshop, startUpdateWorkshopQuote, startUpdateSubState } = useProductionStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkshop, setSelectedWorkshop] = useState("Todos los Talleres");
@@ -169,33 +172,7 @@ if (trackingViewOrder) {
     />
   );
 }
-  
 
-  const openTrackingView = (order: any) => {
-    setTrackingOrderId(order._id);
-  };
-
-const handleApproveTrackingQuality = async (orderId: string) => {
-  try {
-    await updateOrderStatus(orderId, "COMPLETADA");
-    toast.success("Control de calidad aprobado. Orden finalizada.");
-    setTrackingOrderId(null);
-    await startLoadingProductionOrders();
-  } catch {
-    toast.error("Error al actualizar la orden.");
-  }
-};
-
-if (trackingViewOrder) {
-  return (
-    <ProductionTrackingView
-      order={trackingViewOrder}
-      onBack={() => setTrackingOrderId(null)}
-      onApproveQuality={handleApproveTrackingQuality}
-    />
-  );
-}
-  
 
   return (
     <>
@@ -318,14 +295,14 @@ if (trackingViewOrder) {
           }
 
           return filtered.map((order: any) => (
-            
             <ProductionCard
-  key={order._id}
-  order={order}
-  onUpdateStatus={updateOrderStatus}
-  onUpdateCosts={updateOrderCosts}
-  onOpenTracking={openTrackingView}
-/>
+              key={order._id}
+              order={order}
+              onUpdateStatus={updateOrderStatus}
+              onUpdateCosts={updateOrderCosts}
+              onOpenTracking={openTrackingView}
+              onUpdateSubState={startUpdateSubState}
+            />
           ));
         })()}
       </div>
@@ -342,14 +319,16 @@ function ProductionCard({
   onUpdateStatus,
   onUpdateCosts,
   onOpenTracking,
+  onUpdateSubState,
 }: {
   order: any;
   onUpdateStatus: (id: string, status: string, winnerId?: string) => Promise<void>;
   onUpdateCosts: (id: string, costs: Record<string, number>) => Promise<void>;
   onOpenTracking: (order: any) => void;
+  onUpdateSubState: (id: string, step: string) => Promise<any>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | "WINNER" | null>(null);
+  const [activeModal, setActiveModal] = useState<"STATUS" | "DATE" | "TECH" | "COST" | "WINNER" | "PROD_SUB" | null>(null);
   
   const [trackingOrder, setTrackingOrder] = useState<TrackingOrder | null>(null);
   
@@ -720,6 +699,23 @@ function ProductionCard({
       
       <UpdatePhaseModal isOpen={activeModal === "STATUS"} onClose={() => setActiveModal(null)} order={order} onUpdateStatus={onUpdateStatus} onConfirmAdvance={handleAdvancePhase} />
       
+      <ProductionSubStateModal 
+        isOpen={activeModal === "PROD_SUB"} 
+        onClose={() => setActiveModal(null)} 
+        order={order} 
+        prodSubState={(() => {
+          const subStates = order.sub_states || [];
+          const hasCorte = subStates.some((s: any) => s.step === "CORTE");
+          const hasConfeccion = subStates.some((s: any) => s.step === "CONFECCION");
+          const hasAvance = subStates.some((s: any) => s.step === "AVANCE");
+          if (!hasCorte) return "CORTE";
+          if (!hasConfeccion) return "CONFECCION";
+          if (!hasAvance) return "AVANCE";
+          return "ENTREGA";
+        })()} 
+        onUpdateSubState={onUpdateSubState} 
+      />
+      
 
     </article>
   );
@@ -735,10 +731,10 @@ function StepItem({ active, icon, label, sub, date, onClick, interactive }: { ac
         {icon}
       </div>
       <div className="space-y-1 mt-2">
-        <p className={`text-sm font-bold ${isActive || isCompleted ? "text-[#F2778D] dark:text-[#c4a0ae]" : "text-[#b79ca5] dark:text-[#a08088]"}`}>{label}</p>
+        <p className={`text-sm font-bold ${active ? "text-[#F2778D] dark:text-[#c4a0ae]" : "text-[#b79ca5] dark:text-[#a08088]"}`}>{label}</p>
         <p className="text-[11px] leading-tight text-[#9b8088] dark:text-[rgba(255,255,255,0.4)] max-w-[140px] mx-auto">{sub}</p>
-        {(isActive || isCompleted) && date && (
-          <p className={`text-[10px] font-bold ${isActive ? "text-[#D6405F] dark:text-[#e8d8dc] animate-pulse-slow" : "text-[#F2778D] dark:text-[#a08088]"} mt-1`}>
+        {active && date && (
+          <p className={`text-[10px] font-bold ${active ? "text-[#D6405F] dark:text-[#e8d8dc] animate-pulse-slow" : "text-[#F2778D] dark:text-[#a08088]"} mt-1`}>
             {new Date(date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} · {new Date(date).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
           </p>
         )}

@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { FilterDropdown } from "./filter-dropdown";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
