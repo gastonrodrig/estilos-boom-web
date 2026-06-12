@@ -29,7 +29,7 @@ export default function ProductPage() {
   if (!product) return <div className="h-screen flex items-center justify-center">Producto no encontrado</div>;
 
   return (
-    <main className="min-h-screen bg-[#FAF9F6]">
+    <main className="min-h-screen bg-[#FAF9F6] dark:bg-[#150d18] transition-colors duration-300">
       <div className="pt-0">
         <ProductDetail product={product} />
       </div>

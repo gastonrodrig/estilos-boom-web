@@ -415,7 +415,7 @@ export const Navbar = ({
               )}
 
               {!isBackofficeRole && (
-                <Link href="/wishlist" className={iconButtonClass}>
+                <Link href="/client/favorites" className={iconButtonClass}>
                   <Heart className={iconClass} />
                 </Link>
               )}

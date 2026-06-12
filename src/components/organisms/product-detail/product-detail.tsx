@@ -104,23 +104,23 @@ export const ProductDetail = ({ product }: Props) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#594246] font-sans">
+    <div className="min-h-screen bg-[#FAF9F6] dark:bg-transparent text-[#594246] dark:text-[#f0d8e8] font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <nav className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-10 flex gap-2">
-          <span className="hover:text-[#632034] cursor-pointer transition-colors">Inicio</span> /
-          <span className="hover:text-[#632034] cursor-pointer transition-colors">Catálogo</span> /
-          <span className="font-bold text-[#632034]">{product.name}</span>
+        <nav className="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-[#e8688a]/80 mb-10 flex gap-2">
+          <span className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">INICIO</span> /
+          <span className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">CATÁLOGO</span> /
+          <span className="font-bold text-[#632034] dark:text-[#f0a0c0] uppercase">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           <div className="lg:col-span-8 flex flex-col gap-6">
-            <motion.div layoutId="main-img" className="aspect-3/4 bg-white overflow-hidden relative">
+            <motion.div layoutId="main-img" className="aspect-3/4 bg-white dark:bg-transparent overflow-hidden relative border border-transparent dark:border-transparent">
               <img
                 src={mainImage || "/placeholder.jpg"}
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 alt={product.name}
               />
-              <button className="absolute top-6 right-6 p-3 bg-white/70 backdrop-blur-sm rounded-full text-[#594246] hover:text-[#632034] transition-all">
+              <button className="absolute top-6 right-6 p-3 bg-white/70 dark:bg-white/5 backdrop-blur-sm rounded-full text-[#594246] dark:text-white hover:text-[#632034] dark:hover:text-[#f0a0c0] hover:bg-white dark:hover:bg-white/10 transition-all border border-transparent dark:border-[#e8688a]/20">
                 <Heart size={20} className="stroke-2" />
               </button>
             </motion.div>
@@ -130,14 +130,14 @@ export const ProductDetail = ({ product }: Props) => {
                 <button
                   key={idx}
                   onClick={() => setMainImage(img)}
-                  className={`aspect-square bg-white border transition-all ${
-                    mainImage === img ? "border-[#C5A059] p-0.5" : "border-[#EBEAE8]"
+                  className={`aspect-square bg-white dark:bg-transparent border transition-all ${
+                    mainImage === img ? "border-[#C5A059] dark:border-[#f0a0c0] p-0.5" : "border-[#EBEAE8] dark:border-transparent"
                   }`}
                 >
                   <img
                     src={img}
                     alt={`${product.name} miniatura ${idx + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity"
                   />
                 </button>
               ))}
@@ -145,35 +145,35 @@ export const ProductDetail = ({ product }: Props) => {
           </div>
 
           <div className="lg:col-span-4 flex flex-col gap-8">
-            <div className="border-b border-[#EBEAE8] pb-6">
+            <div className="border-b border-[#EBEAE8] dark:border-[#e8688a]/20 pb-6">
               {product.is_new_in && (
-                <span className="inline-block bg-[#D9A2A8] text-white text-[9px] px-2.5 py-1 font-bold uppercase tracking-widest mb-4 shadow-sm">
-                  New Arrival
+                <span className="inline-block bg-[#D9A2A8] dark:bg-transparent border border-transparent dark:border-[#e8688a]/80 text-white dark:text-[#e8688a] text-[9px] px-2.5 py-1 font-bold uppercase tracking-widest mb-4 shadow-sm">
+                  NEW ARRIVAL
                 </span>
               )}
-              <h1 className="text-3xl md:text-4xl font-serif uppercase tracking-widest leading-tight mb-3 text-[#632034]">
+              <h1 className="text-3xl md:text-4xl font-serif uppercase tracking-widest leading-tight mb-3 text-[#632034] dark:text-white">
                 {product.name}
               </h1>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="flex text-[#C5A059]">
+                <div className="flex text-[#C5A059] dark:text-[#e8688a]">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={14} fill="currentColor" stroke="none" />
                   ))}
                 </div>
-                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-medium">
-                  (156 reseñas)
+                <span className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-[#f0d8e8]/60 font-medium">
+                  (156 RESEÑAS)
                 </span>
               </div>
 
-              <p className="text-2xl font-medium tracking-tight text-[#632034]">
+              <p className="text-2xl font-medium tracking-tight text-[#632034] dark:text-[#f0a0c0]">
                 S/ {product.base_price.toFixed(2)}
               </p>
             </div>
 
             <div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-bold block mb-4">
-                Color: <span className="font-light text-gray-500">{selectedColor || "Seleccionar"}</span>
+              <span className="text-[11px] uppercase tracking-[0.2em] font-bold block mb-4 text-[#594246] dark:text-white">
+                COLOR: <span className="font-light text-gray-500 dark:text-[#f0d8e8]/70 uppercase">{selectedColor || "SELECCIONAR"}</span>
               </span>
               <div className="flex gap-4">
                 {uniqueColors.map((color) => (
@@ -184,8 +184,8 @@ export const ProductDetail = ({ product }: Props) => {
                       setSelectedSize("");
                       setQuantity(1);
                     }}
-                    className={`w-9 h-9 rounded-full border transition-all ${
-                      selectedColor === color ? "border-[#C5A059] p-1 scale-110" : "border-[#EBEAE8]"
+                    className={`w-9 h-9 rounded-full border transition-all flex items-center justify-center ${
+                      selectedColor === color ? "border-[#C5A059] dark:border-white p-[3px] scale-110" : "border-[#EBEAE8] dark:border-transparent"
                     }`}
                   >
                     <div
@@ -202,14 +202,14 @@ export const ProductDetail = ({ product }: Props) => {
 
             <div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[11px] uppercase tracking-[0.2em] font-bold">
-                  Talla: <span className="font-bold text-[#632034]">{selectedSize || "Seleccionar"}</span>
+                <span className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#594246] dark:text-white">
+                  TALLA: <span className="font-light text-gray-500 dark:text-[#f0d8e8]/70 uppercase">{selectedSize || "SELECCIONAR"}</span>
                 </span>
                 <button 
                   onClick={handleOpenSizeGuide}
-                  className="text-[10px] uppercase tracking-widest border-b border-[#594246] pb-0.5 font-bold hover:text-[#C5A059] hover:border-[#C5A059] transition-all"
+                  className="text-[10px] uppercase tracking-widest border-b border-[#594246] dark:border-white pb-0.5 font-bold hover:text-[#C5A059] dark:hover:text-[#f0a0c0] hover:border-[#C5A059] dark:hover:border-[#f0a0c0] transition-all dark:text-white"
                 >
-                  Guía de tallas
+                  GUÍA DE TALLAS
                 </button>
               </div>
               <div className="grid grid-cols-5 gap-2.5">
@@ -223,10 +223,10 @@ export const ProductDetail = ({ product }: Props) => {
                     }}
                     className={`h-12 text-xs font-bold transition-all border ${
                       stock === 0
-                        ? "bg-[#FAF9F6] border-[#EBEAE8] text-gray-300 cursor-not-allowed"
+                        ? "bg-[#FAF9F6] dark:bg-transparent border-[#EBEAE8] dark:border-[#e8688a]/10 text-gray-300 dark:text-[#e8688a]/30 cursor-not-allowed"
                         : selectedSize === size
-                        ? "bg-[#632034] border-[#632034] text-white"
-                        : "bg-white border-gray-300 hover:bg-[#FCF5F5] hover:border-[#D9A2A8] hover:text-[#632034] text-[#594246]"
+                        ? "bg-[#632034] dark:bg-[#e8688a]/10 border-[#632034] dark:border-[#e8688a] text-white dark:text-white"
+                        : "bg-white dark:bg-transparent border-gray-300 dark:border-[#e8688a]/30 hover:bg-[#FCF5F5] dark:hover:bg-[#e8688a]/5 hover:border-[#D9A2A8] dark:hover:border-[#e8688a] hover:text-[#632034] dark:hover:text-white text-[#594246] dark:text-[#e8688a]/80"
                     }`}
                   >
                     {size}
@@ -240,66 +240,66 @@ export const ProductDetail = ({ product }: Props) => {
               )}
             </div>
 
-            <div className="flex flex-col gap-4 pt-2 border-t border-[#EBEAE8]">
+            <div className="flex flex-col gap-4 pt-2">
               <div className="flex gap-3">
-                <div className="relative border border-[#EBEAE8] bg-white group min-w-17.5">
+                <div className="relative border border-[#EBEAE8] dark:border-[#e8688a]/30 bg-white dark:bg-transparent group w-24">
                   <select
                     value={quantity}
                     onChange={(e) => setQuantity(Number(e.target.value))}
-                    className="w-full bg-transparent px-5 pr-9 py-3 text-xs font-bold outline-none appearance-none cursor-pointer text-[#594246]"
+                    className="w-full bg-transparent px-5 pr-9 py-4 text-xs font-bold outline-none appearance-none cursor-pointer text-[#594246] dark:text-white"
                   >
                     {quantityOptions.map((n) => (
-                      <option key={n} value={n} className="text-black bg-white">
+                      <option key={n} value={n} className="text-black dark:text-white bg-white dark:bg-[#2d0a1e]">
                         {n}
                       </option>
                     ))}
                   </select>
                   <ChevronDown
                     size={14}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-[#632034] transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#f0d8e8]/70 pointer-events-none group-hover:text-[#632034] dark:group-hover:text-white transition-colors"
                   />
                 </div>
 
                 <button
                   onClick={handleAddToCart}
                   disabled={!canAddToCart}
-                  className={`flex-1 text-[11px] font-bold uppercase tracking-[0.3em] py-4 rounded-sm transition-all ${
+                  className={`flex-1 text-[11px] font-bold uppercase tracking-[0.3em] py-4 rounded-sm transition-all border ${
                     canAddToCart
-                      ? "bg-[#632034] hover:bg-black text-white active:scale-[0.98]"
-                      : "bg-[#FDF9F3] text-[#594246]/60 border border-[#EBEAE8] cursor-not-allowed"
+                      ? "bg-[#632034] dark:bg-white/5 border-transparent dark:border-[#e8688a]/30 hover:bg-black dark:hover:bg-white/10 text-white dark:text-white active:scale-[0.98]"
+                      : "bg-[#FDF9F3] dark:bg-transparent text-[#594246]/60 dark:text-[#f0d8e8]/50 border-[#EBEAE8] dark:border-[#e8688a]/30 cursor-not-allowed"
                   }`}
                 >
-                  {canAddToCart ? "Agregar al carrito" : "Selecciona tu talla"}
+                  {canAddToCart ? "AGREGAR AL CARRITO" : "SELECCIONA TU TALLA"}
                 </button>
               </div>
-              <p className="text-[10px] text-center text-gray-400 italic">
+              <p className="text-[10px] text-gray-400 dark:text-[#f0d8e8]/50 italic">
                 Envíos gratis en Lima por compras superiores a S/ 199
               </p>
             </div>
 
-            <div className="bg-[#FCF5F5] border border-[#E5B3B8] rounded-sm p-6 space-y-4 shadow-sm">
+            <div className="bg-[#FCF5F5] dark:bg-transparent border border-[#E5B3B8] dark:border-[#e8688a]/30 rounded-sm p-6 space-y-4">
               <div className="flex items-center gap-4 text-xs">
-                <Truck className="text-[#D9A2A8]" size={20} />
+                <Truck className="text-[#D9A2A8] dark:text-white" size={20} strokeWidth={1.5} />
                 <div>
-                  <p className="font-bold text-[#594246]">Envíos gratis</p>
-                  <p className="text-gray-500">En Lima Metropolitana mayores a S/199.</p>
+                  <p className="font-bold text-[#594246] dark:text-white">Envíos gratis</p>
+                  <p className="text-gray-500 dark:text-[#f0d8e8]/70">En Lima Metropolitana mayores a S/199.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs border-t border-[#E5B3B8] pt-4">
-                <RefreshCcw className="text-[#D9A2A8]" size={20} />
+              <div className="flex items-center gap-4 text-xs border-t border-[#E5B3B8] dark:border-[#e8688a]/30 pt-4">
+                <RefreshCcw className="text-[#D9A2A8] dark:text-white" size={20} strokeWidth={1.5} />
                 <div>
-                  <p className="font-bold text-[#594246]">Cambios fáciles</p>
-                  <p className="text-gray-500">Hasta 30 días después de tu compra.</p>
+                  <p className="font-bold text-[#594246] dark:text-white">Cambios fáciles</p>
+                  <p className="text-gray-500 dark:text-[#f0d8e8]/70">Hasta 30 días después de tu compra.</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-[#EBEAE8] space-y-8">
+            <div className="mt-2 pt-2 space-y-8">
               <div>
-                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold mb-6 text-[#594246]">
-                  Detalles del Producto
+                <h3 className="text-[11px] uppercase tracking-[0.3em] font-bold mb-6 text-[#594246] dark:text-white">
+                  DETALLES DEL PRODUCTO
                 </h3>
-                <p className="text-sm leading-relaxed text-gray-500 font-light mb-6">
+                <p className="text-sm leading-relaxed text-gray-500 dark:text-[#f0d8e8]/70 font-light mb-6">
                   {product.description}
                 </p>
                 <ul className="space-y-3">
@@ -313,21 +313,21 @@ export const ProductDetail = ({ product }: Props) => {
               </div>
 
               <div className="pt-6 space-y-4">
-                <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-6">
-                  Ref.: <span className="text-[#594246] font-bold">{product.sku}</span>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-[#f0d8e8]/60 mb-6">
+                  REF.: <span className="text-[#594246] dark:text-white font-bold">{product.sku}</span>
                 </p>
 
                 <div className="grid grid-cols-1 gap-y-4">
                   {[
-                    { label: "Género", value: product.gender },
-                    { label: "Estilo", value: product.style_type || product.category?.name },
-                    { label: "Composición", value: product.composition },
-                    { label: "Temporada", value: product.season },
+                    { label: "GÉNERO", value: product.gender },
+                    { label: "ESTILO", value: product.style_type || product.category?.name },
+                    { label: "COMPOSICIÓN", value: product.composition },
+                    { label: "TEMPORADA", value: product.season },
                   ].map((spec, i) => (
                     spec.value && (
                       <div key={i} className="flex items-center text-[11px] uppercase tracking-[0.15em]">
-                        <span className="w-32 text-gray-400">{spec.label} :</span>
-                        <span className="font-bold text-[#594246]">{spec.value}</span>
+                        <span className="w-32 text-gray-400 dark:text-[#f0d8e8]/60">{spec.label} :</span>
+                        <span className="font-bold text-[#594246] dark:text-[#e8688a]">{spec.value}</span>
                       </div>
                     )
                   ))}
