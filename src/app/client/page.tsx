@@ -2,6 +2,7 @@
 
 import { Package, Heart, TrendingUp, Clock, CheckCircle2, MessageCircleHeart } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ClientHomePage() {
   return (
@@ -15,7 +16,7 @@ export default function ClientHomePage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1 */}
-        <div className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
+        <Link href="/client/orders/active" className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#F2D0D3] to-[#F2B6C1] dark:from-[#e8688a]/20 dark:to-[#f0a0c0]/20 flex items-center justify-center shadow-inner">
             <Package className="w-7 h-7 text-[#594246] dark:text-[#f0a0c0]" strokeWidth={1.5} />
           </div>
@@ -23,10 +24,10 @@ export default function ClientHomePage() {
             <p className="text-3xl font-medium text-[#594246] dark:text-[#f8f0f5]">2</p>
             <p className="text-sm text-[#594246]/70 dark:text-[#f0d8e8]/90 mt-0.5 font-medium">Pedidos activos</p>
           </div>
-        </div>
+        </Link>
 
         {/* Card 2 */}
-        <div className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
+        <Link href="/client/favorites" className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#F2778D]/30 to-[#F291A3]/30 dark:from-[#e8688a]/30 dark:to-[#f0a0c0]/30 flex items-center justify-center shadow-inner">
             <Heart className="w-7 h-7 text-[#F2778D] dark:text-[#e8688a]" strokeWidth={1.5} />
           </div>
@@ -34,10 +35,10 @@ export default function ClientHomePage() {
             <p className="text-3xl font-medium text-[#594246] dark:text-[#f8f0f5]">8</p>
             <p className="text-sm text-[#594246]/70 dark:text-[#f0d8e8]/90 mt-0.5 font-medium">Productos favoritos</p>
           </div>
-        </div>
+        </Link>
 
         {/* Card 3 */}
-        <div className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
+        <Link href="/client/orders/history" className="bg-white/60 dark:bg-[#2d0a1e]/40 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.05)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-white/40 dark:border-[#e8688a]/20 flex items-center gap-5 hover:-translate-y-1 transition-transform duration-300">
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#EBEAE8] to-[#F2D0D3] dark:from-[#e8688a]/10 dark:to-[#f0a0c0]/10 flex items-center justify-center shadow-inner">
             <TrendingUp className="w-7 h-7 text-[#594246] dark:text-[#f0a0c0]" strokeWidth={1.5} />
           </div>
@@ -45,7 +46,7 @@ export default function ClientHomePage() {
             <p className="text-3xl font-medium text-[#594246] dark:text-[#f8f0f5]">5</p>
             <p className="text-sm text-[#594246]/70 dark:text-[#f0d8e8]/90 mt-0.5 font-medium">Compras completadas</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Promotional Banner */}

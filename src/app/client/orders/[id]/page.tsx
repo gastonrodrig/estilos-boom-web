@@ -20,9 +20,9 @@ export default function OrderDetailsPage() {
       <div className="flex items-center gap-4">
         <Link 
           href="/client/orders/active" 
-          className="flex items-center gap-2 text-[#594246]/60 dark:text-[#f0d8e8]/60 hover:text-[#594246] dark:hover:text-[#f8f0f5] transition-colors font-medium group"
+          className="flex items-center gap-2 text-[#594246]/60 dark:text-[rgba(180,170,200,0.6)] hover:text-[#594246] dark:hover:text-[rgba(232,184,109,0.8)] transition-colors font-medium group"
         >
-          <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2d0a1e]/60 border border-[#EBEAE8] dark:border-[#e8688a]/30 flex items-center justify-center group-hover:border-[#F2D0D3] dark:group-hover:border-[#e8688a] group-hover:bg-[#FAF9F6] dark:group-hover:bg-[#e8688a]/20 transition-all">
+          <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2d0a1e]/60 border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.2)] flex items-center justify-center group-hover:border-[#F2D0D3] dark:group-hover:border-[rgba(232,184,109,0.5)] group-hover:bg-[#FAF9F6] dark:group-hover:bg-[#e8b86d]/10 transition-all">
             <ArrowLeft className="w-4 h-4" />
           </div>
           Volver a mis pedidos
@@ -30,25 +30,28 @@ export default function OrderDetailsPage() {
       </div>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-[#2d0a1e]/40 p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20">
-        <div>
-          <h1 className="text-3xl font-serif font-medium text-[#594246] dark:text-[#f8f0f5] tracking-wide">
-            Detalle del Pedido #{orderId}
-          </h1>
-          <p className="text-[#594246]/50 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">Realizado el 15 de mayo, 2026</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-transparent py-4 relative mt-4">
+        <div className="relative z-10 w-full flex flex-col sm:flex-row sm:items-center justify-between pl-6 sm:pl-10">
+          <div className="relative inline-block">
+            <h1 className="text-[2.4rem] font-semibold font-serif text-[#594246] dark:text-[#fdeef5] tracking-tight">
+              Detalle del Pedido <span className="text-[#e8b86d] dark:text-[#e8b86d] font-['Inter',sans-serif] font-medium tracking-normal">#{orderId}</span>
+            </h1>
+            <p className="text-[#594246]/60 dark:text-[#b8afc8] text-[0.85rem] mt-1 font-normal font-['Inter',sans-serif]">Realizado el 15 de mayo, 2026</p>
+            <div className="hidden dark:block w-[60px] h-[1px] mt-[12px] mb-[24px] bg-gradient-to-r from-[#e8b86d] to-transparent"></div>
+          </div>
+          
+          {isPending ? (
+            <div className="mt-4 sm:mt-0 flex items-center gap-2 px-[16px] py-[6px] rounded-[20px] bg-amber-50 dark:bg-[rgba(232,184,109,0.06)] border-[1.5px] border-dashed border-[#d4803a] dark:border-solid dark:border-[rgba(232,184,109,0.5)] relative">
+              <div className="w-[6px] h-[6px] rounded-full bg-[#d4803a] dark:bg-[#e8b86d] animate-pulse"></div>
+              <span className="text-[#d4803a] dark:text-[#e8b86d] text-[0.75rem] font-medium tracking-[0.1em] uppercase font-['Inter',sans-serif]">Pago pendiente</span>
+            </div>
+          ) : (
+            <div className="mt-4 sm:mt-0 flex items-center gap-2 px-[14px] py-[5px] rounded-[20px] bg-emerald-50 dark:bg-[rgba(240,150,190,0.06)] border-[1.5px] border-dashed border-emerald-500 dark:border-solid dark:border-[rgba(240,150,190,0.5)]">
+              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-[rgba(240,150,190,0.9)]" />
+              <span className="text-emerald-600 dark:text-[rgba(240,150,190,0.9)] text-[0.75rem] font-medium tracking-[0.08em] uppercase">Pago confirmado</span>
+            </div>
+          )}
         </div>
-        
-        {isPending ? (
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm">
-            <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span className="text-amber-700 dark:text-amber-400 text-sm font-bold tracking-wide uppercase">Pago pendiente</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 dark:bg-slate-500/10 border border-slate-200 dark:border-slate-500/20 shadow-sm">
-            <Check className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-            <span className="text-slate-700 dark:text-slate-400 text-sm font-bold tracking-wide uppercase">Pago confirmado</span>
-          </div>
-        )}
       </div>
 
       {/* Main Content Grid */}
@@ -58,83 +61,96 @@ export default function OrderDetailsPage() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Product List */}
-          <div className="bg-white dark:bg-[#2d0a1e]/40 p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20">
-            <h2 className="text-xl font-bold text-[#594246] dark:text-[#f8f0f5] mb-6 flex items-center gap-2">
-              <Package className="w-5 h-5 text-[#F2778D] dark:text-[#f0a0c0]" /> Productos comprados
+          <div className="bg-white dark:bg-[rgba(30,8,22,0.82)] p-8 rounded-[14px] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] backdrop-blur-[20px] shadow-sm dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),inset_0_0_30px_rgba(196,84,122,0.04),0_4px_24px_rgba(0,0,0,0.3)] relative overflow-hidden">
+            
+            <h2 className="mb-[16px] border-b border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] pb-[14px] relative z-10">
+              <span className="text-[#594246]/80 dark:text-[rgba(232,184,109,0.6)] text-[0.68rem] tracking-[0.16em] uppercase font-normal">Productos comprados</span>
             </h2>
             
-            <div className="space-y-6">
+            <div className="flex flex-col relative z-10">
               {/* Product Item 1 */}
-              <div className="flex gap-4 items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 dark:from-white/5 dark:to-[#e8688a]/10 border border-[#EBEAE8] dark:border-[#e8688a]/20 flex items-center justify-center shrink-0">
-                  <Shirt className="w-8 h-8 text-[#F2778D]/40 dark:text-[#f0a0c0]/50" />
+              <div className="group flex flex-row items-center py-[12px] px-[12px] border-b border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] border-l-[2px] border-l-transparent transition-all duration-[250ms] ease-out hover:bg-[rgba(232,184,109,0.04)] hover:border-l-[#e8b86d] hover:translate-x-[2px]">
+                <div className="w-[64px] h-[64px] rounded-[10px] bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 dark:bg-[linear-gradient(135deg,rgba(232,184,109,0.08)_0%,rgba(196,84,122,0.1)_100%)] border border-transparent dark:border-[rgba(232,184,109,0.15)] flex items-center justify-center shrink-0">
+                  <Shirt className="w-8 h-8 text-[#F2778D]/40 dark:text-[rgba(232,184,109,0.5)]" strokeWidth={1} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-[#594246] dark:text-[#f8f0f5] font-bold text-lg">Blusa Lara</h3>
-                  <p className="text-[#594246]/60 dark:text-[#f0d8e8]/60 text-sm">Talla: M | Color: Blanco</p>
+                <div className="flex-1 pl-[16px]">
+                  <h3 className="text-[#594246] dark:text-[#fdeef5] font-semibold text-[1rem] mb-[4px]">Blusa Lara</h3>
+                  <div>
+                    <span className="inline-block bg-[#FAF9F6] dark:bg-[rgba(180,170,200,0.07)] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.18)] rounded-[20px] px-[10px] py-[2px] text-[0.72rem] text-[#594246]/60 dark:text-[#b8afc8] mr-[6px]">
+                      Talla: M
+                    </span>
+                    <span className="inline-block bg-[#FAF9F6] dark:bg-[rgba(180,170,200,0.07)] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.18)] rounded-[20px] px-[10px] py-[2px] text-[0.72rem] text-[#594246]/60 dark:text-[#b8afc8] mr-[6px]">
+                      Color: Blanco
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[#594246] dark:text-[#f8f0f5] font-bold">S/ 89.90</p>
-                  <p className="text-[#594246]/50 dark:text-[#f0d8e8]/50 text-sm">Cant: 1</p>
+                <div className="text-right min-w-[90px]">
+                  <span className="text-[#594246] dark:text-[#fdeef5] font-['Inter',sans-serif] not-italic font-medium text-[1.05rem] block" style={{ fontVariantNumeric: 'normal' }}>S/ 89.90</span>
+                  <p className="text-[#594246]/50 dark:text-[#b8afc8] text-[0.8rem] font-['Inter',sans-serif] mt-[4px]">× 1</p>
                 </div>
               </div>
 
-              {/* Separator */}
-              <div className="w-full h-px bg-[#EBEAE8] dark:bg-[#e8688a]/20"></div>
-
               {/* Product Item 2 */}
-              <div className="flex gap-4 items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 dark:from-white/5 dark:to-[#e8688a]/10 border border-[#EBEAE8] dark:border-[#e8688a]/20 flex items-center justify-center shrink-0">
-                  <Shirt className="w-8 h-8 text-[#F2778D]/40 dark:text-[#f0a0c0]/50" />
+              <div className="group flex flex-row items-center py-[12px] px-[12px] border-b border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] border-l-[2px] border-l-transparent transition-all duration-[250ms] ease-out hover:bg-[rgba(232,184,109,0.04)] hover:border-l-[#e8b86d] hover:translate-x-[2px]">
+                <div className="w-[64px] h-[64px] rounded-[10px] bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 dark:bg-[linear-gradient(135deg,rgba(232,184,109,0.08)_0%,rgba(196,84,122,0.1)_100%)] border border-transparent dark:border-[rgba(232,184,109,0.15)] flex items-center justify-center shrink-0">
+                  <Shirt className="w-8 h-8 text-[#F2778D]/40 dark:text-[rgba(232,184,109,0.5)]" strokeWidth={1} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-[#594246] dark:text-[#f8f0f5] font-bold text-lg">Vestido Floral</h3>
-                  <p className="text-[#594246]/60 dark:text-[#f0d8e8]/60 text-sm">Talla: S | Color: Rosado</p>
+                <div className="flex-1 pl-[16px]">
+                  <h3 className="text-[#594246] dark:text-[#fdeef5] font-semibold text-[1rem] mb-[4px]">Vestido Floral</h3>
+                  <div>
+                    <span className="inline-block bg-[#FAF9F6] dark:bg-[rgba(180,170,200,0.07)] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.18)] rounded-[20px] px-[10px] py-[2px] text-[0.72rem] text-[#594246]/60 dark:text-[#b8afc8] mr-[6px]">
+                      Talla: S
+                    </span>
+                    <span className="inline-block bg-[#FAF9F6] dark:bg-[rgba(180,170,200,0.07)] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.18)] rounded-[20px] px-[10px] py-[2px] text-[0.72rem] text-[#594246]/60 dark:text-[#b8afc8] mr-[6px]">
+                      Color: Rosado
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[#594246] dark:text-[#f8f0f5] font-bold">S/ 50.00</p>
-                  <p className="text-[#594246]/50 dark:text-[#f0d8e8]/50 text-sm">Cant: 2</p>
+                <div className="text-right min-w-[90px]">
+                  <span className="text-[#594246] dark:text-[#fdeef5] font-['Inter',sans-serif] not-italic font-medium text-[1.05rem] block" style={{ fontVariantNumeric: 'normal' }}>S/ 50.00</span>
+                  <p className="text-[#594246]/50 dark:text-[#b8afc8] text-[0.8rem] font-['Inter',sans-serif] mt-[4px]">× 2</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Shipping and Payment Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Shipping Address */}
-            <div className="bg-[#FAF9F6] dark:bg-white/5 p-6 rounded-3xl border border-[#EBEAE8]/50 dark:border-[#e8688a]/20 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#F2D0D3]/20 dark:bg-[#e8688a]/10 rounded-bl-full -z-0"></div>
-              <h3 className="text-sm font-bold text-[#594246]/60 dark:text-[#f0d8e8]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
-                <MapPin className="w-4 h-4" /> Dirección de envío
-              </h3>
-              <p className="text-[#594246] dark:text-[#f8f0f5] font-bold relative z-10">Ana de Armas</p>
-              <p className="text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm mt-1 relative z-10">Av. Los Rosales 123, Dpto 402</p>
-              <p className="text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm relative z-10">Miraflores, Lima, Perú</p>
-              <p className="text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm mt-2 relative z-10">Ref: Frente al parque central.</p>
-            </div>
+          {/* Shipping and Payment Info */}
+          <div className="bg-white dark:bg-[rgba(30,8,22,0.82)] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] rounded-[14px] p-8 backdrop-blur-[20px] shadow-sm dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),inset_0_0_30px_rgba(196,84,122,0.04),0_4px_24px_rgba(0,0,0,0.3)] mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+              
+              {/* Shipping Address */}
+              <div className="flex flex-col md:pr-8">
+                <h3 className="text-[0.68rem] tracking-[0.14em] uppercase text-[#594246]/60 dark:text-[rgba(232,184,109,0.6)] font-normal mb-[10px]">
+                  Dirección de envío
+                </h3>
+                <p className="text-[#594246] dark:text-[#fdeef5] font-semibold text-[1rem] mb-[6px]">Ana de Armas</p>
+                <div className="flex flex-col gap-[4px]">
+                  <p className="text-[0.81rem] text-[#594246]/80 dark:text-[#b8afc8]">Av. Los Rosales 123, Dpto 402</p>
+                  <p className="text-[0.81rem] text-[#594246]/80 dark:text-[#b8afc8]">Miraflores, Lima, Perú</p>
+                </div>
+              </div>
 
-            {/* Payment Method */}
-            <div className="bg-[#FAF9F6] dark:bg-white/5 p-6 rounded-3xl border border-[#EBEAE8]/50 dark:border-[#e8688a]/20 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#F2D0D3]/20 dark:bg-[#e8688a]/10 rounded-bl-full -z-0"></div>
-              <h3 className="text-sm font-bold text-[#594246]/60 dark:text-[#f0d8e8]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
-                <CreditCard className="w-4 h-4" /> Método de pago
-              </h3>
-              {isPending ? (
-                <>
-                  <p className="text-[#594246] dark:text-[#f8f0f5] font-bold relative z-10">Yape / Plin</p>
-                  <p className="text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">#4981249</span></p>
-                  <p className="text-amber-600 dark:text-amber-400 text-sm mt-2 relative z-10 font-medium">Validación manual pendiente.</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[#594246] dark:text-[#f8f0f5] font-bold relative z-10">Tarjeta de Crédito</p>
-                  <p className="text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm mt-1 relative z-10">Visa terminada en **** 4567</p>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm mt-2 relative z-10 font-medium">Cobro realizado exitosamente.</p>
-                </>
-              )}
+              {/* Payment Method */}
+              <div className="flex flex-col md:border-l border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] md:pl-8">
+                <h3 className="text-[0.68rem] tracking-[0.14em] uppercase text-[#594246]/60 dark:text-[rgba(232,184,109,0.6)] font-normal mb-[10px]">
+                  Método de pago
+                </h3>
+                {isPending ? (
+                  <>
+                    <p className="text-[#594246] dark:text-[#fdeef5] font-semibold text-[1rem] mb-[6px]">Yape / Plin</p>
+                    <p className="text-[#594246]/80 dark:text-[#b8afc8] text-[0.82rem] leading-[1.65] flex items-center">
+                      <span className="text-[0.65rem] text-[#d4803a] dark:text-[rgba(240,150,190,0.4)] tracking-[0.1em] mr-1">OP.</span>
+                      <span className="text-[#d4803a] dark:text-[#e8b86d] font-['Inter',sans-serif] not-italic font-medium text-[0.9rem] tracking-wider" style={{ fontVariantNumeric: 'normal' }}>#4981249</span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[#594246] dark:text-[#fdeef5] font-semibold text-[1rem] mb-[6px]">Tarjeta de Crédito</p>
+                    <p className="text-[#594246]/80 dark:text-[#b8afc8] text-[0.82rem] leading-[1.65]">Visa terminada en **** 4567</p>
+                  </>
+                )}
+              </div>
             </div>
-
           </div>
 
         </div>
@@ -142,69 +158,76 @@ export default function OrderDetailsPage() {
         {/* Right Column: Summary & Actions */}
         <div className="space-y-6">
           
-          {/* Order Summary */}
-          <div className="bg-white dark:bg-[#2d0a1e]/40 p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20">
-            <h2 className="text-xl font-bold text-[#594246] dark:text-[#f8f0f5] mb-6">Resumen</h2>
+          {/* Order Summary - Tarjeta de Cobro Elegante */}
+          <div className="bg-white dark:bg-[rgba(28,7,20,0.88)] p-6 rounded-[14px] border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] shadow-sm dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),inset_0_0_30px_rgba(196,84,122,0.04),0_4px_24px_rgba(0,0,0,0.3)] mt-2 relative overflow-hidden">
+            <h2 className="mb-[16px] border-b border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] pb-[14px]">
+              <span className="text-[#594246]/80 dark:text-[rgba(232,184,109,0.6)] text-[0.68rem] tracking-[0.16em] uppercase font-normal">Resumen</span>
+            </h2>
             
-            <div className="space-y-4">
-              <div className="flex justify-between text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm font-medium">
-                <span>Subtotal (3 artículos)</span>
-                <span>S/ 189.90</span>
+            {/* Zona superior: Grid 2x2 */}
+            <div className="grid grid-cols-2 grid-rows-2">
+              <div className="p-[14px] border-b border-r border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#594246]/60 dark:text-[#b8afc8] mb-[6px]">Subtotal</span>
+                <span className="text-[1rem] font-['Inter',sans-serif] not-italic font-medium text-[#594246] dark:text-[#fdeef5] tracking-wide" style={{ fontVariantNumeric: 'normal' }}>S/ 189.90</span>
               </div>
-              <div className="flex justify-between text-[#594246]/80 dark:text-[#f0d8e8]/80 text-sm font-medium">
-                <span>Costo de envío</span>
-                <span>S/ 10.00</span>
+              <div className="p-[14px] border-b border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#594246]/60 dark:text-[#b8afc8] mb-[6px]">Envío</span>
+                <span className="text-[1rem] font-['Inter',sans-serif] not-italic font-medium text-[#594246] dark:text-[#fdeef5] tracking-wide" style={{ fontVariantNumeric: 'normal' }}>S/ 10.00</span>
               </div>
-              <div className="flex justify-between text-[#F2778D] dark:text-[#f0a0c0] text-sm font-medium">
-                <span>Descuento (Verano)</span>
-                <span>- S/ 10.00</span>
+              <div className="p-[14px] border-r border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#594246]/60 dark:text-[#b8afc8] mb-[6px]">Descuento</span>
+                <span className="text-[1rem] font-['Inter',sans-serif] not-italic font-medium text-[#F2778D] dark:text-[#f0a0c0] tracking-wide" style={{ fontVariantNumeric: 'normal' }}>− S/ 10.00</span>
               </div>
-              
-              <div className="w-full h-px bg-[#EBEAE8] dark:bg-[#e8688a]/20 my-2"></div>
-              
-              <div className="flex justify-between text-[#594246] dark:text-[#f8f0f5] text-xl font-bold">
-                <span>Total</span>
-                <span>S/ 189.90</span>
+              <div className="p-[14px] flex flex-col justify-center">
+                <span className="text-[0.65rem] uppercase tracking-[0.12em] text-[#594246]/60 dark:text-[#b8afc8] mb-[6px]">Artículos</span>
+                <span className="text-[1rem] font-['Inter',sans-serif] not-italic font-medium text-[#594246] dark:text-[#fdeef5] tracking-wide" style={{ fontVariantNumeric: 'normal' }}>3</span>
               </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-3">
-            {/* Descargar Boleta */}
-            <button 
-              disabled={isPending}
-              title={isPending ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 border-2 border-transparent
-                ${isPending 
-                  ? "bg-[#EBEAE8] dark:bg-white/5 text-[#594246]/40 dark:text-[#f8f0f5]/40 cursor-not-allowed" 
-                  : "bg-[#594246] dark:bg-[#e8688a]/20 text-white dark:text-[#f0a0c0] hover:bg-[#F2778D] dark:hover:bg-[#e8688a] dark:hover:text-[#f8f0f5] dark:border-[#e8688a]/30 shadow-md"}
-              `}
-            >
-              <Download className="w-5 h-5" />
-              Descargar Boleta (PDF)
-              {isPending && <span className="text-[10px] absolute mt-12 font-medium">(Requiere validación)</span>}
-            </button>
-            
-            {/* Necesito Ayuda */}
-            <button className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-[#EBEAE8] dark:border-[#e8688a]/30 text-[#594246] dark:text-[#f0a0c0] font-bold hover:bg-[#FAF9F6] dark:hover:bg-[#e8688a]/20 hover:border-[#F2D0D3] dark:hover:border-[#e8688a]/50 transition-colors duration-300">
-              <HelpCircle className="w-5 h-5" />
-              Necesito ayuda
-            </button>
+            {/* Separador decorativo (Línea punteada con círculos) */}
+            <div className="relative my-[20px] mx-[-24px]">
+              <div className="absolute top-1/2 left-[-4px] w-[8px] h-[8px] rounded-full border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] bg-[#FAF9F6] dark:bg-[#1a0618] transform -translate-y-1/2 z-10"></div>
+              <div className="absolute top-1/2 right-[-4px] w-[8px] h-[8px] rounded-full border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] bg-[#FAF9F6] dark:bg-[#1a0618] transform -translate-y-1/2 z-10"></div>
+              <div className="border-t border-dashed border-[#EBEAE8] dark:border-[rgba(180,170,200,0.12)] mx-[24px]"></div>
+            </div>
 
-            {/* Cancelar Pedido */}
-            <button 
-              disabled={isEnCaminoOrDelivered}
-              title={isEnCaminoOrDelivered ? "No se puede cancelar porque ya está en camino" : "Cancelar este pedido"}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 border-2
-                ${isEnCaminoOrDelivered
-                  ? "border-transparent bg-gray-50 dark:bg-white/5 text-gray-300 dark:text-gray-500 cursor-not-allowed"
-                  : "border-red-100 dark:border-red-500/30 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/50"}
-              `}
-            >
-              <XCircle className="w-5 h-5" />
-              Cancelar Pedido
-            </button>
+            {/* Zona inferior: Total destacado */}
+            <div className="bg-[#FAF9F6] dark:bg-[rgba(240,150,190,0.06)] rounded-[10px] p-[16px] flex justify-between items-center mb-[24px]">
+              <div>
+                <span className="text-[0.65rem] uppercase tracking-[0.15em] text-[#594246]/60 dark:text-[rgba(240,150,190,0.5)] block">Total a pagar</span>
+                <span className="text-[0.78rem] text-[#594246]/80 dark:text-[#b8afc8] mt-[4px] block">{isPending ? "Yape / Plin" : "Tarjeta de Crédito"}</span>
+              </div>
+              <div>
+                <span className="text-[1.75rem] font-['Inter',sans-serif] not-italic font-semibold text-[#594246] dark:text-[#f0a0c0] tracking-tight" style={{ fontVariantNumeric: 'normal' }}>S/ 189.90</span>
+              </div>
+            </div>
+
+            {/* Zona acciones: Fila horizontal de 3 */}
+            <div className="flex justify-around items-center border-t border-[#EBEAE8] dark:border-[rgba(240,150,190,0.08)] pt-[16px]">
+              {/* PDF */}
+              <button disabled={isPending} className="group flex flex-col items-center gap-[6px]">
+                <div className={`w-[36px] h-[36px] rounded-full border border-[#EBEAE8] dark:border-[rgba(232,184,109,0.3)] dark:bg-[rgba(232,184,109,0.04)] text-[#594246]/60 dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 ${isPending ? 'cursor-not-allowed opacity-40' : 'group-hover:border-[#594246] dark:group-hover:border-[#e8b86d] dark:group-hover:bg-[rgba(232,184,109,0.12)] dark:group-hover:text-[#e8b86d]'}`}>
+                  <Download className="w-[15px] h-[15px]" strokeWidth={2} />
+                </div>
+                <span className={`text-[0.68rem] text-center font-['Inter',sans-serif] tracking-wide transition-all duration-200 ${isPending ? 'text-[#594246]/40 dark:text-[rgba(253,238,245,0.3)]' : 'text-[#594246]/60 dark:text-[rgba(253,238,245,0.65)] group-hover:text-[#594246] dark:group-hover:text-[#fdeef5]'}`}>PDF</span>
+              </button>
+
+              {/* Ayuda */}
+              <button className="group flex flex-col items-center gap-[6px]">
+                <div className="w-[36px] h-[36px] rounded-full border border-[#EBEAE8] dark:border-[rgba(232,184,109,0.3)] dark:bg-[rgba(232,184,109,0.04)] text-[#594246]/60 dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 group-hover:border-[#594246] dark:group-hover:border-[#e8b86d] dark:group-hover:bg-[rgba(232,184,109,0.12)] dark:group-hover:text-[#e8b86d]">
+                  <HelpCircle className="w-[15px] h-[15px]" strokeWidth={2} />
+                </div>
+                <span className="text-[0.68rem] text-center font-['Inter',sans-serif] tracking-wide text-[#594246]/60 dark:text-[rgba(253,238,245,0.65)] transition-all duration-200 group-hover:text-[#594246] dark:group-hover:text-[#fdeef5]">Ayuda</span>
+              </button>
+
+              {/* Cancelar */}
+              <button disabled={isEnCaminoOrDelivered} className="group flex flex-col items-center gap-[6px]">
+                <div className={`w-[36px] h-[36px] rounded-full border border-[#EBEAE8] dark:border-[rgba(232,184,109,0.3)] dark:bg-[rgba(232,184,109,0.04)] text-[#594246]/60 dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 ${isEnCaminoOrDelivered ? 'cursor-not-allowed opacity-40' : 'group-hover:border-[#594246] dark:group-hover:border-[#e8b86d] dark:group-hover:bg-[rgba(232,184,109,0.12)] dark:group-hover:text-[#e8b86d]'}`}>
+                  <XCircle className="w-[15px] h-[15px]" strokeWidth={2} />
+                </div>
+                <span className={`text-[0.68rem] text-center font-['Inter',sans-serif] tracking-wide transition-all duration-200 ${isEnCaminoOrDelivered ? 'text-[#594246]/40 dark:text-[rgba(253,238,245,0.3)]' : 'text-[#594246]/60 dark:text-[rgba(253,238,245,0.65)] group-hover:text-[#594246] dark:group-hover:text-[#fdeef5]'}`}>Cancelar</span>
+              </button>
+            </div>
           </div>
 
         </div>
