@@ -60,10 +60,10 @@ const CheckoutPaymentForm: React.FC = () => {
   };
 
   return (
-    <div className="border-[#594246]/30 rounded-sm p-8 space-y-8 border border-[#EBEAE8] shadow-sm">
+    <div className="bg-[#FAF9F6] dark:bg-[#1a0618]/60 dark:backdrop-blur-md border border-[#EBEAE8] dark:border-[#C5A059]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-sm p-6 lg:p-8 space-y-8 animate-in fade-in duration-300">
       <header>
-        <h2 className="text-[25px] font-semibold text-[#594246]">Método de Pago</h2>
-        <p className="text-sm text-[#827D7D]">Selecciona tu forma de pago preferida.</p>
+        <h2 className="payment-title text-[25px] font-semibold text-[#594246] dark:text-[#fdeef5]">Método de Pago</h2>
+        <p className="payment-subtitle text-sm text-[#827D7D] dark:text-[rgba(253,238,245,0.4)]">Selecciona tu forma de pago preferida.</p>
       </header>
 
       {/* 💳 SELECCIÓN DE MÉTODO */}
@@ -71,10 +71,10 @@ const CheckoutPaymentForm: React.FC = () => {
         {PAYMENT_METHODS.map((method) => (
           <label
           key={method.id}
-          className={`flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
+          className={`payment-option flex items-center p-4 border rounded-sm cursor-pointer transition-all ${
             paymentMethod === method.id 
-              ? 'border-[#F291A3] bg-[#F2D0D3]/60' 
-              : 'border-gray-100 hover:border-[#594246]'
+              ? 'selected border-[#F291A3] dark:border-[#e8b86d] bg-[#F2D0D3]/60 dark:bg-[#C5A059]/10' 
+              : 'border-gray-100 dark:border-[#C5A059]/30 hover:border-[#594246] dark:hover:border-[#C5A059]/60'
           }`}
         >
           <input
@@ -84,7 +84,7 @@ const CheckoutPaymentForm: React.FC = () => {
             className="w-4 h-4 "
           />
           
-          <span className="ml-3 font-semibold text-[#594246] flex-1">
+          <span className="payment-option-name ml-3 font-semibold text-[#594246] dark:text-[#fdeef5] flex-1">
             {method.label}
           </span>
 
@@ -103,10 +103,10 @@ const CheckoutPaymentForm: React.FC = () => {
 
       {/* 📝 FORMULARIO DE TARJETA */}
       {paymentMethod === 'card' && (
-        <div className="p-6 rounded-lg bg-[#FAF9F6] border border-[#F2D0D3]/30 space-y-4">
+        <div className="payment-detail-card p-6 rounded-lg bg-[#FAF9F6] dark:bg-[#1a0618]/60 border border-[#F2D0D3]/30 dark:border-[#C5A059]/20 space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase text-[#594246] mb-1">Número de Tarjeta</label>
+              <label className="block text-xs font-bold uppercase text-[#594246] dark:text-[#fdeef5] mb-1">Número de Tarjeta</label>
               <Controller
                 name="cardNumber"
                 control={control}
@@ -115,7 +115,7 @@ const CheckoutPaymentForm: React.FC = () => {
                     mask="0000 0000 0000 0000"
                     placeholder="0000 0000 0000 0000"
                     onAccept={(value) => field.onChange(value)}
-                    className="w-full px-4 py-2 border rounded-sm focus:outline-[#594246]"
+                    className="operation-number-input"
                   />
                 )}
               />
@@ -123,7 +123,7 @@ const CheckoutPaymentForm: React.FC = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-[#594246] mb-1">Vencimiento</label>
+                <label className="block text-xs font-bold uppercase text-[#594246] dark:text-[#fdeef5] mb-1">Vencimiento</label>
                 <Controller
                   name="expiryDate"
                   control={control}
@@ -132,18 +132,18 @@ const CheckoutPaymentForm: React.FC = () => {
                       mask="00/00"
                       placeholder="MM/YY"
                       onAccept={(value) => field.onChange(value)}
-                      className="w-full px-4 py-2 border rounded-sm focus:outline-[#594246]"
+                      className="operation-number-input"
                     />
                   )}
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase text-[#594246] mb-1">CVC</label>
+                <label className="block text-xs font-bold uppercase text-[#594246] dark:text-[#fdeef5] mb-1">CVC</label>
                 <input
                   type="password"
                   maxLength={4}
                   {...register('securityCode')}
-                  className="w-full px-4 py-2 border rounded-sm focus:outline-[#594246]"
+                  className="operation-number-input"
                   placeholder="***"
                 />
               </div>
@@ -153,59 +153,59 @@ const CheckoutPaymentForm: React.FC = () => {
       )}
 
       {paymentMethod === 'qr' && (
-        <div className="space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 rounded-lg p-6 bg-[#FAF9F6]">
+        <div className="yape-card space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 dark:border-[#C5A059]/30 rounded-lg p-6 bg-[#FAF9F6] dark:bg-[#1a0618]/60">
           
           {/* Tabs Yape / Plin */}
-          <div className="flex rounded-full border border-gray-200 p-1 bg-white">
+          <div className="flex rounded-full border border-gray-200 dark:border-[#C5A059]/20 p-1 bg-white dark:bg-transparent">
             <button
               type="button"
               onClick={() => setQrMethod('yape')}
-              className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                qrMethod === 'yape' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
+              className={`payment-tab flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
+                qrMethod === 'yape' ? 'active shadow-sm' : 'text-[#827D7D] dark:text-[rgba(253,238,245,0.45)] hover:bg-gray-50 dark:hover:bg-transparent'
               }`}
-              style={qrMethod === 'yape' ? { backgroundColor: '#742365', color: 'white' } : {}}
+              style={qrMethod === 'yape' && !document.documentElement.classList.contains('dark') ? { backgroundColor: '#742365', color: 'white' } : {}}
             >
               Yape
             </button>
             <button
               type="button"
               onClick={() => setQrMethod('plin')}
-              className={`flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
-                qrMethod === 'plin' ? 'shadow-sm' : 'text-[#827D7D] hover:bg-gray-50'
+              className={`payment-tab flex-1 py-2 text-sm font-bold rounded-full transition-colors ${
+                qrMethod === 'plin' ? 'active shadow-sm' : 'text-[#827D7D] dark:text-[rgba(253,238,245,0.45)] hover:bg-gray-50 dark:hover:bg-transparent'
               }`}
-              style={qrMethod === 'plin' ? { backgroundColor: '#00E4A4', color: 'white' } : {}}
+              style={qrMethod === 'plin' && !document.documentElement.classList.contains('dark') ? { backgroundColor: '#00E4A4', color: 'white' } : {}}
             >
               Plin
             </button>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start bg-white dark:bg-transparent p-6 rounded-xl border border-gray-100 dark:border-transparent shadow-sm">
             {/* QR Code */}
-            <div className="bg-gray-50 p-2 rounded-xl border border-gray-100 shrink-0">
-              <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-lg">
-                <span className="text-gray-400 text-xs text-center px-2">[QR {qrMethod === 'yape' ? 'Yape' : 'Plin'}]</span>
+            <div className="qr-placeholder p-2 rounded-xl shrink-0">
+              <div className="w-32 h-32 flex items-center justify-center rounded-lg">
+                <span className="text-xs text-center px-2">[QR {qrMethod === 'yape' ? 'Yape' : 'Plin'}]</span>
               </div>
             </div>
 
             {/* Info */}
             <div className="text-left flex-1 space-y-1 w-full">
-              <p className="text-xs text-[#827D7D]">O {qrMethod === 'yape' ? 'yapea' : 'plinea'} a este número</p>
-              <p className="text-2xl font-bold tracking-widest text-[#594246]">999 888 777</p>
-              <p className="text-xs font-medium text-[#827D7D]">A nombre de: Estilos Boom</p>
-              <p className="text-xl font-bold text-[#594246] mt-2">S/ 89.00</p>
+              <p className="yape-instruction">O {qrMethod === 'yape' ? 'yapea' : 'plinea'} a este número</p>
+              <p className="yape-number">999 888 777</p>
+              <p className="yape-name">A nombre de: Estilos Boom</p>
+              <p className="yape-amount mt-2">S/ 89.00</p>
             </div>
           </div>
 
           {/* Número de operación */}
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-            <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
+          <div className="bg-white dark:bg-transparent p-6 rounded-xl border border-gray-100 dark:border-transparent shadow-sm">
+            <label className="operation-number-label block text-xs font-bold uppercase mb-2">Número de operación</label>
             <input
               type="text"
               {...register('operationNumber', { required: 'Ingresa el número de operación' })}
               placeholder="Ej: 20250523001234"
-              className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
+              className="operation-number-input"
             />
-            <p className="text-[11px] text-[#827D7D] mt-2">
+            <p className="operation-number-hint">
               Encuéntralo en la pantalla de confirmación de tu app {qrMethod === 'yape' ? 'Yape' : 'Plin'}.
             </p>
             {errors.operationNumber && (
@@ -214,15 +214,15 @@ const CheckoutPaymentForm: React.FC = () => {
           </div>
 
           {/* Guía con Imagen */}
-          <div className="rounded-xl border border-[#F2D0D3]/50 overflow-hidden bg-[#FAF9F6] shadow-sm">
-            <div className="bg-[#F2D0D3]/20 px-5 py-3 border-b border-[#F2D0D3]/50">
-              <h3 className="text-sm font-bold text-[#594246] flex items-center gap-2">
+          <div className="yape-guide-card rounded-xl border border-[#F2D0D3]/50 dark:border-transparent overflow-hidden bg-[#FAF9F6] shadow-sm">
+            <div className="bg-[#F2D0D3]/20 dark:bg-black/20 px-5 py-3 border-b border-[#F2D0D3]/50 dark:border-transparent">
+              <h3 className="yape-guide-title text-sm font-bold text-[#594246] flex items-center gap-2">
                 ✨ Guía para {qrMethod === 'yape' ? 'Yapear' : 'Plinear'} correctamente
               </h3>
             </div>
-            <div className="p-4 bg-white">
+            <div className="p-4 bg-white dark:bg-transparent">
               <div 
-                className="relative w-full h-[250px] overflow-hidden rounded-lg border border-gray-100 cursor-pointer group shadow-sm bg-gray-50"
+                className="relative w-full h-[250px] overflow-hidden rounded-lg border border-gray-100 dark:border-transparent cursor-pointer group shadow-sm bg-gray-50 dark:bg-transparent"
                 onClick={() => setIsImageModalOpen(true)}
               >
                 <Image 
@@ -230,14 +230,14 @@ const CheckoutPaymentForm: React.FC = () => {
                   alt="Guía paso a paso" 
                   width={600} 
                   height={1200} 
-                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="yape-guide-image w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 
                 {/* Degradado blanco en la parte inferior para dar a entender que sigue */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-[#1a0618] via-white/80 dark:via-[#1a0618]/80 to-transparent pointer-events-none" />
                 
-                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                  <span className="bg-white text-[#594246] px-5 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-all">
+                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 dark:bg-black/60">
+                  <span className="yape-guide-expand bg-white text-[#594246] px-5 py-2.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-all">
                     Ampliar guía completa
                   </span>
                 </div>
@@ -246,72 +246,72 @@ const CheckoutPaymentForm: React.FC = () => {
           </div>
 
           {/* Ayuda Telefónica */}
-          <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
-            <div className="w-8 h-8 rounded-full bg-[#F2D0D3]/30 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#594246" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="help-phone-card flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-[#C5A059]/20">
+            <div className="w-8 h-8 rounded-full bg-[#F2D0D3]/30 dark:bg-[#C5A059]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="help-phone-icon text-[#594246]">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
               </svg>
             </div>
             <div>
-              <p className="text-sm text-[#827D7D]">¿Necesitas ayuda o prefieres asistencia por teléfono?</p>
-              <p className="text-sm font-bold text-[#594246]">Llámanos al 999 888 777</p>
+              <p className="help-phone-text text-sm text-[#827D7D]">¿Necesitas ayuda o prefieres asistencia por teléfono?</p>
+              <p className="help-phone-number text-sm font-bold text-[#594246]">Llámanos al 999 888 777</p>
             </div>
           </div>
         </div>
       )}
 
     {paymentMethod === 'transfer' && (
-      <div className="space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 rounded-lg p-6 bg-[#FAF9F6]">
+      <div className="payment-detail-card space-y-6 animate-in fade-in duration-300 border border-[#F2D0D3]/30 dark:border-[#C5A059]/30 rounded-lg p-6 bg-[#FAF9F6] dark:bg-[#1a0618]/60">
         {/* Guía/Tips para transferencias */}
-        <div className="rounded-xl border border-[#F2D0D3]/50 overflow-hidden bg-white shadow-sm">
-          <div className="bg-[#F2D0D3]/20 px-5 py-3 border-b border-[#F2D0D3]/50">
-            <h3 className="text-sm font-bold text-[#594246] flex items-center gap-2">
+        <div className="yape-guide-card rounded-xl border border-[#F2D0D3]/50 dark:border-transparent overflow-hidden bg-white dark:bg-transparent shadow-sm">
+          <div className="bg-[#F2D0D3]/20 dark:bg-black/20 px-5 py-3 border-b border-[#F2D0D3]/50 dark:border-transparent">
+            <h3 className="yape-guide-title text-sm font-bold text-[#594246] flex items-center gap-2">
               💡 Recomendaciones importantes
             </h3>
           </div>
-          <div className="p-5 space-y-3">
-            <p className="text-xs text-[#594246] flex items-start gap-2">
-              <span className="text-[#F2778D] font-bold">1.</span> Si transfieres desde otro banco (Interbancario), el pago puede demorar hasta 24h hábiles en reflejarse.
+          <div className="p-5 space-y-3 bg-white dark:bg-transparent">
+            <p className="text-xs text-[#594246] dark:text-[#fdeef5] flex items-start gap-2">
+              <span className="text-[#F2778D] dark:text-[#e8b86d] font-bold">1.</span> Si transfieres desde otro banco (Interbancario), el pago puede demorar hasta 24h hábiles en reflejarse.
             </p>
-            <p className="text-xs text-[#594246] flex items-start gap-2">
-              <span className="text-[#F2778D] font-bold">2.</span> Es obligatorio ingresar el Número de Operación abajo para poder rastrear tu pago rápidamente.
+            <p className="text-xs text-[#594246] dark:text-[#fdeef5] flex items-start gap-2">
+              <span className="text-[#F2778D] dark:text-[#e8b86d] font-bold">2.</span> Es obligatorio ingresar el Número de Operación abajo para poder rastrear tu pago rápidamente.
             </p>
-            <p className="text-xs text-[#594246] flex items-start gap-2">
-              <span className="text-[#F2778D] font-bold">3.</span> Envíanos la captura o foto del voucher por WhatsApp para agilizar la validación.
+            <p className="text-xs text-[#594246] dark:text-[#fdeef5] flex items-start gap-2">
+              <span className="text-[#F2778D] dark:text-[#e8b86d] font-bold">3.</span> Envíanos la captura o foto del voucher por WhatsApp para agilizar la validación.
             </p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-[#594246] uppercase mb-4">Cuentas Bancarias Disponibles</h3>
+        <div className="bg-white dark:bg-transparent p-6 rounded-xl border border-gray-100 dark:border-[#C5A059]/30 shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-[#594246] dark:text-[#fdeef5] uppercase mb-4">Cuentas Bancarias Disponibles</h3>
           <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:justify-between text-sm border-b border-gray-100 pb-3 gap-1">
-              <span className="text-[#827D7D] flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#002A8D]"></div>
+            <div className="flex flex-col sm:flex-row sm:justify-between text-sm border-b border-gray-100 dark:border-[#C5A059]/20 pb-3 gap-1">
+              <span className="text-[#827D7D] dark:text-[#f0d8e8]/70 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#002A8D] dark:bg-[#5080e0]"></div>
                 BCP (Soles):
               </span>
-              <span className="font-mono font-bold text-[#594246] tracking-wide">193-XXXXXX-X-XX</span>
+              <span className="font-mono font-bold text-[#594246] dark:text-[#f0a0c0] tracking-wide">193-XXXXXX-X-XX</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between text-sm pb-1 gap-1">
-              <span className="text-[#827D7D] flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#E5E7EB]"></div>
+              <span className="text-[#827D7D] dark:text-[#f0d8e8]/70 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#E5E7EB] dark:bg-[#808080]"></div>
                 CCI (Interbancario):
               </span>
-              <span className="font-mono font-bold text-[#594246] tracking-wide">002-193XXXXXXXXX-XX</span>
+              <span className="font-mono font-bold text-[#594246] dark:text-[#f0a0c0] tracking-wide">002-193XXXXXXXXX-XX</span>
             </div>
           </div>
         </div>
 
         {/* Número de operación */}
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <label className="block text-xs font-bold uppercase text-[#594246] mb-2">Número de operación</label>
+        <div className="bg-white dark:bg-transparent p-6 rounded-xl border border-gray-100 dark:border-transparent shadow-sm">
+          <label className="operation-number-label block text-xs font-bold uppercase mb-2">Número de operación</label>
           <input
             type="text"
             {...register('operationNumber', { required: 'Ingresa el número de operación del voucher' })}
             placeholder="Ej: 0123456"
-            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-[#F2B6C1]"
+            className="operation-number-input"
           />
-          <p className="text-[11px] text-[#827D7D] mt-2">
+          <p className="operation-number-hint">
             Lo encuentras en el voucher físico o captura de pantalla de tu transferencia.
           </p>
           {errors.operationNumber && (
@@ -322,23 +322,23 @@ const CheckoutPaymentForm: React.FC = () => {
     )}
 
       {/* 🏠 DIRECCIÓN DE FACTURACIÓN */}
-      <div className="pt-6 border-t border-gray-100">
+      <div className="pt-6 border-t border-gray-100 dark:border-[#C5A059]/20">
         <div className="flex items-center gap-3 mb-4">
           <input
             type="checkbox"
             id="billingCheck"
             {...register('billingSameAsShipping')}
-            className="w-4 h-4 accent-[#F2778D]"
+            className="billing-checkbox w-4 h-4"
           />
-          <label htmlFor="billingCheck" className="text-sm text-[#594246]">
+          <label htmlFor="billingCheck" className="billing-label text-sm text-[#594246]">
             Mi dirección de facturación es la misma que la de envío
           </label>
         </div>
 
         {!billingSameAsShipping && (
-          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-black/20 rounded-lg">
              {/* Aquí usarías los mismos campos de Ubigeo que en el paso anterior */}
-             <p className="col-span-2 text-xs text-gray-400 italic">Ingresa los datos para tu comprobante de pago.</p>
+             <p className="col-span-2 text-xs text-gray-400 dark:text-[#f0d8e8]/50 italic">Ingresa los datos para tu comprobante de pago.</p>
           </div>
         )}
       </div>
@@ -348,7 +348,7 @@ const CheckoutPaymentForm: React.FC = () => {
         <button
           type="button"
           onClick={handleGoToDelivery}
-          className="w-1/2 py-4 border-2 border-gray-200 rounded-full font-bold text-[#594246] hover:bg-gray-50 transition-colors"
+          className="btn-back w-1/2 py-4 border-2 border-gray-200 rounded-full font-bold text-[#594246] hover:bg-gray-50 transition-colors"
         >
           Atras
         </button>
@@ -356,7 +356,7 @@ const CheckoutPaymentForm: React.FC = () => {
           type="button"
           onClick={handleNext}
           disabled={isSubmitting}
-          className=" py-4  w-1/2 bg-[#F2B6C1] hover:bg-[#F2778D] rounded-full font-bold text-black hover:text-white transition-all "
+          className="btn-review py-4 w-1/2 rounded-full text-black hover:text-white transition-all "
         >
           {isSubmitting ? 'Procesando...' : 'Revisar Pedido'}
         </button>

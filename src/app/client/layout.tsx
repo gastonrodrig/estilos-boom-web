@@ -17,25 +17,30 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           0%, 100% { opacity: 0.1; transform: scale(0.8); }
           50% { opacity: 1; transform: scale(1.2); }
         }
-        @keyframes eclipsePulse1 {
-          0%,100% {
-            opacity: var(--base-opacity);
-            filter: drop-shadow(0 0 4px rgba(232,184,109,0.3));
+        @keyframes lunaPulse {
+          0%, 100% {
+            filter: drop-shadow(0 0 4px rgba(232,184,109,0.25));
+            opacity: var(--luna-opacity);
           }
           50% {
-            opacity: calc(var(--base-opacity) * 1.6);
-            filter: drop-shadow(0 0 10px rgba(232,184,109,0.5));
+            filter: drop-shadow(0 0 12px rgba(232,184,109,0.5)) drop-shadow(0 0 24px rgba(232,184,109,0.2));
+            opacity: calc(var(--luna-opacity) * 1.7);
           }
         }
-        @keyframes eclipsePulse2 {
-          0%,100% {
-            opacity: var(--base-opacity);
-            filter: drop-shadow(0 0 3px rgba(232,184,109,0.2));
-          }
-          50% {
-            opacity: calc(var(--base-opacity) * 1.4);
-            filter: drop-shadow(0 0 7px rgba(232,184,109,0.35));
-          }
+        @keyframes florGirar {
+          from { transform: rotate(0deg);   }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes florPulse {
+          0%,100% { filter: drop-shadow(0 0 3px rgba(220,120,160,0.2)); opacity: var(--f-op); }
+          50%      { filter: drop-shadow(0 0 8px rgba(220,120,160,0.4)); opacity: calc(var(--f-op) * 1.5); }
+        }
+        @keyframes respira {
+          0%   { background-position: 0%   50%; }
+          25%  { background-position: 50%  100%; }
+          50%  { background-position: 100% 50%; }
+          75%  { background-position: 50%  0%; }
+          100% { background-position: 0%   50%; }
         }
       `}</style>
       
@@ -50,29 +55,21 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           `
         }}
       >
-        {/* Global SVG Defs for Eclipses */}
+        {/* Global SVG Defs for Lunas */}
         <svg width="0" height="0" className="absolute">
           <defs>
-            <filter id="eclipse-glow">
-              <feGaussianBlur stdDeviation="2" result="blur"/>
+            <filter id="lunaGlow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
               <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
           </defs>
         </svg>
 
-        {/* Eclipse 1 */}
-        <div className="fixed pointer-events-none z-0" style={{ top: '8%', right: '6%', width: '90px', height: '90px', animation: 'eclipsePulse1 6s ease-in-out infinite', '--base-opacity': 0.55 } as React.CSSProperties}>
+        {/* Luna 1 */}
+        <div className="fixed pointer-events-none z-0" style={{ top: '6%', right: '5%', width: '85px', height: '85px', opacity: 0.5, transform: 'rotate(-20deg)', animation: 'lunaPulse 6s ease-in-out infinite', '--luna-opacity': 0.5 } as React.CSSProperties}>
           <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-            <circle cx="50" cy="50" r="28" fill="none" stroke="#e8b86d" strokeWidth="1.5" filter="url(#eclipse-glow)"/>
-            <circle cx="50" cy="50" r="24" fill="rgba(8,4,14,0.95)"/>
-            <line x1="50" y1="18" x2="50" y2="8" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="50" y1="92" x2="50" y2="82" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="18" y1="50" x2="8" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="92" y1="50" x2="82" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="27" x2="20" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="73" x2="80" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="73" x2="20" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="27" x2="80" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
+            <circle cx="50" cy="50" r="28" fill="#e8b86d" filter="url(#lunaGlow)" opacity="0.9"/>
+            <circle cx="62" cy="50" r="24" fill="#0d0408"/>
           </svg>
         </div>
 
@@ -101,51 +98,27 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
           );
         })}
 
-        {/* Eclipse 2 */}
-        <div className="fixed pointer-events-none z-0" style={{ top: '3%', left: '28%', width: '38px', height: '38px', animation: 'eclipsePulse2 8s ease-in-out infinite 2s', '--base-opacity': 0.25 } as React.CSSProperties}>
+        {/* Luna 2 */}
+        <div className="fixed pointer-events-none z-0" style={{ top: '4%', left: '30%', width: '35px', height: '35px', opacity: 0.2, transform: 'rotate(15deg)', animation: 'lunaPulse 9s ease-in-out infinite 2s', '--luna-opacity': 0.2 } as React.CSSProperties}>
           <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-            <circle cx="50" cy="50" r="28" fill="none" stroke="#e8b86d" strokeWidth="1.5" filter="url(#eclipse-glow)"/>
-            <circle cx="50" cy="50" r="24" fill="rgba(8,4,14,0.95)"/>
-            <line x1="50" y1="18" x2="50" y2="8" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="50" y1="92" x2="50" y2="82" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="18" y1="50" x2="8" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="92" y1="50" x2="82" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="27" x2="20" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="73" x2="80" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="73" x2="20" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="27" x2="80" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
+            <circle cx="50" cy="50" r="28" fill="#f0c8d8" filter="url(#lunaGlow)" opacity="0.9"/>
+            <circle cx="62" cy="50" r="24" fill="#0d0408"/>
           </svg>
         </div>
 
-        {/* Eclipse 3 */}
-        <div className="fixed pointer-events-none z-0" style={{ top: '48%', right: '2%', width: '55px', height: '55px', animation: 'eclipsePulse1 10s ease-in-out infinite 4s', '--base-opacity': 0.2 } as React.CSSProperties}>
+        {/* Luna 3 */}
+        <div className="fixed pointer-events-none z-0" style={{ top: '45%', right: '1.5%', width: '50px', height: '50px', opacity: 0.18, transform: 'rotate(-35deg)', animation: 'lunaPulse 11s ease-in-out infinite 4s', '--luna-opacity': 0.18 } as React.CSSProperties}>
           <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-            <circle cx="50" cy="50" r="28" fill="none" stroke="#e8b86d" strokeWidth="1.5" filter="url(#eclipse-glow)"/>
-            <circle cx="50" cy="50" r="24" fill="rgba(8,4,14,0.95)"/>
-            <line x1="50" y1="18" x2="50" y2="8" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="50" y1="92" x2="50" y2="82" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="18" y1="50" x2="8" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="92" y1="50" x2="82" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="27" x2="20" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="73" x2="80" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="73" x2="20" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="27" x2="80" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
+            <circle cx="50" cy="50" r="28" fill="#e8b86d" filter="url(#lunaGlow)" opacity="0.9"/>
+            <circle cx="62" cy="50" r="24" fill="#0d0408"/>
           </svg>
         </div>
 
-        {/* Eclipse 4 */}
-        <div className="fixed pointer-events-none z-0" style={{ bottom: '12%', left: '20%', width: '28px', height: '28px', animation: 'eclipsePulse2 7s ease-in-out infinite 1s', '--base-opacity': 0.15 } as React.CSSProperties}>
+        {/* Luna 4 */}
+        <div className="fixed pointer-events-none z-0" style={{ bottom: '15%', left: '22%', width: '26px', height: '26px', opacity: 0.13, transform: 'rotate(10deg)', animation: 'lunaPulse 8s ease-in-out infinite 1.5s', '--luna-opacity': 0.13 } as React.CSSProperties}>
           <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-            <circle cx="50" cy="50" r="28" fill="none" stroke="#e8b86d" strokeWidth="1.5" filter="url(#eclipse-glow)"/>
-            <circle cx="50" cy="50" r="24" fill="rgba(8,4,14,0.95)"/>
-            <line x1="50" y1="18" x2="50" y2="8" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="50" y1="92" x2="50" y2="82" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="18" y1="50" x2="8" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="92" y1="50" x2="82" y2="50" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="27" x2="20" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="73" x2="80" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="27" y1="73" x2="20" y2="80" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
-            <line x1="73" y1="27" x2="80" y2="20" stroke="rgba(232,184,109,0.3)" strokeWidth="0.8"/>
+            <circle cx="50" cy="50" r="28" fill="#d4a8c4" filter="url(#lunaGlow)" opacity="0.9"/>
+            <circle cx="62" cy="50" r="24" fill="#0d0408"/>
           </svg>
         </div>
 
@@ -177,9 +150,101 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
         <div className="absolute bottom-0 right-[-10%] w-[450px] h-[280px] blur-[50px] rounded-[100%]" style={{ background: 'rgba(180,60,100,0.3)' }} />
       </div>
 
-      {/* MAGICAL BACKGROUND (LIGHT MODE) */}
-      <div className="absolute inset-0 z-[-1] dark:hidden overflow-hidden bg-[#faf7f4] pointer-events-none">
-        <div className="absolute top-[30%] left-[50%] w-[600px] h-[600px] bg-[#F2D0D3] rounded-full blur-[100px] opacity-[0.4]" />
+      {/* BACKGROUND QUE RESPIRA (LIGHT MODE) */}
+      <div className="absolute inset-0 z-[-1] dark:hidden pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, #fce8ee 0%, #fdf0e8 25%, #f8e8f4 50%, #fdeee8 75%, #fce8ee 100%)',
+          backgroundSize: '400% 400%',
+          animation: 'respira 18s ease-in-out infinite'
+        }}
+      >
+        <div className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            background: `
+              radial-gradient(ellipse 55% 45% at 85% 5%, rgba(220,120,160,0.22) 0%, transparent 50%),
+              radial-gradient(ellipse 45% 40% at 10% 90%, rgba(210,150,90,0.18) 0%, transparent 50%),
+              radial-gradient(ellipse 35% 30% at 50% 50%, rgba(240,200,215,0.15) 0%, transparent 55%)
+            `
+          }}
+        />
+
+        {/* Lottie Sakura */}
+        <div className="dark:hidden fixed z-0 pointer-events-none" style={{ top: '-10px', right: '-10px', width: '220px', height: '220px', opacity: 0.55 }}>
+          {/* @ts-ignore */}
+          <lottie-player
+            src="/animations/sakura.json"
+            background="transparent"
+            speed="0.15"
+            loop
+            autoplay
+            className="sakura"
+            style={{ width: '100%', height: '100%' }}
+          />
+        </div>
+
+        {/* Flor 2 */}
+        <div className="absolute pointer-events-none z-0" style={{ top: '3%', left: '30%', width: '32px', height: '32px', animation: 'florPulse 6s ease-in-out infinite 1s', '--f-op': 0.2 } as React.CSSProperties}>
+          <svg viewBox="0 0 60 60" style={{ width: '100%', height: '100%' }}>
+            <g opacity="0.35">
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(72,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(144,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(216,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(288,30,30)"/>
+              <circle cx="30" cy="30" r="5" fill="rgba(184,134,11,0.7)"/>
+            </g>
+          </svg>
+        </div>
+
+        {/* Flor 3 */}
+        <div className="absolute pointer-events-none z-0" style={{ top: '45%', right: '2%', width: '48px', height: '48px', animation: 'florPulse 9s ease-in-out infinite 2s', '--f-op': 0.18 } as React.CSSProperties}>
+          <svg viewBox="0 0 60 60" style={{ width: '100%', height: '100%' }}>
+            <g opacity="0.35">
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(72,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(144,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(216,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(288,30,30)"/>
+              <circle cx="30" cy="30" r="5" fill="rgba(184,134,11,0.7)"/>
+            </g>
+          </svg>
+        </div>
+
+        {/* Flor 4 */}
+        <div className="absolute pointer-events-none z-0" style={{ bottom: '15%', left: '22%', width: '24px', height: '24px', animation: 'florPulse 7s ease-in-out infinite 3s', '--f-op': 0.14 } as React.CSSProperties}>
+          <svg viewBox="0 0 60 60" style={{ width: '100%', height: '100%' }}>
+            <g opacity="0.35">
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(72,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(144,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(216,30,30)"/>
+              <ellipse cx="30" cy="16" rx="7" ry="13" fill="#e8a0b8" transform="rotate(288,30,30)"/>
+              <circle cx="30" cy="30" r="5" fill="rgba(184,134,11,0.7)"/>
+            </g>
+          </svg>
+        </div>
+
+        {/* Estrellas Doradas Light Mode */}
+        {Array.from({ length: 12 }).map((_, i) => {
+          const isGold = Math.random() < 0.6;
+          const color = isGold ? '#b8860b' : '#c4547a';
+          const opacity = Math.random() * 0.2 + 0.2;
+          return (
+            <div 
+              key={`light-star-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: Math.random() > 0.5 ? '1px' : '2px',
+                height: Math.random() > 0.5 ? '1px' : '2px',
+                top: Math.random() * 50 + 2 + '%',
+                left: Math.random() * 100 + '%',
+                backgroundColor: color,
+                opacity: opacity,
+                animation: `twinkle ${Math.random() * 4 + 2}s ease-in-out ${Math.random() * 2}s infinite`,
+              }}
+            />
+          );
+        })}
       </div>
 
       <Navbar isHome={false} showTopBar showClientCenterMenu />

@@ -31,9 +31,9 @@ export function ThemeSwitcher({ className, iconClassName }: ThemeSwitcherProps) 
       title="Cambiar tema"
     >
       {isDark ? (
-        <Sun className={iconClassName || "w-5 h-5"} />
+        <Sun className={`${iconClassName || "w-5 h-5"} text-[#b8860b] transition-transform duration-300 hover:rotate-[20deg]`} />
       ) : (
-        <Moon className={iconClassName || "w-5 h-5"} />
+        <Moon className={`${iconClassName || "w-5 h-5"} text-[#b8860b] transition-transform duration-300 hover:rotate-[20deg]`} />
       )}
     </button>
   );
