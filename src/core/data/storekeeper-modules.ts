@@ -21,6 +21,12 @@ export const storekeeperModules: StorekeeperModule[] = [
     requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
   },
   {
+    label: "Despachos de Ventas",
+    icon: "truck",
+    href: "/storekeeper/warehouse/dispatches",
+    requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
+  },
+  {
     label: "Movimientos de Prendas",
     icon: "warehouse",
     href: "/storekeeper/warehouse/transfers",

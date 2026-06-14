@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Package, Zap, AlertTriangle, CheckCircle2, Scissors, ArrowRight, Clock, Sparkles } from "lucide-react";
+import { Package, Zap, AlertTriangle, CheckCircle2, Scissors, ArrowRight, Clock, Sparkles, Truck } from "lucide-react";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { useStorehouseStore, useAuthStore } from "@/hooks";
@@ -81,6 +81,14 @@ export default function WarehouseDashboardPage() {
     });
   }, [pending, role]);
 
+  const dispatches = useMemo(() => {
+    return pending.filter((d) => {
+      if (d.type !== "SALIDA_VENTA") return false;
+      const sourceCode = role === "Almacenero Boom" ? "ALM-CEN" : "TND-PRI";
+      return d.id_source_warehouse?.code === sourceCode;
+    });
+  }, [pending, role]);
+
   const recentPending = useMemo(() => {
     return [...pending]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -126,7 +134,7 @@ export default function WarehouseDashboardPage() {
         {[
           { label: "Recepciones pendientes",    value: receptions.length, Icon: Package,     color: "rose" },
           { label: "Transferencias pendientes", value: transfers.length,  Icon: Zap,          color: "orange" },
-          { label: "Con incidencia potencial",  value: 0,                 Icon: AlertTriangle, color: "rose" },
+          { label: "Despachos pendientes",      value: dispatches.length, Icon: Truck,        color: "rose" },
           { label: "Documentos completados",    value: completed.length,  Icon: CheckCircle2,  color: "emerald" },
         ].map(({ label, value, Icon, color }) => (
           <motion.div 
@@ -232,6 +240,8 @@ export default function WarehouseDashboardPage() {
               {recentPending.map((doc) => {
                 const href = doc.type === "TRANSFERENCIA"
                   ? `/storekeeper/warehouse/transfers/${doc._id}/confirm`
+                  : doc.type === "SALIDA_VENTA"
+                  ? `/storekeeper/warehouse/dispatches/${doc._id}`
                   : `/storekeeper/warehouse/receptions/${doc._id}`;
                 return (
                   <Link 

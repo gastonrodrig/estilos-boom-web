@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Package, Shirt, Truck, Check, Clock, AlertCircle, XCircle, FileWarning } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Shirt, Check, Clock, AlertCircle, XCircle, FileWarning } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -12,7 +12,7 @@ import { getAuthConfig } from '@utils';
 
 export default function OrderDetailsPage() {
   const params = useParams();
-  const orderId = params.id as string; // Usually '0042' etc
+  const orderId = params.id as string;
 
   const [orderData, setOrderData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -21,10 +21,11 @@ export default function OrderDetailsPage() {
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [newOperationNumber, setNewOperationNumber] = useState('');
   const [hasSubmittedCorrection, setHasSubmittedCorrection] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
-      // FALLBACK PARA MOCKS: Si es 0041 o 0042, mostrar data mockeada directamente sin llamar a la API
+      // Fallback de desarrollo / Mocks controlados
       if (orderId === '0041' || orderId === '0042') {
         setOrderData({
           orderNumber: orderId,
@@ -35,7 +36,8 @@ export default function OrderDetailsPage() {
           paymentMethod: "Yape",
           deliveryMethod: "DELIVERY",
           items: [
-            { productId: "1", name: "Producto de Prueba", size: "M", color: "Azul", quantity: 1, price: orderId === '0041' ? 95.00 : 189.90, image: "https://placehold.co/100x100?text=Mock" }
+            { productId: "1", name: "Blusa Lara", size: "M", color: "Blanco", quantity: 1, price: orderId === '0041' ? 95.00 : 139.90 },
+            { productId: "2", name: "Vestido Floral", size: "S", color: "Rosado", quantity: 1, price: 50.00 }
           ]
         });
         setLoading(false);
@@ -56,14 +58,13 @@ export default function OrderDetailsPage() {
     fetchOrder();
   }, [orderId]);
 
-  // Derived state from real order data
+  // Derived states basados en la API real
   const isPending = orderData?.status === 'PRE_ORDER';
   const isConfirmed = orderData?.status === 'CONFIRMED';
   const isObserved = orderData?.status === 'OBSERVED';
+  
   const currentStep = isConfirmed ? 2 : 1; 
   const isEnCaminoOrDelivered = currentStep >= 4;
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubsanar = async () => {
     if (!newOperationNumber.trim()) return;
@@ -75,8 +76,6 @@ export default function OrderDetailsPage() {
       }, getAuthConfig({ token }));
       
       setHasSubmittedCorrection(true);
-      // Opcional: Recargar la data de la orden para que vuelva a mostrar "En validación"
-      // window.location.reload(); 
     } catch (err) {
       console.error("Error resubmitting operation number:", err);
       setError("No se pudo enviar el nuevo número de operación. Intenta de nuevo.");
@@ -86,43 +85,51 @@ export default function OrderDetailsPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-[#594246]/50">Cargando detalles del pedido...</div>;
+    return <div className="p-8 text-center text-[#594246]/50 dark:text-[#b8afc8]/50">Cargando detalles del pedido...</div>;
   }
 
   if (error || !orderData) {
     return (
-      <div className="p-8 text-center text-red-500">
+      <div className="p-8 text-center text-red-500 max-w-md mx-auto">
         <FileWarning className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        {error || 'Pedido no encontrado'}
-        <Link href="/client/orders/active" className="block mt-4 text-[#F2778D] font-bold underline">
+        <p className="font-medium">{error || 'Pedido no encontrado'}</p>
+        <Link href="/client/orders/active" className="block mt-4 text-[#c4547a] dark:text-[#f0a0c0] font-bold underline text-sm">
           Volver a mis pedidos
         </Link>
       </div>
     );
   }
 
-  const dateStr = new Date(orderData.createdAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  // Formateos dinámicos basados en la data cargada
+  const dateStr = new Date(orderData.createdAt).toLocaleDateString('es-PE', { 
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+  });
   
-  const dummyOrderData: any = {
+  const dummyOrderData = {
     id: `#${orderData.orderNumber}`,
     date: dateStr,
     client: orderData.clientName || "Cliente",
     amount: orderData.amount,
-    status: isPending ? "Verificación de Pago" : isObserved ? "Observado" : "Finalizado",
+    // Castamos el status al tipo esperado por tu tipado global (OrderStatus) para complacer a TS
+    status: orderData.status as any, 
     deliveryMethod: orderData.deliveryMethod,
     items: orderData.items || []
   };
 
+  // Cálculos dinámicos para el desglose del cobro
+  const shippingCost = orderData.deliveryMethod === 'motorized' ? 10.00 : 0.00;
+  const subtotal = orderData.amount - shippingCost;
+
   return (
-    <div className="space-y-8 w-full pb-10">
+    <div className="space-y-8 w-full pb-10 max-w-6xl mx-auto px-4">
 
       {/* Top Navigation */}
       <div className="flex items-center gap-4">
-        <Link
-          href="/client/orders/active"
-          className="flex items-center gap-2 text-[#594246]/60 hover:text-[#594246] transition-colors font-medium group"
+        <Link 
+          href="/client/orders/active" 
+          className="flex items-center gap-2 text-[#594246]/60 dark:text-[rgba(180,170,200,0.6)] hover:text-[#594246] dark:hover:text-[#e8b86d] transition-colors font-medium group text-sm"
         >
-          <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2d0a1e]/60 border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.2)] flex items-center justify-center group-hover:border-[#F2D0D3] dark:group-hover:border-[rgba(232,184,109,0.5)] group-hover:bg-[#FAF9F6] dark:group-hover:bg-[#e8b86d]/10 transition-all">
+          <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2d0a1e]/60 border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.2)] flex items-center justify-center group-hover:border-[#F2D0D3] dark:group-hover:border-[#e8b86d]/50 group-hover:bg-[#FAF9F6] dark:group-hover:bg-[#e8b86d]/10 transition-all">
             <ArrowLeft className="w-4 h-4" />
           </div>
           Volver a mis pedidos
@@ -130,29 +137,36 @@ export default function OrderDetailsPage() {
       </div>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
-        <div>
-          <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">
-            Detalle del Pedido {orderData.orderNumber}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-transparent py-2 relative">
+        <div className="relative z-10 w-full flex flex-col pl-2">
+          <h1 className="text-3xl font-semibold font-serif text-[#1a0c12] dark:text-[#fdeef5] tracking-tight">
+            Detalle del Pedido <span className="text-[#b8860b] dark:text-[#e8b86d] font-sans font-medium tracking-normal">#{orderData.orderNumber}</span>
           </h1>
-          <p className="text-[#594246]/50 text-sm mt-1 font-medium">Realizado el {dateStr}</p>
-        </div>
-
-        {isPending || hasSubmittedCorrection ? (
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
-            <Clock className="w-4 h-4 text-amber-600" />
-            <span className="text-amber-700 text-sm font-bold tracking-wide uppercase">Verificación de Pago</span>
+          
+          <div className="flex flex-wrap items-center gap-4 mt-2">
+            <p className="text-[#9b6070] dark:text-[#b8afc8] text-xs font-sans">Realizado el {dateStr}</p>
+            
+            <div className="flex items-center">
+              {isPending || hasSubmittedCorrection ? (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[rgba(184,134,11,0.06)] border border-dashed border-[#b8860b]/60">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#b8860b] animate-pulse relative before:content-[''] before:absolute before:inset-[-2px] before:rounded-full before:bg-[#b8860b] before:opacity-30 before:animate-ping"></div>
+                  <span className="text-[#b8860b] text-[11px] font-bold tracking-wider uppercase font-sans">Verificación de Pago</span>
+                </div>
+              ) : isObserved ? (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/40">
+                  <AlertCircle className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                  <span className="text-orange-600 dark:text-orange-400 text-[11px] font-bold tracking-wider uppercase font-sans">Pago Observado</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">
+                  <Check className="w-3.5 h-3.5 text-white" />
+                  <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Pago confirmado</span>
+                </div>
+              )}
+            </div>
           </div>
-        ) : isObserved ? (
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-50 border border-orange-200 shadow-sm">
-            <AlertCircle className="w-4 h-4 text-orange-600" />
-            <span className="text-orange-700 text-sm font-bold tracking-wide uppercase">Pago Observado</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
-            <Check className="w-4 h-4 text-slate-600" />
-            <span className="text-slate-700 text-sm font-bold tracking-wide uppercase">Pago confirmado</span>
-          </div>
+          <div className="dark:hidden w-12 h-0.5 mt-4 rounded-full bg-gradient-to-r from-[#b8860b] via-[#c4547a]/40 to-transparent"></div>
+          <div className="hidden dark:block w-16 h-[1px] mt-4 bg-gradient-to-r from-[#e8b86d] to-transparent"></div>
         </div>
       </div>
 
@@ -162,182 +176,210 @@ export default function OrderDetailsPage() {
         {/* Left Column: Products & Info */}
         <div className="lg:col-span-2 space-y-8">
 
-          {/* Product List */}
-          <div className="bg-[rgba(255,232,238,0.75)] backdrop-blur-[8px] border border-[rgba(196,84,122,0.18)] shadow-[inset_0_1px_0_rgba(184,134,11,0.1),0_4px_24px_rgba(196,84,122,0.1),0_1px_4px_rgba(196,84,122,0.06)] transition-all duration-300 dark:bg-[rgba(30,8,22,0.82)] p-8 rounded-[14px] dark:border-[rgba(180,170,200,0.12)] dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),inset_0_0_30px_rgba(196,84,122,0.04),0_4px_24px_rgba(0,0,0,0.3)] relative overflow-hidden">
-            
-            <h2 className="mb-[16px] border-b border-[rgba(196,84,122,0.1)] dark:border-[rgba(180,170,200,0.12)] pb-[14px] relative z-10">
-              <span className="text-[#9a6f00] font-semibold dark:text-[rgba(232,184,109,0.6)] text-[0.85rem] tracking-[0.15em] uppercase">Productos comprados</span>
+          {/* Product List Card */}
+          <div className="bg-[rgba(255,232,238,0.75)] backdrop-blur-md border border-[rgba(196,84,122,0.18)] shadow-[inset_0_1px_0_rgba(184,134,11,0.1),0_4px_24px_rgba(196,84,122,0.1)] dark:bg-[rgba(30,8,22,0.82)] p-6 sm:p-8 rounded-2xl dark:border-[rgba(180,170,200,0.12)] dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),0_4px_24px_rgba(0,0,0,0.3)] relative overflow-hidden">
+            <h2 className="mb-4 border-b border-[rgba(196,84,122,0.1)] dark:border-[rgba(180,170,200,0.12)] pb-3 relative z-10">
+              <span className="text-[#9a6f00] font-bold dark:text-[rgba(232,184,109,0.6)] text-xs tracking-widest uppercase">Productos comprados</span>
             </h2>
 
-            <div className="space-y-6">
+            <div className="flex flex-col relative z-10 space-y-1">
               {orderData.items && orderData.items.map((item: any, i: number) => (
-                <div key={i}>
-                  <div className="flex gap-4 items-center">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#F2D0D3]/30 border border-[#EBEAE8] flex items-center justify-center shrink-0 overflow-hidden">
-                      {item.image ? (
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Shirt className="w-8 h-8 text-[#F2778D]/40" />
+                <div 
+                  key={i} 
+                  className="group flex flex-row items-center py-3 px-2 border-b border-[rgba(196,84,122,0.1)] dark:border-[rgba(180,170,200,0.12)] border-l-2 border-l-transparent transition-all duration-200 hover:bg-[rgba(255,225,232,0.6)] dark:hover:bg-[rgba(232,184,109,0.03)] hover:border-l-[rgba(196,84,122,0.4)] dark:hover:border-l-[#e8b86d]"
+                >
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/80 to-[#F2D0D3]/20 dark:from-white/5 dark:to-white/0 border border-[rgba(196,84,122,0.15)] dark:border-[rgba(232,184,109,0.15)] flex items-center justify-center shrink-0 overflow-hidden">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Shirt className="w-7 h-7 text-[rgba(196,84,122,0.45)] dark:text-[rgba(232,184,109,0.5)]" strokeWidth={1.5} />
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 pl-4">
+                    <h3 className="text-[#1a0c12] dark:text-[#fdeef5] font-semibold text-base mb-1">{item.name}</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.size && (
+                        <span className="inline-block font-medium bg-[rgba(220,140,170,0.15)] dark:bg-[rgba(180,170,200,0.07)] border border-[rgba(196,84,122,0.2)] dark:border-[rgba(180,170,200,0.15)] rounded-full px-2.5 py-0.5 text-[10px] text-[#8b3555] dark:text-[#b8afc8]">
+                          Talla: {item.size}
+                        </span>
+                      )}
+                      {item.color && (
+                        <span className="inline-block font-medium bg-[rgba(220,140,170,0.15)] dark:bg-[rgba(180,170,200,0.07)] border border-[rgba(196,84,122,0.2)] dark:border-[rgba(180,170,200,0.15)] rounded-full px-2.5 py-0.5 text-[10px] text-[#8b3555] dark:text-[#b8afc8]">
+                          Color: {item.color}
+                        </span>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-[#594246] font-bold text-lg">{item.name}</h3>
-                      <p className="text-[#594246]/60 text-sm">
-                        {item.size ? `Talla: ${item.size}` : ''} {item.color ? `| Color: ${item.color}` : ''}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[#594246] font-bold">S/ {item.price.toFixed(2)}</p>
-                      <p className="text-[#594246]/50 text-sm">Cant: {item.quantity}</p>
-                    </div>
                   </div>
-                  {i < orderData.items.length - 1 && <div className="w-full h-px bg-[#EBEAE8] mt-6"></div>}
+                  
+                  <div className="text-right min-w-[80px]">
+                    <span className="text-[#1a0c12] dark:text-[#fdeef5] font-sans font-bold text-base block">S/ {item.price.toFixed(2)}</span>
+                    <p className="text-[#6b3d50] dark:text-[#b8afc8] text-xs font-sans mt-0.5">× {item.quantity}</p>
+                  </div>
                 </div>
               ))}
-              
+
               {!orderData.items?.length && (
-                 <p className="text-[#594246]/50 text-sm italic">Los productos de este pedido se encuentran en preparación.</p>
+                <p className="text-[#594246]/50 dark:text-[#fdeef5]/40 text-sm italic py-4 text-center">Los detalles de los productos se están procesando.</p>
               )}
             </div>
           </div>
 
-          {/* Shipping and Payment Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Shipping and Payment Info Container */}
+          <div className="bg-[rgba(255,232,238,0.75)] backdrop-blur-md border border-[rgba(184,134,11,0.15)] shadow-[inset_0_1px_0_rgba(184,134,11,0.1),0_4px_24px_rgba(196,84,122,0.1)] dark:bg-[rgba(30,8,22,0.82)] dark:border-[rgba(180,170,200,0.12)] rounded-2xl p-6 sm:p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
+              
+              {/* Shipping Address Section */}
+              <div className="flex flex-col md:pr-8">
+                <h3 className="text-xs tracking-widest uppercase text-[#9a6f00] dark:text-[rgba(232,184,109,0.6)] font-bold mb-3">
+                  Dirección de envío
+                </h3>
+                <p className="text-[#1a0c12] dark:text-[#fdeef5] font-semibold text-base mb-1.5">{orderData.clientName || 'Cliente'}</p>
+                <div className="flex flex-col gap-1 text-sm text-[#9b6070] dark:text-[#b8afc8]">
+                  <p>Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
+                  <p>Lima, Perú</p>
+                </div>
+              </div>
 
-            {/* Shipping Address */}
-            <div className="bg-[#FAF9F6] p-6 rounded-3xl border border-[#EBEAE8]/50 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#F2D0D3]/20 rounded-bl-full -z-0"></div>
-              <h3 className="text-sm font-bold text-[#594246]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
-                <MapPin className="w-4 h-4" /> Dirección de envío
-              </h3>
-              <p className="text-[#594246] font-bold relative z-10">{orderData.clientName || 'Cliente'}</p>
-              <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
-              <p className="text-[#594246]/80 text-sm relative z-10">Lima, Perú</p>
-            </div>
+              {/* Payment Method Section & Correction Logic */}
+              <div className="flex flex-col md:border-l border-[rgba(196,84,122,0.1)] dark:border-[rgba(180,170,200,0.12)] md:pl-8 justify-center">
+                <h3 className="text-xs tracking-widest uppercase text-[#9a6f00] dark:text-[rgba(232,184,109,0.6)] font-bold mb-3">
+                  Método de pago
+                </h3>
+                
+                {isObserved && !hasSubmittedCorrection ? (
+                  /* Formulario de Subsanación si el Pago está Observado */
+                  <div className="flex flex-col gap-2 w-full">
+                    <p className="text-[#1a0c12] dark:text-[#fdeef5] font-semibold uppercase text-sm">{orderData.paymentMethod}</p>
+                    <div className="bg-orange-500/10 border border-orange-500/30 p-3 rounded-xl">
+                      <p className="text-orange-800 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Motivo de observación:</p>
+                      <p className="text-orange-950 dark:text-orange-200 text-xs font-medium">El número de operación no coincide con los registros. Por favor reingrésalo.</p>
+                    </div>
 
-            {/* Payment Method */}
-            <div className={`bg-[#FAF9F6] p-6 rounded-3xl border border-[#EBEAE8]/50 shadow-sm relative overflow-hidden ${isObserved && !hasSubmittedCorrection ? 'ring-2 ring-orange-200 bg-orange-50/30' : ''}`}>
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#F2D0D3]/20 rounded-bl-full -z-0"></div>
-              <h3 className="text-sm font-bold text-[#594246]/60 uppercase tracking-wider mb-4 relative z-10 flex items-center gap-2">
-                <CreditCard className="w-4 h-4" /> Método de pago
-              </h3>
-
-              {isObserved && !hasSubmittedCorrection ? (
-                <div className="relative z-10 flex flex-col gap-3">
-                  <p className="text-[#594246] font-bold uppercase">{orderData.paymentMethod}</p>
-                  <p className="text-[#594246]/80 text-sm">Operación registrada: <span className="line-through text-gray-400">Desconocida</span></p>
-
-                  <div className="bg-orange-100/50 border border-orange-200 p-3 rounded-xl mt-1">
-                    <p className="text-orange-800 text-xs font-semibold uppercase tracking-wider mb-1">Motivo de observación:</p>
-                    <p className="text-orange-900 text-sm font-medium">El número de operación no coincide con nuestros registros. Por favor verifica y vuelve a ingresarlo.</p>
-                  </div>
-
-                  <div className="mt-2 space-y-2">
-                    <label className="text-[11px] font-bold text-[#594246]/60 uppercase tracking-widest">Subsanar Operación</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newOperationNumber}
-                        onChange={(e) => setNewOperationNumber(e.target.value)}
-                        placeholder="Nuevo N° Operación"
-                        className="flex-1 bg-white border border-[#EBEAE8] rounded-xl px-3 py-2 text-sm text-[#594246] font-medium focus:outline-none focus:border-[#F2D0D3] focus:ring-1 focus:ring-[#F2D0D3]"
-                      />
-                      <button
-                        onClick={handleSubsanar}
-                        disabled={!newOperationNumber.trim()}
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Enviar
-                      </button>
+                    <div className="mt-1 space-y-1.5">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newOperationNumber}
+                          onChange={(e) => setNewOperationNumber(e.target.value)}
+                          placeholder="Nuevo N° Operación"
+                          className="flex-1 bg-white/80 dark:bg-white/5 border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.2)] rounded-xl px-3 py-1.5 text-xs text-[#1a0c12] dark:text-[#fdeef5] focus:outline-none focus:border-[#F2D0D3] dark:focus:border-[#e8b86d]/50"
+                        />
+                        <button
+                          onClick={handleSubsanar}
+                          disabled={!newOperationNumber.trim() || isSubmitting}
+                          className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
+                        >
+                          {isSubmitting ? '...' : 'Enviar'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : isPending || hasSubmittedCorrection ? (
-                <>
-                  <p className="text-[#594246] font-bold relative z-10 uppercase">{orderData.paymentMethod}</p>
-                  {orderData.paymentMethod?.toLowerCase() === 'mercadopago' ? (
-                    <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Procesando pago con Mercado Pago...</p>
-                  ) : (
-                    <>
-                      <p className="text-[#594246]/80 text-sm mt-1 relative z-10">Operación: <span className="font-bold">{hasSubmittedCorrection ? newOperationNumber : 'Enviada'}</span></p>
-                      <p className="text-amber-600 text-sm mt-2 relative z-10 font-medium">Validación manual pendiente.</p>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <p className="text-[#594246] font-bold relative z-10 uppercase">{orderData.paymentMethod}</p>
-                  <p className="text-slate-600 text-sm mt-2 relative z-10 font-medium">Cobro realizado exitosamente.</p>
-                </>
-              )}
+                ) : (
+                  /* Flujo Regular de Información */
+                  <>
+                    <p className="text-[#1a0c12] dark:text-[#fdeef5] font-semibold text-base mb-1 uppercase">{orderData.paymentMethod || "Manual"}</p>
+                    {isPending || hasSubmittedCorrection ? (
+                      <div>
+                        {hasSubmittedCorrection && (
+                          <p className="text-xs text-[#9b6070] dark:text-[#b8afc8] font-mono mb-1">Nueva Op: #{newOperationNumber}</p>
+                        )}
+                        <p className="text-[#b8860b] dark:text-[#e8b86d] text-xs font-medium">Validación manual pendiente.</p>
+                      </div>
+                    ) : (
+                      <p className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">Cobro verificado y cerrado exitosamente.</p>
+                    )}
+                  </>
+                )}
+              </div>
+
             </div>
           </div>
 
         </div>
 
-        {/* Right Column: Summary & Actions */}
-        <div className="space-y-6">
-
-          {/* Order Summary */}
-          <div className="bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
-            <h2 className="text-xl font-bold text-[#594246] mb-6">Resumen</h2>
-
-            <div className="space-y-4">
-              <div className="flex justify-between text-[#594246]/80 text-sm font-medium">
-                <span>Subtotal ({orderData.items?.length || 0} artículos)</span>
-                <span>S/ {(orderData.amount - (orderData.deliveryMethod === 'motorized' ? 10 : 0)).toFixed(2)}</span>
+        {/* Right Column: Cobro Card & Actions */}
+        <div className="flex flex-col h-full">
+          
+          <div className="bg-[rgba(255,232,238,0.75)] backdrop-blur-md border border-[rgba(196,84,122,0.18)] shadow-[0_4px_24px_rgba(196,84,122,0.1)] dark:bg-[rgba(28,7,20,0.88)] p-6 rounded-2xl dark:border-[rgba(180,170,200,0.12)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)] relative overflow-hidden flex-1 flex flex-col">
+            <h2 className="mb-4 border-b border-[rgba(196,84,122,0.18)] dark:border-[rgba(180,170,200,0.12)] pb-3">
+              <span className="text-[#9a6f00] font-bold dark:text-[rgba(232,184,109,0.6)] text-xs tracking-widest uppercase">Resumen</span>
+            </h2>
+            
+            {/* Grid Desglose Financiero */}
+            <div className="grid grid-cols-2 grid-rows-2 gap-y-3 gap-x-2">
+              <div className="p-3 border-b border-r border-[rgba(184,134,11,0.2)] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[10px] uppercase tracking-wider text-[#9b6070] dark:text-[#b8afc8] mb-1">Subtotal</span>
+                <span className="text-sm font-sans font-semibold text-[#1a0c12] dark:text-[#fdeef5]">S/ {subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-[#594246]/80 text-sm font-medium">
-                <span>Costo de envío</span>
-                <span>S/ {orderData.deliveryMethod === 'motorized' ? '10.00' : '0.00'}</span>
+              <div className="p-3 border-b border-[rgba(184,134,11,0.2)] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[10px] uppercase tracking-wider text-[#9b6070] dark:text-[#b8afc8] mb-1">Envío</span>
+                <span className="text-sm font-sans font-semibold text-[#1a0c12] dark:text-[#fdeef5]">S/ {shippingCost.toFixed(2)}</span>
               </div>
-
-              <div className="w-full h-px bg-[#EBEAE8] my-2"></div>
-
-              <div className="flex justify-between text-[#594246] text-xl font-bold">
-                <span>Total</span>
-                <span>S/ {orderData.amount.toFixed(2)}</span>
+              <div className="p-3 border-r border-[rgba(184,134,11,0.2)] dark:border-[rgba(180,170,200,0.12)] flex flex-col justify-center">
+                <span className="text-[10px] uppercase tracking-wider text-[#9b6070] dark:text-[#b8afc8] mb-1">Descuento</span>
+                <span className="text-sm font-sans font-semibold text-[#c4547a] dark:text-[#f0a0c0]">− S/ 0.00</span>
+              </div>
+              <div className="p-3 flex flex-col justify-center">
+                <span className="text-[10px] uppercase tracking-wider text-[#9b6070] dark:text-[#b8afc8] mb-1">Artículos</span>
+                <span className="text-sm font-sans font-semibold text-[#1a0c12] dark:text-[#fdeef5]">{orderData.items?.length || 0}</span>
               </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-3">
-            {/* Descargar Boleta */}
-            <button
-              onClick={() => setIsInvoiceOpen(true)}
-              disabled={!isConfirmed}
-              title={!isConfirmed ? "Disponible cuando se confirme el pago" : "Descargar comprobante PDF"}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 
-                ${!isConfirmed
-                  ? "bg-[#EBEAE8] text-[#594246]/40 cursor-not-allowed"
-                  : "bg-[#594246] text-white hover:bg-[#F2778D] shadow-md"}
-              `}
-            >
-              <Download className="w-5 h-5" />
-              Descargar Boleta (PDF)
-              {!isConfirmed && <span className="text-[10px] absolute mt-12 font-medium">(Requiere confirmación)</span>}
-            </button>
+            {/* Separador decorativo de ticket */}
+            <div className="relative my-5 mx-[-24px]">
+              <div className="absolute top-1/2 left-[-4px] w-2 h-2 rounded-full border border-[rgba(184,134,11,0.25)] dark:border-[rgba(180,170,200,0.12)] bg-[#fff0eb] dark:bg-[#1a0618] transform -translate-y-1/2 z-10"></div>
+              <div className="absolute top-1/2 right-[-4px] w-2 h-2 rounded-full border border-[rgba(184,134,11,0.25)] dark:border-[rgba(180,170,200,0.12)] bg-[#fff0eb] dark:bg-[#1a0618] transform -translate-y-1/2 z-10"></div>
+              <div className="border-t border-dashed border-[rgba(184,134,11,0.25)] dark:border-[rgba(180,170,200,0.12)] mx-6"></div>
+            </div>
 
-            {/* Necesito Ayuda */}
-            <button className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-[#EBEAE8] text-[#594246] font-bold hover:bg-[#FAF9F6] hover:border-[#F2D0D3] transition-colors duration-300">
-              <HelpCircle className="w-5 h-5" />
-              Necesito ayuda
-            </button>
+            {/* Total Destacado */}
+            <div className="mt-auto bg-gradient-to-br from-[rgba(255,220,232,0.5)] to-[rgba(255,235,210,0.4)] dark:bg-none dark:bg-[rgba(240,150,190,0.06)] border border-[rgba(196,84,122,0.12)] dark:border-transparent rounded-xl p-4 flex justify-between items-center mb-6">
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-[#9b6070] dark:text-[rgba(240,150,190,0.5)] block">Total pagado</span>
+                <span className="text-xs text-[#9b6070] dark:text-[#b8afc8] mt-0.5 block uppercase">{orderData.paymentMethod}</span>
+              </div>
+              <div>
+                <span className="text-2xl font-sans font-extrabold text-[#c4547a] dark:text-[#f0a0c0] tracking-tight">S/ {orderData.amount.toFixed(2)}</span>
+              </div>
+            </div>
 
-            {/* Cancelar Pedido */}
-            <button
-              disabled={isEnCaminoOrDelivered}
-              title={isEnCaminoOrDelivered ? "No se puede cancelar porque ya está en camino" : "Cancelar este pedido"}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all duration-300 border-2
-                ${isEnCaminoOrDelivered
-                  ? "border-transparent bg-gray-50 text-gray-300 cursor-not-allowed"
-                  : "border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200"}
-              `}
-            >
-              <XCircle className="w-5 h-5" />
-              Cancelar Pedido
-            </button>
+            {/* Fila Horizontal de Acciones Rápidas */}
+            <div className="flex justify-around items-center border-t border-[rgba(184,134,11,0.2)] dark:border-[rgba(240,150,190,0.08)] pt-4">
+              
+              {/* PDF */}
+              <button 
+                disabled={!isConfirmed} 
+                onClick={() => setIsInvoiceOpen(true)}
+                title={!isConfirmed ? "Disponible al confirmar pago" : "Descargar comprobante"} 
+                className="group flex flex-col items-center gap-1 bg-transparent border-none outline-none"
+              >
+                <div className={`w-9 h-9 rounded-full border border-[rgba(196,84,122,0.25)] dark:border-[rgba(232,184,109,0.3)] dark:bg-[rgba(232,184,109,0.04)] text-[rgba(196,84,122,0.6)] dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 ${!isConfirmed ? 'cursor-not-allowed opacity-40' : 'group-hover:border-[#b8860b] group-hover:text-[#b8860b] dark:group-hover:border-[#e8b86d] dark:group-hover:text-[#e8b86d]'}`}>
+                  <Download className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
+                <span className={`text-[10px] text-center font-sans tracking-wide transition-all duration-200 ${!isConfirmed ? 'text-[#9b6070]/40' : 'text-[rgba(196,84,122,0.6)] dark:text-[rgba(253,238,245,0.65)] group-hover:text-[#b8860b] dark:group-hover:text-[#fdeef5]'}`}>PDF</span>
+              </button>
+
+              {/* Ayuda */}
+              <button className="group flex flex-col items-center gap-1 bg-transparent border-none outline-none">
+                <div className="w-9 h-9 rounded-full border border-[rgba(196,84,122,0.25)] dark:border-[rgba(232,184,109,0.3)] dark:bg-[rgba(232,184,109,0.04)] text-[rgba(196,84,122,0.6)] dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 group-hover:border-[#b8860b] group-hover:text-[#b8860b] dark:group-hover:border-[#e8b86d] dark:group-hover:text-[#e8b86d]">
+                  <HelpCircle className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
+                <span className="text-[10px] text-center font-sans tracking-wide text-[rgba(196,84,122,0.6)] dark:text-[rgba(253,238,245,0.65)] transition-all duration-200 group-hover:text-[#b8860b] dark:group-hover:text-[#fdeef5]">Ayuda</span>
+              </button>
+
+              {/* Cancelar */}
+              <button 
+                disabled={isEnCaminoOrDelivered} 
+                className="group flex flex-col items-center gap-1 bg-transparent border-none outline-none"
+              >
+                <div className={`w-9 h-9 rounded-full border border-[rgba(196,84,122,0.25)] dark:border-[rgba(196,84,122,0.25)] text-[rgba(196,84,122,0.6)] dark:text-[rgba(232,184,109,0.8)] flex items-center justify-center transition-all duration-200 ${isEnCaminoOrDelivered ? 'cursor-not-allowed opacity-40' : 'group-hover:border-red-500 group-hover:text-red-500 dark:group-hover:border-red-400 dark:group-hover:text-red-400'}`}>
+                  <XCircle className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
+                <span className={`text-[10px] text-center font-sans tracking-wide transition-all duration-200 ${isEnCaminoOrDelivered ? 'text-[#9b6070]/40' : 'text-[rgba(196,84,122,0.6)] dark:text-[rgba(253,238,245,0.65)] group-hover:text-red-500 dark:group-hover:text-[#fdeef5]'}`}>Cancelar</span>
+              </button>
+            </div>
+
           </div>
 
         </div>

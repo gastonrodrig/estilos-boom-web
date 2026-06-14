@@ -84,7 +84,7 @@ const CheckoutShippingForm: React.FC = () => {
           type="button"
           onClick={handleNext}
           disabled={isSubmitting}
-          className="btn-checkout w-full md:w-auto px-10 py-3.5 rounded-sm !mt-0"
+          className="btn-checkout w-full md:w-auto px-10 py-3.5 rounded-sm !mt-0 border cursor-pointer" 
         >
           {isSubmitting ? 'Validando...' : 'Siguiente: Entrega'}
         </button>
