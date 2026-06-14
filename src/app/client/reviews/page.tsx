@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Star, Camera, UploadCloud, MessageSquareHeart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { reviewsApi } from '../../../api/reviews/reviews-api';
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
+import { useAuthStore } from '@hooks';
 
 // Mock Data for pending reviews
 const PENDING_REVIEWS = [
@@ -35,6 +38,35 @@ const RATING_PHRASES: Record<number, string> = {
 
 export default function ReviewsPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
+  const [completedReviews, setCompletedReviews] = useState<any[]>([]);
+  const [loadingCompleted, setLoadingCompleted] = useState(false);
+  const { status } = useAuthStore();
+
+  useEffect(() => {
+    if (activeTab === 'completed') {
+      const loadCompletedReviews = async () => {
+        if (status === 'checking') return;
+
+        if (status !== 'authenticated') {
+          setCompletedReviews([]);
+          setLoadingCompleted(false);
+          return;
+        }
+
+        setLoadingCompleted(true);
+        try {
+          const token = await getFirebaseAuthToken();
+          const { data } = await reviewsApi.get('/user/me', getAuthConfig({ token }));
+          setCompletedReviews(data || []);
+        } catch (error) {
+          console.error("Error loading user reviews:", error);
+        } finally {
+          setLoadingCompleted(false);
+        }
+      };
+      loadCompletedReviews();
+    }
+  }, [activeTab, status]);
 
   return (
     <div className="relative space-y-8 w-full pb-10 min-h-[80vh]">
@@ -81,8 +113,12 @@ export default function ReviewsPage() {
       </div>
 
       <div className="pt-2 relative z-10">
-        <h2 className="text-xl font-bold text-[#594246]">Productos que puedes reseñar</h2>
-        <p className="text-[#594246]/70 text-sm mt-1 font-medium">Solo aparecen productos de pedidos ya entregados.</p>
+        <h2 className="text-xl font-bold text-[#594246]">
+          {activeTab === 'pending' ? 'Productos que puedes reseñar' : 'Reseñas publicadas'}
+        </h2>
+        <p className="text-[#594246]/70 text-sm mt-1 font-medium">
+          {activeTab === 'pending' ? 'Solo aparecen productos de pedidos ya entregados.' : 'Estas son las opiniones que has compartido.'}
+        </p>
       </div>
 
       {/* Review Cards */}
@@ -92,10 +128,44 @@ export default function ReviewsPage() {
         ))}
 
         {activeTab === 'completed' && (
-          <div className="py-20 flex flex-col items-center justify-center text-[#594246]/40 bg-white/60 backdrop-blur-sm rounded-3xl border border-[#EBEAE8] shadow-sm">
-            <MessageSquareHeart className="w-16 h-16 mb-4 stroke-1 opacity-50" />
-            <p className="text-lg font-medium">Aún no has publicado ninguna reseña.</p>
-          </div>
+          loadingCompleted ? (
+            <p className="text-center text-[#594246]/50">Cargando tus reseñas...</p>
+          ) : completedReviews.length > 0 ? (
+            <div className="space-y-6">
+              {completedReviews.map((rev: any) => (
+                <div key={rev._id} className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.15)] border border-[#EBEAE8] p-6 flex flex-col sm:flex-row gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F2778D] to-[#F2B6C1]"></div>
+                  
+                  {/* Left part: Product image/details */}
+                  <div className="flex items-center gap-4 sm:w-1/3 shrink-0">
+                    <div className="w-16 h-20 rounded-xl overflow-hidden bg-[#FAF9F6] border border-[#EBEAE8] shrink-0">
+                      <img src={rev.productId?.images?.[0] || "/assets/product/vestido-corto-floral-cuello-v.png"} alt={rev.productId?.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-[#632034] text-sm line-clamp-2">{rev.productId?.name || "Producto"}</h4>
+                      <p className="text-[#594246]/50 text-xs mt-1">Calificación: {rev.rating} ★</p>
+                    </div>
+                  </div>
+
+                  {/* Right part: Stars & comment */}
+                  <div className="flex-1">
+                    <div className="flex gap-0.5 mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star key={star} className={`w-4 h-4 ${star <= rev.rating ? 'fill-[#F2778D] text-[#F2778D]' : 'fill-transparent text-[#EBEAE8]'}`} />
+                      ))}
+                    </div>
+                    <p className="text-[#594246] text-sm font-medium italic">"{rev.comment || 'Sin comentario'}"</p>
+                    <p className="text-[#594246]/40 text-[10px] mt-2 font-bold">Publicado el {new Date(rev.createdAt).toLocaleDateString('es-PE')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-[#594246]/40 bg-white/60 backdrop-blur-sm rounded-3xl border border-[#EBEAE8] shadow-sm">
+              <MessageSquareHeart className="w-16 h-16 mb-4 stroke-1 opacity-50" />
+              <p className="text-lg font-medium">Aún no has publicado ninguna reseña.</p>
+            </div>
+          )
         )}
       </div>
 
@@ -138,7 +208,7 @@ function ReviewCard({ product }: { product: any }) {
         
         {/* Star Rating Section */}
         <div className="mb-6">
-          <p className="text-[#632034] font-bold text-sm mb-3">Califica este producto</p>
+          <p className="text-[#632034] font-bold text-sm mb-3">Califica este product</p>
           <div className="flex items-center gap-4">
             <div className="flex gap-1" onMouseLeave={() => setHoverRating(0)}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -198,15 +268,22 @@ function ReviewCard({ product }: { product: any }) {
             disabled={rating === 0}
             onClick={async () => {
               try {
+                const token = await getFirebaseAuthToken();
+                const cleanProductId = (product.id.toString().length === 24) ? product.id.toString() : '65f1a2b3c4d5e6f7a8b9c0d1';
+                const cleanOrderId = (product.orderId && product.orderId.toString().length === 24) ? product.orderId.toString() : '65f1a2b3c4d5e6f7a8b9c0d1';
+                
                 await reviewsApi.post('/', {
-                  productId: product.id.toString(), // Needs to be mongo id theoretically, but we use what we have
-                  orderId: '65f1a2b3c4d5e6f7a8b9c0d1', // Dummy order ID
+                  productId: cleanProductId,
+                  orderId: cleanOrderId,
                   rating: rating,
                   comment: reviewText
-                });
+                }, getAuthConfig({ token }));
                 alert('¡Reseña publicada con éxito!');
+                setReviewText("");
+                setRating(0);
               } catch (error) {
-                console.error(error);
+                console.error("Error submitting review:", error);
+                alert('Hubo un error al publicar tu reseña. Por favor intenta de nuevo.');
               }
             }}
             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm

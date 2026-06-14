@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, CheckCircle2, Sparkles, MessageSquare, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { suggestionsApi } from '../../../api/suggestions/suggestions-api';
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
+import { useAuthStore } from '@hooks';
 
 // Mock Data
 const SUGGESTION_CATEGORIES = [
@@ -31,13 +34,13 @@ const SIZES = ["XS", "S", "M", "L", "XL"];
 // Initial list
 const INITIAL_SUGGESTIONS = [
   {
-    id: 1,
+    id: "1",
     text: "Solicitaste la Blusa Romántica en talla L",
     date: "20 de mayo, 2026",
     status: "En revisión",
   },
   {
-    id: 2,
+    id: "2",
     text: "Sugeriste colores oscuros para la temporada de otoño",
     date: "15 de mayo, 2026",
     status: "Considerada",
@@ -56,12 +59,85 @@ export default function SuggestionsPage() {
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [suggestionsHistory, setSuggestionsHistory] = useState(INITIAL_SUGGESTIONS);
+  const [suggestionsHistory, setSuggestionsHistory] = useState<any[]>(INITIAL_SUGGESTIONS);
+  const [dynamicProducts, setDynamicProducts] = useState<string[]>(MOCK_PRODUCTS);
+  const { status } = useAuthStore();
   
   // Custom Dropdown State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPage, setDropdownPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
+
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      if (status === 'checking') return;
+
+      if (status !== 'authenticated') {
+        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        return;
+      }
+
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await suggestionsApi.get('/user/me', getAuthConfig({ token }));
+        if (data && data.length > 0) {
+          const mapped = data.map((sug: any) => {
+            let desc = sug.message || "";
+            if (sug.category === "Pedir una talla") {
+              desc = `Solicitaste el producto "${sug.productId?.name || 'Producto'}" en talla ${sug.sizeRequested}`;
+            } else if (sug.category === "Repetir un producto") {
+              desc = `Solicitaste volver a producir el producto "${sug.productId?.name || 'Producto'}"`;
+            } else if (sug.category === "Sugerir un nuevo color") {
+              desc = `Sugeriste el color "${sug.colorSuggested}" para el producto "${sug.productId?.name || 'Producto'}"`;
+            }
+            
+            let statusLabel = "Recibida";
+            if (sug.status === "CONSIDERED") statusLabel = "Considerada";
+            else if (sug.status === "UNDER_REVIEW") statusLabel = "En revisión";
+
+            return {
+              id: sug._id,
+              text: desc,
+              date: new Date(sug.createdAt).toLocaleDateString('es-PE'),
+              status: statusLabel
+            };
+          });
+          setSuggestionsHistory(mapped);
+        } else {
+          setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        }
+      } catch (error) {
+        console.error("Error loading user suggestions:", error);
+        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+      }
+    };
+
+    const loadInteractionProducts = async () => {
+      if (status === 'checking') return;
+
+      if (status !== 'authenticated') {
+        setDynamicProducts(MOCK_PRODUCTS);
+        return;
+      }
+
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await suggestionsApi.get('/interaction-products', getAuthConfig({ token }));
+        if (data && data.data && data.data.length > 0) {
+          const names = data.data.map((p: any) => p.name);
+          setDynamicProducts(names);
+        } else {
+          setDynamicProducts(MOCK_PRODUCTS);
+        }
+      } catch (error) {
+        console.error("Error loading interaction products:", error);
+        setDynamicProducts(MOCK_PRODUCTS);
+      }
+    };
+
+    loadSuggestions();
+    loadInteractionProducts();
+  }, [status]);
 
   const isFormValid = () => {
     if (selectedCategory === "Pedir una talla") return selectedProduct !== "" && selectedSize !== "";
@@ -84,6 +160,7 @@ export default function SuggestionsPage() {
     setIsSubmitting(true);
     
     try {
+      const token = await getFirebaseAuthToken();
       // Usamos el API configurada (axios instance)
       await suggestionsApi.post('/', {
         category: selectedCategory,
@@ -92,7 +169,7 @@ export default function SuggestionsPage() {
         sizeRequested: selectedSize,
         colorSuggested: suggestedColor,
         message: suggestionText
-      });
+      }, getAuthConfig({ token }));
     } catch (error) {
       console.error('Error enviando sugerencia:', error);
     }
@@ -104,7 +181,7 @@ export default function SuggestionsPage() {
       
       // Add to history
       const newSuggestion = {
-        id: Date.now(),
+        id: Date.now().toString(),
         text: generateSuggestionText(),
         date: "Hoy",
         status: "Recibida",
@@ -242,7 +319,7 @@ export default function SuggestionsPage() {
                           >
                             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                               {/* Paginated mock display */}
-                              {MOCK_PRODUCTS.slice((dropdownPage - 1) * ITEMS_PER_PAGE, dropdownPage * ITEMS_PER_PAGE).map(prod => (
+                              {dynamicProducts.slice((dropdownPage - 1) * ITEMS_PER_PAGE, dropdownPage * ITEMS_PER_PAGE).map(prod => (
                                 <button
                                   key={prod}
                                   type="button"
@@ -267,11 +344,11 @@ export default function SuggestionsPage() {
                               >
                                 <ChevronLeft className="w-4 h-4 text-[#632034]" />
                               </button>
-                              <span className="text-xs font-bold text-[#632034]/60">Pág {dropdownPage} de {Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}</span>
+                              <span className="text-xs font-bold text-[#632034]/60">Pág {dropdownPage} de {Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE)}</span>
                               <button
                                 type="button"
-                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.min(Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE), dropdownPage + 1)); }}
-                                disabled={dropdownPage === Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}
+                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.min(Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE), dropdownPage + 1)); }}
+                                disabled={dropdownPage === Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE)}
                                 className="p-1.5 rounded-lg hover:bg-[#EBEAE8] disabled:opacity-30 transition-colors"
                               >
                                 <ChevronRight className="w-4 h-4 text-[#632034]" />

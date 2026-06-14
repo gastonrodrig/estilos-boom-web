@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Package, ArrowRight, Sparkles, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { useStorehouseStore } from "@/hooks";
+import { useStorehouseStore, useAuthStore } from "@/hooks";
 
 const STATUS_STYLES: Record<string, string> = {
   PENDIENTE:   "bg-white dark:bg-[#F2778D]/10 text-[#F23B69] dark:text-[#F8BBD0] border-[#F2DEE4] dark:border-[#F2778D]/30",
@@ -15,17 +15,29 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function ReceptionsListPage() {
   const { startLoadingWarehouseDocuments, loading } = useStorehouseStore();
+  const { role } = useAuthStore();
   const [receptions, setReceptions] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
       const data = await startLoadingWarehouseDocuments();
       if (Array.isArray(data)) {
-        setReceptions(data.filter((d) => d.type === "INGRESO_COMPRA"));
+        const roleFiltered = data.filter((d) => {
+          if (d.type !== "INGRESO_COMPRA" && d.type !== "TRANSFERENCIA") return false;
+
+          if (role === "Almacenero Boom") {
+            return d.id_target_warehouse?.code === "ALM-CEN";
+          }
+          if (role === "Almacenero Tienda") {
+            return d.id_target_warehouse?.code === "TND-PRI";
+          }
+          return true;
+        });
+        setReceptions(roleFiltered);
       }
     };
     void load();
-  }, [startLoadingWarehouseDocuments]);
+  }, [startLoadingWarehouseDocuments, role]);
 
   return (
     <motion.div 

@@ -42,7 +42,7 @@ export const userMenuItemsByRole: Record<UserMenuRole, UserMenuItem[]> = {
       label: "Panel de Almacén",
       href: "/storekeeper",
       icon: "dashboard",
-      requiredRoles: ["Almacenero"],
+      requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
     },
   ],
 };

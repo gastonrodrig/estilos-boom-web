@@ -37,7 +37,7 @@ export function AdminHeaderActions() {
 
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
-  const isStorekeeper = role === "Almacenero";
+  const isStorekeeper = role === "Almacenero" || role === "Almacenero Boom" || role === "Almacenero Tienda";
 
   const userRole: UserMenuRole | null = isAdmin
     ? "admin"

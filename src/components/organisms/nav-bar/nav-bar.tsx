@@ -78,7 +78,7 @@ export const Navbar = ({
   const isAuthenticated = status === "authenticated";
   const isAdmin = role === "Administrador";
   const isClient = role === "Cliente";
-  const isStorekeeper = role === "Almacenero";
+  const isStorekeeper = role === "Almacenero" || role === "Almacenero Boom" || role === "Almacenero Tienda";
   const isBackofficeRole = isAdmin || isStorekeeper;
   const hasSession =
     isAuthenticated || status === "first-login-password" || !!role;
@@ -414,7 +414,7 @@ export const Navbar = ({
               )}
 
               {!isBackofficeRole && (
-                <Link href="/wishlist" className={iconButtonClass}>
+                <Link href="/client/favorites" className={iconButtonClass}>
                   <Heart className={iconClass} />
                 </Link>
               )}

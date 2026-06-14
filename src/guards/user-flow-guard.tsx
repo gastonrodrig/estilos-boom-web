@@ -12,7 +12,7 @@ export const UserFlowGuard = ({ children }: UserFlowGuardProps) => {
   const { status, role, isExtraDataCompleted } = useAppSelector((state) => state.auth);
 
   const showExtraModal =
-    status === "authenticated" && role !== "Almacenero" && isExtraDataCompleted === false;
+    status === "authenticated" && role !== "Almacenero" && role !== "Almacenero Boom" && role !== "Almacenero Tienda" && isExtraDataCompleted === false;
 
   const showChangePasswordModal = status === "first-login-password";
 

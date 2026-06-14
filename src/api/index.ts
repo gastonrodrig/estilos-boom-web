@@ -10,3 +10,7 @@ export * from "./supplie";
 export * from "./production";
 export * from "./payment";
 export * from "./worker";
+export * from "./favorites/favorites-api";
+export * from "./reviews/reviews-api";
+export * from "./suggestions/suggestions-api";
+

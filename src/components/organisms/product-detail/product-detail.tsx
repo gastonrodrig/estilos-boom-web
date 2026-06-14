@@ -6,6 +6,10 @@ import { motion } from "framer-motion";
 import { CartItem, Product } from "@/core/models";
 import { useCartStore } from "@hooks";
 import { CheckoutDrawer } from "@components";
+import { favoritesApi } from "@api";
+import { getFirebaseAuthToken } from "@helpers";
+import { getAuthConfig } from "@utils";
+import toast from "react-hot-toast";
 
 interface Props {
   product: Product;
@@ -24,6 +28,39 @@ export const ProductDetail = ({ product }: Props) => {
   const { addItem } = useCartStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | undefined>(undefined);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      let token;
+      try {
+        token = await getFirebaseAuthToken();
+      } catch (err) {
+        toast.error("Debes iniciar sesión para agregar a favoritos");
+        return;
+      }
+      const config = getAuthConfig({ token });
+      const productId = product.id_product;
+      
+      try {
+        await favoritesApi.post("/", { productId }, config);
+        setIsFavorited(true);
+        toast.success("Producto agregado a tus favoritos");
+      } catch (err: any) {
+        if (err.response?.status === 409) {
+          await favoritesApi.delete(`/${productId}`, config);
+          setIsFavorited(false);
+          toast.success("Producto eliminado de tus favoritos");
+        } else {
+          throw err;
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      toast.error("Hubo un error al procesar tu solicitud.");
+    }
+  };
 
   const variants = useMemo<VariantUI[]>(
     () =>
@@ -120,8 +157,11 @@ export const ProductDetail = ({ product }: Props) => {
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 alt={product.name}
               />
-              <button className="absolute top-6 right-6 p-3 bg-white/70 backdrop-blur-sm rounded-full text-[#594246] hover:text-[#632034] transition-all">
-                <Heart size={20} className="stroke-2" />
+              <button 
+                onClick={handleFavoriteClick}
+                className="absolute top-6 right-6 p-3 bg-white/70 backdrop-blur-sm rounded-full text-[#594246] hover:text-[#632034] transition-all"
+              >
+                <Heart size={20} className={`stroke-2 ${isFavorited ? 'fill-[#F2778D] text-[#F2778D]' : ''}`} />
               </button>
             </motion.div>
 

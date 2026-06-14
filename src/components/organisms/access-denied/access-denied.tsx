@@ -23,7 +23,7 @@ export const AccessDenied = () => {
         return;
       }
 
-      if (role === "Almacenero") {
+      if (role === "Almacenero" || role === "Almacenero Boom" || role === "Almacenero Tienda") {
         router.push("/storekeeper");
         return;
       }
@@ -36,7 +36,7 @@ export const AccessDenied = () => {
     status === "authenticated"
       ? role === "Administrador"
         ? "/admin"
-        : role === "Almacenero"
+        : (role === "Almacenero" || role === "Almacenero Boom" || role === "Almacenero Tienda")
         ? "/storekeeper"
         : "/client"
       : "/auth/login";

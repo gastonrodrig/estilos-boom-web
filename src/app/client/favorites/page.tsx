@@ -1,67 +1,71 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
 import { favoritesApi } from '../../../api/favorites/favorites-api';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Mock Data
-const MOCK_FAVORITES = [
-  {
-    id: 1,
-    name: "Vestido Floral Primavera",
-    price: 129.90,
-    size: "S",
-    image: "/assets/product/vestido-corto-floral-cuello-v.png",
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Vestido Elegante Encaje",
-    price: 150.00,
-    size: "M",
-    image: "/assets/product/vestido-elegante-encaje-volantes.png",
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: "Vestido Escote V",
-    price: 95.00,
-    size: "L",
-    image: "/assets/product/vestido-escote-v.png",
-    inStock: false,
-  },
-  {
-    id: 4,
-    name: "Vestido Línea A Floral",
-    price: 110.00,
-    size: "M",
-    image: "/assets/product/vestido-linea-a-floral.png",
-    inStock: true,
-  },
-  {
-    id: 5,
-    name: "Vestido Midi Halter",
-    price: 89.90,
-    size: "S",
-    image: "/assets/product/vestido-midi-halter.png",
-    inStock: false,
-  },
-];
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
+import { useAuthStore } from '@hooks';
 
 type FilterType = 'all' | 'available' | 'out_of_stock';
 
 export default function FavoritesPage() {
   const [filter, setFilter] = useState<FilterType>('all');
-  
-  // Local state to track which items are still favorited (for the visual toggle)
-  const [favoritedIds, setFavoritedIds] = useState<number[]>(
-    MOCK_FAVORITES.map(item => item.id)
-  );
+  const [favoritesList, setFavoritesList] = useState<any[]>([]);
+  const [favoritedIds, setFavoritedIds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { status } = useAuthStore();
 
-  const toggleFavorite = async (id: number) => {
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (status === 'checking') return;
+
+      if (status !== 'authenticated') {
+        setFavoritesList([]);
+        setFavoritedIds([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await favoritesApi.get('/', getAuthConfig({ token }));
+        if (data && data.length > 0) {
+          const mapped = data
+            .map((fav: any) => {
+              const prod = fav.productId;
+              if (!prod) return null;
+              return {
+                id: prod._id,
+                name: prod.name || "Producto sin nombre",
+                price: prod.base_price || 0,
+                image: (prod.images && prod.images.length > 0) ? prod.images[0] : "/assets/product/vestido-corto-floral-cuello-v.png",
+                inStock: prod.is_active !== false,
+              };
+            })
+            .filter(Boolean) as any[];
+          setFavoritesList(mapped);
+          setFavoritedIds(mapped.map((item: any) => item.id));
+        } else {
+          setFavoritesList([]);
+          setFavoritedIds([]);
+        }
+      } catch (error) {
+        console.error("Error loading favorites from backend:", error);
+        setFavoritesList([]);
+        setFavoritedIds([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFavorites();
+  }, [status]);
+
+  const toggleFavorite = async (id: any) => {
     const isCurrentlyFavorited = favoritedIds.includes(id);
     
     // Optimistic UI update
@@ -69,15 +73,17 @@ export default function FavoritesPage() {
       isCurrentlyFavorited ? prev.filter(fId => fId !== id) : [...prev, id]
     );
 
-    // Simulate Axios/Fetch connection
     try {
+      const token = await getFirebaseAuthToken();
+      const config = getAuthConfig({ token });
+      const idStr = id.toString();
       if (isCurrentlyFavorited) {
-        await favoritesApi.delete(`/${id}`);
+        await favoritesApi.delete(`/${idStr}`, config);
       } else {
-        await favoritesApi.post('/', { productId: id.toString() });
+        await favoritesApi.post('/', { productId: idStr }, config);
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error toggling favorite on backend:", error);
       // Revert optimistic update on error
       setFavoritedIds(prev => 
         isCurrentlyFavorited ? [...prev, id] : prev.filter(fId => fId !== id)
@@ -85,7 +91,7 @@ export default function FavoritesPage() {
     }
   };
 
-  const filteredProducts = MOCK_FAVORITES.filter(item => {
+  const filteredProducts = favoritesList.filter(item => {
     if (filter === 'available') return item.inStock;
     if (filter === 'out_of_stock') return !item.inStock;
     return true; // 'all'
@@ -96,7 +102,7 @@ export default function FavoritesPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">Mis favoritos</h1>
-        <p className="text-[#594246]/70 mt-1 font-light">{MOCK_FAVORITES.length} productos guardados</p>
+        <p className="text-[#594246]/70 mt-1 font-light">{favoritesList.length} productos guardados</p>
         <p className="text-[#594246]/50 text-sm mt-1">Productos que guardaste para más tarde</p>
       </div>
 
@@ -201,9 +207,6 @@ export default function FavoritesPage() {
                   <h3 className="text-[#594246] font-bold text-[15px] leading-tight line-clamp-1">{product.name}</h3>
                   <div className="flex justify-between items-center mt-2 mb-4">
                     <p className="text-[#F2778D] font-bold text-lg">S/ {product.price.toFixed(2)}</p>
-                    <span className="text-xs font-bold text-[#594246]/50 bg-[#EBEAE8]/50 px-2.5 py-1 rounded-md">
-                      Talla {product.size}
-                    </span>
                   </div>
 
                   {/* Add to Cart Button */}
@@ -227,7 +230,7 @@ export default function FavoritesPage() {
         {filteredProducts.length === 0 && (
           <div className="col-span-full py-20 flex flex-col items-center justify-center text-[#594246]/40">
             <Heart className="w-16 h-16 mb-4 stroke-1 opacity-50" />
-            <p className="text-lg font-medium">No hay vestidos en esta categoría.</p>
+            <p className="text-lg font-medium">No hay productos en esta categoría.</p>
           </div>
         )}
       </motion.div>

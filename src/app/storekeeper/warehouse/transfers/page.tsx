@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, Sparkles, FileText, Activity, CheckCircle2, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useStorehouseStore } from "@/hooks";
+import { useStorehouseStore, useAuthStore } from "@/hooks";
 
 type Tab = "PENDIENTE" | "COMPLETADO";
 
@@ -17,6 +17,7 @@ const DOC_ROUTE = (doc: any) => `/storekeeper/warehouse/transfers/${doc._id}/con
 
 export default function AdminDocumentsMovementsPage() {
   const { startLoadingWarehouseDocuments, loading } = useStorehouseStore();
+  const { role } = useAuthStore();
   const [allDocs, setAllDocs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("PENDIENTE");
   const [showDelayedOnly, setShowDelayedOnly] = useState(false);
@@ -25,11 +26,21 @@ export default function AdminDocumentsMovementsPage() {
     const load = async () => {
       const data = await startLoadingWarehouseDocuments();
       if (Array.isArray(data)) {
-        setAllDocs(data.filter((d) => d.type === "TRANSFERENCIA"));
+        const typeFiltered = data.filter((d) => d.type === "TRANSFERENCIA");
+        const roleFiltered = typeFiltered.filter((d) => {
+          if (role === "Almacenero Boom") {
+            return d.id_source_warehouse?.code === "ALM-CEN";
+          }
+          if (role === "Almacenero Tienda") {
+            return d.id_source_warehouse?.code === "TND-PRI";
+          }
+          return true;
+        });
+        setAllDocs(roleFiltered);
       }
     };
     void load();
-  }, [startLoadingWarehouseDocuments]);
+  }, [startLoadingWarehouseDocuments, role]);
 
   const filtered = allDocs.filter((d) => {
     if (d.status !== activeTab) return false;
