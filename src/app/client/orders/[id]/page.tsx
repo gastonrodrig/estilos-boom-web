@@ -61,10 +61,18 @@ export default function OrderDetailsPage() {
   // Derived states basados en la API real
   const isPending = orderData?.status === 'PRE_ORDER';
   const isConfirmed = orderData?.status === 'CONFIRMED';
+  const isPreparing = orderData?.status === 'PREPARING';
+  const isShipped = orderData?.status === 'SHIPPED';
+  const isDelivered = orderData?.status === 'DELIVERED';
   const isObserved = orderData?.status === 'OBSERVED';
   
-  const currentStep = isConfirmed ? 2 : 1; 
-  const isEnCaminoOrDelivered = currentStep >= 4;
+  let currentStep = 1;
+  if (isConfirmed) currentStep = 2;
+  else if (isPreparing) currentStep = 3;
+  else if (isShipped) currentStep = 4;
+  else if (isDelivered) currentStep = 5;
+
+  const isEnCaminoOrDelivered = currentStep >= 3;
 
   const handleSubsanar = async () => {
     if (!newOperationNumber.trim()) return;
@@ -156,6 +164,21 @@ export default function OrderDetailsPage() {
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/40">
                   <AlertCircle className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                   <span className="text-orange-600 dark:text-orange-400 text-[11px] font-bold tracking-wider uppercase font-sans">Pago Observado</span>
+                </div>
+              ) : isPreparing ? (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.3)]">
+                  <Clock className="w-3.5 h-3.5 text-white" />
+                  <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Preparando Pedido</span>
+                </div>
+              ) : isShipped ? (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500 shadow-[0_4px_12px_rgba(99,102,241,0.3)]">
+                  <Clock className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                  <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Pedido en Camino</span>
+                </div>
+              ) : isDelivered ? (
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">
+                  <Check className="w-3.5 h-3.5 text-white" />
+                  <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Pedido Entregado</span>
                 </div>
               ) : (
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">

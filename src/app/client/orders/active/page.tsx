@@ -152,12 +152,50 @@ export default function ActiveOrdersPage() {
         {!loading && activeOrders.map((order) => {
           const isConfirmed = order.status === 'CONFIRMED';
           const isObserved = order.status === 'OBSERVED';
-          const step = isConfirmed ? 2 : 1;
-          const statusText = isConfirmed ? 'Pago confirmado' : isObserved ? 'Pago Observado' : 'Verificación de Pago';
+          const isPreparing = order.status === 'PREPARING';
+          const isShipped = order.status === 'SHIPPED';
+          
+          let step = 1;
+          let statusText = 'Verificación de Pago';
+          let borderClass = 'border-t-amber-300';
+          let pillBg = 'bg-amber-50 border-amber-200';
+          let pillColor = 'text-[#d67b00]';
+          let PillIcon = Clock;
+
+          if (isConfirmed) {
+            step = 2;
+            statusText = 'Pago confirmado';
+            borderClass = 'border-t-[#594246]/60';
+            pillBg = 'bg-slate-50 border-slate-200';
+            pillColor = 'text-slate-700';
+            PillIcon = Check;
+          } else if (isPreparing) {
+            step = 3;
+            statusText = 'Preparando pedido';
+            borderClass = 'border-t-blue-500';
+            pillBg = 'bg-blue-50 border-blue-250';
+            pillColor = 'text-blue-700';
+            PillIcon = Clock;
+          } else if (isShipped) {
+            step = 4;
+            statusText = 'Pedido en camino';
+            borderClass = 'border-t-indigo-500';
+            pillBg = 'bg-indigo-50 border-indigo-200';
+            pillColor = 'text-indigo-700';
+            PillIcon = Clock;
+          } else if (isObserved) {
+            step = 1;
+            statusText = 'Pago Observado';
+            borderClass = 'border-t-red-500';
+            pillBg = 'bg-red-50 border-red-200';
+            pillColor = 'text-red-700';
+            PillIcon = AlertCircle;
+          }
+
           const dateStr = new Date(order.createdAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
 
           return (
-            <div key={order._id} className={`bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 ${isConfirmed ? 'border-t-[#594246]/60' : isObserved ? 'border-t-red-500' : 'border-t-amber-300'} flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300`}>
+            <div key={order._id} className={`bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 ${borderClass} flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300`}>
               {/* Top Section */}
               <div className="flex justify-between items-start">
                 <div>
@@ -165,22 +203,10 @@ export default function ActiveOrdersPage() {
                   <p className="text-[#594246]/50 text-sm mt-1 font-medium">{dateStr}</p>
                 </div>
                 {/* Status Pill */}
-                {isConfirmed ? (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
-                    <Check className="w-4 h-4 text-slate-600" />
-                    <span className="text-slate-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                ) : isObserved ? (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border border-red-200 shadow-sm">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
-                    <span className="text-red-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                    <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                )}
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${pillBg} border shadow-sm`}>
+                  <PillIcon className={`w-4 h-4 ${pillColor}`} />
+                  <span className={`${pillColor} text-xs font-bold tracking-wide uppercase`}>{statusText}</span>
+                </div>
               </div>
 
               {/* Alert */}
@@ -192,12 +218,22 @@ export default function ActiveOrdersPage() {
                   </div>
                   <p className="text-red-800 text-sm ml-9">Por favor ingresa al detalle del pedido para revisar el motivo y corregir tu número de operación.</p>
                 </div>
-              ) : !isConfirmed && (
+              ) : order.status === 'PRE_ORDER' ? (
                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-50/50 border border-amber-100">
                   <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
                   <p className="text-amber-800 text-sm font-medium">Estamos verificando tu pago por {order.paymentMethod}. Te avisaremos cuando se confirme.</p>
                 </div>
-              )}
+              ) : isPreparing ? (
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-blue-50/50 border border-blue-100">
+                  <Clock className="w-6 h-6 text-blue-500 shrink-0" />
+                  <p className="text-blue-800 text-sm font-medium">¡Pago verificado con éxito! Tu pedido está siendo preparado en nuestro almacén.</p>
+                </div>
+              ) : isShipped ? (
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+                  <Clock className="w-6 h-6 text-indigo-500 shrink-0" />
+                  <p className="text-indigo-800 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
+                </div>
+              ) : null}
 
               {/* Product Details */}
               <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-[#EBEAE8]/50 mt-2">
