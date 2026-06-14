@@ -81,11 +81,13 @@ const CheckoutPaymentForm: React.FC = () => {
     const fetchPreference = async () => {
       try {
         setLoadingPreference(true);
-        const mpItems = items.map(item => ({
+        const mpItems: any[] = items.map(item => ({
           id: item.productId,
           title: item.name,
           quantity: item.quantity,
-          unit_price: item.price
+          unit_price: item.price,
+          size: item.size,
+          color: item.color
         }));
 
         if (selectedDeliveryMethod && selectedDeliveryMethod.price > 0) {

@@ -64,6 +64,7 @@ export const FilterDrawer = ({ open, onClose }: FilterDrawerProps) => {
       maxPrice: priceRange,
       sizes: selectedSizes.length > 0 ? selectedSizes : undefined,
       colors: selectedColors.length > 0 ? selectedColors : undefined,
+      limit: 100,
     };
 
     startLoadingProducts(baseFilters);

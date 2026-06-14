@@ -44,6 +44,7 @@ export default function CollectionPage() {
   startLoadingProducts({
     section: sectionFilter,
     category: categoryFilter,
+    limit: 100,
   });
 }, [type]);
 
