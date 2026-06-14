@@ -13,8 +13,8 @@ const ProductManagement: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useEffect(() => {
-    // Carga inicial con los filtros por defecto
-    startLoadingProducts({ limit: 10, offset: 0 });
+    // Carga inicial con los filtros por defecto (límite de 100 para listar catálogo completo)
+    startLoadingProducts({ limit: 100, offset: 0 });
   }, [startLoadingProducts]);
 
   return (
