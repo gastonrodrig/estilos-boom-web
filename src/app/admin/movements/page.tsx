@@ -5,8 +5,6 @@ import { DataTable, DataTableAction, DataTableColumn } from "@/components/organi
 import { useStorehouseStore } from "@/hooks";
 import { CheckCircle, FileText, Eye, Activity, Paperclip, AlertTriangle, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { Modal } from "@/components/atoms";
 
 type ActiveTab = "documentos" | "kardex";
@@ -111,72 +109,7 @@ export default function AdminMovementsPage() {
     if (success) await loadData();
   };
 
-  // ── Descargar PDF de la guía ───────────────────────────────────────────────
-  const handleDownloadPDF = (doc: any) => {
-    const pdf = new jsPDF();
-    const primaryColor: [number, number, number] = [242, 119, 141];
 
-    pdf.setFillColor(...primaryColor);
-    pdf.rect(0, 0, 210, 25, "F");
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
-    pdf.text("ESTILOS BOOM S.A.C.", 15, 16);
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "normal");
-    pdf.text("SISTEMA DE GESTIÓN DE INVENTARIOS (SGI)", 105, 16);
-
-    pdf.setTextColor(51, 51, 51);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(13);
-    pdf.text("DOCUMENTO DE ALMACÉN", 15, 40);
-
-    pdf.setDrawColor(...primaryColor);
-    pdf.setLineWidth(0.5);
-    pdf.rect(130, 32, 65, 15);
-    pdf.setFontSize(10);
-    pdf.text(doc.document_number ?? "DOC-000000", 135, 44);
-
-    pdf.setFontSize(10);
-    pdf.setFont("helvetica", "normal");
-    pdf.text(`Fecha: ${new Date(doc.created_at ?? Date.now()).toLocaleDateString()}`, 15, 55);
-    pdf.text(`Tipo: ${DOC_TYPE_LABELS[doc.type] ?? doc.type}`, 15, 62);
-    pdf.text(`Estado: ${doc.status ?? "PENDIENTE"}`, 15, 69);
-
-    const srcName = doc.id_source_warehouse?.name?.replace("_", " ") ?? "Proveedor externo";
-    const tgtName = doc.id_target_warehouse?.name?.replace("_", " ") ?? "—";
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Origen:", 15, 82);
-    pdf.setFont("helvetica", "normal");
-    pdf.text(srcName, 45, 82);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("Destino:", 110, 82);
-    pdf.setFont("helvetica", "normal");
-    pdf.text(tgtName, 140, 82);
-
-    const rows = (doc.items ?? []).map((item: any, i: number) => {
-      const v = item.id_variant;
-      return [
-        i + 1,
-        v?.sku_variant ?? `SKU-${i}`,
-        v?.id_product?.name ?? "Prenda",
-        `${v?.size ?? "—"} / ${v?.color?.name ?? "—"}`,
-        item.quantity_expected,
-        item.quantity_received ?? "—",
-        "Unidades",
-      ];
-    });
-
-    autoTable(pdf, {
-      startY: 90,
-      head: [["#", "SKU", "Producto", "Talla / Color", "Esperado", "Recibido", "U.M."]],
-      body: rows,
-      headStyles: { fillColor: [89, 66, 70] },
-      styles: { fontSize: 9 },
-    });
-
-    pdf.save(`Guia_${doc.document_number ?? "DOC"}.pdf`);
-  };
 
   // ── Columnas — WarehouseDocuments ──────────────────────────────────────────
   const docColumns: DataTableColumn<any>[] = [
@@ -292,40 +225,7 @@ export default function AdminMovementsPage() {
         );
       },
     },
-    {
-      id: "sender",
-      label: "Creado por",
-      width: "130px",
-      accessor: (row) => {
-        const name = workerName(row.id_sender_worker);
-        return (
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center font-black text-[9px] shrink-0">
-              {name.slice(0, 2).toUpperCase()}
-            </div>
-            <span className="truncate max-w-[90px]">{name}</span>
-          </div>
-        );
-      },
-    },
-    {
-      id: "receiver",
-      label: "Procesado por",
-      width: "130px",
-      accessor: (row) => {
-        if (!row.id_receiver_worker?.first_name)
-          return <span className="text-gray-300 text-xs italic block text-center">—</span>;
-        const name = workerName(row.id_receiver_worker);
-        return (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-[9px] shrink-0">
-              {name.slice(0, 2).toUpperCase()}
-            </div>
-            <span className="truncate max-w-[90px]">{name}</span>
-          </div>
-        );
-      },
-    },
+
   ];
 
   const docActions: DataTableAction<any>[] = [
@@ -335,12 +235,7 @@ export default function AdminMovementsPage() {
       onClick: handleProcessDocument,
       show: (row) => row.status === "PENDIENTE",
     },
-    {
-      label: "Descargar guía PDF",
-      icon: <FileText className="h-4 w-4 text-blue-500" />,
-      onClick: handleDownloadPDF,
-      show: () => true,
-    },
+
     {
       label: "Ver detalle",
       icon: <Eye className="h-4 w-4 text-purple-500" />,
