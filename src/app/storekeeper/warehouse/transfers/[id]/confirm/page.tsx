@@ -80,7 +80,7 @@ export default function ConfirmMovementPage({ params }: { params: Promise<{ id: 
         <ArrowLeft className="w-4 h-4" /> Volver a transferencias
       </Link>
       <h1 className="text-3xl md:text-4xl font-medium text-[#40202D] dark:text-white mb-10 tracking-wide drop-shadow-md">
-        Confirmar movimiento
+        {doc.status === "PENDIENTE" ? "Confirmar envío" : "Confirmar recepción"}
       </h1>
 
       {/* ORDER SUMMARY */}
