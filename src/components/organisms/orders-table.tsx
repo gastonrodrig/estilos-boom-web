@@ -21,6 +21,8 @@ export interface OrderData {
   status: OrderStatus;
   deliveryMethod: DeliveryMethodId;
   items?: any[];
+  trackingNumber?: string;
+  shippingEvidenceUrl?: string;
 }
 
 interface OrdersTableProps {

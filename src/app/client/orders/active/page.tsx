@@ -229,9 +229,34 @@ export default function ActiveOrdersPage() {
                   <p className="text-blue-800 text-sm font-medium">¡Pago verificado con éxito! Tu pedido está siendo preparado en nuestro almacén.</p>
                 </div>
               ) : isShipped ? (
-                <div className="flex items-center gap-4 p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
-                  <Clock className="w-6 h-6 text-indigo-500 shrink-0" />
-                  <p className="text-indigo-800 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
+                <div className="flex flex-col gap-4 p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+                  <div className="flex items-center gap-4">
+                    <Clock className="w-6 h-6 text-indigo-500 shrink-0" />
+                    <p className="text-indigo-800 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
+                  </div>
+                  {(order.trackingNumber || order.shippingEvidenceUrl) && (
+                    <div className="pl-10 flex flex-col gap-2 border-t border-indigo-200/50 pt-3">
+                      {order.trackingNumber && (
+                        <p className="text-indigo-950 text-sm font-medium">
+                          <span className="font-bold text-indigo-800">Código de Seguimiento / Repartidor:</span> {order.trackingNumber}
+                        </p>
+                      )}
+                      {order.shippingEvidenceUrl && (
+                        <a
+                          href={order.shippingEvidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-indigo-750 hover:text-indigo-900 text-sm font-bold underline transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Ver Foto de Evidencia de Despacho
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : null}
 

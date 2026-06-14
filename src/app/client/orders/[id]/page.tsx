@@ -261,6 +261,30 @@ export default function OrderDetailsPage() {
                 <div className="flex flex-col gap-1 text-sm text-[#9b6070] dark:text-[#b8afc8]">
                   <p>Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
                   <p>Lima, Perú</p>
+
+                  {(orderData.trackingNumber || orderData.shippingEvidenceUrl) && (
+                    <div className="mt-4 pt-3 border-t border-[rgba(196,84,122,0.15)] dark:border-[rgba(180,170,200,0.12)] flex flex-col gap-2">
+                      {orderData.trackingNumber && (
+                        <p className="text-sm font-semibold text-[#1a0c12] dark:text-[#fdeef5]">
+                          Seguimiento: <span className="font-normal text-[#9b6070] dark:text-[#b8afc8]">{orderData.trackingNumber}</span>
+                        </p>
+                      )}
+                      {orderData.shippingEvidenceUrl && (
+                        <a
+                          href={orderData.shippingEvidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-[#c4547a] dark:text-[#f0a0c0] font-bold text-xs hover:underline transition-all mt-1"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Ver Evidencia de Despacho
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
