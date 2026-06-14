@@ -83,7 +83,7 @@ export const SupplyPlanningBoard = () => {
   const itemsPerPage = 8;
 
   useEffect(() => {
-    void startLoadingProducts({ limit: 100 });
+    void startLoadingProducts({ limit: 100, origin_type: "RETAIL" });
     void startLoadingPurchaseOrders();
   }, [startLoadingProducts, startLoadingPurchaseOrders]);
 
