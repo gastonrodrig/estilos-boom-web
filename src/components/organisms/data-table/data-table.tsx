@@ -433,7 +433,7 @@ export function DataTable<T extends object>({
   };
 
   return (
-    <div className={containerClassName || "w-full transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!"}>
+    <div className={containerClassName || "w-full transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg! bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col px-6 pb-6 min-h-[600px]"}>
 
       {(title || description || onAddClick || onGlobalFilterChange) && (
         <div className="flex flex-col gap-4 pt-8 pb-6">

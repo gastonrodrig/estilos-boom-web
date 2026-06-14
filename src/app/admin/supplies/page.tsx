@@ -69,7 +69,7 @@ export default function AdminSuppliesPage() {
           unidades: "bg-emerald-50 text-emerald-500 border border-emerald-100",
           conos: "bg-purple-50 text-purple-500 border border-purple-100"
         };
-        const currentStyle = colors[row.unit] || "bg-gray-50 text-gray-500";
+        const currentStyle = colors[row.unit] || "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400";
         return (
           <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${currentStyle}`}>
             {row.unit}

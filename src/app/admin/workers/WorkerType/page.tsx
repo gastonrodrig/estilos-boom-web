@@ -76,7 +76,7 @@ export default function WorkerTypePage() {
         <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
           row.is_active
             ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-            : "bg-gray-50 text-gray-500 border-gray-100"
+            : "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-100 dark:border-zinc-700"
         }`}>
           {row.is_active ? "Activo" : "Inactivo"}
         </span>

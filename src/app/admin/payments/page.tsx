@@ -17,7 +17,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, dotColor }: StatCardProps) {
   return (
-    <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+    <div className="rounded-2xl border border-pink-100 bg-white/70 backdrop-blur-2xl px-6 py-5 shadow-sm">
       <div className="mb-1 flex items-center gap-2">
         <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
         <span className="text-xs font-medium text-gray-500">{label}</span>
@@ -114,7 +114,7 @@ function PaymentTableRow({
   isActioning,
 }: PaymentRowProps) {
   const { payment, formatStatus, canConfirm } = row;
-  const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white";
+  const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white dark:bg-zinc-900";
 
   return (
     <tr className={`transition-colors group/row ${!isOdd ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
@@ -151,7 +151,7 @@ function PaymentTableRow({
               <button
                 onClick={() => onObserveClick(payment.id)}
                 disabled={isActioning}
-                className="rounded-full bg-white border border-[#EBEAE8] px-4 py-1.5 text-xs font-semibold text-[#594246] transition hover:bg-[#FAF9F6] hover:border-[#F2D0D3] hover:text-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full bg-white dark:bg-zinc-900 border border-[#EBEAE8] px-4 py-1.5 text-xs font-semibold text-[#594246] transition hover:bg-[#FAF9F6] hover:border-[#F2D0D3] hover:text-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Observar
               </button>
@@ -159,7 +159,7 @@ function PaymentTableRow({
           ) : (
             <button
               onClick={() => onViewDetail(payment)}
-              className="rounded-full border border-gray-200 bg-neutral-50 px-4 py-1.5 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100"
+              className="rounded-full border border-gray-200 dark:border-zinc-700 bg-neutral-50 px-4 py-1.5 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100"
             >
               Ver detalle
             </button>
@@ -314,7 +314,7 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Table */}
-      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="flex items-center justify-between border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] px-6 py-5">
           <h2 className="text-[14px] font-black text-[#40202D] dark:text-white tracking-wide">
             Pagos pendientes de verificación
@@ -339,7 +339,7 @@ export default function AdminPaymentsPage() {
                   <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     {Array.from({ length: 6 }).map((__, j) => (
                       <td key={j} className="px-6 py-4">
-                        <div className="h-4 animate-pulse rounded bg-gray-100" />
+                        <div className="h-4 animate-pulse rounded bg-gray-100 dark:bg-zinc-800" />
                       </td>
                     ))}
                   </tr>

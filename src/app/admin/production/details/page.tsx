@@ -178,30 +178,34 @@ if (trackingViewOrder) {
     <>
       <div className="fixed inset-0 hidden dark:block bg-[#1e1018] pointer-events-none -z-10" />
       <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 font-sans transition-colors duration-500 relative min-h-screen">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
-        <div>
-          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
-            Inicio / Producción / Seguimiento
+        <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
+              <span>Inicio</span>
+              <span>/</span>
+              <span>Producción</span>
+              <span>/</span>
+              <span className="text-[#D6405F] dark:text-white/50">Seguimiento</span>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+              <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
+                Seguimiento de Producción
+              </h1>
+            </div>
+            <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+              {counts.TODAS} procesos en curso
+            </p>
           </div>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
-            <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
-              Seguimiento de Producción
-            </h1>
-          </div>
-          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
-            {counts.TODAS} procesos en curso
-          </p>
-        </div>
-        <button 
-          onClick={() => {
-            localStorage.removeItem("mocked_created_orders");
-            window.location.reload();
-          }}
-          className="text-[10px] text-[#8B3A52] dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase transition-colors"
-        >
-          Limpiar simulador
-        </button>
-      </header>
+          <button 
+            onClick={() => {
+              localStorage.removeItem("mocked_created_orders");
+              window.location.reload();
+            }}
+            className="text-[10px] text-[#8B3A52] dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase transition-colors"
+          >
+            Limpiar simulador
+          </button>
+        </header>
 
       <div className="flex flex-col lg:flex-row gap-[12px] items-center mb-6 w-full">
         <div className="relative w-full lg:w-80 shrink-0">
@@ -282,7 +286,7 @@ if (trackingViewOrder) {
 
           if (filtered.length === 0) {
             return (
-              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[1.5rem] bg-[#fffcfd] dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
+              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[1.5rem] bg-white/70 backdrop-blur-2xl dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
                 <div className="bg-white/50 dark:bg-white/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                   <Package className="h-12 w-12 text-[#8C6B79] dark:text-gray-500" />
                 </div>
@@ -390,7 +394,7 @@ function ProductionCard({
 
 
   return (
-    <article className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative group hover:shadow-md">
+    <article className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-white/70 backdrop-blur-2xl dark:bg-black/40 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative group hover:shadow-md">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
@@ -530,7 +534,7 @@ function ProductionCard({
                       </h4>
                     </div>
                     
-                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
                       <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
                         <thead className={`relative transition-[background-color,border-color] duration-[600ms]`}>
                           <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">

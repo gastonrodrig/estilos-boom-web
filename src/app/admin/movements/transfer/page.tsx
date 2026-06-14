@@ -135,8 +135,8 @@ export default function CreateTransferWizard() {
       {/* CUERPO */}
       <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 flex-1 items-start my-auto">
         {/* Ficha del producto */}
-        <div className="md:col-span-5 bg-white border border-[#EBEAE8] p-6 rounded-2xl shadow-sm text-center">
-          <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 border mb-4">
+        <div className="md:col-span-5 bg-white dark:bg-zinc-900 border border-[#EBEAE8] p-6 rounded-2xl shadow-sm text-center">
+          <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800 border mb-4">
             <img src={currentProduct.image} className="w-full h-full object-cover" alt={currentProduct.name} />
           </div>
           <h2 className="text-2xl font-black text-[#40202D] dark:text-white tracking-wide">{currentProduct.name}</h2>
@@ -146,7 +146,7 @@ export default function CreateTransferWizard() {
         </div>
 
         {/* Variantes con cantidades */}
-        <div className="md:col-span-7 bg-white border border-[#EBEAE8] p-6 rounded-2xl shadow-sm space-y-6 max-h-[500px] overflow-y-auto">
+        <div className="md:col-span-7 bg-white dark:bg-zinc-900 border border-[#EBEAE8] p-6 rounded-2xl shadow-sm space-y-6 max-h-[500px] overflow-y-auto">
           <h3 className="font-bold text-sm uppercase opacity-40 tracking-wider">Variantes del producto</h3>
 
           {currentProduct.variants?.map((v: any) => {

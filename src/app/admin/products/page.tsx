@@ -132,7 +132,7 @@ const ProductManagement: React.FC = () => {
           </AnimatePresence>
 
           {!loading && products.length === 0 && (
-            <div className="col-span-full rounded-2xl border border-[rgba(139,58,82,0.08)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] p-8 text-center text-sm text-gray-500 shadow-sm transition-[background-color,border-color] duration-[600ms]">
+            <div className="col-span-full rounded-2xl border border-[rgba(139,58,82,0.08)] bg-white/70 backdrop-blur-2xl dark:bg-[rgba(255,255,255,0.04)] p-8 text-center text-sm text-gray-500 shadow-sm transition-[background-color,border-color] duration-[600ms]">
               No hay registros disponibles.
             </div>
           )}
@@ -152,9 +152,9 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-md transition-colors duration-500 flex flex-col sm:flex-row items-center p-3 gap-4 group"
+        className="bg-white/70 backdrop-blur-2xl dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-md transition-colors duration-500 flex flex-col sm:flex-row items-center p-3 gap-4 group"
       >
-        <div className="relative h-14 w-14 shrink-0 bg-gray-100 dark:bg-white/5 rounded-xl overflow-hidden border border-[#EAE0E2] dark:border-white/5">
+        <div className="relative h-14 w-14 shrink-0 bg-gray-100 dark:bg-zinc-800 rounded-xl overflow-hidden border border-[#EAE0E2] dark:border-white/5">
           {product.images?.[0] ? (
              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
           ) : (
@@ -180,13 +180,13 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
              <div className="flex items-center gap-2">
                 <Link
                   href={`/admin/products/${product.id_product}`}
-                  className="p-[6px] bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-pink-50 dark:hover:bg-white/10 text-[#40202D] dark:text-white hover:text-[#8B3A52] transition-colors"
+                  className="p-[6px] bg-white dark:bg-zinc-800 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-pink-50 dark:hover:bg-white/10 text-[#40202D] dark:text-white hover:text-[#8B3A52] transition-colors"
                 >
                   <Eye size={14} />
                 </Link>
                 <button
                   type="button"
-                  className="p-[6px] bg-white dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-600 transition-colors"
+                  className="p-[6px] bg-white dark:bg-zinc-800 border border-[#EAE0E2] dark:border-white/10 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-600 transition-colors"
                 >
                   <Power size={14} />
                 </button>
@@ -206,9 +206,9 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -15 }}
         transition={{ duration: 0.2 }}
-        className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col sm:flex-row group"
+        className="bg-white/70 backdrop-blur-2xl dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-lg dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col sm:flex-row group"
       >
-        <div className="relative h-48 sm:h-auto sm:w-56 shrink-0 bg-gray-100 dark:bg-white/5 border-b sm:border-b-0 sm:border-r border-[#EAE0E2] dark:border-white/10 overflow-hidden">
+        <div className="relative h-48 sm:h-auto sm:w-56 shrink-0 bg-gray-100 dark:bg-zinc-800 border-b sm:border-b-0 sm:border-r border-[#EAE0E2] dark:border-white/10 overflow-hidden">
           {product.images?.[0] ? (
              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           ) : (
@@ -257,10 +257,10 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.2 }}
-      className="bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-xl dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col group"
+      className="bg-white/70 backdrop-blur-2xl dark:bg-black/40 backdrop-blur-2xl rounded-[1.5rem] border border-pink-100 dark:border-white/5 overflow-hidden shadow-sm hover:shadow-xl dark:hover:shadow-white/5 transition-colors duration-500 flex flex-col group"
     >
       {/* Imagen Superior */}
-      <div className="relative h-[140px] w-full bg-gray-100 dark:bg-white/5 overflow-hidden border-b border-[#EAE0E2] dark:border-white/10">
+      <div className="relative h-[140px] w-full bg-gray-100 dark:bg-zinc-800 overflow-hidden border-b border-[#EAE0E2] dark:border-white/10">
         {product.images?.[0] ? (
           <img
             src={product.images[0]}

@@ -8,7 +8,7 @@ import type { WorkerRow } from "@store";
 
 const STATUS_BADGE: Record<string, string> = {
   Activo:   "bg-emerald-50 text-emerald-700 border-emerald-100",
-  Inactivo: "bg-gray-50 text-gray-500 border-gray-100",
+  Inactivo: "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-100 dark:border-zinc-700",
 };
 
 export default function TrabajadoresPage() {
@@ -63,7 +63,7 @@ export default function TrabajadoresPage() {
       sortable: true,
       width: "100px",
       accessor: (row) => (
-        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[row.employment_status] ?? "bg-gray-50 text-gray-400 border-gray-100"}`}>
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[row.employment_status] ?? "bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-400 border-gray-100 dark:border-zinc-700"}`}>
           {row.employment_status}
         </span>
       ),

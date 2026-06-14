@@ -22,17 +22,17 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 };
 
 const DOC_TYPE_STYLES: Record<string, string> = {
-  INGRESO_COMPRA: "bg-blue-50 text-blue-600 border-blue-100",
-  SALIDA_VENTA: "bg-orange-50 text-orange-600 border-orange-100",
-  TRANSFERENCIA: "bg-amber-50 text-amber-600 border-amber-100",
-  AJUSTE: "bg-slate-50 text-slate-600 border-slate-100",
+  INGRESO_COMPRA: "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20",
+  SALIDA_VENTA: "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20",
+  TRANSFERENCIA: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20",
+  AJUSTE: "bg-slate-50 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-500/20",
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDIENTE: "bg-amber-50 text-amber-600 border-amber-100 animate-pulse",
-  EN_TRANSITO: "bg-sky-50 text-sky-600 border-sky-100",
-  COMPLETADO: "bg-emerald-50 text-emerald-600 border-emerald-100",
-  CANCELADO: "bg-gray-50 text-gray-400 border-gray-100",
+  PENDIENTE: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20 animate-pulse",
+  EN_TRANSITO: "bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-100 dark:border-sky-500/20",
+  COMPLETADO: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20",
+  CANCELADO: "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700",
 };
 
 const workerName = (w: any) =>
@@ -186,12 +186,12 @@ export default function AdminMovementsPage() {
       sortable: true,
       width: "130px",
       accessor: (row) => {
-        if (!row.created_at) return <span className="text-gray-300">—</span>;
+        if (!row.created_at) return <span className="text-gray-300 dark:text-zinc-500">—</span>;
         const d = new Date(row.created_at);
         return (
-          <div className="flex flex-col text-xs text-gray-700 font-medium">
+          <div className="flex flex-col text-xs text-gray-700 dark:text-zinc-200 font-medium">
             <span>{d.toLocaleDateString("es-PE")}</span>
-            <span className="text-[10px] text-gray-400">
+            <span className="text-[10px] text-gray-400 dark:text-zinc-400">
               {d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
@@ -215,7 +215,7 @@ export default function AdminMovementsPage() {
       accessor: (row) => (
         <span
           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-            DOC_TYPE_STYLES[row.type] ?? "bg-gray-50 text-gray-500 border-gray-100"
+            DOC_TYPE_STYLES[row.type] ?? "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700"
           }`}
         >
           {DOC_TYPE_LABELS[row.type] ?? row.type}
@@ -254,7 +254,7 @@ export default function AdminMovementsPage() {
       accessor: (row) => (
         <span
           className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            STATUS_STYLES[row.status] ?? "bg-gray-50 text-gray-400 border-gray-100"
+            STATUS_STYLES[row.status] ?? "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700"
           }`}
         >
           {row.status ?? "—"}
@@ -477,10 +477,18 @@ export default function AdminMovementsPage() {
     );
   }, [rawMovements, searchTerm]);
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="p-4 space-y-4">
-      {/* Tabs */}
+    <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col min-h-[700px] transition-colors duration-500">
+      {/* Header Administrativo */}
+      <div className="px-8 py-6 border-b border-[#EAE0E2] dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/30 dark:bg-white/5 backdrop-blur-md">
+        <div>
+          <h1 className="text-2xl font-bold text-[#40202D] dark:text-white tracking-wide">Documentos de Almacén y Kárdex</h1>
+          <p className="text-[12px] text-[#8C6B79] dark:text-gray-400 font-medium tracking-wide mt-1">Gestión de ingresos, salidas, transferencias y movimientos físicos del inventario.</p>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto p-4 md:p-6 space-y-4">
+        {/* Tabs */}
       <div className="flex gap-2 border-b border-[#EBEAE8]">
         {(
           [
@@ -493,7 +501,7 @@ export default function AdminMovementsPage() {
             onClick={() => { setActiveTab(id); setPage(0); setSearchTerm(""); }}
             className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors border border-b-0 ${
               activeTab === id
-                ? "bg-white text-[#594246] border-[#EBEAE8]"
+                ? "bg-white dark:bg-zinc-900 text-[#594246] border-[#EBEAE8]"
                 : "bg-transparent text-gray-400 border-transparent hover:text-gray-600"
             }`}
           >
@@ -526,6 +534,7 @@ export default function AdminMovementsPage() {
           onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
           columns={docColumns}
           actions={docActions}
+          containerClassName="bg-transparent shadow-none w-full h-full"
           hasActions
         />
       )}
@@ -547,6 +556,7 @@ export default function AdminMovementsPage() {
           globalFilter={searchTerm}
           onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
           columns={kardexColumns}
+          containerClassName="bg-transparent shadow-none w-full h-full"
           hasActions={false}
         />
       )}
@@ -562,6 +572,7 @@ export default function AdminMovementsPage() {
           doc={selectedDoc}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -732,7 +743,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl transition-all shadow-sm group"
+                    className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F2778D] rounded-xl transition-all shadow-sm group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-[#F2778D]/10 flex items-center justify-center shrink-0">
                       <FileText className={`w-4 h-4 ${isPdf ? "text-red-500" : "text-[#D6405F] dark:text-[#F2778D]"}`} />

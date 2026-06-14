@@ -63,16 +63,16 @@ export const useManagementStore = () => {
         try {
             const { data } = await workerApi.get("/");
             const mapped = (Array.isArray(data) ? data : []).map((w: any) => {
-                const u = typeof w.id_user === "object" ? w.id_user : {};
+                const u = w.id_user;
                 return {
                     _id:               w._id,
-                    first_name:        u.first_name  ?? "—",
-                    last_name:         u.last_name   ?? "—",
-                    email:             u.email       ?? "—",
-                    phone:             u.phone       ?? "—",
-                    document_type:     u.document_type   ?? "—",
-                    document_number:   u.document_number ?? "—",
-                    system_role:       u.role         ?? "—",   // rol de User (Administrador, Almacenero…)
+                    first_name:        u?.first_name  ?? "—",
+                    last_name:         u?.last_name   ?? "—",
+                    email:             u?.email       ?? "—",
+                    phone:             u?.phone       ?? "—",
+                    document_type:     u?.document_type   ?? "—",
+                    document_number:   u?.document_number ?? "—",
+                    system_role:       u?.role         ?? "—",   // rol de User (Administrador, Almacenero…)
                     worker_role:       w.role         ?? "—",   // cargo/posición del Worker
                     employment_status: w.employment_status ?? "—",
                     hired_at:          w.hired_at ? new Date(w.hired_at).toLocaleDateString("es-PE") : "—",

@@ -107,7 +107,7 @@ export default function ProductDetailPage() {
 
           {/* 🧵 RENDERIZADO CONDICIONAL: FICHA TÉCNICA DE INSUMOS */}
           {product.origin_type === 'PRODUCCION' && product.technical_sheet && product.technical_sheet.length > 0 && (
-            <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden animate-in fade-in duration-300 transition-[background-color,border-color] duration-[600ms]">
+            <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden animate-in fade-in duration-300 transition-[background-color,border-color] duration-[600ms]">
               <div className="p-5 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] flex items-center gap-2">
                 <Scissors size={18} className="text-[#D6405F] dark:text-[#F8BBD0]" />
                 <h3 className="font-bold uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
@@ -138,7 +138,7 @@ export default function ProductDetailPage() {
           )}
 
           {/* TABLA DE VARIANTES E INVENTARIO */}
-          <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+          <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
             <div className="p-5 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] flex justify-between items-center">
               <h3 className="font-bold flex items-center gap-2 uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                 <Palette size={18} className="text-[#D6405F] dark:text-[#F8BBD0]"/> Control de Stock por Variantes

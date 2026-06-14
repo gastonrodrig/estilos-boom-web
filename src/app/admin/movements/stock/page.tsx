@@ -174,10 +174,10 @@ export default function StockActualPage() {
             />
           </div>
           <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
-            <option className="text-black">Todos los productos</option>
+            <option className="text-black dark:text-zinc-100">Todos los productos</option>
           </select>
           <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
-            <option className="text-black">Todas las ubicaciones</option>
+            <option className="text-black dark:text-zinc-100">Todas las ubicaciones</option>
           </select>
         </div>
 
@@ -197,7 +197,7 @@ export default function StockActualPage() {
         </div>
 
         {/* Tabla / Matriz */}
-        <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[3xl] overflow-hidden transition-[background-color,border-color] duration-[600ms] overflow-x-auto custom-scrollbar">
+        <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[3xl] overflow-hidden transition-[background-color,border-color] duration-[600ms] overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm min-w-[800px] border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">
               <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">

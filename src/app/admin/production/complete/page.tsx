@@ -138,10 +138,14 @@ export default function CompletedProductionOrders() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
-        <div>
-          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
-            Inicio / Producción / Finalizadas
+      <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
+            <span>Inicio</span>
+            <span>/</span>
+            <span>Producción</span>
+            <span>/</span>
+            <span className="text-[#D6405F] dark:text-white/50">Finalizadas</span>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
             <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
@@ -154,11 +158,11 @@ export default function CompletedProductionOrders() {
         </div>
         
         <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto items-end">
-          <div className="rounded-[1rem] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[160px] flex-1">
+          <div className="rounded-[1rem] bg-white/70 backdrop-blur-2xl dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[160px] flex-1">
             <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
             <p className="text-xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
           </div>
-          <div className="rounded-[1rem] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[120px] flex-1">
+          <div className="rounded-[1rem] bg-white/70 backdrop-blur-2xl dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[120px] flex-1">
             <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
             <p className="text-xl font-black text-[#40202D] dark:text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
           </div>
@@ -166,7 +170,7 @@ export default function CompletedProductionOrders() {
       </header>
 
       {/* Tabla */}
-      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">

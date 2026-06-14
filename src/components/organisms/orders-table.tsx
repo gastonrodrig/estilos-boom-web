@@ -93,12 +93,12 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
 
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case 'Pendiente': return "bg-yellow-50 text-yellow-700 border-yellow-200";
-      case 'Preparando': return "bg-orange-50 text-orange-700 border-orange-200";
-      case 'En camino': return "bg-blue-50 text-blue-700 border-blue-200";
-      case 'Entregado': return "bg-green-50 text-green-700 border-green-200";
-      case 'Cancelado': return "bg-gray-100 text-gray-700 border-gray-300";
-      default: return "bg-gray-50 text-gray-800 border-gray-200";
+      case 'Pendiente': return "bg-amber-950 text-amber-300 border-amber-800";
+      case 'Preparando': return "bg-blue-950 text-blue-300 border-blue-800";
+      case 'En camino': return "bg-blue-950 text-blue-300 border-blue-800";
+      case 'Entregado': return "bg-emerald-950 text-emerald-300 border-emerald-800";
+      case 'Cancelado': return "bg-zinc-800 text-zinc-400 border-zinc-700";
+      default: return "bg-zinc-800 text-zinc-400 border-zinc-700";
     }
   };
 
@@ -130,45 +130,45 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
         
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          <p className="text-sm font-medium text-gray-500 mt-1">{description}</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{title}</h1>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{description}</p>
         </div>
 
         {/* STAT CARDS */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 mb-8">
-          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+          <div className="rounded-2xl border border-pink-100 dark:border-white/10 bg-[#fffcfd] dark:bg-zinc-900 px-6 py-5 shadow-sm">
             <div className="mb-1 flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-              <span className="text-xs font-medium text-gray-500">Pendientes</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Pendientes</span>
             </div>
-            <p className="text-2xl font-bold text-gray-800">
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
               {data.filter(o => o.status === 'Pendiente').length}
             </p>
           </div>
-          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+          <div className="rounded-2xl border border-pink-100 dark:border-white/10 bg-[#fffcfd] dark:bg-zinc-900 px-6 py-5 shadow-sm">
             <div className="mb-1 flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-blue-400" />
-              <span className="text-xs font-medium text-gray-500">En Progreso</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">En Progreso</span>
             </div>
-            <p className="text-2xl font-bold text-gray-800">
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
               {data.filter(o => o.status === 'Preparando' || o.status === 'En camino').length}
             </p>
           </div>
-          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+          <div className="rounded-2xl border border-pink-100 dark:border-white/10 bg-[#fffcfd] dark:bg-zinc-900 px-6 py-5 shadow-sm">
             <div className="mb-1 flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-              <span className="text-xs font-medium text-gray-500">Finalizadas</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Finalizadas</span>
             </div>
-            <p className="text-2xl font-bold text-gray-800">
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
               {data.filter(o => o.status === 'Entregado').length}
             </p>
           </div>
-          <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+          <div className="rounded-2xl border border-pink-100 dark:border-white/10 bg-[#fffcfd] dark:bg-zinc-900 px-6 py-5 shadow-sm">
             <div className="mb-1 flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-rose-700" />
-              <span className="text-xs font-medium text-gray-500">Monto Finalizado</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Monto Finalizado</span>
             </div>
-            <p className="text-2xl font-bold text-gray-800">
+            <p className="text-2xl font-bold text-gray-800 dark:text-white">
               S/ {data.filter(o => o.status === 'Entregado').reduce((acc, o) => acc + o.amount, 0).toLocaleString("es-PE", { minimumFractionDigits: 2 })}
             </p>
           </div>
@@ -178,25 +178,17 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-8">
           
           {/* TABS */}
-          <div className="flex p-1 bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-xl w-fit backdrop-blur-md shadow-inner">
+          <div className="flex border-b border-zinc-800 w-full mb-4">
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors ${
+                className={`relative px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === tab.id 
-                    ? "text-white dark:text-white drop-shadow-sm" 
-                    : "text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white"
+                    ? "border-[#8B3A52] text-[#8B3A52] dark:text-white" 
+                    : "border-transparent text-zinc-500 hover:text-zinc-300 hover:border-zinc-700"
                 }`}
               >
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-gradient-to-r from-[#D6405F] to-[#F23B69] rounded-lg shadow-md"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
                 <span className="relative z-10">{tab.label}</span>
               </button>
             ))}
@@ -206,13 +198,13 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {/* Buscador */}
             <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por ID o Cliente..." 
-                className="w-full bg-white/50 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl pl-10 pr-4 py-3 text-[12px] font-bold text-[#40202D] dark:text-white focus:outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors placeholder:text-[#8C6B79]/60 dark:placeholder:text-gray-500 shadow-inner"
+                className="w-full bg-zinc-900 border border-zinc-700 text-zinc-200 placeholder:text-zinc-500 focus:border-[#8B3A52] focus:ring-0 rounded-md pl-10 pr-4 py-2.5 text-sm transition-colors"
               />
             </div>
 
@@ -220,15 +212,15 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
             <div className="relative w-full sm:w-auto">
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className="w-full sm:w-auto flex items-center justify-between gap-3 px-5 py-3 bg-white/50 dark:bg-black/30 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:border-[#D6405F] dark:hover:border-[#F8BBD0] transition-colors shadow-inner group"
+                className="w-full sm:w-auto flex items-center justify-between gap-3 px-4 py-2.5 bg-zinc-900 border border-zinc-700 text-zinc-200 rounded-md hover:border-[#8B3A52] transition-colors group"
               >
                 <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-[#8C6B79] dark:text-gray-400 group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0] transition-colors" />
-                  <span className="text-[12px] font-black text-[#40202D] dark:text-white tracking-wide">
+                  <SlidersHorizontal className="w-4 h-4 text-zinc-500 group-hover:text-[#8B3A52] transition-colors" />
+                  <span className="text-sm font-medium">
                     {DELIVERY_FILTERS.find(f => f.id === selectedDelivery)?.label}
                   </span>
                 </div>
-                <ChevronDown className="w-4 h-4 text-[#8C6B79] dark:text-gray-400 group-hover:text-[#D6405F] dark:group-hover:text-[#F8BBD0] transition-colors" />
+                <ChevronDown className="w-4 h-4 text-zinc-500 group-hover:text-[#8B3A52] transition-colors" />
               </button>
 
               <AnimatePresence>
@@ -248,10 +240,10 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
                         }}
                         className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-left"
                       >
-                        <span className={`text-[11px] font-black tracking-wider uppercase ${selectedDelivery === filter.id ? 'text-[#D6405F] dark:text-[#F8BBD0]' : 'text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white'}`}>
+                        <span className={`text-sm font-medium ${selectedDelivery === filter.id ? 'text-[#8B3A52]' : 'text-zinc-400 hover:text-zinc-200'}`}>
                           {filter.label}
                         </span>
-                        {selectedDelivery === filter.id && <Check className="w-4 h-4 text-[#D6405F] dark:text-[#F8BBD0]" />}
+                        {selectedDelivery === filter.id && <Check className="w-4 h-4 text-[#8B3A52]" />}
                       </button>
                     ))}
                   </motion.div>
@@ -266,51 +258,51 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full min-w-[1000px] text-left border-collapse">
               <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-[background-color,border-color] duration-[600ms]">
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">ID Orden</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cliente</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Origen</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Entrega</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto Total</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
-                  <th className="py-5 px-6 text-[10px] font-black text-[#8B3A52] dark:text-[#e8d8dc] uppercase tracking-widest border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-right">Acciones</th>
+                <tr className="border-b border-zinc-800">
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">ID Orden</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Fecha</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Cliente</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Origen</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Entrega</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Monto Total</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider">Estado</th>
+                  <th className="py-4 px-6 text-xs font-medium text-zinc-400 uppercase tracking-wider text-right">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5">
+              <tbody className="divide-y divide-zinc-800/50">
                 {filteredData.map((order, idx) => (
-                  <tr key={order.id} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+                  <tr key={order.id} className="transition-colors group/row hover:bg-zinc-800/20">
                     <td className="py-4 px-6">
-                      <span className="font-black text-[12px] text-[#D6405F] dark:text-[#F8BBD0]">{order.id}</span>
+                      <span className="text-sm font-medium text-[#8B3A52]">{order.id}</span>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">{order.date}</span>
+                      <span className="text-sm text-zinc-200 font-normal">{order.date}</span>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-[#40202D] dark:text-white text-[13px]">{order.client}</span>
+                        <span className="text-sm text-zinc-200 font-normal">{order.client}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="text-[11px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                      <span className="text-xs text-zinc-500 font-normal">
                         {getOrigin(order.deliveryMethod)}
                       </span>
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <div className="text-[#D6405F] dark:text-[#F8BBD0]">
+                        <div className="text-zinc-400">
                           {getDeliveryIcon(order.deliveryMethod)}
                         </div>
-                        <span className="text-[12px] font-bold text-[#40202D] dark:text-white">
+                        <span className="text-sm text-zinc-200 font-normal">
                           {getDeliveryLabel(order.deliveryMethod)}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="font-medium text-sm text-gray-800">S/ {order.amount.toFixed(2)}</span>
+                      <span className="text-sm text-zinc-200 font-normal">S/ {order.amount.toFixed(2)}</span>
                     </td>
                     <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(order.status)}`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                         {order.status}
                       </span>
                     </td>
@@ -318,21 +310,21 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsDetailOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-[#D6405F] bg-white hover:bg-pink-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-[#D6405F] bg-white dark:bg-zinc-800 hover:bg-pink-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
                           title="Ver detalle"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsEditOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-blue-600 bg-white dark:bg-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
                           title="Editar estado"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsInvoiceOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-emerald-600 bg-white hover:bg-emerald-50 rounded-full transition-colors border border-gray-200 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-emerald-600 bg-white dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
                           title="Ver comprobante"
                         >
                           <FileText className="w-4 h-4" />
@@ -359,11 +351,11 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
           
           {/* Pagination Footer */}
           {filteredData.length > 0 && (
-            <div className="px-6 py-4 bg-gray-50 border-t border-pink-100 flex items-center justify-between">
-              <span className="text-sm text-gray-500">Mostrando <strong className="text-gray-800 font-semibold">{filteredData.length}</strong> órdenes</span>
+            <div className="px-6 py-4 border-t border-zinc-800 flex items-center justify-between">
+              <span className="text-sm text-zinc-400">Mostrando <strong className="text-zinc-200 font-semibold">{filteredData.length}</strong> órdenes</span>
               <div className="flex gap-2">
-                <button className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-100 transition-colors bg-white shadow-sm">Anterior</button>
-                <button className="px-4 py-2 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-100 transition-colors bg-white shadow-sm">Siguiente</button>
+                <button className="border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm rounded-md px-3 py-1.5 transition-colors">Anterior</button>
+                <button className="border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm rounded-md px-3 py-1.5 transition-colors">Siguiente</button>
               </div>
             </div>
           )}

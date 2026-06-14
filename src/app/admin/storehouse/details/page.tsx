@@ -375,7 +375,7 @@ function OPPCard({ opp }: { opp: any }) {
           >
             <h4 className="text-[13px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-6">Detalle de Variantes</h4>
             
-            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
+            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
               <table className="w-full text-left border-collapse">
                 <thead className="relative transition-[background-color,border-color] duration-[600ms]">
                   <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
@@ -690,7 +690,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 
         {selectedSupplier && (
           <div className="space-y-6">
-            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
+            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
               <table className="w-full text-left border-collapse">
                 <thead className="relative transition-[background-color,border-color] duration-[600ms]">
                   <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">

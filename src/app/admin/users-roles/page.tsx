@@ -151,7 +151,7 @@ export default function UsuariosRolesPage() {
                                             return (
                                                 <div key={groupId} className="p-5 bg-white/50 dark:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 transition-all hover:bg-white/80 dark:hover:bg-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] hover:shadow-sm backdrop-blur-md group/card">
                                                     <div className="flex items-center gap-3 mb-5 border-b border-[#EAE0E2] dark:border-white/10 pb-3">
-                                                        <div className="p-1.5 bg-white dark:bg-black/50 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={14} /></div>
+                                                        <div className="p-1.5 bg-white dark:bg-zinc-800 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={14} /></div>
                                                         <h4 className="text-[13px] font-black text-[#40202D] dark:text-white tracking-wide">{group.label}</h4>
                                                     </div>
                                                     <div className="space-y-4">
@@ -206,7 +206,7 @@ export default function UsuariosRolesPage() {
 
                                     return (
                                         <div key={id} className="p-4 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-2xl border border-[#EAE0E2] dark:border-white/10 flex items-center gap-4 group animate-in slide-in-from-right-2">
-                                            <div className="bg-white dark:bg-black/50 border border-[#EAE0E2] dark:border-white/5 p-2 rounded-xl shadow-sm text-[#D6405F] dark:text-[#F8BBD0]">
+                                            <div className="bg-white dark:bg-zinc-800 border border-[#EAE0E2] dark:border-white/5 p-2 rounded-xl shadow-sm text-[#D6405F] dark:text-[#F8BBD0]">
                                                 <Icon size={18} />
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -252,7 +252,7 @@ export default function UsuariosRolesPage() {
                         return (
                             <div key={groupId} className="p-5 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-2xl border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] transition-colors">
                                 <div className="flex items-center gap-3 mb-4 border-b border-[#EAE0E2] dark:border-white/10 pb-2">
-                                    <div className="bg-white dark:bg-black/50 p-1.5 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={13} /></div>
+                                    <div className="bg-white dark:bg-zinc-800 p-1.5 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={13} /></div>
                                     <span className="text-[11px] font-black text-[#40202D] dark:text-white uppercase tracking-wider">{group.label}</span>
                                 </div>
                                 <div className="space-y-3.5">
