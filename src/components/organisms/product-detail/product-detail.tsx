@@ -99,9 +99,13 @@ export const ProductDetail = ({ product }: Props) => {
 
   const maxStockForSelection = selectedVariant?.stock ?? 0;
   const quantityOptions = useMemo(
-    () => Array.from({ length: Math.min(Math.max(maxStockForSelection, 1), 10) }, (_, i) => i + 1),
+    () => Array.from({ length: Math.min(Math.max(maxStockForSelection, 1), 30) }, (_, i) => i + 1),
     [maxStockForSelection],
   );
+
+  const isColorOutOfStock = useMemo(() => {
+    return availableSizes.length > 0 && availableSizes.every((s) => s.stock === 0);
+  }, [availableSizes]);
 
   const canAddToCart =
     Boolean(selectedColor) &&
@@ -266,7 +270,7 @@ export const ProductDetail = ({ product }: Props) => {
                       setSelectedSize(size);
                       setQuantity(1);
                     }}
-                    className={`size-btn h-12 text-xs font-bold transition-all border ${
+                    className={`size-btn h-14 flex flex-col items-center justify-center text-xs font-bold transition-all border rounded-lg ${
                       stock === 0
                         ? "bg-[#FAF9F6] dark:bg-transparent border-[#EBEAE8] dark:border-[#e8688a]/10 text-gray-300 dark:text-[#e8688a]/30 cursor-not-allowed"
                         : selectedSize === size
@@ -274,13 +278,23 @@ export const ProductDetail = ({ product }: Props) => {
                         : "bg-white dark:bg-transparent border-gray-300 dark:border-[#e8688a]/30 hover:bg-[#FCF5F5] dark:hover:bg-[#e8688a]/5 hover:border-[#D9A2A8] dark:hover:border-[#e8688a] hover:text-[#632034] dark:hover:text-white text-[#594246] dark:text-[#e8688a]/80"
                     }`}
                   >
-                    {size}
+                    <span className="block text-[13px] font-bold">{size}</span>
+                    <span className={`block text-[9px] font-normal mt-0.5 uppercase tracking-tighter ${
+                      stock === 0 ? 'text-gray-300 dark:text-[#e8688a]/20' : selectedSize === size ? 'text-pink-200' : 'text-gray-400 dark:text-[#f0d8e8]/50'
+                    }`}>
+                      {stock > 0 ? `${stock} disp.` : 'Agotado'}
+                    </span>
                   </button>
                 ))}
               </div>
               {selectedSize && (
-                <p className="mt-4 text-[11px] uppercase tracking-widest text-[#C5A059] font-bold">
-                  Stock: {maxStockForSelection}
+                <p className={`mt-4 text-[11px] uppercase tracking-widest font-bold ${
+                  maxStockForSelection <= 3 ? 'text-red-500 animate-pulse' : 'text-[#C5A059] dark:text-[#e8b86d]'
+                }`}>
+                  {maxStockForSelection <= 3 
+                    ? `¡Últimas ${maxStockForSelection} unidades disponibles!` 
+                    : `Stock disponible: ${maxStockForSelection} unidades`
+                  }
                 </p>
               )}
             </div>
@@ -307,14 +321,21 @@ export const ProductDetail = ({ product }: Props) => {
 
                 <button
                   onClick={handleAddToCart}
-                  disabled={!canAddToCart}
+                  disabled={!canAddToCart || isColorOutOfStock}
                   className={`btn-add-cart flex-1 text-[11px] font-bold uppercase tracking-[0.3em] py-4 rounded-sm transition-all border ${
-                    canAddToCart
+                    canAddToCart && !isColorOutOfStock
                       ? "bg-[#632034] dark:bg-white/5 border-transparent dark:border-[#e8688a]/30 hover:bg-black dark:hover:bg-white/10 text-white dark:text-white active:scale-[0.98]"
                       : "bg-[#FDF9F3] dark:bg-transparent text-[#594246]/60 dark:text-[#f0d8e8]/50 border-[#EBEAE8] dark:border-[#e8688a]/30 cursor-not-allowed"
                   }`}
                 >
-                  {canAddToCart ? "AGREGAR AL CARRITO" : "SELECCIONA TU TALLA"}
+                  {isColorOutOfStock 
+                    ? "AGOTADO" 
+                    : !selectedSize 
+                    ? "SELECCIONA TU TALLA" 
+                    : maxStockForSelection === 0 
+                    ? "SIN STOCK DISPONIBLE" 
+                    : "AGREGAR AL CARRITO"
+                  }
                 </button>
               </div>
               <p className="shipping-note text-[10px] text-gray-400 dark:text-[#f0d8e8]/50 italic">

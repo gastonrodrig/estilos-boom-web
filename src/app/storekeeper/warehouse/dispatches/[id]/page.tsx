@@ -45,6 +45,7 @@ export default function DispatchConfirmationPage({ params }: { params: Promise<{
   const [incidentPhotoFiles, setIncidentPhotoFiles] = useState<Record<string, File>>({});
   const [dispatchPhotoFile, setDispatchPhotoFile] = useState<File | null>(null);
   const [dispatchDocFile, setDispatchDocFile] = useState<File | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState<string>("");
 
   useEffect(() => {
     const load = async () => {
@@ -80,6 +81,16 @@ export default function DispatchConfirmationPage({ params }: { params: Promise<{
 
   const handleConfirm = async () => {
     if (!doc) return;
+
+    if (!trackingNumber.trim()) {
+      toast.error("Por favor ingresa los datos de envío / código de seguimiento.");
+      return;
+    }
+
+    if (!dispatchPhotoFile && !dispatchDocFile) {
+      toast.error("Por favor adjunta la foto de la caja/guía como evidencia.");
+      return;
+    }
 
     // 1. Upload evidence first if exists
     const filesToUpload: File[] = [];
@@ -131,7 +142,7 @@ export default function DispatchConfirmationPage({ params }: { params: Promise<{
       };
     });
 
-    const success = await startProcessWarehouseDocument(doc._id, workerId, items);
+    const success = await startProcessWarehouseDocument(doc._id, workerId, items, trackingNumber);
     if (success) {
       setIsConfirmed(true);
     }
@@ -456,8 +467,22 @@ export default function DispatchConfirmationPage({ params }: { params: Promise<{
         
         <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 mb-10 transition-colors duration-300">
           <p className="text-[14px] leading-relaxed text-[#844C60] dark:text-[#C9B3BC] mb-6 font-medium">
-            Opcionalmente, puedes adjuntar evidencia documental de la salida física (guía de remisión firmada, foto de la caja sellada, etc.).
+            Es obligatorio ingresar la evidencia del despacho físico y adjuntar una foto de la caja o guía para poder procesar la salida.
           </p>
+
+          <div className="mb-6">
+            <label htmlFor="tracking-input" className="block text-sm font-bold text-[#40202D] dark:text-white mb-2">
+              Código de Seguimiento / Datos del Repartidor / Guía de Envío *
+            </label>
+            <input 
+              type="text" 
+              id="tracking-input"
+              value={trackingNumber}
+              onChange={(e) => setTrackingNumber(e.target.value)}
+              placeholder="Ej. Shalom: Guía 998877, Motorizado: Juan Pérez (Placa ABC-123), Listo para recojo en tienda..."
+              className="w-full bg-[#FCF8F9] dark:bg-black/30 border border-[#EEDCE1] dark:border-white/10 rounded-xl px-4 py-3 text-[14px] font-bold text-[#40202D] dark:text-white focus:outline-none focus:border-[#D6405F] dark:focus:border-[#F2778D] transition-colors"
+            />
+          </div>
 
           <input 
             type="file" 

@@ -60,11 +60,11 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[70] flex justify-end text-[#594246]">
+        <div className="fixed inset-0 z-[70] flex justify-end text-[#594246] dark:text-[#f0d8e8]">
           <motion.button
             type="button"
             aria-label="Cerrar carrito"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 dark:bg-black/60"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -76,28 +76,28 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
             role="dialog"
             aria-modal="true"
             aria-label="Carrito de compras"
-            className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
+            className="relative flex h-full w-full max-w-md flex-col bg-white dark:bg-[#1a0618]/95 dark:backdrop-blur-md dark:border-l dark:border-[#c4547a]/10 shadow-2xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="flex shrink-0 items-center justify-between border-b border-[#EBEAE8] px-5 py-4">
-              <h2 className="text-[18px] font-serif uppercase tracking-widest text-[#632034]">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#EBEAE8] dark:border-[#c4547a]/20 px-5 py-4">
+              <h2 className="text-[18px] font-serif uppercase tracking-widest text-[#632034] dark:text-[#fdeef5]">
                 {itemCount} producto{itemCount !== 1 ? "s" : ""} agregado{itemCount !== 1 ? "s" : ""}
               </h2>
-              <button onClick={onClose} aria-label="Cerrar" className="transition hover:text-[#C5A059]">
-                <X className="h-5 w-5 text-[#594246] hover:text-[#C5A059] transition-colors" />
+              <button onClick={onClose} aria-label="Cerrar" className="transition hover:text-[#C5A059] dark:hover:text-[#e8b86d]">
+                <X className="h-5 w-5 text-[#594246] dark:text-[#f0d8e8] hover:text-[#C5A059] dark:hover:text-[#e8b86d] transition-colors" />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {cartItems.length === 0 ? (
-                <div className="rounded-xl border border-[#EBEAE8] bg-[#FDF9F3] p-6 text-center text-sm text-[#594246]/80">
+                <div className="rounded-xl border border-[#EBEAE8] dark:border-[#c4547a]/20 bg-[#FDF9F3] dark:bg-[#250e24] p-6 text-center text-sm text-[#594246]/80 dark:text-[#f0d8e8]/80">
                   Tu carrito está vacío.
                 </div>
               ) : (
-                <div className="divide-y divide-[#EBEAE8] space-y-0">
+                <div className="divide-y divide-[#EBEAE8] dark:divide-[#c4547a]/20 space-y-0">
                   {cartItems.map((item) => {
                     const maxStock =
                       typeof item.stock === "number" && item.stock >= 0
@@ -120,13 +120,13 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                           />
 
                           <div className="min-w-0 flex-1">
-                            <h2 className="truncate text-xl font-serif text-[#632034]">
+                            <h2 className="truncate text-xl font-serif text-[#632034] dark:text-[#fdeef5]">
                               {item.name}
                             </h2>
-                            <p className=" text-[12px] text-gray-500 mt-1">
+                            <p className=" text-[12px] text-gray-500 dark:text-[#f0d8e8]/50 mt-1">
                               Color : {item.color} 
                             </p>
-                            <p className=" text-[12px] text-[#000000]/70">
+                            <p className=" text-[12px] text-[#000000]/70 dark:text-[#f0d8e8]/75">
                               Talla : {item.size}
                             </p>
 
@@ -136,8 +136,8 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                                   type="button"
                                   className={`size-6 text-[12px] border ${
                                     canDecrease
-                                      ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034] transition-all"
-                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300"
+                                      ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034] transition-all dark:border-[#c4547a]/30 dark:bg-[#1f091d] dark:text-[#f0d8e8] dark:hover:border-[#e8688a]/80 dark:hover:text-[#fdeef5]"
+                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300 dark:border-[#c4547a]/10 dark:bg-[#1f091d]/40 dark:text-gray-600"
                                   }`}
                                   disabled={!canDecrease}
                                   whileTap={canDecrease ? { scale: 1.08 } : undefined}
@@ -154,7 +154,7 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                                   -
                                 </motion.button>
 
-                                <span className="w-6 text-center text-sm font-bold text-[#594246]">
+                                <span className="w-6 text-center text-sm font-bold text-[#594246] dark:text-[#fdeef5]">
                                   {item.quantity}
                                 </span>
 
@@ -162,8 +162,8 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                                   type="button"
                                   className={`size-6 text-sm border ${
                                     canIncrease
-                                      ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034] transition-all"
-                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300"
+                                      ? "border-[#EBEAE8] bg-white text-[#594246] hover:cursor-pointer hover:border-[#D9A2A8] hover:text-[#632034] transition-all dark:border-[#c4547a]/30 dark:bg-[#1f091d] dark:text-[#f0d8e8] dark:hover:border-[#e8688a]/80 dark:hover:text-[#fdeef5]"
+                                      : "cursor-not-allowed border-[#EBEAE8] bg-[#FAF9F6] text-gray-300 dark:border-[#c4547a]/10 dark:bg-[#1f091d]/40 dark:text-gray-600"
                                   }`}
                                   disabled={!canIncrease}
                                   whileTap={canIncrease ? { scale: 1.08 } : undefined}
@@ -182,7 +182,7 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                               </div>
 
                               <button
-                                className="text-gray-400 transition hover:cursor-pointer hover:text-[#C5A059]"
+                                className="text-gray-400 dark:text-gray-500 transition hover:cursor-pointer hover:text-[#C5A059] dark:hover:text-[#e8b86d]"
                                 onClick={() =>
                                   removeItem(item.productId, item.size, item.color)
                                 }
@@ -192,12 +192,12 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                               </button>
                             </div>
 
-                            <p className="mt-5 text-[15px] leading-none font-medium text-[#632034]">
+                            <p className="mt-5 text-[15px] leading-none font-medium text-[#632034] dark:text-[#f0a0c0]">
                               S/ {(item.price * item.quantity).toFixed(2)}
                             </p>
 
                             {typeof item.stock === "number" && item.stock >= 0 && (
-                              <p className="mt-1 text-[11px] text-[#594246]/60">
+                              <p className="mt-1 text-[11px] text-[#594246]/60 dark:text-[#f0d8e8]/50">
                                 Stock disponible: {item.stock}
                               </p>
                             )}
@@ -209,37 +209,37 @@ export const CheckoutDrawer = ({ open, onClose, item }: CheckoutDrawerProps) => 
                 </div>
               )}
 
-              <div className="mt-5 rounded-sm border border-[#E5B3B8] bg-[#FCF5F5] p-6 shadow-sm">
-                <h3 className="text-[12px] font-bold text-[#632034] tracking-[0.2em] uppercase mb-4">Resumen del Pedido</h3>
-                <div className="space-y-2 text-[14px] text-gray-600 font-medium">
+              <div className="mt-5 rounded-sm border border-[#E5B3B8] dark:border-[#c4547a]/30 bg-[#FCF5F5] dark:bg-[#250e24] p-6 shadow-sm">
+                <h3 className="text-[12px] font-bold text-[#632034] dark:text-[#fdeef5] tracking-[0.2em] uppercase mb-4">Resumen del Pedido</h3>
+                <div className="space-y-2 text-[14px] text-gray-600 dark:text-[#f0d8e8]/75 font-medium">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>S/ {total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Envío</span>
-                    <span className="font-light italic text-gray-400">Ver al finalizar</span>
+                    <span className="font-light italic text-gray-400 dark:text-[#f0d8e8]/40">Ver al finalizar</span>
                   </div>
                 </div>
-                <hr className="my-5 border-[#E5B3B8]" />
-                <div className="flex justify-between text-[18px] leading-none font-bold text-[#632034]">
+                <hr className="my-5 border-[#E5B3B8] dark:border-[#c4547a]/20" />
+                <div className="flex justify-between text-[18px] leading-none font-bold text-[#632034] dark:text-[#fdeef5]">
                   <span className="uppercase text-[14px] tracking-widest">Total</span>
                   <span>S/ {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="shrink-0 space-y-3 border-t border-[#EBEAE8] bg-white px-5 py-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <div className="shrink-0 space-y-3 border-t border-[#EBEAE8] dark:border-[#c4547a]/20 bg-white dark:bg-[#1a0618]/95 px-5 py-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
               <button
                 onClick={handleGoToCatalog}
-                className="w-full rounded-sm border border-[#EBEAE8] bg-white py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#632034] transition-all hover:bg-[#FCF5F5] hover:border-[#D9A2A8]"
+                className="w-full rounded-sm border border-[#EBEAE8] bg-white py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#632034] transition-all hover:bg-[#FCF5F5] hover:border-[#D9A2A8] dark:border-[#c4547a]/30 dark:bg-transparent dark:text-[#fdeef5] dark:hover:bg-[#c4547a]/10 dark:hover:border-[#e8688a]"
               >
                 Seguir viendo catálogo
               </button>
 
               <button
                 onClick={handleMainAction}
-                className="w-full rounded-sm bg-[#632034] py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-black hover:shadow-lg active:scale-[0.98]"
+                className="w-full rounded-sm bg-[#632034] py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-black dark:hover:bg-black/60 dark:bg-[#c4547a] hover:shadow-lg active:scale-[0.98]"
               >
                 {isAuthenticated ? "Continuar con la compra" : "Inicie sesión para continuar"}
               </button>

@@ -49,7 +49,9 @@ export default function AdminOrdersHistoryPage() {
           amount: o.amount,
           status: mapBackendStatus(o.status),
           deliveryMethod: o.deliveryMethod || 'store',
-          items: o.items || []
+          items: o.items || [],
+          trackingNumber: o.trackingNumber,
+          shippingEvidenceUrl: o.shippingEvidenceUrl
         }));
 
         // INYECCIÓN TEMPORAL: Mezclamos la data falsa con la real para que siempre tengas registros visibles para probar.

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Shirt, Check, Clock, AlertCircle, XCircle, FileWarning } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Shirt, Check, Clock, AlertCircle, XCircle, FileWarning, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -9,6 +9,7 @@ import { ordersApi } from '@/api/orders/orders-api';
 import { manualPaymentApi } from '@/api/payment/payment-api';
 import { getFirebaseAuthToken } from '@helpers';
 import { getAuthConfig } from '@utils';
+import { toast } from 'react-hot-toast';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -22,6 +23,7 @@ export default function OrderDetailsPage() {
   const [newOperationNumber, setNewOperationNumber] = useState('');
   const [hasSubmittedCorrection, setHasSubmittedCorrection] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -89,6 +91,21 @@ export default function OrderDetailsPage() {
       setError("No se pudo enviar el nuevo número de operación. Intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmReceipt = async () => {
+    setIsConfirming(true);
+    try {
+      const token = await getFirebaseAuthToken();
+      const { data } = await ordersApi.patch(`/client/${orderId}/confirm-delivery`, {}, getAuthConfig({ token }));
+      setOrderData(data);
+      toast.success("¡Entrega confirmada! Gracias por tu compra.");
+    } catch (err) {
+      console.error("Error confirming delivery:", err);
+      toast.error("No se pudo confirmar la entrega. Inténtalo de nuevo.");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -193,6 +210,31 @@ export default function OrderDetailsPage() {
         </div>
       </div>
 
+      {/* Action Banner for Confirming Receipt */}
+      {isShipped && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-indigo-50 border border-indigo-200 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#1a0c12] dark:text-[#fdeef5] text-base">¿Tu pedido ya llegó?</h3>
+              <p className="text-gray-600 dark:text-[#b8afc8] text-sm mt-0.5">
+                Si ya tienes tu paquete contigo, por favor confirma la recepción para finalizar el pedido.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleConfirmReceipt}
+            disabled={isConfirming}
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow transition-all duration-300 active:scale-[0.98] shrink-0 disabled:opacity-50"
+          >
+            {isConfirming ? "Confirmando..." : "Confirmar que lo recibí"}
+          </button>
+        </div>
+      )}
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -261,6 +303,30 @@ export default function OrderDetailsPage() {
                 <div className="flex flex-col gap-1 text-sm text-[#9b6070] dark:text-[#b8afc8]">
                   <p>Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
                   <p>Lima, Perú</p>
+
+                  {(orderData.trackingNumber || orderData.shippingEvidenceUrl) && (
+                    <div className="mt-4 pt-3 border-t border-[rgba(196,84,122,0.15)] dark:border-[rgba(180,170,200,0.12)] flex flex-col gap-2">
+                      {orderData.trackingNumber && (
+                        <p className="text-sm font-semibold text-[#1a0c12] dark:text-[#fdeef5]">
+                          Seguimiento: <span className="font-normal text-[#9b6070] dark:text-[#b8afc8]">{orderData.trackingNumber}</span>
+                        </p>
+                      )}
+                      {orderData.shippingEvidenceUrl && (
+                        <a
+                          href={orderData.shippingEvidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-[#c4547a] dark:text-[#f0a0c0] font-bold text-xs hover:underline transition-all mt-1"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Ver Evidencia de Despacho
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -65,10 +65,6 @@ export function ClientSidebar({ items, hasTopBar = false }: ClientSidebarProps) 
     }, []);
 
     const renderItem = (item: ClientModule, depth = 0, globalIndex?: number) => {
-        if (item.requiredPermission && !permissions.includes(item.requiredPermission)) {
-            return null;
-        }
-
         const ItemIcon = item.icon && item.icon in iconMap ? iconMap[item.icon as keyof typeof iconMap] : null;
 
         const isItemActive = item.href ? isPathActive(item.href) : false;

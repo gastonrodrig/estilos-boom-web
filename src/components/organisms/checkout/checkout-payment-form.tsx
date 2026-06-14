@@ -30,7 +30,7 @@ const CheckoutPaymentForm: React.FC = () => {
   const router = useRouter();
   const { handleGoToReview, handleGoToDelivery } = useCheckoutStore();
   const { submitOrder } = useOrderSubmission();
-  const { items } = useCartStore();
+  const { items, clearCart } = useCartStore();
   const { firstName, lastName } = useAuthStore();
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [loadingPreference, setLoadingPreference] = useState(true);
@@ -81,11 +81,13 @@ const CheckoutPaymentForm: React.FC = () => {
     const fetchPreference = async () => {
       try {
         setLoadingPreference(true);
-        const mpItems = items.map(item => ({
+        const mpItems: any[] = items.map(item => ({
           id: item.productId,
           title: item.name,
           quantity: item.quantity,
-          unit_price: item.price
+          unit_price: item.price,
+          size: item.size,
+          color: item.color
         }));
 
         if (selectedDeliveryMethod && selectedDeliveryMethod.price > 0) {
@@ -103,12 +105,13 @@ const CheckoutPaymentForm: React.FC = () => {
           return;
         }
 
+        const token = await getFirebaseAuthToken();
         console.log('📦 [MP_PREFERENCE] Creando preferencia con payload:', mpItems);
         const response = await mercadopagoApi.createPreference({
           items: mpItems,
           orderId: `ORD-${Date.now()}`,
           payerEmail: watch('email') || 'cliente@estilosboom.com'
-        });
+        }, token);
 
         console.log('✅ [MP_PREFERENCE] Respuesta del backend:', response);
 
@@ -179,6 +182,7 @@ const CheckoutPaymentForm: React.FC = () => {
             deliveryMethod: selectedDeliveryMethod?.id
           }, getAuthConfig({ token }));
 
+          await clearCart();
           handleGoToReview();
         } catch (error) {
           toast.error('Error al enviar el pago manual al servidor.');
@@ -199,6 +203,7 @@ const CheckoutPaymentForm: React.FC = () => {
   }, [selectedDeliveryMethod]);
 
   const onSubmitPayment = async (param: any) => {
+    const token = await getFirebaseAuthToken();
     return new Promise((resolve, reject) => {
       mercadopagoApi.processPayment({ 
         ...param.formData, 
@@ -212,12 +217,13 @@ const CheckoutPaymentForm: React.FC = () => {
           color: item.color
         })),
         deliveryMethod: deliveryMethodRef.current?.id
-      })
+      }, token)
         .then(async (response) => {
           if (response.status === 'approved') {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
+              await clearCart();
               handleGoToReview();
               resolve(true);
             } else {
@@ -225,6 +231,7 @@ const CheckoutPaymentForm: React.FC = () => {
             }
           } else if (response.status === 'pending') {
             toast('Pago pendiente.', { icon: '⏳' });
+            await clearCart();
             handleGoToReview();
             resolve(true);
           } else {
