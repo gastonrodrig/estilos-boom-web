@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Shirt, Check, Clock, AlertCircle, XCircle, FileWarning } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Download, HelpCircle, Shirt, Check, Clock, AlertCircle, XCircle, FileWarning, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -9,6 +9,7 @@ import { ordersApi } from '@/api/orders/orders-api';
 import { manualPaymentApi } from '@/api/payment/payment-api';
 import { getFirebaseAuthToken } from '@helpers';
 import { getAuthConfig } from '@utils';
+import { toast } from 'react-hot-toast';
 
 export default function OrderDetailsPage() {
   const params = useParams();
@@ -22,6 +23,7 @@ export default function OrderDetailsPage() {
   const [newOperationNumber, setNewOperationNumber] = useState('');
   const [hasSubmittedCorrection, setHasSubmittedCorrection] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -89,6 +91,21 @@ export default function OrderDetailsPage() {
       setError("No se pudo enviar el nuevo número de operación. Intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmReceipt = async () => {
+    setIsConfirming(true);
+    try {
+      const token = await getFirebaseAuthToken();
+      const { data } = await ordersApi.patch(`/client/${orderId}/confirm-delivery`, {}, getAuthConfig({ token }));
+      setOrderData(data);
+      toast.success("¡Entrega confirmada! Gracias por tu compra.");
+    } catch (err) {
+      console.error("Error confirming delivery:", err);
+      toast.error("No se pudo confirmar la entrega. Inténtalo de nuevo.");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -192,6 +209,31 @@ export default function OrderDetailsPage() {
           <div className="hidden dark:block w-16 h-[1px] mt-4 bg-gradient-to-r from-[#e8b86d] to-transparent"></div>
         </div>
       </div>
+
+      {/* Action Banner for Confirming Receipt */}
+      {isShipped && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-indigo-50 border border-indigo-200 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#1a0c12] dark:text-[#fdeef5] text-base">¿Tu pedido ya llegó?</h3>
+              <p className="text-gray-600 dark:text-[#b8afc8] text-sm mt-0.5">
+                Si ya tienes tu paquete contigo, por favor confirma la recepción para finalizar el pedido.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleConfirmReceipt}
+            disabled={isConfirming}
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow transition-all duration-300 active:scale-[0.98] shrink-0 disabled:opacity-50"
+          >
+            {isConfirming ? "Confirmando..." : "Confirmar que lo recibí"}
+          </button>
+        </div>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
