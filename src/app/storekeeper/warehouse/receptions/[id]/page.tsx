@@ -156,7 +156,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
     );
   }
 
-  const srcName = doc.id_source_warehouse?.name?.replace(/_/g, " ") ?? "Proveedor externo";
+  const srcName = doc.id_source_warehouse?.name?.replace(/_/g, " ") ?? (doc.type === "INGRESO_PRODUCCION" ? "Taller de producción" : "Proveedor externo");
   const tgtName = doc.id_target_warehouse?.name?.replace(/_/g, " ") ?? "Almacén Principal";
   const totalExpected = (doc.items ?? []).reduce((acc: number, item: any) => acc + (item.quantity_expected ?? 0), 0);
   const totalReceived = (doc.items ?? []).reduce((acc: number, item: any, idx: number) => {
@@ -458,7 +458,7 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
         
         <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 mb-10 transition-colors duration-300">
           <p className="text-[14px] leading-relaxed text-[#844C60] dark:text-[#C9B3BC] mb-6 font-medium">
-            Si lo deseas, puedes adjuntar la documentación que respalde esta recepción física. La <strong className="text-[#40202D] dark:text-white">Orden de Compra</strong> se actualizará automáticamente.
+            Si lo deseas, puedes adjuntar la documentación que respalde esta recepción física. La <strong className="text-[#40202D] dark:text-white">{doc.type === "INGRESO_PRODUCCION" ? "Orden de Producción" : "Orden de Compra"}</strong> se actualizará automáticamente.
           </p>
 
           {/* Inputs de archivos reales */}
