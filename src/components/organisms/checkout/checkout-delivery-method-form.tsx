@@ -102,10 +102,10 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FAF9F6] rounded-sm p-6 lg:p-8 border border-[#EBEAE8] shadow-sm space-y-8 animate-in fade-in duration-300">
+    <div className="bg-[#FAF9F6] dark:bg-[#1a0618]/60 dark:backdrop-blur-md rounded-sm p-6 lg:p-8 border border-[#EBEAE8] dark:border-[#C5A059]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-8 animate-in fade-in duration-300">
       <div>
-        <h2 className="text-[18px] font-serif text-[#632034] mb-1">2. Método de Entrega</h2>
-        <p className="text-[13px] text-[#594246]/70 mb-4">Selecciona cómo deseas recibir tu pedido.</p>
+        <h2 className="text-[18px] font-serif text-[#632034] dark:text-[#C5A059] mb-1">2. Método de Entrega</h2>
+        <p className="text-[13px] text-[#594246]/70 dark:text-[#f0d8e8]/70 mb-4">Selecciona cómo deseas recibir tu pedido.</p>
 
         <Controller
           name="selectedDeliveryMethod"
@@ -114,25 +114,25 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
           render={({ field: { value, onChange } }) => (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {deliveryMethods.map((method) => (
-                <div
+                  <div
                   key={method.id}
                   onClick={() => onChange(method)}
-                  className={`border rounded-sm p-4 cursor-pointer transition-all flex items-start gap-3 ${
+                  className={`delivery-option p-4 cursor-pointer flex items-start gap-3 ${
                     value?.id === method.id 
-                      ? "border-[#632034] bg-[#FCF5F5] shadow-sm" 
-                      : "border-[#EBEAE8] bg-white hover:border-[#D9A2A8]"
+                      ? "selected border-[#632034] dark:border-[#e8b86d] bg-[#FCF5F5] dark:bg-[#C5A059]/10 shadow-sm" 
+                      : "border border-[#EBEAE8] dark:border-[#C5A059]/30 bg-white dark:bg-black/40 hover:border-[#D9A2A8] dark:hover:border-[#C5A059]/60"
                   }`}
                 >
-                  <div className={`mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${value?.id === method.id ? "border-[#632034]" : "border-gray-300"}`}>
-                    {value?.id === method.id && <div className="w-2 h-2 bg-[#632034] rounded-full" />}
+                  <div className={`mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${value?.id === method.id ? "border-[#632034] dark:border-[#e8b86d]" : "border-gray-300 dark:border-white/30"}`}>
+                    {value?.id === method.id && <div className="w-2 h-2 bg-[#632034] dark:bg-[#e8b86d] rounded-full" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
-                      <p className="font-medium text-[14px] text-[#594246]">{method.name}</p>
-                      {getMethodIcon(method.id)}
+                      <p className="delivery-option-name font-medium text-[14px] text-[#594246] dark:text-[#fdeef5]">{method.name}</p>
+                      <div className="delivery-option-icon">{getMethodIcon(method.id)}</div>
                     </div>
-                    <p className="text-[12px] text-[#594246]/70">{method.description}</p>
-                    <p className="text-[13px] font-bold text-[#632034] mt-1">
+                    <p className="delivery-option-desc text-[12px] text-[#594246]/70 dark:text-[#f0d8e8]/70">{method.description}</p>
+                    <p className={`delivery-option-price mt-1 text-[13px] font-bold text-[#632034] dark:text-[#f0a0c0] ${method.price === 0 ? 'free' : ''}`}>
                       {method.price === 0 ? 'GRATIS' : `S/ ${method.price.toFixed(2)}`}
                     </p>
                   </div>
@@ -147,19 +147,19 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
         
         {/* RECOJO EN TIENDA */}
         {selectedDeliveryMethod?.id === 'store' && (
-          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm flex items-center gap-3">
-            <Store className="text-[#632034]" />
-            <p className="text-[13px] text-[#594246]">Tu pedido estará listo para recoger en nuestra tienda principal. Te notificaremos por correo.</p>
+          <div className="p-4 bg-white dark:bg-black/40 border border-[#EBEAE8] dark:border-[#C5A059]/30 rounded-sm flex items-center gap-3">
+            <Store size={24} className="text-[#632034] dark:text-[#e8b86d]" />
+            <p className="text-[13px] text-[#594246] dark:text-[#f0d8e8]/70">Tu pedido estará listo para recoger en nuestra tienda principal. Te notificaremos por correo.</p>
           </div>
         )}
 
         {/* PUNTO DE ENCUENTRO (TREN) */}
         {selectedDeliveryMethod?.id === 'point' && (
-          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm space-y-3">
-            <label className="block text-[13px] font-medium text-[#594246]">Selecciona la estación de la Línea 1*</label>
+          <div className="p-4 bg-white dark:bg-black/40 border border-[#EBEAE8] dark:border-[#C5A059]/30 rounded-sm space-y-3">
+            <label className="block text-[13px] font-medium text-[#594246] dark:text-[#f0d8e8]/90">Selecciona la estación de la Línea 1*</label>
             <select
               {...register('trainStation', { required: 'Selecciona una estación' })}
-              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] ${errors.trainStation ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+              className={`w-full px-4 py-2.5 text-[14px] bg-white dark:bg-[#1a0618]/80 dark:text-[#fdeef5] border rounded-sm focus:outline-[#632034] dark:focus:outline-[#e8b86d] transition-colors ${errors.trainStation ? 'border-red-500' : 'border-[#EBEAE8] dark:border-[#C5A059]/30'}`}
             >
               <option value="">Selecciona...</option>
               {TRAIN_STATIONS.map(station => (
@@ -172,25 +172,25 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
 
         {/* SHALOM */}
         {selectedDeliveryMethod?.id === 'province' && (
-          <div className="p-4 bg-white border border-[#EBEAE8] rounded-sm space-y-3">
-            <label className="block text-[13px] font-medium text-[#594246]">Ingresa la agencia Shalom más cercana a tu domicilio*</label>
+          <div className="p-4 bg-white dark:bg-black/40 border border-[#EBEAE8] dark:border-[#C5A059]/30 rounded-sm space-y-3">
+            <label className="block text-[13px] font-medium text-[#594246] dark:text-[#f0d8e8]/90">Ingresa la agencia Shalom más cercana a tu domicilio*</label>
             <input
               type="text"
               placeholder="Ej: Shalom Piura Centro"
               {...register('shalomAgency', { required: 'Ingresa la agencia Shalom' })}
-              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] ${errors.shalomAgency ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+              className={`w-full px-4 py-2.5 text-[14px] bg-white dark:bg-[#1a0618]/80 dark:text-[#fdeef5] dark:placeholder-[#fdeef5]/30 border rounded-sm focus:outline-[#632034] dark:focus:outline-[#e8b86d] transition-colors ${errors.shalomAgency ? 'border-red-500' : 'border-[#EBEAE8] dark:border-[#C5A059]/30'}`}
             />
             {errors.shalomAgency && <p className="text-red-500 text-xs">{errors.shalomAgency.message}</p>}
-            <p className="text-[12px] text-[#594246]/70">El envío a provincia toma entre 3 a 5 días hábiles.</p>
+            <p className="text-[12px] text-[#594246]/70 dark:text-[#f0d8e8]/70">El envío a provincia toma entre 3 a 5 días hábiles.</p>
           </div>
         )}
 
         {/* TOTAL MOTORIZADO (DIRECCIÓN) */}
         {selectedDeliveryMethod?.id === 'motorized' && (
-          <div className="p-5 bg-white border border-[#EBEAE8] rounded-sm">
+          <div className="address-selector p-5 bg-white dark:bg-transparent border border-[#EBEAE8] dark:border-[#C5A059]/30 rounded-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[15px] font-medium text-[#594246]">Seleccionar Dirección de Entrega</h3>
-              <button type="button" onClick={() => setIsAddressModalOpen(true)} className="flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[12px] rounded-sm hover:bg-[#632034] transition-colors">
+              <h3 className="text-[15px] font-medium text-[#594246] dark:text-[#fdeef5]">Seleccionar Dirección de Entrega</h3>
+              <button type="button" onClick={() => setIsAddressModalOpen(true)} className="btn-add-address flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[12px] rounded-sm hover:bg-[#632034] transition-colors">
                 <Plus size={14} /> Agregar
               </button>
             </div>
@@ -222,8 +222,8 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
                 ))}
                 
                 {savedAddresses.length === 0 && (
-                  <div className="text-center py-6 border border-dashed border-[#EBEAE8] rounded-sm bg-[#FAF9F6]">
-                    <p className="text-[13px] text-[#594246]/70">No tienes direcciones guardadas para entrega a domicilio.</p>
+                  <div className="address-empty-text py-6 border border-dashed border-[#EBEAE8] dark:border-[#C5A059]/30 rounded-sm bg-[#FAF9F6] dark:bg-black/20">
+                    <p>No tienes direcciones guardadas para entrega a domicilio.</p>
                   </div>
                 )}
               </div>
@@ -234,11 +234,11 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
       </div>
 
       {/* BOTONES */}
-      <div className="pt-6 flex gap-4 border-t border-[#EBEAE8]">
+      <div className="pt-6 flex gap-4 border-t border-[#EBEAE8] dark:border-[#C5A059]/20">
         <button
           type="button"
           onClick={handleGoToShipping}
-          className="w-1/2 md:w-auto px-8 py-3.5 border-2 border-gray-200 rounded-sm font-bold text-[#594246] hover:bg-gray-50 transition-colors uppercase text-[12px] tracking-wider"
+          className="btn-back w-1/2 md:w-auto px-8 py-3.5 border-2 border-gray-200 rounded-sm font-bold text-[#594246] hover:bg-gray-50 transition-colors uppercase text-[12px] tracking-wider"
         >
           Atrás
         </button>
@@ -246,7 +246,7 @@ const CheckoutDeliveryMethodForm: React.FC = () => {
           type="button"
           onClick={handleNext}
           disabled={isSubmitting || isLoadingAddresses}
-          className="w-1/2 md:w-auto px-10 py-3.5 rounded-sm text-white text-[12px] uppercase tracking-wider font-bold bg-black hover:bg-[#632034] transition-all disabled:opacity-50"
+          className="btn-next w-1/2 md:w-auto px-10 py-3.5 rounded-sm text-white text-[12px] uppercase tracking-wider font-bold bg-black hover:bg-[#632034] transition-all disabled:opacity-50"
         >
           {isSubmitting ? 'Procesando...' : 'Siguiente: Pago'}
         </button>

@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   Package,
   LogOut,
+  Crown,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -281,7 +282,15 @@ export const Navbar = ({
                       <img src={compactLogoSrc} alt="Logo" className="h-7 w-auto object-contain" />
                     </>
                   ) : (
-                    <Logo width={isHome ? 135 : 135} height={isHome ? 30 : 30} isHome={isHome} />
+                    <div className="flex items-center gap-[8px]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src="/assets/auth-icon.png" 
+                        alt="Logo Flor de Loto" 
+                        className="w-6 h-6 object-contain logo-icon transition-all duration-300" 
+                      />
+                      <span className="logo-text text-[#2a1520] dark:text-[#fdeef5] tracking-[0.05em] font-serif text-[1.25rem] font-semibold whitespace-nowrap transition-colors duration-300">Estilos Boom</span>
+                    </div>
                   )}
                 </Link>
               </div>
@@ -289,7 +298,7 @@ export const Navbar = ({
 
             {/* Menu Desktop */}
             <ul
-              className={`hidden min-[1135px]:flex items-center gap-8 text-md font-medium ${textClass}`}
+              className={`hidden min-[1135px]:flex items-center gap-10 text-[1.05rem] font-medium tracking-wide ${textClass}`}
             >
               {centerMenu.map(({ label, href }) => (
                 <li key={href}>

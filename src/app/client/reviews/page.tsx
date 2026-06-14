@@ -73,22 +73,22 @@ export default function ReviewsPage() {
       
       {/* Header */}
       <div className="relative z-10">
-        <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">Tus Reseñas</h1>
-        <p className="text-[#594246]/70 text-sm mt-1 font-medium">Comparte tu experiencia con otras compradoras.</p>
+        <h1 className="text-3xl font-serif font-medium text-[#594246] dark:text-[#f8f0f5] tracking-wide">Tus Reseñas</h1>
+        <p className="text-[#594246]/70 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">Comparte tu experiencia con otras compradoras.</p>
       </div>
 
       {/* Elegant Fairy-Tale Tabs */}
-      <div className="relative z-10 flex gap-2 p-1.5 bg-white rounded-full w-fit shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
+      <div className="relative z-10 flex gap-2 p-1.5 bg-white dark:bg-[#2d0a1e]/40 rounded-full w-fit shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20">
         <button 
           onClick={() => setActiveTab('pending')}
           className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative
-            ${activeTab === 'pending' ? 'text-[#594246]' : 'text-[#594246]/60 hover:text-[#594246]'}
+            ${activeTab === 'pending' ? 'text-[#594246] dark:text-[#2d0a1e]' : 'text-[#594246]/60 dark:text-[#f0d8e8]/60 hover:text-[#594246] dark:hover:text-[#f8f0f5]'}
           `}
         >
           {activeTab === 'pending' && (
             <motion.div 
               layoutId="active-tab"
-              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 rounded-full border border-[#F2D0D3] -z-10"
+              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 dark:from-[#e8688a] dark:to-[#f0a0c0] rounded-full border border-[#F2D0D3] dark:border-[#e8688a] -z-10"
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             ></motion.div>
           )}
@@ -98,13 +98,13 @@ export default function ReviewsPage() {
         <button 
           onClick={() => setActiveTab('completed')}
           className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 relative
-            ${activeTab === 'completed' ? 'text-[#594246]' : 'text-[#594246]/60 hover:text-[#594246]'}
+            ${activeTab === 'completed' ? 'text-[#594246] dark:text-[#2d0a1e]' : 'text-[#594246]/60 dark:text-[#f0d8e8]/60 hover:text-[#594246] dark:hover:text-[#f8f0f5]'}
           `}
         >
           {activeTab === 'completed' && (
             <motion.div 
               layoutId="active-tab"
-              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 rounded-full border border-[#F2D0D3] -z-10"
+              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 dark:from-[#e8688a] dark:to-[#f0a0c0] rounded-full border border-[#F2D0D3] dark:border-[#e8688a] -z-10"
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             ></motion.div>
           )}
@@ -113,10 +113,10 @@ export default function ReviewsPage() {
       </div>
 
       <div className="pt-2 relative z-10">
-        <h2 className="text-xl font-bold text-[#594246]">
+        <h2 className="text-xl font-bold text-[#594246] dark:text-[#f8f0f5]">
           {activeTab === 'pending' ? 'Productos que puedes reseñar' : 'Reseñas publicadas'}
         </h2>
-        <p className="text-[#594246]/70 text-sm mt-1 font-medium">
+        <p className="text-[#594246]/70 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">
           {activeTab === 'pending' ? 'Solo aparecen productos de pedidos ya entregados.' : 'Estas son las opiniones que has compartido.'}
         </p>
       </div>
@@ -161,7 +161,7 @@ export default function ReviewsPage() {
               ))}
             </div>
           ) : (
-            <div className="py-20 flex flex-col items-center justify-center text-[#594246]/40 bg-white/60 backdrop-blur-sm rounded-3xl border border-[#EBEAE8] shadow-sm">
+            <div className="py-20 flex flex-col items-center justify-center text-[#594246]/40 dark:text-[#f8f0f5]/40 bg-white/60 backdrop-blur-sm rounded-3xl border border-[#EBEAE8] shadow-sm">
               <MessageSquareHeart className="w-16 h-16 mb-4 stroke-1 opacity-50" />
               <p className="text-lg font-medium">Aún no has publicado ninguna reseña.</p>
             </div>
@@ -182,24 +182,24 @@ function ReviewCard({ product }: { product: any }) {
   const displayRating = hoverRating || rating;
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.15)] border border-[#F2D0D3]/60 p-6 lg:p-8 flex flex-col lg:flex-row gap-8 lg:gap-12 transition-shadow duration-300 hover:shadow-[0_15px_50px_-10px_rgba(89,66,70,0.25)] relative overflow-hidden">
+    <div className="bg-white/90 dark:bg-[#2d0a1e]/40 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.15)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#F2D0D3]/60 dark:border-[#e8688a]/20 p-6 lg:p-8 flex flex-col lg:flex-row gap-8 lg:gap-12 transition-shadow duration-300 hover:shadow-[0_15px_50px_-10px_rgba(89,66,70,0.25)] dark:hover:shadow-[0_12px_40px_-4px_rgba(232,104,138,0.2)] relative overflow-hidden">
       
       {/* Subtle top accent line for elegance */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F2778D] via-[#632034] to-[#F2B6C1]"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F2778D] via-[#632034] to-[#F2B6C1] dark:from-[#e8688a] dark:via-[#f0a0c0] dark:to-[#e8688a]"></div>
 
       {/* Left Column: Product Info (Now symmetrical and vertically stacked) */}
-      <div className="flex flex-col items-center text-center lg:w-1/4 shrink-0 border-b lg:border-b-0 lg:border-r border-[#EBEAE8] pb-6 lg:pb-0 lg:pr-8">
-        <div className="w-28 h-36 lg:w-40 lg:h-52 shrink-0 rounded-2xl overflow-hidden bg-[#FAF9F6] border border-[#EBEAE8] shadow-sm mb-4">
+      <div className="flex flex-col items-center text-center lg:w-1/4 shrink-0 border-b lg:border-b-0 lg:border-r border-[#EBEAE8] dark:border-[#e8688a]/20 pb-6 lg:pb-0 lg:pr-8">
+        <div className="w-28 h-36 lg:w-40 lg:h-52 shrink-0 rounded-2xl overflow-hidden bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/20 shadow-sm mb-4">
           <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
         </div>
         {/* Stronger Wine color for product name */}
-        <h3 className="text-lg font-bold text-[#632034] leading-tight px-2">{product.name}</h3>
+        <h3 className="text-lg font-bold text-[#632034] dark:text-[#f8f0f5] leading-tight px-2">{product.name}</h3>
         {/* Removed high transparency for better readability */}
-        <p className="text-[#594246] text-sm font-bold mt-1">Talla {product.size}</p>
+        <p className="text-[#594246] dark:text-[#f0d8e8]/80 text-sm font-bold mt-1">Talla {product.size}</p>
         
-        <div className="mt-4 pt-4 border-t border-[#EBEAE8] w-full space-y-1">
-          <p className="text-[#632034] font-medium text-xs">Pedido #{product.orderId}</p>
-          <p className="text-[#632034] font-medium text-xs">Entregado: {product.deliveryDate}</p>
+        <div className="mt-4 pt-4 border-t border-[#EBEAE8] dark:border-[#e8688a]/20 w-full space-y-1">
+          <p className="text-[#632034] dark:text-[#f0a0c0] font-medium text-xs">Pedido #{product.orderId}</p>
+          <p className="text-[#632034] dark:text-[#f0a0c0] font-medium text-xs">Entregado: {product.deliveryDate}</p>
         </div>
       </div>
 
@@ -221,8 +221,8 @@ function ReviewCard({ product }: { product: any }) {
                   <Star 
                     className={`w-8 h-8 transition-all duration-300 ${
                       star <= displayRating 
-                        ? 'fill-[#F2778D] text-[#F2778D] drop-shadow-[0_2px_8px_rgba(242,119,141,0.5)]' 
-                        : 'fill-transparent text-[#EBEAE8]'
+                        ? 'fill-[#F2778D] dark:fill-[#e8688a] text-[#F2778D] dark:text-[#e8688a] drop-shadow-[0_2px_8px_rgba(242,119,141,0.5)]' 
+                        : 'fill-transparent text-[#EBEAE8] dark:text-[#e8688a]/30'
                     }`} 
                   />
                 </button>
@@ -237,7 +237,7 @@ function ReviewCard({ product }: { product: any }) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="text-[#632034] font-bold text-sm italic bg-[#F2D0D3]/30 px-4 py-2 rounded-full border border-[#F2D0D3]/50 shadow-sm"
+                  className="text-[#632034] dark:text-[#f8f0f5] font-bold text-sm italic bg-[#F2D0D3]/30 dark:bg-[#e8688a]/20 px-4 py-2 rounded-full border border-[#F2D0D3]/50 dark:border-[#e8688a]/30 shadow-sm"
                 >
                   {RATING_PHRASES[displayRating]}
                 </motion.span>
@@ -248,15 +248,15 @@ function ReviewCard({ product }: { product: any }) {
 
         {/* Text Area */}
         <div className="mb-6">
-          <p className="text-[#632034] font-bold text-sm mb-3 flex items-center justify-between">
-            <span>Cuéntanos tu experiencia <span className="text-[#632034]/60 font-medium">(opcional)</span></span>
+          <p className="text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-3 flex items-center justify-between">
+            <span>Cuéntanos tu experiencia <span className="text-[#632034]/60 dark:text-[#f0a0c0]/80 font-medium">(opcional)</span></span>
           </p>
           <textarea 
             rows={4}
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             placeholder="¿Qué te pareció la tela? ¿Cómo te quedó la talla? ¡Ayuda a otras chicas a decidirse!"
-            className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl p-4 text-[#632034] font-medium placeholder:text-[#594246]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all resize-none shadow-inner"
+            className="w-full bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/30 rounded-2xl p-4 text-[#632034] dark:text-[#f8f0f5] font-medium placeholder:text-[#594246]/40 dark:placeholder:text-[#f8f0f5]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] dark:focus:ring-[#e8688a]/50 focus:border-[#F2D0D3] dark:focus:border-[#e8688a]/50 transition-all resize-none shadow-inner"
           />
         </div>
 
@@ -288,8 +288,8 @@ function ReviewCard({ product }: { product: any }) {
             }}
             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm
               ${rating > 0 
-                ? 'bg-[#632034] text-white hover:bg-[#F2778D] hover:shadow-md' 
-                : 'bg-[#EBEAE8] text-[#594246]/50 cursor-not-allowed shadow-none border border-[#EBEAE8]'}
+                ? 'bg-[#632034] dark:bg-[#e8688a]/20 text-white dark:text-[#f0a0c0] hover:bg-[#F2778D] dark:hover:bg-[#e8688a] dark:hover:text-[#f8f0f5] border-2 border-transparent dark:border-[#e8688a]/30 hover:shadow-md' 
+                : 'bg-[#EBEAE8] dark:bg-white/5 text-[#594246]/50 dark:text-[#f8f0f5]/30 cursor-not-allowed shadow-none border-2 border-[#EBEAE8] dark:border-transparent'}
             `}
           >
             <UploadCloud className="w-5 h-5" />
@@ -299,7 +299,7 @@ function ReviewCard({ product }: { product: any }) {
         </div>
         
         {rating === 0 && (
-          <p className="text-center sm:text-right text-[12px] text-[#632034]/60 mt-2 font-bold">
+          <p className="text-center sm:text-right text-[12px] text-[#632034]/60 dark:text-[#f0a0c0]/80 mt-2 font-bold">
             * Debes seleccionar al menos una estrella para publicar.
           </p>
         )}

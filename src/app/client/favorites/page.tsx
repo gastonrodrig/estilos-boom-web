@@ -101,23 +101,23 @@ export default function FavoritesPage() {
     <div className="space-y-8 w-full pb-10">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">Mis favoritos</h1>
-        <p className="text-[#594246]/70 mt-1 font-light">{favoritesList.length} productos guardados</p>
-        <p className="text-[#594246]/50 text-sm mt-1">Productos que guardaste para más tarde</p>
+        <h1 className="text-3xl font-serif font-medium text-[#594246] dark:text-[#f8f0f5]  tracking-wide">Mis favoritos</h1>
+        <p className="text-[#594246]/70 dark:text-[#f0d8e8] mt-1 font-light">{favoritesList.length} productos guardados</p>
+        <p className="text-[#594246]/50 dark:text-[#f0d8e8]/70 text-sm mt-1">Productos que guardaste para más tarde</p>
       </div>
 
       {/* Elegant Fairy-Tale Filters */}
-      <div className="flex gap-2 p-1.5 bg-white rounded-full w-fit shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
+      <div className="flex gap-2 p-1.5 bg-white dark:bg-[#2d0a1e]/60 rounded-full w-fit shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] dark:shadow-[0_4px_20px_-4px_rgba(232,104,138,0.2)] border border-[#EBEAE8] dark:border-[#e8688a]/20 backdrop-blur-md">
         <button 
           onClick={() => setFilter('all')}
           className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 relative
-            ${filter === 'all' ? 'text-[#594246]' : 'text-[#594246]/50 hover:text-[#594246]/80'}
+            ${filter === 'all' ? 'text-[#594246] dark:text-[#f8f0f5]' : 'text-[#594246]/50 dark:text-[#f0d8e8]/50 hover:text-[#594246]/80 dark:hover:text-[#f8f0f5]/80'}
           `}
         >
           {filter === 'all' && (
             <motion.div 
               layoutId="active-pill"
-              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 rounded-full border border-[#F2D0D3] -z-10"
+              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 dark:from-[#e8688a]/30 dark:to-[#f0a0c0]/20 rounded-full border border-[#F2D0D3] dark:border-[#e8688a]/40 -z-10"
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             ></motion.div>
           )}
@@ -127,13 +127,13 @@ export default function FavoritesPage() {
         <button 
           onClick={() => setFilter('available')}
           className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 relative
-            ${filter === 'available' ? 'text-[#594246]' : 'text-[#594246]/50 hover:text-[#594246]/80'}
+            ${filter === 'available' ? 'text-[#594246] dark:text-[#f8f0f5]' : 'text-[#594246]/50 dark:text-[#f0d8e8]/50 hover:text-[#594246]/80 dark:hover:text-[#f8f0f5]/80'}
           `}
         >
           {filter === 'available' && (
             <motion.div 
               layoutId="active-pill"
-              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 rounded-full border border-[#F2D0D3] -z-10"
+              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 dark:from-[#e8688a]/30 dark:to-[#f0a0c0]/20 rounded-full border border-[#F2D0D3] dark:border-[#e8688a]/40 -z-10"
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             ></motion.div>
           )}
@@ -143,13 +143,13 @@ export default function FavoritesPage() {
         <button 
           onClick={() => setFilter('out_of_stock')}
           className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 relative
-            ${filter === 'out_of_stock' ? 'text-[#594246]' : 'text-[#594246]/50 hover:text-[#594246]/80'}
+            ${filter === 'out_of_stock' ? 'text-[#594246] dark:text-[#f8f0f5]' : 'text-[#594246]/50 dark:text-[#f0d8e8]/50 hover:text-[#594246]/80 dark:hover:text-[#f8f0f5]/80'}
           `}
         >
           {filter === 'out_of_stock' && (
             <motion.div 
               layoutId="active-pill"
-              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 rounded-full border border-[#F2D0D3] -z-10"
+              className="absolute inset-0 bg-gradient-to-r from-[#F2D0D3]/40 to-[#F2B6C1]/30 dark:from-[#e8688a]/30 dark:to-[#f0a0c0]/20 rounded-full border border-[#F2D0D3] dark:border-[#e8688a]/40 -z-10"
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
             ></motion.div>
           )}
@@ -174,19 +174,19 @@ export default function FavoritesPage() {
                 className="group flex flex-col bg-transparent"
               >
                 {/* Image Container */}
-                <div className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden bg-[#FAF9F6] border border-[#EBEAE8]/50 shadow-sm transition-shadow duration-500 group-hover:shadow-[0_12px_40px_-10px_rgba(89,66,70,0.15)] mb-4">
+                <div className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden bg-[#FAF9F6] dark:bg-[#2d0a1e]/40 border border-[#EBEAE8]/50 dark:border-[#e8688a]/20 shadow-sm transition-shadow duration-500 group-hover:shadow-[0_12px_40px_-10px_rgba(89,66,70,0.15)] dark:group-hover:shadow-[0_12px_40px_-10px_rgba(232,104,138,0.3)] mb-4">
                   {/* The Image */}
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className={`w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 ${!product.inStock ? 'opacity-40 grayscale-[0.5]' : ''}`}
+                    className={`w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 ${!product.inStock ? 'opacity-40 grayscale-[0.5] dark:opacity-20' : ''}`}
                   />
 
                   {/* Out of stock overlay */}
                   {!product.inStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#594246]/10 backdrop-blur-[1px]">
-                      <div className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full border border-[#EBEAE8] shadow-sm">
-                        <span className="text-[#594246]/70 font-bold text-sm tracking-wide">Sin stock</span>
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#594246]/10 dark:bg-[#e8688a]/5 backdrop-blur-[1px]">
+                      <div className="bg-white/90 dark:bg-[#2d0a1e]/90 backdrop-blur-md px-5 py-2 rounded-full border border-[#EBEAE8] dark:border-[#e8688a]/30 shadow-sm">
+                        <span className="text-[#594246]/70 dark:text-[#f0a0c0] font-bold text-sm tracking-wide">Sin stock</span>
                       </div>
                     </div>
                   )}
@@ -194,19 +194,22 @@ export default function FavoritesPage() {
                   {/* Heart Button */}
                   <button 
                     onClick={() => toggleFavorite(product.id)}
-                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-white flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 dark:bg-[#2d0a1e]/80 backdrop-blur-md shadow-sm border border-white dark:border-[#e8688a]/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
                   >
                     <Heart 
-                      className={`w-5 h-5 transition-colors duration-300 ${isFavorited ? 'fill-[#F2778D] text-[#F2778D]' : 'text-[#594246]/40'}`} 
+                      className={`w-5 h-5 transition-colors duration-300 ${isFavorited ? 'fill-[#F2778D] dark:fill-[#f0a0c0] text-[#F2778D] dark:text-[#f0a0c0]' : 'text-[#594246]/40 dark:text-[#f0d8e8]/40'}`} 
                     />
                   </button>
                 </div>
 
                 {/* Product Info */}
                 <div className="px-2 flex flex-col flex-1">
-                  <h3 className="text-[#594246] font-bold text-[15px] leading-tight line-clamp-1">{product.name}</h3>
+                  <h3 className="text-[#594246] dark:text-[#f8f0f5] font-bold text-[15px] leading-tight line-clamp-1">{product.name}</h3>
                   <div className="flex justify-between items-center mt-2 mb-4">
-                    <p className="text-[#F2778D] font-bold text-lg">S/ {product.price.toFixed(2)}</p>
+                    <p className="text-[#F2778D] dark:text-[#f0a0c0] font-bold text-lg">S/ {product.price.toFixed(2)}</p>
+                    <span className="text-xs font-bold text-[#594246]/50 dark:text-[#f8f0f5]/70 bg-[#EBEAE8]/50 dark:bg-[#e8688a]/20 px-2.5 py-1 rounded-md">
+                      Talla {product.size}
+                    </span>
                   </div>
 
                   {/* Add to Cart Button */}
@@ -214,8 +217,8 @@ export default function FavoritesPage() {
                     disabled={!product.inStock}
                     className={`mt-auto w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold transition-all duration-300
                       ${product.inStock 
-                        ? 'bg-[#F2D0D3]/40 text-[#594246] border border-[#F2D0D3] hover:bg-[#F2778D] hover:text-white hover:border-[#F2778D] shadow-sm' 
-                        : 'bg-[#EBEAE8] text-[#594246]/30 border border-[#EBEAE8] cursor-not-allowed'}
+                        ? 'bg-[#F2D0D3]/40 dark:bg-[#e8688a]/20 text-[#594246] dark:text-[#f0a0c0] border border-[#F2D0D3] dark:border-[#e8688a]/30 hover:bg-[#F2778D] dark:hover:bg-[#e8688a] hover:text-white dark:hover:text-[#f8f0f5] hover:border-[#F2778D] dark:hover:border-[#e8688a] shadow-sm' 
+                        : 'bg-[#EBEAE8] dark:bg-[#2d0a1e]/40 text-[#594246]/30 dark:text-[#f0d8e8]/30 border border-[#EBEAE8] dark:border-[#e8688a]/10 cursor-not-allowed'}
                     `}
                   >
                     <ShoppingCart className="w-4 h-4" />

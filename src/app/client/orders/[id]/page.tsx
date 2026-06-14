@@ -122,7 +122,7 @@ export default function OrderDetailsPage() {
           href="/client/orders/active"
           className="flex items-center gap-2 text-[#594246]/60 hover:text-[#594246] transition-colors font-medium group"
         >
-          <div className="w-8 h-8 rounded-full bg-white border border-[#EBEAE8] flex items-center justify-center group-hover:border-[#F2D0D3] group-hover:bg-[#FAF9F6] transition-all">
+          <div className="w-8 h-8 rounded-full bg-white dark:bg-[#2d0a1e]/60 border border-[#EBEAE8] dark:border-[rgba(180,170,200,0.2)] flex items-center justify-center group-hover:border-[#F2D0D3] dark:group-hover:border-[rgba(232,184,109,0.5)] group-hover:bg-[#FAF9F6] dark:group-hover:bg-[#e8b86d]/10 transition-all">
             <ArrowLeft className="w-4 h-4" />
           </div>
           Volver a mis pedidos
@@ -153,7 +153,7 @@ export default function OrderDetailsPage() {
             <Check className="w-4 h-4 text-slate-600" />
             <span className="text-slate-700 text-sm font-bold tracking-wide uppercase">Pago confirmado</span>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -163,9 +163,10 @@ export default function OrderDetailsPage() {
         <div className="lg:col-span-2 space-y-8">
 
           {/* Product List */}
-          <div className="bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(89,66,70,0.04)] border border-[#EBEAE8]">
-            <h2 className="text-xl font-bold text-[#594246] mb-6 flex items-center gap-2">
-              <Package className="w-5 h-5 text-[#F2778D]" /> Productos comprados
+          <div className="bg-[rgba(255,232,238,0.75)] backdrop-blur-[8px] border border-[rgba(196,84,122,0.18)] shadow-[inset_0_1px_0_rgba(184,134,11,0.1),0_4px_24px_rgba(196,84,122,0.1),0_1px_4px_rgba(196,84,122,0.06)] transition-all duration-300 dark:bg-[rgba(30,8,22,0.82)] p-8 rounded-[14px] dark:border-[rgba(180,170,200,0.12)] dark:shadow-[inset_0_1px_0_rgba(232,184,109,0.12),inset_0_0_30px_rgba(196,84,122,0.04),0_4px_24px_rgba(0,0,0,0.3)] relative overflow-hidden">
+            
+            <h2 className="mb-[16px] border-b border-[rgba(196,84,122,0.1)] dark:border-[rgba(180,170,200,0.12)] pb-[14px] relative z-10">
+              <span className="text-[#9a6f00] font-semibold dark:text-[rgba(232,184,109,0.6)] text-[0.85rem] tracking-[0.15em] uppercase">Productos comprados</span>
             </h2>
 
             <div className="space-y-6">
@@ -270,7 +271,6 @@ export default function OrderDetailsPage() {
                 </>
               )}
             </div>
-
           </div>
 
         </div>

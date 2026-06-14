@@ -58,29 +58,20 @@ export const ProductCardCatalogue = ({ product }: Props) => {
 
   return (
     <motion.div
-      className="group flex flex-col relative bg-[#ffffff] dark:bg-[#2a1a22] border border-[rgba(180,60,100,0.1)] dark:border-[rgba(255,255,255,0.07)] shadow-[0_4px_20px_rgba(0,0,0,0.07)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-[6px] hover:shadow-[0_16px_40px_rgba(180,60,100,0.15)] dark:hover:border-[rgba(180,60,100,0.3)] dark:hover:shadow-[0_16px_40px_rgba(180,60,100,0.25)] rounded-[16px] overflow-hidden transition-all duration-500 h-full"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      className="product-card flex flex-col h-full"
     >
-      {/* Contenedor de Imagen con Efectos */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#FAF9F6] rounded-t-[16px]">
+      {/* ZONA IMAGEN */}
+      <div className="product-image-wrapper">
         <Link href={`/product/${product.id_product}`} className="block w-full h-full">
-          <motion.img
+          <img
             src={product.images[0] || "/placeholder.jpg"}
             alt={product.name}
-            className="w-full h-full object-cover"
-            animate={{ scale: isHovered ? 1.03 : 1 }}
-            transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
-          />
-
-          {/* Overlay oscuro para hover */}
-          <motion.div
-            className="absolute inset-0 bg-black/5 z-0"
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.4 }}
+            className="product-image"
           />
         </Link>
 
@@ -93,51 +84,29 @@ export const ProductCardCatalogue = ({ product }: Props) => {
         >
           <Heart size={16} fill={isFavorited || isHovered ? "currentColor" : "none"} strokeWidth={1.5} className="transition-all" />
         </motion.button>
+        
       </div>
 
-      {/* Información del Producto */}
-      <div className="flex flex-col p-[14px_16px_16px] flex-1 bg-[#ffffff] dark:bg-[#2a1a22] transition-colors duration-500">
-        
-        {/* Line 1: Nombre */}
+      {/* ZONA INFO — más limpia */}
+      <div className="product-info flex flex-col flex-1 h-full">
         <Link href={`/product/${product.id_product}`}>
-          <h3 className="text-[#1a1018] dark:text-white line-clamp-1 group-hover:text-[#632034] dark:group-hover:text-[#F3E5AB] transition-colors mb-1"
-              style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '1.05rem', fontWeight: 500 }}>
+          <h3 className="product-nombre line-clamp-1">
             {product.name}
           </h3>
         </Link>
 
-        {/* Line 2: Precios y Badge alineados a la izquierda y derecha */}
-        <div className="flex items-center gap-2 mb-3">
-          <p className="text-[#632034] dark:text-white font-bold tracking-wide" style={{ fontSize: '0.9rem' }}>
+        <div className="product-precios mt-auto">
+          <span className="precio-actual">
             S/ {product.base_price.toFixed(2)}
-          </p>
-          <span className="text-[#1a1018] dark:text-[#e8829a] line-through opacity-45" style={{ fontSize: '0.9rem' }}>
+          </span>
+          <span className="precio-original">
             S/ {(product.base_price * 1.2).toFixed(2)}
           </span>
-          <span className="bg-[#8B3A52] text-white px-[8px] py-[2px] font-bold ml-auto rounded-full" style={{ fontSize: '0.65rem' }}>
-            -20%
-          </span>
         </div>
 
-        {/* Line 3: Tags (Categoría y Nuevo) */}
-        <div className="mt-auto mb-1 flex items-center gap-2">
-          {product.is_new_in && (
-            <span className="text-[#8B3A52] dark:text-[#e8829a] uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.1em', opacity: 0.8 }}>
-              NUEVO
-            </span>
-          )}
-          {product.is_new_in && <span className="text-[#1a1018] dark:text-white opacity-20" style={{ fontSize: '0.65rem' }}>•</span>}
-          <span className="text-[#1a1018] dark:text-white uppercase opacity-45" style={{ fontSize: '0.65rem', letterSpacing: '0.1em' }}>
-            {product.category?.name || "COLECCIÓN"}
-          </span>
-        </div>
-
-        {/* Line 4: Colores como texto */}
-        <div>
-          <span className="text-[#1a1018] dark:text-white opacity-50 uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.08em' }}>
-            {colorsText || "VARIOS COLORES"} {product.variants.length > 3 && `· +${product.variants.length - 3}`}
-          </span>
-        </div>
+        <button className="btn-carrito">
+          <span className="text-[14px]">🛒</span> Agregar al carrito
+        </button>
       </div>
     </motion.div>
   );
