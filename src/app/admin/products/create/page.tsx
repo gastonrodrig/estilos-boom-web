@@ -110,15 +110,26 @@ export default function CreateProductPage() {
       return toast.error("Este color ya fue seleccionado.");
     }
     setSelectedColors([...selectedColors, color]);
+    const next = [...selectedColors, color];
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
     setColorSearch('');
     setShowColorDropdown(false);
   };
 
   const handleAddCustomColor = () => {
     if (!customColorName.trim()) return toast.error("Escribe el nombre del color.");
-    setSelectedColors([...selectedColors, { name: customColorName.trim(), hex: customColorHex }]);
+    const next = [...selectedColors, { name: customColorName.trim(), hex: customColorHex }];
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
     setCustomColorName('');
     setIsCreatingCustomColor(false);
+  };
+
+  const handleRemoveColor = (colorName: string) => {
+    const next = selectedColors.filter(c => c.name !== colorName);
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
   };
 
   // 🧵 Gestión de Ficha Técnica vinculando IDs reales de MongoDB
@@ -572,7 +583,7 @@ export default function CreateProductPage() {
                   <div key={color.name} className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-black/50 backdrop-blur-md text-[#40202D] dark:text-white rounded-full text-xs font-bold border border-[#EAE0E2] dark:border-white/10 shadow-sm animate-in zoom-in-75 duration-150">
                     <div className="w-3 h-3 rounded-full border border-black/5 dark:border-white/10 shadow-inner" style={{ backgroundColor: color.hex }} />
                     {color.name}
-                    <X size={14} className="cursor-pointer text-[#8C6B79] dark:text-gray-400 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] transition-colors" onClick={() => setSelectedColors(selectedColors.filter(c => c.name !== color.name))} />
+                    <X size={14} className="cursor-pointer text-[#8C6B79] dark:text-gray-400 hover:text-[#D6405F] dark:hover:text-[#F8BBD0] transition-colors" onClick={() => handleRemoveColor(color.name)} />
                   </div>
                 ))}
                 {selectedColors.length === 0 && (
