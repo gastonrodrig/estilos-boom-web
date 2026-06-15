@@ -162,22 +162,22 @@ export default function StockActualPage() {
       {/* SECCIÓN IZQUIERDA: MATRIZ DE STOCK */}
       <div className="flex-1 space-y-6">
         {/* Filtros superiores */}
-        <div className="flex flex-col md:flex-row gap-4 items-center bg-white/30 dark:bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 items-center bg-white/30 dark:bg-white/5 backdrop-blur-md p-4 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8C6B79] dark:text-gray-400" size={18} />
             <input 
               type="text" 
               placeholder="Buscar producto..." 
-              className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl outline-none text-sm text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500 focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors"
+              className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 rounded-2xl outline-none text-sm text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500 focus:border-[#D6405F] dark:focus:border-[#8B3A52] transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
-            <option className="text-black dark:text-zinc-100">Todos los productos</option>
+          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] transition-colors text-[#40202D] dark:text-white">
+            <option className="text-black dark:text-white">Todos los productos</option>
           </select>
-          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] transition-colors text-[#40202D] dark:text-white">
-            <option className="text-black dark:text-zinc-100">Todas las ubicaciones</option>
+          <select className="p-3 w-full md:w-auto bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 rounded-2xl text-sm outline-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] transition-colors text-[#40202D] dark:text-white">
+            <option className="text-black dark:text-white">Todas las ubicaciones</option>
           </select>
         </div>
 
@@ -188,7 +188,7 @@ export default function StockActualPage() {
               key={size}
               onClick={() => setSelectedSizeFilter(size)}
               className={`px-5 py-2 rounded-full text-xs font-bold transition-all shadow-sm ${
-                selectedSizeFilter === size ? "bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] border border-transparent shadow-md scale-105" : "bg-white/70 dark:bg-black/50 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-300 hover:scale-105"
+                selectedSizeFilter === size ? "bg-[#8B3A52] text-white border border-transparent shadow-md scale-105" : "bg-white/70 dark:bg-white/5 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-300 hover:scale-105"
               }`}
             >
               {size}
@@ -200,7 +200,7 @@ export default function StockActualPage() {
         <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[3xl] overflow-hidden transition-[background-color,border-color] duration-[600ms] overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm min-w-[800px] border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                 <th className="p-5 w-12 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]"></th>
                 <th className="p-5 min-w-[280px] border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Producto</th>
                 <th className="p-5 text-center w-36 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Total Almacén</th>
@@ -251,16 +251,16 @@ export default function StockActualPage() {
                           <p className="text-xs text-[#8C6B79] dark:text-gray-400 truncate">{prod.id_category?.name || 'Prendas'}</p>
                         </div>
                       </td>
-                      <td className="p-4 text-center font-bold text-lg text-gray-700">
+                      <td className="p-4 text-center text-lg text-gray-700 dark:text-zinc-300">
                         {totalAlmacen}
                       </td>
                       
                       {/* CELDA TOTAL TIENDA */}
-                      <td className="p-4 text-center font-bold text-lg text-rose-400">
+                      <td className="p-4 text-center text-lg text-rose-500 dark:text-rose-400">
                         {totalTienda}
                       </td>
                       <td className="p-4 text-center">
-                        <span className="bg-emerald-500/10 text-emerald-600 dark:text-[#A5D6A7] px-2.5 py-1 rounded-full text-[11px] font-black tracking-wider uppercase border border-emerald-500/20 shadow-sm">
+                        <span className="bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-[#A5D6A7] px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wider uppercase border border-emerald-500/20 shadow-sm">
                           Todo OK
                         </span>
                       </td>
@@ -268,7 +268,7 @@ export default function StockActualPage() {
                         <button 
                           type="button"
                           onClick={() => handleAddProductToOrder(prod)}
-                          className="px-4 py-1.5 bg-[#D6405F] dark:bg-[#F8BBD0] hover:scale-105 text-white dark:text-[#40202D] text-xs font-bold rounded-full transition-transform shadow-md"
+                          className="px-4 py-1.5 bg-[#D6405F] dark:bg-[#8B3A52] hover:scale-105 text-white dark:text-white text-xs font-bold rounded-full transition-transform shadow-md"
                         >
                           Mover
                         </button>
@@ -286,21 +286,21 @@ export default function StockActualPage() {
                         <tr key={variantKey} className="bg-white/40 dark:bg-white/5 text-xs">
                           <td></td>
                           {/* 🎨 CELDA DE PRODUCTO ADAPTATIVA Y RESPONSIVA */}
-                          <td className="p-3 pl-10 border-l-2 border-[#D6405F] dark:border-[#F8BBD0]">
+                          <td className="p-3 pl-10 border-l-2 border-[#D6405F] dark:border-[#8B3A52]">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 min-w-0">
                               <div className="flex items-center gap-2 shrink-0">
                                 <div className="w-3 h-3 rounded-full border border-black/10 dark:border-white/10 shadow-inner" style={{ backgroundColor: variant.color?.hex }} />
                                 <span className="font-bold text-[#40202D] dark:text-white text-sm">{variant.size} • {variant.color?.name}</span>
                               </div>
-                              <span className="font-mono text-[11px] text-[#8C6B79] dark:text-gray-400 bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 px-2 py-0.5 rounded truncate max-w-[220px]">
+                              <span className="font-mono text-[11px] text-[#8C6B79] dark:text-gray-400 bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-2 py-0.5 rounded truncate max-w-[220px]">
                                 {variant.sku_variant}
                               </span>
                             </div>
                           </td>
-                          <td className="p-3 text-center font-bold text-[#40202D] dark:text-white text-sm">
+                          <td className="p-3 text-center text-[#40202D] dark:text-white text-sm">
                             {hasStockData ? stocksByVariant[variant._id].almacen : <span className="animate-pulse opacity-50">...</span>}
                           </td>
-                          <td className="p-3 text-center font-bold text-[#D6405F] dark:text-[#F8BBD0] text-sm">
+                          <td className="p-3 text-center text-[#8B3A52] dark:text-[#e8c4cc] text-sm">
                             {hasStockData ? stocksByVariant[variant._id].tienda : <span className="animate-pulse opacity-50">...</span>}
                           </td>
                           <td className="p-3"></td>
@@ -316,18 +316,18 @@ export default function StockActualPage() {
 
           {/* ── Paginación de Productos ── */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 border-t border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 border-t border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5">
               <span className="text-xs font-bold text-[#8C6B79] dark:text-gray-400 uppercase tracking-wider">
                 Mostrando {Math.min(filteredProducts.length, (page - 1) * itemsPerPage + 1)}-
                 {Math.min(filteredProducts.length, page * itemsPerPage)} de {filteredProducts.length} productos
               </span>
 
-              <div className="flex items-center gap-1 bg-white/50 dark:bg-black/30 backdrop-blur-md p-1.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+              <div className="flex items-center gap-1 bg-white/50 dark:bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
                 <button
                   type="button"
                   disabled={page === 1}
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                  className="p-2 rounded-xl text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
@@ -339,10 +339,10 @@ export default function StockActualPage() {
                       key={pNum}
                       type="button"
                       onClick={() => setPage(pNum)}
-                      className={`min-w-[36px] h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer
+                      className={`min-w-[36px] h-9 rounded-xl text-xs font-medium uppercase tracking-widest transition-all cursor-pointer
                         ${page === pNum
-                          ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white shadow-md"
-                          : "text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10"
+                          ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] dark:from-[#8B3A52] dark:to-[#D6405F] text-white shadow-md"
+                          : "text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10"
                         }`}
                     >
                       {pNum}
@@ -354,7 +354,7 @@ export default function StockActualPage() {
                   type="button"
                   disabled={page === totalPages}
                   onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                  className="p-2 rounded-xl text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
+                  className="p-2 rounded-xl text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-all disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -365,25 +365,25 @@ export default function StockActualPage() {
       </div>
 
       {/* SECCIÓN DERECHA: PANEL FLOTANTE "ORDEN DE MOVIMIENTO" */}
-      <div className="w-full lg:w-80 bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl p-5 shadow-sm flex flex-col h-[calc(100vh-50px)] sticky top-6 z-10">
+      <div className="w-full lg:w-80 bg-white/70 dark:bg-white/5 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl p-5 shadow-sm flex flex-col h-[calc(100vh-50px)] sticky top-6 z-10">
         {/* Título */}
         <div className="flex items-center gap-2 border-b border-[#EAE0E2] dark:border-white/10 pb-4 mb-4">
-          <div className="w-8 h-8 rounded-full bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 flex items-center justify-center shrink-0">
-            <ArrowRightLeft className="text-[#D6405F] dark:text-[#F8BBD0]" size={16} />
+          <div className="w-8 h-8 rounded-full bg-[#8B3A52]/10 dark:bg-[#8B3A52]/20 flex items-center justify-center shrink-0">
+            <ArrowRightLeft className="text-[#8B3A52] dark:text-[#e8c4cc]" size={16} />
           </div>
           <h3 className="font-bold tracking-wide text-lg text-[#40202D] dark:text-white">Orden de movimiento</h3>
         </div>
 
         {/* Selector de dirección */}
         <div className="mb-4 space-y-2">
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Dirección del movimiento</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Dirección del movimiento</p>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => { setTransferDirection("to-store"); setCartMovement({}); }}
               className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border text-[11px] font-bold tracking-wide transition-all ${
                 transferDirection === "to-store"
-                  ? "bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 border-[#D6405F]/30 dark:border-[#F8BBD0]/30 text-[#D6405F] dark:text-[#F8BBD0] shadow-sm"
+                  ? "bg-[#8B3A52]/10 dark:bg-[#8B3A52]/20 border-[#8B3A52]/30 dark:border-[#8B3A52]/40 text-[#8B3A52] dark:text-[#e8c4cc] shadow-sm"
                   : "bg-white/30 dark:bg-white/5 border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10"
               }`}
             >
@@ -395,7 +395,7 @@ export default function StockActualPage() {
               onClick={() => { setTransferDirection("to-warehouse"); setCartMovement({}); }}
               className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border text-[11px] font-bold tracking-wide transition-all ${
                 transferDirection === "to-warehouse"
-                  ? "bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 border-[#D6405F]/30 dark:border-[#F8BBD0]/30 text-[#D6405F] dark:text-[#F8BBD0] shadow-sm"
+                  ? "bg-[#8B3A52]/10 dark:bg-[#8B3A52]/20 border-[#8B3A52]/30 dark:border-[#8B3A52]/40 text-[#8B3A52] dark:text-[#e8c4cc] shadow-sm"
                   : "bg-white/30 dark:bg-white/5 border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 hover:bg-white/60 dark:hover:bg-white/10"
               }`}
             >
@@ -420,7 +420,7 @@ export default function StockActualPage() {
                 className="flex items-center justify-between p-3 hover:bg-white/50 dark:hover:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 relative group animate-in fade-in zoom-in-95 duration-150 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <img src={item.image} className="w-10 h-12 object-cover rounded-xl bg-white/50 border border-[#EAE0E2] dark:border-white/5" alt="" />
+                  <img src={item.image} className="w-10 h-12 object-cover rounded-xl bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/5" alt="" />
                   <div>
                     <p className="text-xs font-bold text-[#40202D] dark:text-white truncate max-w-[130px]">{item.name}</p>
                     <p className="text-[10px] opacity-60 text-[#8C6B79] dark:text-gray-400 font-bold uppercase tracking-wider">{item.variants?.length} variantes</p>
@@ -451,14 +451,14 @@ export default function StockActualPage() {
 
         {/* Footer del Carrito */}
         <div className="border-t border-[#EAE0E2] dark:border-white/10 pt-4 mt-4 space-y-3">
-          <div className="flex justify-between text-xs font-black text-[#8C6B79] dark:text-gray-400 tracking-wider uppercase">
+          <div className="flex justify-between text-xs font-medium text-[#8C6B79] dark:text-gray-400 tracking-wider uppercase">
             <span>Resumen total:</span>
-            <span className="text-[#D6405F] dark:text-[#F8BBD0]">{cartItemsCount} prod. • {cartVariantsCount} vars</span>
+            <span className="text-[#8B3A52] dark:text-[#e8c4cc]">{cartItemsCount} prod. • {cartVariantsCount} vars</span>
           </div>
           <button
             disabled={cartItemsCount === 0}
             onClick={handleGoToWizard}
-            className="w-full py-3.5 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#F2778D] dark:hover:bg-[#F8BBD0] text-white dark:text-[#1A0B11] text-sm font-bold rounded-xl transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(242,119,141,0.2)] disabled:opacity-30 disabled:pointer-events-none disabled:hover:translate-y-0"
+            className="w-full py-3.5 bg-[#40202D] hover:bg-[#5B283A] dark:bg-[#8B3A52] dark:hover:bg-[#a64a66] text-white text-sm font-bold rounded-xl transition-transform hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_15px_rgba(139,58,82,0.3)] disabled:opacity-30 disabled:pointer-events-none disabled:hover:translate-y-0"
           >
             {transferDirection === "to-store" ? "Transferir a Tienda" : "Transferir a Almacén"}
             <ArrowRightLeft className="w-4 h-4" />

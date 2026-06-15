@@ -9,6 +9,7 @@ interface LogoProps {
   onClick?: () => void;
   priority?: boolean;
   isHome?: boolean;
+  iconOnly?: boolean;
 }
 
 export const Logo = ({
@@ -17,6 +18,7 @@ export const Logo = ({
   onClick,
   priority = true,
   isHome,
+  iconOnly = false,
 }: LogoProps) => {
   const finalHeight = height ?? Math.round(width * 0.4);
 
@@ -30,12 +32,12 @@ export const Logo = ({
       transition={isHome ? { duration: 0.6 } : undefined}
     >
       <Image
-        src="/assets/logo-eb.png"
+        src={iconOnly ? "/assets/auth-icon.png" : "/assets/logo-eb.png"}
         alt="Estilos Boom"
         width={width}
         height={finalHeight}
         priority={priority}
-        className="w-auto h-auto"
+        className="w-full h-full object-contain"
       />
     </motion.div>
   );

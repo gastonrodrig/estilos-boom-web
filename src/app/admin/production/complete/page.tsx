@@ -140,7 +140,7 @@ export default function CompletedProductionOrders() {
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
       <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2">
         <div className="flex-1">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
+          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
             <span>Inicio</span>
             <span>/</span>
             <span>Producción</span>
@@ -159,12 +159,12 @@ export default function CompletedProductionOrders() {
         
         <div className="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto items-end">
           <div className="rounded-[1rem] bg-white/70 backdrop-blur-2xl dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[160px] flex-1">
-            <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
-            <p className="text-xl font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
+            <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
+            <p className="text-xl font-medium text-[#D6405F] dark:text-[#F8BBD0] mt-1 drop-shadow-sm">{formatCurrency(totalInvestment)}</p>
           </div>
           <div className="rounded-[1rem] bg-white/70 backdrop-blur-2xl dark:bg-[rgba(255,255,255,0.04)] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] p-5 shadow-sm min-w-[120px] flex-1">
-            <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
-            <p className="text-xl font-black text-[#40202D] dark:text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
+            <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Órdenes</p>
+            <p className="text-xl font-medium text-[#40202D] dark:text-white mt-1 drop-shadow-sm">{completedOrders.length} OP</p>
           </div>
         </div>
       </header>
@@ -174,7 +174,7 @@ export default function CompletedProductionOrders() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Código OP</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Taller</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha Término</th>
@@ -218,7 +218,7 @@ export default function CompletedProductionOrders() {
           onClose={closeModal}
           panelClassName="relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm w-full max-w-3xl p-8"
           title="Línea de Tiempo de Producción"
-          titleClassName="text-2xl font-black text-[#40202D] dark:text-white"
+          titleClassName="text-2xl font-medium text-[#40202D] dark:text-white"
         >
           <div className="pt-8 pb-4">
             <div className="relative">
@@ -232,8 +232,8 @@ export default function CompletedProductionOrders() {
                     <Package className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-black text-[#40202D] dark:text-white">Contacto Inicial</p>
-                    <p className="text-[10px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase tracking-widest">Negociación</p>
+                    <p className="text-sm font-medium text-[#40202D] dark:text-white">Contacto Inicial</p>
+                    <p className="text-[10px] font-medium text-[#D6405F] dark:text-[#F8BBD0] uppercase tracking-widest">Negociación</p>
                     <p className="text-[11px] text-[#8C6B79] dark:text-gray-400 font-medium leading-tight">{formatDate(selectedOrder.created_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
                       <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium leading-none">Acuerdo de costos y asignación de taller.</p>
@@ -247,15 +247,15 @@ export default function CompletedProductionOrders() {
                     <Factory className="w-6 h-6" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-black text-[#40202D] dark:text-white">En Producción</p>
+                    <p className="text-sm font-medium text-[#40202D] dark:text-white">En Producción</p>
                     <div className="flex flex-col gap-1 mt-2 bg-white/30 dark:bg-white/5 p-2 rounded-lg border border-[#EAE0E2] dark:border-white/10 backdrop-blur-md">
-                       <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Corte:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
+                       <p className="text-[9px] font-medium text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Corte:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CORTE');
                             return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
                          })()}
                        </span></p>
-                       <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Confección:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
+                       <p className="text-[9px] font-medium text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Confección:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CONFECCION');
                             return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
@@ -271,8 +271,8 @@ export default function CompletedProductionOrders() {
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
                   <div className="mt-4 space-y-1 px-2">
-                    <p className="text-sm font-black text-[#40202D] dark:text-white">Finalizado</p>
-                    <p className="text-[10px] font-black text-[#10b981] dark:text-emerald-400 uppercase tracking-widest">Entregado y Validado</p>
+                    <p className="text-sm font-medium text-[#40202D] dark:text-white">Finalizado</p>
+                    <p className="text-[10px] font-medium text-[#10b981] dark:text-emerald-400 uppercase tracking-widest">Entregado y Validado</p>
                     <p className="text-[11px] text-[#8C6B79] dark:text-gray-400 font-medium leading-tight">{formatDate(selectedOrder.updated_at)}</p>
                     <div className="pt-2 opacity-0 group-hover:opacity-100 transition-opacity max-w-[150px]">
                       <p className="text-[10px] text-[#8C6B79] dark:text-gray-500 font-medium leading-none">Control de calidad aprobado y registrado en inventario.</p>
@@ -285,11 +285,11 @@ export default function CompletedProductionOrders() {
             <div className="mt-12 bg-white/50 dark:bg-white/5 rounded-2xl p-5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
               <div className="flex items-center gap-3 mb-2">
                 <FileText className="w-5 h-5 text-[#D6405F] dark:text-[#F8BBD0]" />
-                <h4 className="text-xs font-black text-[#40202D] dark:text-white uppercase tracking-widest">Resumen de Auditoría</h4>
+                <h4 className="text-xs font-medium text-[#40202D] dark:text-white uppercase tracking-widest">Resumen de Auditoría</h4>
               </div>
               <p className="text-xs text-[#8C6B79] dark:text-gray-400 leading-relaxed font-medium">
-                La orden <span className="font-black text-[#40202D] dark:text-white">{selectedOrder.pre_order_number}</span> completó satisfactoriamente todas las etapas de validación. 
-                Se confirma el ingreso de <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{selectedTotalUnits} unidades</span> al inventario central bajo la supervisión del taller <span className="font-black text-[#40202D] dark:text-white">{selectedWorkshopName}</span>.
+                La orden <span className="font-medium text-[#40202D] dark:text-white">{selectedOrder.pre_order_number}</span> completó satisfactoriamente todas las etapas de validación. 
+                Se confirma el ingreso de <span className="font-medium text-[#D6405F] dark:text-[#F8BBD0]">{selectedTotalUnits} unidades</span> al inventario central bajo la supervisión del taller <span className="font-medium text-[#40202D] dark:text-white">{selectedWorkshopName}</span>.
               </p>
             </div>
 
@@ -304,7 +304,7 @@ export default function CompletedProductionOrders() {
           onClose={closeModal}
           panelClassName="relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-[32px] border border-[#EAE0E2] dark:border-white/10 shadow-sm w-full max-w-2xl p-8"
           title="Ficha Técnica Detallada"
-          titleClassName="text-2xl font-black text-[#40202D] dark:text-white"
+          titleClassName="text-2xl font-medium text-[#40202D] dark:text-white"
         >
           <div className="space-y-8 pt-4">
              <div className="flex flex-col sm:flex-row items-start gap-8">
@@ -313,36 +313,36 @@ export default function CompletedProductionOrders() {
                 </div>
                 <div className="space-y-6 flex-1 w-full">
                    <div>
-                      <h4 className="text-3xl font-black text-[#40202D] dark:text-white leading-tight">{selectedFirstItem?.name}</h4>
-                      <p className="text-sm text-[#D6405F] dark:text-[#F8BBD0] font-black mt-1">Orden N° {selectedOrder.pre_order_number}</p>
+                      <h4 className="text-3xl font-medium text-[#40202D] dark:text-white leading-tight">{selectedFirstItem?.name}</h4>
+                      <p className="text-sm text-[#D6405F] dark:text-[#F8BBD0] font-medium mt-1">Orden N° {selectedOrder.pre_order_number}</p>
                    </div>
                    
                    <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Taller</p>
-                         <p className="text-sm font-black text-[#40202D] dark:text-white truncate mt-0.5">{selectedWorkshopName}</p>
+                         <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Taller</p>
+                         <p className="text-sm font-medium text-[#40202D] dark:text-white truncate mt-0.5">{selectedWorkshopName}</p>
                       </div>
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Costo Unit. Promedio</p>
-                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">S/ {(selectedTotalAmount / selectedTotalUnits).toFixed(2)}</p>
+                         <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Costo Unit. Promedio</p>
+                         <p className="text-sm font-medium text-[#40202D] dark:text-white mt-0.5">S/ {(selectedTotalAmount / selectedTotalUnits).toFixed(2)}</p>
                       </div>
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Material</p>
-                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">Algodón / Poliéster</p>
+                         <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Material</p>
+                         <p className="text-sm font-medium text-[#40202D] dark:text-white mt-0.5">Algodón / Poliéster</p>
                       </div>
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                         <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
-                         <p className="text-sm font-black text-[#D6405F] dark:text-[#F8BBD0] mt-0.5">{formatCurrency(selectedTotalAmount)}</p>
+                         <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Inversión Total</p>
+                         <p className="text-sm font-medium text-[#D6405F] dark:text-[#F8BBD0] mt-0.5">{formatCurrency(selectedTotalAmount)}</p>
                       </div>
                    </div>
                 </div>
              </div>
 
              <div className="space-y-4">
-                <h5 className="text-[11px] font-black text-[#40202D] dark:text-white uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 pb-2">Distribución de Producción</h5>
+                <h5 className="text-[11px] font-medium text-[#40202D] dark:text-white uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 pb-2">Distribución de Producción</h5>
                 <div className="overflow-hidden border border-[#EAE0E2] dark:border-white/10 rounded-2xl bg-white/50 dark:bg-white/5 shadow-inner">
                    <table className="w-full text-left text-xs">
-                      <thead className="bg-white/30 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black uppercase tracking-widest text-[10px]">
+                      <thead className="bg-white/30 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-medium uppercase tracking-widest text-[10px]">
                          <tr>
                             <th className="p-4 border-b border-[#EAE0E2] dark:border-white/10">Variante</th>
                             <th className="p-4 text-center border-b border-[#EAE0E2] dark:border-white/10">Talla</th>
@@ -356,7 +356,7 @@ export default function CompletedProductionOrders() {
                               <td className="p-4 font-bold">Lote A-{idx + 1}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.size || "M"}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.color || "N/A"}</td>
-                              <td className="p-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>
+                              <td className="p-4 text-right font-medium text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>
                            </tr>
                          ))}
                       </tbody>
@@ -380,10 +380,10 @@ function CompletedOrderRow({ order, idx, onOpenTech, onOpenObs }: { order: any; 
 
   return (
     <tr className={`transition-colors group ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-      <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</td>
+      <td className="px-6 py-5 font-medium text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</td>
       <td className="px-6 py-5">
           <p className="font-bold text-[#40202D] dark:text-white">{workshopName}</p>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Producción</p>
+          <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Producción</p>
       </td>
       <td className="px-6 py-5">
         <div className="flex items-center gap-2 text-[#40202D] dark:text-white font-medium text-xs">
@@ -392,11 +392,11 @@ function CompletedOrderRow({ order, idx, onOpenTech, onOpenObs }: { order: any; 
         </div>
       </td>
       <td className="px-6 py-5 text-center">
-        <span className="rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[11px] font-black text-[#40202D] dark:text-white shadow-sm">
+        <span className="rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[11px] font-medium text-[#40202D] dark:text-white shadow-sm">
           {totalUnits} uds.
         </span>
       </td>
-      <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">{formatCurrency(totalAmount)}</td>
+      <td className="px-6 py-5 font-medium text-[#40202D] dark:text-white">{formatCurrency(totalAmount)}</td>
       <td className="px-6 py-5 text-right">
         <div className="flex justify-end gap-2">
           {/* Ojo = Ficha Técnica */}

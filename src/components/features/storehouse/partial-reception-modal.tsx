@@ -43,7 +43,7 @@ export const PartialReceptionModal = ({
     >
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Porcentaje recibido (%)</label>
+          <label className="block text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Porcentaje recibido (%)</label>
           <input
             type="number"
             {...register("received_percentage", { required: true, min: 1, max: 99 })}
@@ -51,7 +51,7 @@ export const PartialReceptionModal = ({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Observaciones</label>
+          <label className="block text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Observaciones</label>
           <textarea
             {...register("notes", { required: true })}
             rows={3}

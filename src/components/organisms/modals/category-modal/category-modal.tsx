@@ -54,7 +54,7 @@ export function CategoryModal({ open, selectedCategory, onClose, onSaved }: Cate
         
         {/* Header */}
         <div className="flex justify-between items-center border-b border-[#EAE0E2] dark:border-white/10 pb-4 mb-5">
-          <h3 className="font-black text-xl tracking-wide drop-shadow-sm">
+          <h3 className="font-medium text-xl tracking-wide drop-shadow-sm">
             {selectedCategory ? "Editar Categoría" : "Nueva Categoría"}
           </h3>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-white/50 dark:hover:bg-white/10 opacity-70 hover:opacity-100 transition-all text-[#8C6B79] dark:text-gray-300">
@@ -65,7 +65,7 @@ export function CategoryModal({ open, selectedCategory, onClose, onSaved }: Cate
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="text-[11px] font-black uppercase tracking-wider text-[#8C6B79] dark:text-gray-400 block mb-2">Nombre de Categoría *</label>
+            <label className="text-[11px] font-medium uppercase tracking-wider text-[#8C6B79] dark:text-gray-400 block mb-2">Nombre de Categoría *</label>
             <input 
               type="text" 
               required
@@ -77,7 +77,7 @@ export function CategoryModal({ open, selectedCategory, onClose, onSaved }: Cate
           </div>
 
           <div>
-            <label className="text-[11px] font-black uppercase tracking-wider text-[#8C6B79] dark:text-gray-400 block mb-2">Descripción</label>
+            <label className="text-[11px] font-medium uppercase tracking-wider text-[#8C6B79] dark:text-gray-400 block mb-2">Descripción</label>
             <textarea 
               className="w-full p-3.5 bg-white/50 dark:bg-black/40 backdrop-blur-md border border-[#EAE0E2] dark:border-white/10 rounded-xl outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] focus:ring-2 focus:ring-[#D6405F]/20 dark:focus:ring-[#F8BBD0]/20 text-sm font-medium transition-all h-28 resize-none shadow-inner custom-scrollbar text-[#40202D] dark:text-white placeholder:text-[#8C6B79] dark:placeholder:text-gray-500" 
               placeholder="Escribe una breve descripción de las prendas agrupadas..."

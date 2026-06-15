@@ -29,6 +29,7 @@ export interface DataTableColumn<T> {
   width?: string | number;
   truncate?: boolean;
   accessor?: (row: T) => React.ReactNode;
+  headerClassName?: string;
 }
 
 export interface DataTableAction<T> {
@@ -68,6 +69,8 @@ interface DataTableProps<T> {
   globalFilter?: string;
   onGlobalFilterChange?: (value: string) => void;
   containerClassName?: string;
+  headerRowClassName?: string;
+  rowClassName?: (row: T, index: number) => string;
   breadcrumb?: React.ReactNode;
 }
 
@@ -151,8 +154,10 @@ function ActionMenu<T>({
       <button
         type="button"
         onClick={handleToggleMenu}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#f7e1e6] dark:bg-transparent text-[#a74c66] dark:text-white/85 shadow-sm transition-colors hover:bg-[#f4d4dc] dark:hover:bg-[rgba(255,255,255,0.06)] hover:cursor-pointer"
+        className="p-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200 focus:outline-none"
         aria-label="Acciones"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
@@ -219,6 +224,8 @@ export function DataTable<T extends object>({
   globalFilter = "",
   onGlobalFilterChange,
   containerClassName,
+  headerRowClassName,
+  rowClassName,
   breadcrumb,
 }: DataTableProps<T>) {
   const { isMd } = useScreenSizes();
@@ -279,13 +286,11 @@ export function DataTable<T extends object>({
     Number.isFinite(rowsPerPage) && rowsPerPage > 0 ? rowsPerPage : 5;
   const loadingRowsCount = Math.max(1, Math.min(safeRowsPerPage, 5));
   
-  // ✅ CORRECCIÓN: Si el total viene en 0, que adopte el tamaño real de las filas inyectadas
   const safeTotal = total > 0 ? total : filteredRows.length;
   
   const totalPages = Math.max(1, Math.ceil(safeTotal / safeRowsPerPage));
   const safePage = Math.min(Number.isFinite(page) ? page : 0, totalPages - 1);
   
-  // ✅ CORRECCIÓN: Si no hay manejador externo de página (onPageChange), es paginación cliente
   const isServerPaginated = !!onPageChange && safeTotal > rowsArr.length;
 
   const paginatedRows = useMemo(() => {
@@ -319,20 +324,31 @@ export function DataTable<T extends object>({
   };
 
   const renderStatusBadge = (status: unknown) => {
-    const value = String(status ?? "").toLowerCase();
-    const base =
-      "inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-semibold";
+    const value = String(status ?? "").toUpperCase();
+    const base = "inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-medium border whitespace-nowrap";
 
-    if (value === "activo") {
-      return <span className={`${base} bg-emerald-100 text-emerald-700`}>Activo</span>;
+    if (value === "ACTIVO") {
+      return <span className={`${base} bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20`}>Activo</span>;
     }
 
-    if (value === "inactivo") {
-      return <span className={`${base} bg-rose-100 text-rose-700`}>Inactivo</span>;
+    if (value === "INACTIVO") {
+      return <span className={`${base} bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-500/20`}>Inactivo</span>;
+    }
+
+    if (value === "COMPLETADO" || value === "COMPLETADA") {
+      return <span className={base} style={{ backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }}>{String(status)}</span>;
+    }
+
+    if (value === "PENDIENTE") {
+      return <span className={base} style={{ backgroundColor: '#1c1000', color: '#fcd34d', borderColor: '#78350f' }}>{String(status)}</span>;
+    }
+
+    if (value === "CANCELADO" || value === "CANCELADA") {
+      return <span className={base} style={{ backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' }}>{String(status)}</span>;
     }
 
     return (
-      <span className={`${base} bg-gray-100 text-gray-600`}>
+      <span className={`${base} bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-100 dark:border-zinc-700`}>
         {String(status ?? "-")}
       </span>
     );
@@ -433,17 +449,18 @@ export function DataTable<T extends object>({
   };
 
   return (
-    <div className={containerClassName || "w-full transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg! bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col px-6 pb-6 min-h-[600px]"}>
-
+    <div className="w-full">
+      <div className="fixed inset-0 hidden dark:block bg-[#1e1018] pointer-events-none -z-10" />
+      
       {(title || description || onAddClick || onGlobalFilterChange) && (
-        <div className="flex flex-col gap-4 pt-8 pb-6">
-          <div>
+        <header className="mb-6 flex flex-col gap-6 px-2 w-full transition-colors duration-500 max-[768px]:**:text-xs! max-[768px]:[&_h2]:text-lg!">
+          <div className="flex-1">
             {breadcrumb && <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium">{breadcrumb}</div>}
             
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
-              {title && <h2 className="text-[#40202D] dark:text-white leading-none" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>{title}</h2>}
+              {title && <h2 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>{title}</h2>}
               
-              <div className="flex items-center gap-[12px] ml-auto">
+              <div className="flex items-center gap-[12px] sm:ml-auto">
                 {onAddClick && (
                   <button
                     type="button"
@@ -462,18 +479,20 @@ export function DataTable<T extends object>({
 
           {onGlobalFilterChange && (
             <div className="relative w-full sm:w-80 mt-2">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#a08088]" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a08088] pointer-events-none" size={16} />
               <input
                 type="text"
                 value={globalFilter}
                 onChange={(e) => onGlobalFilterChange(e.target.value)}
                 placeholder="Buscar..."
-                className="w-full rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] py-[10px] pl-[44px] pr-[16px] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[rgba(139,58,82,0.5)] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-[#a08088]"
+                className="w-full rounded-[10px] border border-[#EAE0E2] dark:border-[rgba(255,255,255,0.15)] bg-white/80 dark:bg-[rgba(255,255,255,0.08)] py-[10px] pl-[44px] pr-[16px] text-sm text-[#40202D] dark:text-[#e8d8dc] shadow-md dark:shadow-none focus:border-[#D6405F] dark:focus:border-[#8B3A52] focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-[#a08088]"
               />
             </div>
           )}
-        </div>
+        </header>
       )}
+
+      <div className={containerClassName || "w-full transition-colors duration-500 bg-transparent flex flex-col h-full"}>
 
       {useCardsLayout ? (
         <div
@@ -567,21 +586,21 @@ export function DataTable<T extends object>({
               })}
         </div>
       ) : (
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto w-full [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-zinc-900 [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full">
           <div
-            className={`border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "max-h-95 overflow-y-auto" : "overflow-y-visible"}`}
+            className={`overflow-x-auto w-full border border-[#EAE0E2] dark:border-zinc-800/60 bg-transparent rounded-xl overflow-hidden transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "max-h-95 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-zinc-900 [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full" : "overflow-y-visible"}`}
           >
-            <table className="min-w-full border-separate border-spacing-0">
+            <table className="min-w-[900px] w-full border-separate border-spacing-0">
               <thead
                 className={`relative transition-[background-color,border-color] duration-[600ms] ${shouldEnableRowsScroll ? "sticky top-0 z-20" : ""}`}
               >
-                <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
+                <tr className={headerRowClassName || "relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]"}>
                   {columnsArr.map((column, index) => (
                     <th
                       key={String(column.id)}
-                      className={`group px-6 py-4 text-left hover:cursor-pointer border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] ${index === 0 ? "border-l dark:border-l-0" : ""} ${index === columnsArr.length - 1 && !hasActions ? "border-r dark:border-r-0" : ""} text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]`}
+                      className={`group px-6 py-4 text-left hover:cursor-pointer border-y border-[rgba(139,58,82,0.06)] dark:border-0 dark:border-b dark:border-[rgba(212,175,55,0.15)] ${index === 0 ? "border-l dark:border-l-0" : ""} ${index === columnsArr.length - 1 && !hasActions ? "border-r dark:border-r-0" : ""} text-[0.7rem] tracking-[0.12em] uppercase text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms] ${column.headerClassName || ""}`}
                       style={{
-                        maxWidth: column.width || "auto",
+                        minWidth: column.width || "auto",
                       }}
                     >
                       {column.sortable ? (
@@ -598,7 +617,7 @@ export function DataTable<T extends object>({
                               onClick={() => onRequestSort?.(String(column.id))}
                               className="inline-flex w-full items-center justify-start gap-2 cursor-pointer transition-colors duration-200 hover:cursor-pointer uppercase"
                             >
-                              <span className="transition-all duration-200 group-hover:font-black">
+                              <span className="transition-all duration-200 group-hover:font-medium">
                                 {column.label}
                               </span>
                               <SortIcon
@@ -608,7 +627,7 @@ export function DataTable<T extends object>({
                           );
                         })()
                       ) : (
-                        <span className="transition-all duration-200 group-hover:font-black">
+                        <span className="transition-all duration-200 group-hover:font-medium">
                           {column.label}
                         </span>
                       )}
@@ -669,16 +688,16 @@ export function DataTable<T extends object>({
                       return (
                         <tr
                           key={rowKey}
-                          className={`transition-colors group/row ${rowIndex % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}
+                          className={rowClassName ? rowClassName(row, rowIndex) : `transition-colors group/row ${rowIndex % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}
                         >
                           {columnsArr.map((column, colIndex) => (
                             <td
                               key={`${String(column.id)}-${rowKey}`}
-                              className={`px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 ${colIndex === 0 ? "border-l dark:border-l-0" : ""} ${column.truncate && !isCopyableColumn(String(column.id))
+                              className={`px-6 py-2.5 ${rowClassName ? 'border-b border-zinc-800' : 'border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)]'} group-last/row:border-0 ${colIndex === 0 ? (rowClassName ? '' : "border-l dark:border-l-0") : ""} ${column.truncate && !isCopyableColumn(String(column.id))
                                   ? "max-w-55 truncate"
                                   : ""
-                                } text-[#2d1f25] dark:text-[#e8d8dc]`}
-                              style={{ maxWidth: column.width || "auto", fontSize: "0.85rem" }}
+                                } ${rowClassName ? '' : 'text-[#2d1f25] dark:text-[#e8d8dc]'}`}
+                              style={{ minWidth: column.width || "auto", fontSize: "0.85rem" }}
                             >
                               {renderCellContent(row, column, rowKey)}
                             </td>
@@ -750,8 +769,9 @@ export function DataTable<T extends object>({
           >
             <ChevronRight className="h-5 w-5" />
           </button>
-        </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 }

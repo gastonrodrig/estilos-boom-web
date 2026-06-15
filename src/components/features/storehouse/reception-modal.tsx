@@ -48,7 +48,7 @@ export const ReceptionModal = ({
     >
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Fecha Real</label>
+          <label className="block text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Fecha Real</label>
           <input
             type="date"
             {...register("delivery_date_actual")}
@@ -56,7 +56,7 @@ export const ReceptionModal = ({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Calidad (1-5)</label>
+          <label className="block text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Calidad (1-5)</label>
           <input
             type="number"
             {...register("quality_rating")}
@@ -64,7 +64,7 @@ export const ReceptionModal = ({
           />
         </div>
         <div>
-          <label className="block text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Costo Envío</label>
+          <label className="block text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-2">Costo Envío</label>
           <input
             type="number"
             {...register("shipping_cost")}

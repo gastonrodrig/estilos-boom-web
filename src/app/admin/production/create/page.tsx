@@ -302,7 +302,7 @@ export default function AdminPreProductionCreatePage() {
     <section className="mx-auto max-w-7xl px-4 py-8 space-y-8 min-h-screen transition-colors duration-500">
       <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
+          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
             <span onClick={() => router.push("/admin/pre-production")} className="hover:text-[#D6405F] dark:hover:text-white/50 cursor-pointer transition-colors">Inventario</span>
             <span>/</span>
             <span onClick={() => setStep(1)} className={`cursor-pointer transition-colors ${step === 1 ? 'text-[#D6405F] dark:text-white/50' : 'hover:text-[#D6405F] dark:hover:text-white/50'}`}>Planificar Producción</span>
@@ -317,7 +317,7 @@ export default function AdminPreProductionCreatePage() {
             {step === 1 ? "Selecciona uno o más talleres" : "Define cantidades e insumos automáticos"}
           </p>
         </div>
-        <button onClick={() => step === 1 ? router.back() : setStep(1)} className="flex items-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-widest text-[#8C6B79] dark:text-white/50 hover:text-[#40202D] dark:hover:text-white bg-white/50 dark:bg-white/5 rounded-full border border-[#EAE0E2] dark:border-white/10 transition-colors shadow-sm">
+        <button onClick={() => step === 1 ? router.back() : setStep(1)} className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium uppercase tracking-widest text-[#8C6B79] dark:text-white/50 hover:text-[#40202D] dark:hover:text-white bg-white/50 dark:bg-white/5 rounded-full border border-[#EAE0E2] dark:border-white/10 transition-colors shadow-sm">
           <ArrowLeft className="h-3.5 w-3.5" /> {step === 1 ? "Volver al Tablero" : "Cambiar Talleres"}
         </button>
       </header>
@@ -621,7 +621,7 @@ export default function AdminPreProductionCreatePage() {
             <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
               <table className="w-full text-left border-collapse">
                 <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                     <th className="px-6 py-3 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Insumo</th>
                     <th className="px-6 py-3 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
                     <th className="px-6 py-3 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidad</th>

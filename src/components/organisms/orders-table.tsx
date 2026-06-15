@@ -77,10 +77,10 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
 
   const getDeliveryIcon = (method: DeliveryMethodId) => {
     switch (method) {
-      case 'store': return <Store className="w-3.5 h-3.5" />;
-      case 'motorized': return <Bike className="w-3.5 h-3.5" />;
-      case 'point': return <Train className="w-3.5 h-3.5" />;
-      case 'province': return <Truck className="w-3.5 h-3.5" />;
+      case 'store': return <div className="p-1.5 rounded-md bg-fuchsia-50 dark:bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-100 dark:border-fuchsia-500/20"><Store className="w-3.5 h-3.5" /></div>;
+      case 'motorized': return <div className="p-1.5 rounded-md bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-100 dark:border-cyan-500/20"><Bike className="w-3.5 h-3.5" /></div>;
+      case 'point': return <div className="p-1.5 rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20"><Train className="w-3.5 h-3.5" /></div>;
+      case 'province': return <div className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20"><Truck className="w-3.5 h-3.5" /></div>;
     }
   };
 
@@ -291,11 +291,11 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-2">
-                        <div className="text-zinc-400">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0">
                           {getDeliveryIcon(order.deliveryMethod)}
                         </div>
-                        <span className="text-sm text-zinc-200 font-normal">
+                        <span className="text-sm text-gray-700 dark:text-zinc-200 font-medium">
                           {getDeliveryLabel(order.deliveryMethod)}
                         </span>
                       </div>
@@ -312,21 +312,21 @@ export function OrdersTable({ title, description, data: initialData, baseHref = 
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsDetailOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-[#D6405F] bg-white dark:bg-zinc-800 hover:bg-pink-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-[#D6405F] bg-white dark:bg-[#D6405F]/10 hover:bg-pink-50 dark:hover:bg-[#D6405F]/20 rounded-full transition-all duration-300 border border-gray-200 dark:border-[#D6405F]/20 shadow-sm dark:text-[#D6405F] hover:scale-110"
                           title="Ver detalle"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsEditOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-blue-600 bg-white dark:bg-zinc-800 hover:bg-blue-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-blue-600 bg-white dark:bg-blue-500/10 hover:bg-blue-50 dark:hover:bg-blue-500/20 rounded-full transition-all duration-300 border border-gray-200 dark:border-blue-500/20 shadow-sm dark:text-blue-400 hover:scale-110"
                           title="Editar estado"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button 
                           onClick={() => { setSelectedOrder(order); setIsInvoiceOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-emerald-600 bg-white dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-700 rounded-full transition-colors border border-gray-200 dark:border-zinc-700 shadow-sm"
+                          className="p-2 text-gray-400 hover:text-emerald-600 bg-white dark:bg-emerald-500/10 hover:bg-emerald-50 dark:hover:bg-emerald-500/20 rounded-full transition-all duration-300 border border-gray-200 dark:border-emerald-500/20 shadow-sm dark:text-emerald-400 hover:scale-110"
                           title="Ver comprobante"
                         >
                           <FileText className="w-4 h-4" />

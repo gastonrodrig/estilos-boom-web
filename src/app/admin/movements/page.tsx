@@ -14,25 +14,30 @@ type ActiveTab = "documentos" | "kardex";
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-const DOC_TYPE_LABELS: Record<string, string> = {
-  INGRESO_COMPRA: "📥 Ingreso compra",
-  SALIDA_VENTA: "📤 Salida venta",
-  TRANSFERENCIA: "⇄ Transferencia",
-  AJUSTE: "⚖️ Ajuste",
+const NUEVOS_LABELS_LIMPIOS: Record<string, string> = {
+  INGRESO_COMPRA: "Ingreso compra",
+  SALIDA_VENTA: "Salida venta",
+  TRANSFERENCIA: "Transferencia",
+  AJUSTE: "Ajuste",
+  ENTRADA: "Entrada",
+  SALIDA: "Salida"
 };
 
-const DOC_TYPE_STYLES: Record<string, string> = {
-  INGRESO_COMPRA: "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20",
-  SALIDA_VENTA: "bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-500/20",
-  TRANSFERENCIA: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20",
-  AJUSTE: "bg-slate-50 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-100 dark:border-slate-500/20",
+const NUEVOS_ESTILOS_DE_BADGE_TIPO: Record<string, React.CSSProperties> = {
+  INGRESO_COMPRA: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
+  ENTRADA: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
+  SALIDA_VENTA: { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' }, // rose
+  SALIDA: { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' }, // rose
+  TRANSFERENCIA: { backgroundColor: '#2e1065', color: '#c4b5fd', borderColor: '#5b21b6' }, // violet
+  AJUSTE: { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' }, // amber
+  default: { backgroundColor: '#27272a', color: '#a1a1aa', borderColor: '#3f3f46' } // zinc
 };
 
-const STATUS_STYLES: Record<string, string> = {
-  PENDIENTE: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20 animate-pulse",
-  EN_TRANSITO: "bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-100 dark:border-sky-500/20",
-  COMPLETADO: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20",
-  CANCELADO: "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700",
+const NUEVOS_ESTILOS_DE_ESTADO: Record<string, React.CSSProperties> = {
+  PENDIENTE: { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' }, // amber
+  COMPLETADO: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
+  CANCELADO: { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' }, // zinc
+  default: { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' } // zinc
 };
 
 const workerName = (w: any) =>
@@ -184,14 +189,14 @@ export default function AdminMovementsPage() {
       id: "created_at",
       label: "Fecha",
       sortable: true,
-      width: "130px",
+      width: "150px",
       accessor: (row) => {
-        if (!row.created_at) return <span className="text-gray-300 dark:text-zinc-500">—</span>;
+        if (!row.created_at) return <span className="text-zinc-500">—</span>;
         const d = new Date(row.created_at);
         return (
-          <div className="flex flex-col text-xs text-gray-700 dark:text-zinc-200 font-medium">
-            <span>{d.toLocaleDateString("es-PE")}</span>
-            <span className="text-[10px] text-gray-400 dark:text-zinc-400">
+          <div className="flex flex-col">
+            <span className="text-sm text-zinc-200 font-medium">{d.toLocaleDateString("es-PE")}</span>
+            <span className="text-xs text-zinc-500 font-normal">
               {d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
@@ -201,9 +206,9 @@ export default function AdminMovementsPage() {
     {
       id: "document_number",
       label: "N° Documento",
-      width: "150px",
+      width: "180px",
       accessor: (row) => (
-        <span className="font-mono text-xs font-bold text-[#594246]">
+        <span className="text-sm text-zinc-300 font-medium whitespace-nowrap min-w-[140px] inline-block">
           {row.document_number ?? "—"}
         </span>
       ),
@@ -211,28 +216,28 @@ export default function AdminMovementsPage() {
     {
       id: "type",
       label: "Tipo",
-      width: "160px",
+      width: "180px",
       accessor: (row) => (
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-            DOC_TYPE_STYLES[row.type] ?? "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700"
-          }`}
+        <span 
+          className="text-xs font-medium px-2 py-0.5 rounded-md border whitespace-nowrap"
+          style={NUEVOS_ESTILOS_DE_BADGE_TIPO[row.type] || NUEVOS_ESTILOS_DE_BADGE_TIPO.default}
         >
-          {DOC_TYPE_LABELS[row.type] ?? row.type}
+          • {NUEVOS_LABELS_LIMPIOS[row.type] ?? row.type}
         </span>
       ),
     },
     {
       id: "route",
       label: "Origen ➔ Destino",
-      width: "220px",
+      width: "260px",
+      headerClassName: "min-w-[140px] whitespace-nowrap",
       accessor: (row) => {
         const src = row.id_source_warehouse?.name?.replace("_", " ") ?? "Externo";
         const tgt = row.id_target_warehouse?.name?.replace("_", " ") ?? "—";
         return (
-          <div className="flex flex-col text-xs font-semibold text-gray-700">
-            <span>{src} ➔</span>
-            <span className="text-rose-400 text-[11px] mt-0.5">{tgt}</span>
+          <div className="flex flex-col text-xs">
+            <span className="text-zinc-400">{src} <span className="text-zinc-600">➔</span></span>
+            <span className="text-zinc-300 font-medium">{tgt}</span>
           </div>
         );
       },
@@ -240,22 +245,21 @@ export default function AdminMovementsPage() {
     {
       id: "items_count",
       label: "Prendas",
-      width: "80px",
+      width: "100px",
       accessor: (row) => (
-        <span className="text-xs font-bold text-gray-600 text-center block">
-          {row.items?.length ?? 0} variantes
+        <span className="text-sm text-zinc-300 text-center block">
+          {row.items?.length ?? 0}
         </span>
       ),
     },
     {
       id: "status",
       label: "Estado",
-      width: "120px",
+      width: "140px",
       accessor: (row) => (
-        <span
-          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            STATUS_STYLES[row.status] ?? "bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700"
-          }`}
+        <span 
+          className="text-xs font-medium px-2.5 py-0.5 rounded-full border whitespace-nowrap"
+          style={NUEVOS_ESTILOS_DE_ESTADO[row.status] || NUEVOS_ESTILOS_DE_ESTADO.default}
         >
           {row.status ?? "—"}
         </span>
@@ -264,7 +268,7 @@ export default function AdminMovementsPage() {
     {
       id: "attachments",
       label: "Adjuntos",
-      width: "110px",
+      width: "140px",
       accessor: (row) => {
         const atts = row.attachments || [];
         if (atts.length === 0) return <span className="text-gray-300 text-xs italic block text-center">—</span>;
@@ -295,15 +299,16 @@ export default function AdminMovementsPage() {
     {
       id: "sender",
       label: "Creado por",
-      width: "130px",
+      width: "170px",
+      headerClassName: "min-w-[160px] whitespace-nowrap",
       accessor: (row) => {
         const name = workerName(row.id_sender_worker);
         return (
-          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center font-black text-[9px] shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium whitespace-nowrap">
+            <div className="w-5 h-5 rounded-full bg-rose-100 text-[#F2778D] flex items-center justify-center font-medium text-[9px] shrink-0">
               {name.slice(0, 2).toUpperCase()}
             </div>
-            <span className="truncate max-w-[90px]">{name}</span>
+            <span className="truncate max-w-[120px]">{name}</span>
           </div>
         );
       },
@@ -311,17 +316,17 @@ export default function AdminMovementsPage() {
     {
       id: "receiver",
       label: "Procesado por",
-      width: "130px",
+      width: "170px",
       accessor: (row) => {
         if (!row.id_receiver_worker?.first_name)
           return <span className="text-gray-300 text-xs italic block text-center">—</span>;
         const name = workerName(row.id_receiver_worker);
         return (
           <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-black text-[9px] shrink-0">
+            <div className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center font-medium text-[9px] shrink-0">
               {name.slice(0, 2).toUpperCase()}
             </div>
-            <span className="truncate max-w-[90px]">{name}</span>
+            <span className="truncate max-w-[120px]">{name}</span>
           </div>
         );
       },
@@ -358,14 +363,14 @@ export default function AdminMovementsPage() {
       id: "created_at",
       label: "Fecha",
       sortable: true,
-      width: "130px",
+      width: "150px",
       accessor: (row) => {
-        if (!row.createdAt && !row.created_at) return <span className="text-gray-300">—</span>;
+        if (!row.createdAt && !row.created_at) return <span className="text-zinc-500">—</span>;
         const d = new Date(row.createdAt ?? row.created_at);
         return (
-          <div className="flex flex-col text-xs text-gray-700 font-medium">
-            <span>{d.toLocaleDateString("es-PE")}</span>
-            <span className="text-[10px] text-gray-400">
+          <div className="flex flex-col">
+            <span className="text-sm text-zinc-200 font-medium">{d.toLocaleDateString("es-PE")}</span>
+            <span className="text-xs text-zinc-500 font-normal">
               {d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
@@ -375,9 +380,9 @@ export default function AdminMovementsPage() {
     {
       id: "sku",
       label: "SKU variante",
-      width: "150px",
+      width: "180px",
       accessor: (row) => (
-        <span className="font-mono text-xs text-gray-600">
+        <span className="text-sm text-zinc-300 font-medium">
           {row.id_variant?.sku_variant ?? row.variantSku ?? "—"}
         </span>
       ),
@@ -385,9 +390,9 @@ export default function AdminMovementsPage() {
     {
       id: "product_name",
       label: "Producto",
-      width: "180px",
+      width: "240px",
       accessor: (row) => (
-        <span className="text-xs font-semibold text-gray-800 truncate block max-w-[170px]">
+        <span className="text-xs text-zinc-300 font-medium truncate block max-w-[220px]">
           {row.id_variant?.id_product?.name ?? row.productName ?? "—"}
         </span>
       ),
@@ -395,9 +400,9 @@ export default function AdminMovementsPage() {
     {
       id: "warehouse",
       label: "Almacén",
-      width: "130px",
+      width: "160px",
       accessor: (row) => (
-        <span className="text-xs text-gray-600">
+        <span className="text-xs text-zinc-400">
           {row.id_warehouse?.name?.replace("_", " ") ?? "—"}
         </span>
       ),
@@ -405,41 +410,38 @@ export default function AdminMovementsPage() {
     {
       id: "type",
       label: "Tipo",
-      width: "100px",
+      width: "120px",
       accessor: (row) => (
-        <span
-          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            row.type === "ENTRADA"
-              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-              : "bg-rose-50 text-rose-600 border-rose-100"
-          }`}
+        <span 
+          className="text-xs font-medium px-2 py-0.5 rounded-md border whitespace-nowrap"
+          style={NUEVOS_ESTILOS_DE_BADGE_TIPO[row.type] || NUEVOS_ESTILOS_DE_BADGE_TIPO.default}
         >
-          {row.type === "ENTRADA" ? "↑ Entrada" : "↓ Salida"}
+          • {NUEVOS_LABELS_LIMPIOS[row.type] ?? row.type}
         </span>
       ),
     },
     {
       id: "quantity",
       label: "Cantidad",
-      width: "90px",
+      width: "110px",
       accessor: (row) => (
-        <span className="text-sm font-bold text-gray-700 block text-center">{row.quantity ?? "—"}</span>
+        <span className="text-sm font-bold text-zinc-300 block text-center">{row.quantity ?? "—"}</span>
       ),
     },
     {
       id: "new_stock",
       label: "Saldo",
-      width: "90px",
+      width: "110px",
       accessor: (row) => (
-        <span className="text-sm font-bold text-[#594246] block text-center">{row.new_stock ?? "—"}</span>
+        <span className="text-sm font-bold text-zinc-200 block text-center">{row.new_stock ?? "—"}</span>
       ),
     },
     {
       id: "reason",
       label: "Motivo",
-      width: "130px",
+      width: "180px",
       accessor: (row) => (
-        <span className="text-xs text-gray-500 font-medium">{row.reason ?? "—"}</span>
+        <span className="text-xs text-zinc-500 font-medium">{row.reason ?? "—"}</span>
       ),
     },
   ];
@@ -478,14 +480,21 @@ export default function AdminMovementsPage() {
   }, [rawMovements, searchTerm]);
 
   return (
-    <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col min-h-[700px] transition-colors duration-500">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
       {/* Header Administrativo */}
-      <div className="px-8 py-6 border-b border-[#EAE0E2] dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/30 dark:bg-white/5 backdrop-blur-md">
-        <div>
-          <h1 className="text-2xl font-bold text-[#40202D] dark:text-white tracking-wide">Documentos de Almacén y Kárdex</h1>
-          <p className="text-[12px] text-[#8C6B79] dark:text-gray-400 font-medium tracking-wide mt-1">Gestión de ingresos, salidas, transferencias y movimientos físicos del inventario.</p>
+      <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2 w-full transition-colors duration-500">
+        <div className="flex-1">
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest flex items-center gap-2">
+            <span>MOVIMIENTOS</span>
+          </div>
+          <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
+            Documentos de Almacén y Kárdex
+          </h1>
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+            Gestión de ingresos, salidas, transferencias y movimientos físicos del inventario.
+          </p>
         </div>
-      </div>
+      </header>
 
       <div className="flex-1 overflow-auto p-4 md:p-6 space-y-4">
         {/* Tabs */}
@@ -501,8 +510,8 @@ export default function AdminMovementsPage() {
             onClick={() => { setActiveTab(id); setPage(0); setSearchTerm(""); }}
             className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors border border-b-0 ${
               activeTab === id
-                ? "bg-white dark:bg-zinc-900 text-[#594246] border-[#EBEAE8]"
-                : "bg-transparent text-gray-400 border-transparent hover:text-gray-600"
+                ? "bg-zinc-900 text-zinc-100 border-zinc-800 border-b-2 !border-b-[#8B3A52]"
+                : "bg-transparent text-zinc-400 border-transparent hover:text-zinc-200"
             }`}
           >
             <Icon size={14} />
@@ -516,8 +525,6 @@ export default function AdminMovementsPage() {
         <DataTable
           rows={filteredDocuments}
           loading={loading || tableLoading}
-          title="Documentos de Almacén"
-          description="Todos los movimientos físicos del inventario: ingresos por compra, salidas por venta, transferencias entre almacenes y ajustes por merma."
           onAddClick={() =>
             toast("Selecciona productos en 'Stock Actual' y usa el asistente de movimiento.", {
               icon: "💡",
@@ -535,6 +542,8 @@ export default function AdminMovementsPage() {
           columns={docColumns}
           actions={docActions}
           containerClassName="bg-transparent shadow-none w-full h-full"
+          headerRowClassName="bg-zinc-900 border-b border-zinc-700 text-xs font-medium text-zinc-400 uppercase tracking-wide"
+          rowClassName={(_, idx) => `transition-colors border-b border-zinc-800 ${idx % 2 === 0 ? "bg-zinc-900/40" : "bg-zinc-800/20"}`}
           hasActions
         />
       )}
@@ -544,8 +553,6 @@ export default function AdminMovementsPage() {
         <DataTable
           rows={filteredMovements as any[]}
           loading={loading || tableLoading}
-          title="Historial del Kárdex"
-          description="Líneas inmutables de auditoría generadas automáticamente al procesar cada documento de almacén. Solo lectura."
           page={page}
           rowsPerPage={rowsPerPage}
           onPageChange={(_, p) => setPage(p)}
@@ -557,6 +564,8 @@ export default function AdminMovementsPage() {
           onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
           columns={kardexColumns}
           containerClassName="bg-transparent shadow-none w-full h-full"
+          headerRowClassName="bg-zinc-900 border-b border-zinc-700 text-xs font-medium text-zinc-400 uppercase tracking-wide"
+          rowClassName={(_, idx) => `transition-colors border-b border-zinc-800 ${idx % 2 === 0 ? "bg-zinc-900/40" : "bg-zinc-800/20"}`}
           hasActions={false}
         />
       )}
@@ -609,14 +618,14 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
         {/* Cabecera de Estados y Tipo */}
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-sm backdrop-blur-md">
-            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Tipo Documento</p>
+            <p className="text-[10px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Tipo Documento</p>
             <p className="text-[13px] font-bold text-[#40202D] dark:text-white mt-1">
               {DOC_TYPE_LABELS[doc.type] || doc.type}
             </p>
           </div>
           <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-sm backdrop-blur-md">
-            <p className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Estado actual</p>
-            <p className="text-[13px] font-black text-[#D6405F] dark:text-[#F8BBD0] mt-1 uppercase">
+            <p className="text-[10px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Estado actual</p>
+            <p className="text-[13px] font-medium text-[#D6405F] dark:text-[#F8BBD0] mt-1 uppercase">
               {doc.status}
             </p>
           </div>
@@ -624,7 +633,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
 
         {/* Información general */}
         <section className="space-y-3">
-          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+          <h5 className="text-[11px] font-medium tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
             Información del Movimiento
           </h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-5 text-[12px] bg-white/30 dark:bg-black/25 p-4 rounded-xl border border-[#EAE0E2] dark:border-white/5">
@@ -653,7 +662,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
 
         {/* Listado de Ítems */}
         <section className="space-y-3">
-          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+          <h5 className="text-[11px] font-medium tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
             Detalle de Prendas ({doc.items?.length || 0})
           </h5>
           <div className="rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 overflow-hidden text-[12px] shadow-inner">
@@ -690,7 +699,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
                         {item.quantity_expected}
                       </td>
                       <td className="p-3 text-center">
-                        <span className={`font-bold ${item.quantity_received < item.quantity_expected ? 'text-amber-500 font-black' : 'text-[#D6405F] dark:text-[#F8BBD0]'}`}>
+                        <span className={`font-bold ${item.quantity_received < item.quantity_expected ? 'text-amber-500 font-medium' : 'text-[#D6405F] dark:text-[#F8BBD0]'}`}>
                           {item.quantity_received}
                         </span>
                       </td>
@@ -715,7 +724,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
         {/* Log/Notas del Proceso */}
         {doc.notes && (
           <section className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/5 shadow-inner">
-            <h5 className="text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase mb-1.5">Notas adicionales:</h5>
+            <h5 className="text-[10px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase mb-1.5">Notas adicionales:</h5>
             <p className="text-[12px] text-gray-600 dark:text-gray-200 font-medium italic leading-relaxed">
               {doc.notes}
             </p>
@@ -724,7 +733,7 @@ function MovementDetailsModal({ isOpen, onClose, doc }: { isOpen: boolean; onClo
 
         {/* Documentos Adjuntos (Evidencias y Guías) */}
         <section className="space-y-3">
-          <h5 className="text-[11px] font-black tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+          <h5 className="text-[11px] font-medium tracking-wider text-[#8C6B79] dark:text-gray-300 uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
             Evidencias y Guías Documentales ({doc.attachments?.length || 0})
           </h5>
           {doc.attachments && doc.attachments.length > 0 ? (

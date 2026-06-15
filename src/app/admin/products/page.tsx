@@ -13,8 +13,8 @@ const ProductManagement: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useEffect(() => {
-    // Carga inicial con los filtros por defecto
-    startLoadingProducts({ limit: 10, offset: 0 });
+    // Carga inicial (aumentamos el límite para que se vean todos)
+    startLoadingProducts({ limit: 1000, offset: 0 });
   }, [startLoadingProducts]);
 
   return (
@@ -113,7 +113,7 @@ const ProductManagement: React.FC = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-[#D6405F] dark:text-[#F8BBD0]">
           <div className="w-12 h-12 border-4 border-[#D6405F] border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-[13px] font-black uppercase tracking-widest text-[#8C6B79]">
+          <p className="text-[13px] font-medium uppercase tracking-widest text-[#8C6B79]">
             Cargando Catálogo...
           </p>
         </div>
@@ -174,8 +174,8 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
           
           <div className="flex items-center gap-6 shrink-0">
              <div className="text-right">
-               <p className="text-[14px] font-black text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
-               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>{product.is_active ? "Activo" : "Inactivo"}</span>
+               <p className="text-[14px] font-medium text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
+               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-medium uppercase tracking-widest ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>{product.is_active ? "Activo" : "Inactivo"}</span>
              </div>
              <div className="flex items-center gap-2">
                 <Link
@@ -212,10 +212,10 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
           {product.images?.[0] ? (
              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-[#8C6B79]/40"><Package size={32} className="mb-2" /><span className="text-[9px] font-black uppercase tracking-widest">Sin Foto</span></div>
+            <div className="w-full h-full flex flex-col items-center justify-center text-[#8C6B79]/40"><Package size={32} className="mb-2" /><span className="text-[9px] font-medium uppercase tracking-widest">Sin Foto</span></div>
           )}
           <div className="absolute top-3 left-3">
-             <span className={`inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm backdrop-blur-md ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>
+             <span className={`inline-flex px-3 py-1 rounded-full text-[9px] font-medium uppercase tracking-widest shadow-sm backdrop-blur-md ${product.is_active ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/30" : "bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300 border border-gray-500/30"}`}>
                {product.is_active ? "Activo" : "Inactivo"}
              </span>
           </div>
@@ -225,18 +225,18 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
            <div>
              <div className="flex items-start justify-between gap-4 mb-2">
                 <h3 className="font-bold text-[18px] text-[#40202D] dark:text-white leading-tight group-hover:text-[#D6405F] transition-colors">{product.name}</h3>
-                <span className="shrink-0 inline-flex px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-white/80 dark:bg-black/60 text-[#40202D] dark:text-white shadow-sm border border-[#EAE0E2] dark:border-white/20">{product.gender}</span>
+                <span className="shrink-0 inline-flex px-3 py-1 rounded-full text-[9px] font-medium uppercase tracking-widest bg-white/80 dark:bg-black/60 text-[#40202D] dark:text-white shadow-sm border border-[#EAE0E2] dark:border-white/20">{product.gender}</span>
              </div>
              <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-400 line-clamp-2 mb-4">{product.composition || "Sin composición definida"}</p>
            </div>
 
            <div className="flex items-center justify-between mt-auto">
              <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-500 mb-1">{product.variants?.length || 0} Variantes • {product.season || "Atópico"}</p>
-                <p className="text-2xl font-black text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
+                <p className="text-[11px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-500 mb-1">{product.variants?.length || 0} Variantes • {product.season || "Atópico"}</p>
+                <p className="text-2xl font-medium text-[#D6405F] dark:text-[#F8BBD0]">S/ {product.base_price.toFixed(2)}</p>
              </div>
              <div className="flex gap-2">
-                <Link href={`/admin/products/${product.id_product}`} className="flex items-center gap-2 px-5 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:border-pink-200 bg-white/80 dark:bg-white/5 hover:bg-pink-50 transition-colors text-[11px] font-black uppercase tracking-widest text-[#40202D] dark:text-white hover:text-[#8B3A52] shadow-sm">
+                <Link href={`/admin/products/${product.id_product}`} className="flex items-center gap-2 px-5 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:border-pink-200 bg-white/80 dark:bg-white/5 hover:bg-pink-50 transition-colors text-[11px] font-medium uppercase tracking-widest text-[#40202D] dark:text-white hover:text-[#8B3A52] shadow-sm">
                   <Eye size={16} /> Detalles
                 </Link>
                 <button type="button" className="px-4 py-3 border border-[#EAE0E2] dark:border-white/10 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 hover:border-red-200 dark:hover:border-red-500/30 text-[#8C6B79] hover:text-red-600 transition-colors bg-white/80 dark:bg-white/5 shadow-sm">
@@ -270,7 +270,7 @@ const ProductCard: React.FC<{ product: Product; viewMode: ViewMode }> = ({ produ
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-[#8C6B79]/50 dark:text-white/20">
             <Package size={40} className="mb-2" />
-            <span className="text-[10px] font-black uppercase tracking-widest">
+            <span className="text-[10px] font-medium uppercase tracking-widest">
               Sin Foto
             </span>
           </div>

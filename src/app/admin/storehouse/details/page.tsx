@@ -156,15 +156,15 @@ export default function PrePurchaseOrderTracking() {
   
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-2">
-            Seguimiento Activo
-          </p>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+      <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2 w-full transition-colors duration-500">
+        <div className="flex-1">
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest">
+            SEGUIMIENTO ACTIVO
+          </div>
+          <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
             Órdenes de Pre-Compra
           </h1>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
             {counts.TODAS} procesos en curso
           </p>
         </div>
@@ -188,7 +188,7 @@ export default function PrePurchaseOrderTracking() {
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[11px] font-black uppercase tracking-widest transition-all shadow-sm ${
+            className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[11px] font-medium uppercase tracking-widest transition-all shadow-sm ${
               filter === key 
                 ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white hover:scale-[1.02]" 
                 : "border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white"
@@ -277,10 +277,10 @@ function OPPCard({ opp }: { opp: any }) {
           </div>
           <div className="space-y-3 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-xl sm:text-[22px] font-black text-[#40202D] dark:text-white tracking-wide leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              <h3 className="text-xl sm:text-[22px] font-medium text-[#40202D] dark:text-white tracking-wide leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               
               <div className="flex flex-wrap gap-2">
-                <span className={`rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+                <span className={`rounded-full px-4 py-1.5 text-[10px] font-medium uppercase tracking-widest shadow-sm border ${
                   opp.status === 'COMPLETADA' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/20' :
                   opp.status === 'EN_REVISION' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20' : 
                   opp.status === 'CONVERTIDA' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
@@ -292,7 +292,7 @@ function OPPCard({ opp }: { opp: any }) {
 
                 {opp.status === 'COMPLETADA' && (
                   <div className="flex items-center gap-2 bg-white/50 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                    <span className="text-[9px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Calificación:</span>
+                    <span className="text-[9px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">Calificación:</span>
                     <StarRating rating={opp.id_purchase_order?.quality_rating || 5} size={3} />
                   </div>
                 )}
@@ -301,7 +301,7 @@ function OPPCard({ opp }: { opp: any }) {
             <div className="text-[12px] sm:text-[13px] text-[#8C6B79] dark:text-gray-400 font-medium flex flex-wrap items-center gap-1.5">
               <span className="font-bold">{opp.pre_order_number}</span>
               <span className="mx-1 opacity-40">|</span>
-              <span className="text-[#40202D] dark:text-white font-black">{opp.quotes?.length || 0} Proveedores</span>
+              <span className="text-[#40202D] dark:text-white font-medium">{opp.quotes?.length || 0} Proveedores</span>
               <span className="mx-1 opacity-40">|</span>
               <span className="font-bold">{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0) || 0} uds</span>
             </div>
@@ -310,7 +310,7 @@ function OPPCard({ opp }: { opp: any }) {
 
         <div className="flex flex-wrap items-center justify-between xl:justify-end gap-5 sm:gap-8 lg:gap-12 pt-5 xl:pt-0 border-t xl:border-t-0 border-[#EAE0E2] dark:border-white/10">
           <div className="space-y-2 sm:space-y-3 min-w-[140px]">
-            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-black uppercase tracking-widest">
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-medium uppercase tracking-widest">
               <span className="text-[#8C6B79] dark:text-gray-400">Progreso</span>
               <span className="text-[#D6405F] dark:text-[#F8BBD0]">{getProgress()}%</span>
             </div>
@@ -321,7 +321,7 @@ function OPPCard({ opp }: { opp: any }) {
           </div>
           
           <div className="flex items-center gap-5">
-            <div className="text-[20px] sm:text-[28px] text-[#D6405F] dark:text-[#F8BBD0] tracking-tight font-black">
+            <div className="text-[20px] sm:text-[28px] text-[#D6405F] dark:text-[#F8BBD0] tracking-tight font-medium">
               {totalAmount > 0 ? formatCurrency(totalAmount) : "S/ 0.00"}
             </div>
 
@@ -373,12 +373,12 @@ function OPPCard({ opp }: { opp: any }) {
             exit={{ height: 0, opacity: 0 }}
             className="mt-8 pt-8 border-t border-[#EAE0E2] dark:border-white/10"
           >
-            <h4 className="text-[13px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-6">Detalle de Variantes</h4>
+            <h4 className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-6">Detalle de Variantes</h4>
             
             <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
               <table className="w-full text-left border-collapse">
                 <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                     <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
                     <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
                     <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
@@ -410,13 +410,13 @@ function OPPCard({ opp }: { opp: any }) {
                   {item.id_variant?.color?.name ?? (typeof item.id_variant?.color === "string" ? item.id_variant.color : null) ?? item.color ?? "-"}
                 </span>
               </td>
-							<td className="py-5 px-6 text-center font-black text-[14px]">{item.quantity}</td>
+							<td className="py-5 px-6 text-center font-medium text-[14px]">{item.quantity}</td>
 							
 							<td className="py-5 px-6 text-center font-bold text-[13px] text-[#8C6B79] dark:text-gray-400">
 							S/ {unitPrice.toFixed(2)}
 							</td>
 							
-							<td className="py-5 px-6 text-right font-black text-[14px] text-[#D6405F] dark:text-[#F8BBD0]">
+							<td className="py-5 px-6 text-right font-medium text-[14px] text-[#D6405F] dark:text-[#F8BBD0]">
 							S/ {subtotal.toFixed(2)}
 							</td>
 						</tr>
@@ -425,13 +425,13 @@ function OPPCard({ opp }: { opp: any }) {
 					
 					{/* Fila de Total */}
 					<tr className="bg-white/50 dark:bg-white/5">
-						<td className="py-6 px-6 font-black text-[12px] uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Total</td>
+						<td className="py-6 px-6 font-medium text-[12px] uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Total</td>
 						<td />
-						<td className="py-6 px-6 text-center font-black text-[16px] text-[#40202D] dark:text-white">
+						<td className="py-6 px-6 text-center font-medium text-[16px] text-[#40202D] dark:text-white">
 						{opp.base_items?.reduce((acc: number, it: any) => acc + it.quantity, 0)}
 						</td>
 						<td />
-						<td className="py-6 px-6 text-right font-black text-[18px] text-[#D6405F] dark:text-[#F8BBD0]">
+						<td className="py-6 px-6 text-right font-medium text-[18px] text-[#D6405F] dark:text-[#F8BBD0]">
 						{formatCurrency(totalAmount)}
 						</td>
 					</tr>
@@ -441,11 +441,11 @@ function OPPCard({ opp }: { opp: any }) {
 
             {/* Cuadro de Observaciones */}
             <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md space-y-3">
-              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Observaciones:</p>
+              <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Observaciones:</p>
               {/* Observaciones de control de calidad (post-aprobación) */}
               {opp.id_purchase_order?.quality_observations && (
                 <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-500/20">
-                  <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Control de calidad:</p>
+                  <p className="text-[10px] font-medium text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Control de calidad:</p>
                   <p className="text-[13px] font-medium text-[#40202D] dark:text-white leading-relaxed">{opp.id_purchase_order.quality_observations}</p>
                 </div>
               )}
@@ -460,7 +460,7 @@ function OPPCard({ opp }: { opp: any }) {
 
             {/* Adjuntos (PDFs) */}
             <div className="mt-6 p-6 rounded-[1.5rem] bg-white/50 dark:bg-black/30 border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md space-y-4">
-              <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Documentos Adjuntos (PDF):</p>
+              <p className="text-[10px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Documentos Adjuntos (PDF):</p>
               
               {opp.id_purchase_order?.attachments && opp.id_purchase_order.attachments.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -526,19 +526,19 @@ function OPPCard({ opp }: { opp: any }) {
 				<>
 				<button 
 					onClick={() => setIsQuotationModalOpen(true)}
-					className="px-8 py-4 rounded-2xl border border-[#D6405F] text-[#D6405F] dark:text-[#F8BBD0] dark:border-[#F8BBD0] bg-white/50 dark:bg-transparent backdrop-blur-md font-black text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-[#D6405F] hover:text-white dark:hover:bg-[#F8BBD0] dark:hover:text-black transition-all shadow-sm"
+					className="px-8 py-4 rounded-2xl border border-[#D6405F] text-[#D6405F] dark:text-[#F8BBD0] dark:border-[#F8BBD0] bg-white/50 dark:bg-transparent backdrop-blur-md font-medium text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-[#D6405F] hover:text-white dark:hover:bg-[#F8BBD0] dark:hover:text-black transition-all shadow-sm"
 				>
 					<Plus className="w-4 h-4" /> Registrar Cotización
 				</button>
 				
-				<button className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm">
+				<button className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 text-[#8C6B79] dark:text-gray-400 font-medium text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm">
 					Rechazar Orden
 				</button>
 
 				<button 
 					disabled={opp.quotes?.every((q: any) => q.total_amount === 0)}
 					onClick={() => setIsWinnerModalOpen(true)}
-					className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest disabled:opacity-50 hover:scale-[1.02] transition-all shadow-lg"
+					className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-medium text-[11px] uppercase tracking-widest disabled:opacity-50 hover:scale-[1.02] transition-all shadow-lg"
 				>
 					Marcar como En Camino
 				</button>
@@ -556,7 +556,7 @@ function OPPCard({ opp }: { opp: any }) {
 					const ok = await startInitalQualityCheck(purchaseOrderId, opp._id);
 					if (ok) await startLoadingPrePurchaseOrders();
 					}}
-					className={`px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg ${
+					className={`px-8 py-4 rounded-2xl font-medium text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg ${
 					!purchaseOrderId ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white hover:scale-[1.02]'
 					}`}
 				>
@@ -570,7 +570,7 @@ function OPPCard({ opp }: { opp: any }) {
 			{/* BOTÓN UNIVERSAL: Siempre visible para ver la orden completa */}
 			<button 
         onClick={() => setIsDetailsModalOpen(true)}
-        className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm"
+        className="px-8 py-4 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-medium text-[11px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm"
       >
         <Eye className="w-4 h-4" /> Detalles Completos
       </button>
@@ -664,7 +664,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
     <Modal open={isOpen} onClose={onClose} title="Registrar Cotización Recibida">
       <div className="space-y-6">
         <label className="block space-y-2">
-          <span className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Seleccionar Proveedor</span>
+          <span className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Seleccionar Proveedor</span>
           <select 
             className="w-full h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-4 text-[13px] font-bold text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner appearance-none transition-all"
             value={selectedSupplier}
@@ -693,7 +693,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
             <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
               <table className="w-full text-left border-collapse">
                 <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                     <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Variante</th>
                     <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
                     <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Costo Unitario</th>
@@ -715,7 +715,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
                         {it.id_variant?.color?.name ?? (typeof it.id_variant?.color === "string" ? it.id_variant.color : null) ?? "-"}
                       </span>
                     </td>
-                    <td className="py-5 px-6 text-center font-black text-[14px]">{it.quantity}</td>
+                    <td className="py-5 px-6 text-center font-medium text-[14px]">{it.quantity}</td>
                     <td className="py-5 px-6 text-center">
                       <div className="relative inline-block">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[12px] font-bold text-[#8C6B79]">S/</span>
@@ -727,7 +727,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
                             newItems[idx].unit_cost = Number(e.target.value);
                             setItems(newItems);
                           }}
-                          className="w-28 h-10 border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/30 rounded-xl pl-8 pr-3 outline-none focus:ring-2 focus:ring-[#D6405F]/50 text-[13px] font-black text-[#40202D] dark:text-white shadow-inner transition-all"
+                          className="w-28 h-10 border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/30 rounded-xl pl-8 pr-3 outline-none focus:ring-2 focus:ring-[#D6405F]/50 text-[13px] font-medium text-[#40202D] dark:text-white shadow-inner transition-all"
                         />
                       </div>
                     </td>
@@ -738,7 +738,7 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
             </div>
             <button 
               onClick={() => onSave(selectedSupplier, items)}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-medium text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
             >
               Guardar Precios Negociados
             </button>
@@ -786,9 +786,9 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
                     <Trophy className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className={`text-[15px] font-black ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{agentName}</p>
+                    <p className={`text-[15px] font-medium ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{agentName}</p>
                     <div className="flex flex-wrap items-center gap-3 mt-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+                      <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                         Score: 
                         <span className="text-[#D6405F] dark:text-[#F8BBD0] ml-1">
                           {(q.ranking_score * 100).toFixed(0)}/100
@@ -800,7 +800,7 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
                   </div>
                 </div>
                 <div className="text-right flex items-center gap-3">
-                  <p className={`text-[18px] font-black ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{formatCurrency(q.total_amount)}</p>
+                  <p className={`text-[18px] font-medium ${winnerId === agentId ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{formatCurrency(q.total_amount)}</p>
                   <div className={`h-6 w-6 rounded-full flex items-center justify-center transition-all ${winnerId === agentId ? "bg-[#D6405F] text-white" : "border-2 border-[#EAE0E2] dark:border-white/10 text-transparent"}`}>
                     <Check className="w-4 h-4" />
                   </div>
@@ -813,7 +813,7 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
         {winnerId && (
           <div className="pt-6 border-t border-[#EAE0E2] dark:border-white/10 space-y-6">
             <div className="space-y-3">
-              <label className="block text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-1">Fecha Estimada de Entrega</label>
+              <label className="block text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-1">Fecha Estimada de Entrega</label>
               <input 
                 type="date"
                 value={deliveryDate}
@@ -828,7 +828,7 @@ function WinnerModal({ isOpen, onClose, opp, onConfirm }: any) {
             
             <button 
               onClick={() => onConfirm(winnerId, deliveryDate)} 
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
+              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-medium text-[11px] uppercase tracking-widest shadow-lg hover:scale-[1.02] transition-all"
             >
               Confirmar Ganador y Generar OC
             </button>
@@ -849,7 +849,7 @@ function StepItem({ active, icon, label, sub }: { active: boolean; icon: React.R
         {icon}
       </div>
       <div className="space-y-1">
-        <p className={`text-[12px] font-black uppercase tracking-widest ${active ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#8C6B79] dark:text-gray-500"}`}>{label}</p>
+        <p className={`text-[12px] font-medium uppercase tracking-widest ${active ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#8C6B79] dark:text-gray-500"}`}>{label}</p>
         <p className="text-[11px] font-medium leading-tight text-[#8C6B79] dark:text-gray-400 max-w-[140px] mx-auto">{sub}</p>
       </div>
     </div>

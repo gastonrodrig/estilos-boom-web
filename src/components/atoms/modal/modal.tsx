@@ -19,7 +19,7 @@ export const Modal = ({
   children,
   panelClassName = "relative bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl space-y-6",
   title,
-  titleClassName = "text-2xl font-black text-[#40202D] dark:text-white tracking-wide",
+  titleClassName = "text-2xl font-medium text-[#40202D] dark:text-white tracking-wide",
   description,
 }: ModalProps) => {
   return (

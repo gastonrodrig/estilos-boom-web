@@ -18,16 +18,16 @@ export default function AdminQuotationsPage() {
         <div>
           <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0]">
             <FileText className="h-5 w-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Ventas</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest">Ventas</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide mt-2">Cotizaciones</h1>
+          <h1 className="text-3xl md:text-4xl font-medium text-[#40202D] dark:text-white tracking-wide mt-2">Cotizaciones</h1>
           <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Gestiona los presupuestos emitidos a clientes.</p>
         </div>
 
         <div className="flex gap-3">
           <Link 
             href="/admin/quotations/add"
-            className="rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-6 py-4 text-[11px] font-black uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
+            className="rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-6 py-4 text-[11px] font-medium uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Nueva Cotización
@@ -46,7 +46,7 @@ export default function AdminQuotationsPage() {
           />
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <button className="flex-1 md:flex-none h-14 px-6 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-black text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm flex items-center justify-center gap-2">
+          <button className="flex-1 md:flex-none h-14 px-6 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 font-medium text-[11px] uppercase tracking-widest hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white transition-colors shadow-sm flex items-center justify-center gap-2">
             <Filter className="h-4 w-4" /> Filtros
           </button>
         </div>
@@ -57,7 +57,7 @@ export default function AdminQuotationsPage() {
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Código</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cliente</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha</th>
@@ -69,7 +69,7 @@ export default function AdminQuotationsPage() {
             <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[13px]">
               {dummyQuotations.map((q, idx) => (
                 <tr key={q.id} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-                  <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
+                  <td className="px-6 py-5 font-medium text-[#40202D] dark:text-white">
                     {q.id}
                   </td>
                   <td className="px-6 py-5 font-bold text-[#40202D] dark:text-white">
@@ -78,11 +78,11 @@ export default function AdminQuotationsPage() {
                   <td className="px-6 py-5 font-medium text-[#8C6B79] dark:text-gray-300">
                     {q.date}
                   </td>
-                  <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">
+                  <td className="px-6 py-5 font-medium text-[#D6405F] dark:text-[#F8BBD0]">
                     S/ {q.total.toFixed(2)}
                   </td>
                   <td className="px-6 py-5">
-                    <span className={`inline-flex rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border shadow-sm ${
+                    <span className={`inline-flex rounded-full px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest border shadow-sm ${
                       q.status === 'Aprobada' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' :
                       q.status === 'Rechazada' ? 'bg-rose-500/10 text-rose-600 border-rose-500/20' :
                       q.status === 'Enviada' ? 'bg-sky-500/10 text-sky-600 border-sky-500/20' :
