@@ -229,7 +229,6 @@ export default function AdminMovementsPage() {
         );
       },
     },
-<<<<<<< HEAD
     {
       id: "sender",
       label: "Creado por",
