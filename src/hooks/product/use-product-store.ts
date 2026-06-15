@@ -90,6 +90,7 @@ export const useProductStore = () => {
       offset?: number;
       gender?: string; // Agregamos gender a los params permitidos
       season?: string; // Agregamos season a los params permitidos
+      origin_type?: string; // Agregamos origin_type para filtrar por RETAIL o PRODUCCION
     }) => {
       dispatch(setLoadingProduct(true));
       try {

@@ -17,7 +17,7 @@ interface ProductionTrackingViewOrder extends TrackingOrder {
 interface ProductionTrackingViewProps {
   order: ProductionTrackingViewOrder;
   onBack: () => void;
-  onApproveQuality: (id: string) => Promise<void>;
+  onApproveQuality?: (id: string) => Promise<void>;
 }
 
 export function ProductionTrackingView({
@@ -53,14 +53,6 @@ export function ProductionTrackingView({
     order.order_number || order.pre_order_number || "Orden sin numero";
 
   const workshopName = order.workshopName || "Taller asignado";
-
-  const handleApproveQuality = async () => {
-    try {
-      await onApproveQuality(order._id);
-    } catch {
-      toast.error("No se pudo aprobar el control de calidad.");
-    }
-  };
 
   return (
     <section className="min-h-screen bg-[#fdfcfc]">
@@ -175,19 +167,23 @@ export function ProductionTrackingView({
               />
             </div>
 
-            {isReadyForQuality ? (
-              <button
-                type="button"
-                onClick={handleApproveQuality}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-green-700"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                Aprobar QC y finalizar orden
-              </button>
+            {order.status === "COMPLETADA" ? (
+              <div className="rounded-xl border border-[#d1e7dd] bg-[#d1e7dd]/30 px-4 py-4 text-center text-sm leading-relaxed text-[#0f5132] font-medium flex flex-col items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 animate-pulse" />
+                <span className="font-bold">¡Orden Completada!</span>
+                Las prendas han sido recibidas físicamente y el stock del Almacén Central (Boom) se actualizó correctamente.
+              </div>
+            ) : order.status === "CONTROL_CALIDAD" ? (
+              <div className="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-4 text-center text-sm leading-relaxed text-blue-900 font-medium flex flex-col items-center gap-2">
+                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-600 animate-bounce">
+                  ⏳
+                </div>
+                <span className="font-bold">En espera de recepción en Almacén</span>
+                La producción del taller ha finalizado. Esperando que el almacenero central realice la recepción física y conteo de mercadería desde el módulo de Recepciones para cerrar la orden y actualizar el inventario.
+              </div>
             ) : (
               <div className="rounded-xl border border-dashed border-rose-200 bg-rose-50 px-4 py-3 text-center text-sm leading-relaxed text-[#9b8088]">
-                La aprobacion se habilitara cuando el taller complete el
-                seguimiento por WhatsApp.
+                El taller se encuentra en proceso de fabricación. El seguimiento y reportes de avance continúan automáticamente por WhatsApp.
               </div>
             )}
           </div>

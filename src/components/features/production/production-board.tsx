@@ -76,7 +76,7 @@ export const ProductionBoard = () => {
   const [selected, setSelected] = useState<Record<string, SupplySelection>>({});
 
   useEffect(() => {
-    void startLoadingProducts({ limit: 100 });
+    void startLoadingProducts({ limit: 100, origin_type: "PRODUCCION" });
     void startLoadingProductionOrders();
   }, [startLoadingProducts, startLoadingProductionOrders]);
 

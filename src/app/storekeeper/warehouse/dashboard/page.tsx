@@ -21,6 +21,7 @@ const itemVariants: Variants = {
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   INGRESO_COMPRA: "Recepción de compra",
+  INGRESO_PRODUCCION: "Ingreso por producción",
   SALIDA_VENTA: "Salida por venta",
   TRANSFERENCIA: "Transferencia interna",
   AJUSTE: "Ajuste de inventario",
@@ -67,7 +68,7 @@ export default function WarehouseDashboardPage() {
 
   const receptions = useMemo(() => {
     return pending.filter((d) => {
-      if (d.type !== "INGRESO_COMPRA" && d.type !== "TRANSFERENCIA") return false;
+      if (d.type !== "INGRESO_COMPRA" && d.type !== "INGRESO_PRODUCCION" && d.type !== "TRANSFERENCIA") return false;
       const targetCode = role === "Almacenero Boom" ? "ALM-CEN" : "TND-PRI";
       return d.id_target_warehouse?.code === targetCode;
     });

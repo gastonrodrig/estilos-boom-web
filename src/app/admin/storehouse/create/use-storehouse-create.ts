@@ -84,7 +84,7 @@ export const useStorehouseCreate = () => {
   // --- CARGA INICIAL ---
   useEffect(() => {
     void startLoadingSuppliers();
-    void startLoadingProducts({ limit: 100 });
+    void startLoadingProducts({ limit: 100, origin_type: "RETAIL" });
 
     const loadWorkers = async () => {
       setLoadingWorkers(true);

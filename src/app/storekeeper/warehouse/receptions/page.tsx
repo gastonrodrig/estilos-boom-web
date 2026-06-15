@@ -23,7 +23,7 @@ export default function ReceptionsListPage() {
       const data = await startLoadingWarehouseDocuments();
       if (Array.isArray(data)) {
         const roleFiltered = data.filter((d) => {
-          if (d.type !== "INGRESO_COMPRA" && d.type !== "TRANSFERENCIA") return false;
+          if (d.type !== "INGRESO_COMPRA" && d.type !== "INGRESO_PRODUCCION" && d.type !== "TRANSFERENCIA") return false;
 
           if (role === "Almacenero Boom") {
             return d.id_target_warehouse?.code === "ALM-CEN";

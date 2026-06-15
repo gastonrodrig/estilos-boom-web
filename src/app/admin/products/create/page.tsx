@@ -35,6 +35,9 @@ export default function CreateProductPage() {
     season: '',
     id_category: '',
     origin_type: 'RETAIL', // 'RETAIL' o 'PRODUCCION'
+    is_active: true,
+    is_best_seller: false,
+    is_new_in: true,
   });
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -88,6 +91,48 @@ export default function CreateProductPage() {
 
     setVariants(newVariants);
   }, [formData.sku]);
+
+  // Generar SKU base a partir de nombre, temporada y composición/material
+  const generateBaseSKU = () => {
+    if (!formData.name || !formData.season || !formData.composition) {
+      toast.error("Por favor completa los campos: Nombre, Temporada y Material / Tela para poder generar el SKU.");
+      return;
+    }
+
+    // Abreviatura del nombre (ej. VEST para Vestido Gala)
+    const cleanName = formData.name
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9\s]/g, "");
+    const nameWords = cleanName.split(/\s+/).filter(Boolean);
+    let nameAbbr = "";
+    if (nameWords.length >= 2) {
+      nameAbbr = (nameWords[0].slice(0, 2) + nameWords[1].slice(0, 2)).padEnd(4, "X");
+    } else if (nameWords.length === 1) {
+      nameAbbr = nameWords[0].slice(0, 4).padEnd(4, "X");
+    } else {
+      nameAbbr = "PROD";
+    }
+
+    // Abreviatura de temporada (ej. PRIM26 para PRIMAVERA 2026)
+    const cleanSeason = formData.season
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "");
+    const seasonAbbr = cleanSeason.slice(0, 5).padEnd(4, "X");
+
+    // Abreviatura de material/composición (ej. ALGO para Algodón)
+    const cleanComp = formData.composition
+      .trim()
+      .toUpperCase()
+      .replace(/[0-9%]/g, "")
+      .replace(/[^A-Z0-9]/g, "");
+    const compAbbr = cleanComp.slice(0, 4).padEnd(4, "X");
+
+    const generatedSku = `${nameAbbr}-${seasonAbbr}-${compAbbr}`;
+    setFormData(prev => ({ ...prev, sku: generatedSku }));
+    toast.success(`SKU generado: ${generatedSku}`);
+  };
 
   // Carga inicial de datos desde la API
   useEffect(() => {
@@ -226,6 +271,9 @@ export default function CreateProductPage() {
     data.append("id_category", formData.id_category);
     data.append("season", formData.season);
     data.append("origin_type", formData.origin_type);
+    data.append("is_active", formData.is_active.toString());
+    data.append("is_best_seller", formData.is_best_seller.toString());
+    data.append("is_new_in", formData.is_new_in.toString());
     data.append("variants", JSON.stringify(variants));
 
     // Si es producción propia, limpiamos el objeto antes de enviarlo
@@ -362,7 +410,16 @@ export default function CreateProductPage() {
             <div className="grid grid-cols-2 gap-[16px]">
               <div>
                 <label className={labelClass}>SKU Base *</label>
-                <input type="text" className={inputClass} placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
+                <div className="flex gap-2">
+                  <input type="text" className={`${inputClass} flex-1`} placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
+                  <button
+                    type="button"
+                    onClick={generateBaseSKU}
+                    className="px-4 bg-[#8B3A52] hover:bg-[#a05068] text-white text-xs font-bold rounded-[10px] hover:scale-105 active:scale-95 transition-all shadow-md shrink-0 flex items-center justify-center uppercase tracking-wider"
+                  >
+                    Generar SKU
+                  </button>
+                </div>
               </div>
               <div>
                 <label className={labelClass}>Género *</label>
@@ -378,6 +435,51 @@ export default function CreateProductPage() {
             <div>
               <label className={labelClass}>Descripción</label>
               <textarea className={`${inputClass} h-[80px]`} placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
+            </div>
+          </div>
+
+          {/* Estados y Promoción */}
+          <div className={sectionClass}>
+            <h3 className={titleClass}>Estados y Promoción</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Producto Activo</span>
+                  <p className="text-[10px] text-gray-400 font-medium">Visible en catálogo y compras.</p>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={formData.is_best_seller}
+                  onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
+                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Best Seller</span>
+                  <p className="text-[10px] text-gray-400 font-medium">Destacado como más vendido.</p>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={formData.is_new_in}
+                  onChange={(e) => setFormData({ ...formData, is_new_in: e.target.checked })}
+                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Nuevo Ingreso (New In)</span>
+                  <p className="text-[10px] text-gray-400 font-medium">Etiquetado como novedad.</p>
+                </div>
+              </label>
             </div>
           </div>
 
