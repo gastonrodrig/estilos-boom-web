@@ -265,9 +265,7 @@ export default function AdminMovementsPage() {
         );
       },
     },
-=======
 
->>>>>>> origin/juan
   ];
 
   const docActions: DataTableAction<any>[] = [
