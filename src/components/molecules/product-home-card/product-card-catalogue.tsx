@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Product } from "@/core/models";
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export const ProductCardCatalogue = ({ product }: Props) => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
 
@@ -104,7 +106,13 @@ export const ProductCardCatalogue = ({ product }: Props) => {
           </span>
         </div>
 
-        <button className="btn-carrito">
+        <button 
+          className="btn-carrito"
+          onClick={(e) => {
+            e.preventDefault();
+            router.push(`/product/${product.id_product}`);
+          }}
+        >
           <span className="text-[14px]">🛒</span> Agregar al carrito
         </button>
       </div>
