@@ -160,7 +160,14 @@ const CheckoutPaymentForm: React.FC = () => {
         try {
           const operationNumber = watch('operationNumber');
           const token = await getFirebaseAuthToken();
-          const clientNameStr = (firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : 'Cliente Web';
+          
+          const typedFirstName = watch('firstName') || '';
+          const typedLastName = watch('lastName') || '';
+          const clientNameStr = (firstName || lastName) 
+            ? `${firstName || ''} ${lastName || ''}`.trim() 
+            : (typedFirstName || typedLastName) 
+              ? `${typedFirstName} ${typedLastName}`.trim() 
+              : 'Cliente Web';
 
           await manualPaymentApi.post('/process', {
             operationNumber,
@@ -200,9 +207,18 @@ const CheckoutPaymentForm: React.FC = () => {
 
   const onSubmitPayment = async (param: any) => {
     return new Promise((resolve, reject) => {
+      const typedFirstName = watch('firstName') || '';
+      const typedLastName = watch('lastName') || '';
+      const clientNameStr = (firstName || lastName) 
+        ? `${firstName || ''} ${lastName || ''}`.trim() 
+        : (typedFirstName || typedLastName) 
+          ? `${typedFirstName} ${typedLastName}`.trim() 
+          : 'Cliente Web';
+
       mercadopagoApi.processPayment({ 
         ...param.formData, 
         orderId: `ORD-${Date.now()}`,
+        clientName: clientNameStr,
         items: itemsRef.current.map(item => ({
           id: item.id,
           name: item.name,
