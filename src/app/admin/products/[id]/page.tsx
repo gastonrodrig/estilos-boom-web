@@ -107,25 +107,25 @@ export default function ProductDetailPage() {
 
           {/* 🧵 RENDERIZADO CONDICIONAL: FICHA TÉCNICA DE INSUMOS */}
           {product.origin_type === 'PRODUCCION' && product.technical_sheet && product.technical_sheet.length > 0 && (
-            <section className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden animate-in fade-in duration-300">
-              <div className="p-5 bg-white/50 dark:bg-black/30 border-b border-[#EAE0E2] dark:border-white/10 flex items-center gap-2">
+            <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden animate-in fade-in duration-300 transition-[background-color,border-color] duration-[600ms]">
+              <div className="p-5 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] flex items-center gap-2">
                 <Scissors size={18} className="text-[#D6405F] dark:text-[#F8BBD0]" />
                 <h3 className="font-bold uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                   Ficha Técnica de Materiales / Insumos
                 </h3>
               </div>
               <div className="p-2">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="text-[#8C6B79] dark:text-gray-400 font-bold uppercase tracking-wider border-b border-[#EAE0E2] dark:border-white/10">
-                      <th className="p-4">Material Requerido</th>
-                      <th className="p-4">Unidad de Medida</th>
-                      <th className="p-4 text-right">Cant. por Prenda</th>
+                <table className="w-full text-left text-sm border-collapse">
+                  <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                    <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                      <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Material Requerido</th>
+                      <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidad de Medida</th>
+                      <th className="p-4 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cant. por Prenda</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                     {product.technical_sheet.map((item: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                         <td className="p-4 font-black text-[#40202D] dark:text-white">{item.name}</td>
                         <td className="p-4 opacity-70 uppercase text-xs">{item.unit}</td>
                         <td className="p-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity}</td>
@@ -138,20 +138,20 @@ export default function ProductDetailPage() {
           )}
 
           {/* TABLA DE VARIANTES E INVENTARIO */}
-          <section className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 flex justify-between items-center">
+          <section className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-3xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+            <div className="p-5 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] flex justify-between items-center">
               <h3 className="font-bold flex items-center gap-2 uppercase text-xs tracking-wider text-[#D6405F] dark:text-[#F8BBD0]">
                 <Palette size={18} className="text-[#D6405F] dark:text-[#F8BBD0]"/> Control de Stock por Variantes
               </h3>
             </div>
             <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-xs uppercase font-bold text-[#8C6B79] dark:text-gray-400 border-b border-[#EAE0E2] dark:border-white/10">
-                    <th className="px-6 py-4">Talla</th>
-                    <th className="px-6 py-4">Color Comercial</th>
-                    <th className="px-6 py-4">SKU Variante</th>
-                    <th className="px-6 py-4 text-right">Stock</th>
+              <table className="w-full text-left border-collapse">
+                <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                    <th className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
+                    <th className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color Comercial</th>
+                    <th className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">SKU Variante</th>
+                    <th className="px-6 py-4 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Stock</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
@@ -162,7 +162,7 @@ export default function ProductDetailPage() {
                     const isStockLow = variant.stock <= (variant.min_stock_alert || 10);
 
                     return (
-                      <tr key={variant._id || idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={variant._id || idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                         <td className="px-6 py-4 font-black text-sm text-[#40202D] dark:text-white">{variant.size}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3 text-sm font-bold text-[#40202D] dark:text-white">

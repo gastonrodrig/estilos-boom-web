@@ -19,11 +19,12 @@ export const RoleGuard = ({ children }: Props) => {
   const isStorekeeperArea = pathname.startsWith("/storekeeper");
   const isOutsideStorekeeperArea = !isStorekeeperArea;
   const isAuthRoute = pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register");
+  const isStorekeeperRole = role === "Almacenero" || role === "Almacenero Boom" || role === "Almacenero Tienda";
 
   useEffect(() => {
     if (status === "checking" || (status === "authenticated" && !role)) return;
 
-    if (status === "authenticated" && role === "Almacenero" && isOutsideStorekeeperArea) {
+    if (status === "authenticated" && isStorekeeperRole && isOutsideStorekeeperArea) {
       router.replace("/storekeeper");
       return;
     }
@@ -34,20 +35,20 @@ export const RoleGuard = ({ children }: Props) => {
         return;
       }
 
-      if (role === "Almacenero") {
+      if (isStorekeeperRole) {
         router.replace("/storekeeper");
         return;
       }
 
       router.replace("/client");
     }
-  }, [status, role, isAuthRoute, isOutsideStorekeeperArea, router]);
+  }, [status, role, isAuthRoute, isOutsideStorekeeperArea, router, isStorekeeperRole]);
 
   if (
     status === "checking" ||
     (suppressAccessDenied && (isClientArea || isAdminArea || isStorekeeperArea)) ||
     (status === "authenticated" && (!role || isAuthRoute)) ||
-    (status === "authenticated" && role === "Almacenero" && isOutsideStorekeeperArea)
+    (status === "authenticated" && isStorekeeperRole && isOutsideStorekeeperArea)
   ) {
     return <FullScreenLoader />;
   }
@@ -58,8 +59,8 @@ export const RoleGuard = ({ children }: Props) => {
     (status === "authenticated" && role === "Cliente" && isStorekeeperArea) ||
     (status === "authenticated" && role === "Administrador" && isClientArea) ||
     (status === "authenticated" && role === "Administrador" && isStorekeeperArea) ||
-    (status === "authenticated" && role === "Almacenero" && isAdminArea) ||
-    (status === "authenticated" && role === "Almacenero" && isClientArea)
+    (status === "authenticated" && isStorekeeperRole && isAdminArea) ||
+    (status === "authenticated" && isStorekeeperRole && isClientArea)
   ) {
     return <AccessDenied />;
   }

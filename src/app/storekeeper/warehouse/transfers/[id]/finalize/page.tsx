@@ -86,7 +86,7 @@ export default function FinalizeMovementPage({ params }: { params: Promise<{ id:
       pdf.setFont("helvetica", "normal");
       pdf.text(`Fecha: ${new Date(doc.created_at ?? Date.now()).toLocaleDateString()}`, 15, 55);
       pdf.text(`Tipo: Transferencia Interna`, 15, 62);
-      pdf.text(`Estado de Guía: PENDIENTE DE RECEPCIÓN`, 15, 69);
+      pdf.text(`Estado de Guía: ${doc.status === "PENDIENTE" ? "DESPACHADO - EN TRÁNSITO" : "RECIBIDO - COMPLETADO"}`, 15, 69);
 
       const sourceName = doc.id_source_warehouse?.name?.replace(/_/g, " ") ?? "Origen";
       const targetName = doc.id_target_warehouse?.name?.replace(/_/g, " ") ?? "Destino";
@@ -192,9 +192,13 @@ export default function FinalizeMovementPage({ params }: { params: Promise<{ id:
             <CheckCircle2 className="w-8 h-8 text-[#D6405F] dark:text-[#F2778D]" />
           </div>
           
-          <h1 className="text-2xl font-bold font-serif text-[#5B283A] dark:text-[#Fdfcfc] mb-2 transition-colors duration-300">¡Transferencia ejecutada!</h1>
+          <h1 className="text-2xl font-bold font-serif text-[#5B283A] dark:text-[#Fdfcfc] mb-2 transition-colors duration-300">
+            {doc?.status === "PENDIENTE" ? "¡Despacho Realizado!" : "¡Mercadería Recibida!"}
+          </h1>
           <p className="text-[#844C60] dark:text-[#C9B3BC] text-sm mb-8 transition-colors duration-300 leading-relaxed">
-            La transferencia <span className="font-bold text-[#40202D] dark:text-white">#{doc?.document_number}</span> ha sido procesada exitosamente.
+            {doc?.status === "PENDIENTE"
+              ? `El envío de la transferencia #${doc?.document_number} ha sido despachado y se encuentra en camino (En Tránsito).`
+              : `La recepción de la transferencia #${doc?.document_number} ha sido registrada y completada con éxito.`}
           </p>
 
           <div className="bg-[#FCF8F9] dark:bg-white/5 border border-[#EEDCE1] dark:border-white/5 rounded-xl p-5 text-left mb-8">
@@ -409,9 +413,10 @@ export default function FinalizeMovementPage({ params }: { params: Promise<{ id:
           disabled={loading || doc.status === "COMPLETADO"}
           className="w-full py-4 bg-[#40202D] hover:bg-[#5B283A] dark:bg-white/5 dark:hover:bg-white/10 dark:border dark:border-white/10 text-white dark:text-white disabled:opacity-40 text-sm font-medium tracking-wide rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-none transition-all"
         >
-          {loading ? "Ejecutando transferencia..."
+          {loading ? (doc.status === "PENDIENTE" ? "Despachando envío..." : "Registrando recepción...")
            : doc.status === "COMPLETADO" ? "Transferencia ya ejecutada"
-           : "Confirmar y ejecutar transferencia"}
+           : doc.status === "PENDIENTE" ? "Confirmar y despachar envío"
+           : "Confirmar y registrar recepción"}
         </button>
       </div>
 

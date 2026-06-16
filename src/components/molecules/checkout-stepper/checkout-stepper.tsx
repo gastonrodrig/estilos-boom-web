@@ -17,17 +17,17 @@ const steps = [
 export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep }) => {
   return (
     <section className="mb-4 py-4">
-      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 stepper">
         {steps.map((step, index) => {
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
 
           return (
             <React.Fragment key={step}>
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 step ${isActive || isCompleted ? 'active' : ''}`}>
                 {/* Círculo del paso */}
                 <span
-                  className={`h-2 w-2 rounded-full transition-colors duration-300 ${
+                  className={`step-dot h-2 w-2 rounded-full transition-colors duration-300 ${
                     isActive ? "bg-[#632034]" : isCompleted ? "bg-[#D9A2A8]" : "bg-[#F5E3E6]"
                   }`}
                 />
@@ -35,7 +35,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep })
                 {/* Etiqueta y línea inferior decorativa */}
                 <div className="flex flex-col items-start">
                   <span
-                    className={`text-[12px] md:text-[13px] font-medium capitalize transition-colors duration-300 ${
+                    className={`step-label text-[12px] md:text-[13px] font-medium capitalize transition-colors duration-300 ${
                       isActive ? "text-[#632034]" : isCompleted ? "text-[#D9A2A8]" : "text-[#D9A2A8]/60"
                     }`}
                   >
@@ -47,16 +47,16 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({ currentStep })
                     }`}
                   />
                 </div>
-
-                {/* Línea conectora entre pasos */}
-                {index < steps.length - 1 && (
-                  <span 
-                    className={`mx-1 h-px w-4 md:w-8 transition-colors duration-300 ${
-                      isCompleted ? "bg-[#D9A2A8]" : "bg-[#F5E3E6]"
-                    }`} 
-                  />
-                )}
               </div>
+
+              {/* Línea conectora entre pasos */}
+              {index < steps.length - 1 && (
+                <span 
+                  className={`step-line mx-1 h-px w-4 md:w-8 transition-colors duration-300 ${
+                    isCompleted ? "bg-[#D9A2A8]" : "bg-[#F5E3E6]"
+                  }`} 
+                />
+              )}
             </React.Fragment>
           );
         })}

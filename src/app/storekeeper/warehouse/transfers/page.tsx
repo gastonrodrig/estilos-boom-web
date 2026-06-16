@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, Sparkles, FileText, Activity, CheckCircle2, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useStorehouseStore } from "@/hooks";
+import { useStorehouseStore, useAuthStore } from "@/hooks";
 
 type Tab = "PENDIENTE" | "COMPLETADO";
 
@@ -17,6 +17,7 @@ const DOC_ROUTE = (doc: any) => `/storekeeper/warehouse/transfers/${doc._id}/con
 
 export default function AdminDocumentsMovementsPage() {
   const { startLoadingWarehouseDocuments, loading } = useStorehouseStore();
+  const { role } = useAuthStore();
   const [allDocs, setAllDocs] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("PENDIENTE");
   const [showDelayedOnly, setShowDelayedOnly] = useState(false);
@@ -25,14 +26,40 @@ export default function AdminDocumentsMovementsPage() {
     const load = async () => {
       const data = await startLoadingWarehouseDocuments();
       if (Array.isArray(data)) {
-        setAllDocs(data.filter((d) => d.type === "TRANSFERENCIA"));
+        const typeFiltered = data.filter((d) => d.type === "TRANSFERENCIA");
+        const roleFiltered = typeFiltered.filter((d) => {
+          const isSourceBoom = d.id_source_warehouse?.code === "ALM-CEN";
+          const isTargetBoom = d.id_target_warehouse?.code === "ALM-CEN";
+          const isSourceTienda = d.id_source_warehouse?.code === "TND-PRI";
+          const isTargetTienda = d.id_target_warehouse?.code === "TND-PRI";
+
+          if (role === "Almacenero Boom") {
+            return (
+              (d.status === "PENDIENTE" && isSourceBoom) ||
+              (d.status === "EN_TRANSITO" && isTargetBoom) ||
+              (d.status === "COMPLETADO" && (isSourceBoom || isTargetBoom))
+            );
+          }
+          if (role === "Almacenero Tienda") {
+            return (
+              (d.status === "PENDIENTE" && isSourceTienda) ||
+              (d.status === "EN_TRANSITO" && isTargetTienda) ||
+              (d.status === "COMPLETADO" && (isSourceTienda || isTargetTienda))
+            );
+          }
+          return true;
+        });
+        setAllDocs(roleFiltered);
       }
     };
     void load();
-  }, [startLoadingWarehouseDocuments]);
+  }, [startLoadingWarehouseDocuments, role]);
 
   const filtered = allDocs.filter((d) => {
-    if (d.status !== activeTab) return false;
+    const isPending = d.status === "PENDIENTE" || d.status === "EN_TRANSITO";
+    if (activeTab === "PENDIENTE" && !isPending) return false;
+    if (activeTab === "COMPLETADO" && d.status !== "COMPLETADO") return false;
+    
     if (activeTab === "PENDIENTE" && showDelayedOnly) {
       const msSince = Date.now() - new Date(d.created_at).getTime();
       const hoursSince = Math.round(msSince / 1000 / 3600);
@@ -40,7 +67,7 @@ export default function AdminDocumentsMovementsPage() {
     }
     return true;
   });
-  const pendingCount = allDocs.filter((d) => d.status === "PENDIENTE").length;
+  const pendingCount = allDocs.filter((d) => d.status === "PENDIENTE" || d.status === "EN_TRANSITO").length;
 
   return (
     <motion.div 
@@ -233,12 +260,14 @@ export default function AdminDocumentsMovementsPage() {
                       <span>Lleva {hoursSince}h en espera</span>
                     </div>
 
-                    {doc.status === "PENDIENTE" && (
+                    {(doc.status === "PENDIENTE" || doc.status === "EN_TRANSITO") && (
                       <Link 
                         href={DOC_ROUTE(doc)}
                         className="group/btn relative py-3.5 px-8 bg-[#40202D] dark:bg-[#F2778D]/20 hover:bg-[#5B283A] dark:hover:bg-[#F3D899]/20 border border-transparent dark:border-[#F2778D]/40 dark:hover:border-[#F3D899]/60 text-white dark:text-[#F8BBD0] dark:hover:text-[#F3D899] text-[13px] font-bold tracking-wide rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(242,119,141,0.1)] dark:hover:shadow-[0_0_20px_rgba(243,216,153,0.15)] overflow-hidden backdrop-blur-md"
                       >
-                        <span className="relative z-10">Ejecutar movimiento</span>
+                        <span className="relative z-10">
+                          {doc.status === "PENDIENTE" ? "Ejecutar envío" : "Confirmar recepción"}
+                        </span>
                         <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out" />
                       </Link>

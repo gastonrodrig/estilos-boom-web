@@ -197,16 +197,16 @@ export default function StockActualPage() {
         </div>
 
         {/* Tabla / Matriz */}
-        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/10 rounded-3xl overflow-hidden shadow-sm overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left text-sm min-w-[800px]">
-            <thead className="bg-white/50 dark:bg-black/30 text-xs uppercase font-bold text-[#D6405F] dark:text-[#F8BBD0] border-b border-[#EAE0E2] dark:border-white/10">
-              <tr>
-                <th className="p-5 w-12 text-center"></th>
-                <th className="p-5 min-w-[280px]">Producto</th>
-                <th className="p-5 text-center w-36">Total Almacén</th>
-                <th className="p-5 text-center w-36">Total Tienda</th>
-                <th className="p-5 text-center w-32">Estado</th>
-                <th className="p-5 text-center w-28">Acción</th>
+        <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[3xl] overflow-hidden transition-[background-color,border-color] duration-[600ms] overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left text-sm min-w-[800px] border-collapse">
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="p-5 w-12 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]"></th>
+                <th className="p-5 min-w-[280px] border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Producto</th>
+                <th className="p-5 text-center w-36 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Total Almacén</th>
+                <th className="p-5 text-center w-36 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Total Tienda</th>
+                <th className="p-5 text-center w-32 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
+                <th className="p-5 text-center w-28 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acción</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
@@ -232,7 +232,7 @@ export default function StockActualPage() {
                 return (
                   <Fragment key={productKey}>
                     {/* FILA PADRE */}
-                    <tr className={`transition-colors font-medium hover:bg-white/50 dark:hover:bg-white/5 ${isExpanded ? "bg-white/80 dark:bg-white/10" : ""}`}>
+                    <tr className={`transition-colors font-medium group/row ${index % 2 === 0 ? "bg-white/40 dark:bg-black/20" : "bg-transparent"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)] ${isExpanded ? "bg-white/80 dark:bg-white/10" : ""}`}>
                       <td className="p-4 text-center">
                         <button 
                           type="button"

@@ -145,6 +145,7 @@ export const useManagementStore = () => {
             const list = Array.isArray(data) ? data : [];
             dispatch(setRoles(
                 list.map((r: any) => ({
+                    id:          r.name.toLowerCase().replace(/\s+/g, '-'),
                     name:        r.name,
                     user_count:  r.user_count ?? 0,
                     is_active:   r.is_active ?? true,
@@ -163,6 +164,70 @@ export const useManagementStore = () => {
     const setPageGlobal = (page: number) => dispatch(setPageManagement(page));
     const setRowsPerPageGlobal = (rows: number) => dispatch(setRowsPerPageManagement(rows));
 
+    const togglePermission = async (roleId: string, item: any, isActive: boolean) => {
+        const role = roles.find(r => r.id === roleId);
+        if (!role) return;
+
+        let newPermissions = [...role.permissions];
+
+        if (isActive) {
+            newPermissions = newPermissions.filter(p => !item.matches(p));
+        } else {
+            const toAdd: Record<string, string[]> = {
+                'dash_metrics': ['dashboard:view'],
+                'cat_view': ['products:view', 'categories:view', 'production:view'],
+                'cat_manage': ['products:add', 'products:edit', 'categories:edit'],
+                'inv_view': ['products_inventory:view', 'supplies_inventory:view'],
+                'inv_manage': ['products_inventory:update', 'supplies_inventory:create', 'supplies_inventory:update'],
+                'log_view': ['orders:view', 'payments:view'],
+                'log_manage': ['orders:manage', 'procurement:update']
+            };
+
+            const permsToAdd = toAdd[item.id] || [];
+            permsToAdd.forEach(p => {
+                if (!newPermissions.includes(p)) newPermissions.push(p);
+            });
+        }
+
+        try {
+            const token = await getFirebaseAuthToken();
+            await clientApi.patch(`/users/roles-permissions/${role.name}`, {
+                permissions: newPermissions
+            }, getAuthConfig({ token }));
+
+            dispatch(setRoles(roles.map(r => r.id === roleId ? { ...r, permissions: newPermissions } : r)));
+            toast.success("Permisos guardados satisfactoriamente");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al guardar cambios");
+        }
+    };
+
+    const createNewRole = async (name: string, permissions: string[] = []) => {
+        try {
+            const token = await getFirebaseAuthToken();
+            const { data } = await clientApi.post("/users/roles-permissions", {
+                name,
+                permissions
+            }, getAuthConfig({ token }));
+
+            const newRole = {
+                id: name.toLowerCase().replace(/\s+/g, '-'),
+                name: data.name,
+                permissions: data.permissions,
+                user_count: 0,
+                is_active: true
+            };
+
+            dispatch(setRoles([...roles, newRole]));
+            return newRole.id;
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al crear nuevo rol");
+            return null;
+        }
+    };
+
     return {
         // estado
         users, workers, roles,
@@ -176,5 +241,7 @@ export const useManagementStore = () => {
         startUpdateWorker,
         startDeleteWorker,
         startLoadingRoles,
+        togglePermission,
+        createNewRole,
     };
 };

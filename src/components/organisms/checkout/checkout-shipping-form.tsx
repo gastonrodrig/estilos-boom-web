@@ -32,15 +32,15 @@ const CheckoutShippingForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#FAF9F6] rounded-sm p-6 lg:p-8 border border-[#EBEAE8] shadow-sm space-y-8">
+    <div className="bg-[#FAF9F6] dark:bg-[#1a0618]/60 dark:backdrop-blur-md rounded-sm p-6 lg:p-8 border border-[#EBEAE8] dark:border-[#C5A059]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] space-y-8">
       {/* 1. INFORMACIÓN DE CONTACTO */}
       <div>
-        <h2 className="text-[18px] font-serif text-[#632034] mb-1">1. Información de Contacto</h2>
-        <p className="text-[13px] text-[#594246]/70 mb-4">Usa tus datos registrados o actualízalos.</p>
+        <h2 className="text-[18px] font-serif text-[#632034] dark:text-[#C5A059] mb-1">1. Información de Contacto</h2>
+        <p className="text-[13px] text-[#594246]/70 dark:text-[#f0d8e8]/70 mb-4">Usa tus datos registrados o actualízalos.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[13px] font-medium mb-2 text-[#594246]">Email*</label>
+            <label className="block text-[13px] font-medium mb-2 text-[#594246] dark:text-[#f0d8e8]/90">Email*</label>
             <input
               type="email"
               placeholder="correo@ejemplo.com"
@@ -48,18 +48,18 @@ const CheckoutShippingForm: React.FC = () => {
                 required: 'El email es requerido',
                 pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Email inválido' },
               })}
-              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] transition-colors ${errors.email ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+              className={`w-full px-4 py-2.5 text-[14px] bg-white dark:bg-black/40 border dark:text-white dark:placeholder-white/30 rounded-sm focus:outline-[#632034] dark:focus:outline-[#C5A059] transition-colors ${errors.email ? 'border-red-500' : 'border-[#EBEAE8] dark:border-[#C5A059]/30'}`}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
 
           <div>
-            <label className="block text-[13px] font-medium mb-2 text-[#594246]">Teléfono*</label>
+            <label className="block text-[13px] font-medium mb-2 text-[#594246] dark:text-[#f0d8e8]/90">Teléfono*</label>
             <input
               type="tel"
               placeholder="987654321"
               {...register('phone', { required: 'El teléfono es requerido' })}
-              className={`w-full px-4 py-2.5 text-[14px] bg-white border rounded-sm focus:outline-[#632034] transition-colors ${errors.phone ? 'border-red-500' : 'border-[#EBEAE8]'}`}
+              className={`w-full px-4 py-2.5 text-[14px] bg-white dark:bg-black/40 border dark:text-white dark:placeholder-white/30 rounded-sm focus:outline-[#632034] dark:focus:outline-[#C5A059] transition-colors ${errors.phone ? 'border-red-500' : 'border-[#EBEAE8] dark:border-[#C5A059]/30'}`}
             />
             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
           </div>
@@ -67,15 +67,15 @@ const CheckoutShippingForm: React.FC = () => {
       </div>
 
       {/* 4. NEWSLETTER */}
-      <div className="pt-4 flex items-center gap-3 border-t border-[#EBEAE8]">
+      <div className="pt-4 flex items-center gap-3 border-t border-[#EBEAE8] dark:border-[#C5A059]/20">
         <Controller
           name="wantsNews"
           control={control}
           render={({ field: { value, onChange } }) => (
-            <input type="checkbox" id="wantsNews" checked={value} onChange={onChange} className="w-4 h-4 rounded accent-[#632034]" />
+            <input type="checkbox" id="wantsNews" checked={value} onChange={onChange} className="w-4 h-4 rounded accent-[#632034] dark:accent-[#C5A059]" />
           )}
         />
-        <label htmlFor="wantsNews" className="text-[13px] text-[#594246]">Me gustaría recibir actualizaciones sobre los últimos productos y promociones</label>
+        <label htmlFor="wantsNews" className="text-[13px] text-[#594246] dark:text-[#f0d8e8]/90">Me gustaría recibir actualizaciones sobre los últimos productos y promociones</label>
       </div>
 
       {/* BOTÓN CONTINUAR */}
@@ -84,7 +84,7 @@ const CheckoutShippingForm: React.FC = () => {
           type="button"
           onClick={handleNext}
           disabled={isSubmitting}
-          className="w-full md:w-auto px-10 py-3.5 rounded-sm text-white text-[12px] uppercase tracking-wider font-bold bg-black hover:bg-[#632034] transition-all disabled:opacity-50"
+          className="btn-checkout w-full md:w-auto px-10 py-3.5 rounded-sm !mt-0 border cursor-pointer" 
         >
           {isSubmitting ? 'Validando...' : 'Siguiente: Entrega'}
         </button>

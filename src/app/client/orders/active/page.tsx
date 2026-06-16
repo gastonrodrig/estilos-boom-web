@@ -24,7 +24,7 @@ function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObs
       <div className="relative flex justify-between items-start w-full">
         
         {/* Background Line */}
-        <div className="absolute top-5 left-[10%] right-[10%] h-[4px] bg-[#EBEAE8] rounded-full z-0"></div>
+        <div className="absolute top-5 left-[10%] right-[10%] h-[4px] bg-[#EBEAE8] dark:bg-[#e8688a]/20 rounded-full z-0"></div>
         
         {/* Magical Active Progress Line */}
         <div className="absolute top-5 left-[10%] right-[10%] h-[4px] z-0">
@@ -62,9 +62,9 @@ function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObs
                     type: "spring", stiffness: 200, damping: 15, delay: index * 0.15 
                   }}
                   className={`flex items-center justify-center text-sm transition-all duration-500 relative z-10
-                    ${isCompleted ? "w-10 h-10 rounded-full bg-gradient-to-br from-[#F2D0D3] to-[#F291A3] text-white shadow-md" : ""}
-                    ${isCurrent ? "w-12 h-12 rounded-full bg-gradient-to-br from-[#F2778D] to-[#F291A3] text-white shadow-lg" : ""}
-                    ${isPending ? "w-10 h-10 rounded-full bg-white text-[#594246]/40 border-[3px] border-[#EBEAE8]" : ""}
+                    ${isCompleted ? "w-10 h-10 rounded-full bg-gradient-to-br from-[#F2D0D3] to-[#F291A3] dark:from-[#e8688a]/60 dark:to-[#f0a0c0]/60 text-white dark:text-[#f8f0f5] shadow-md border-0" : ""}
+                    ${isCurrent ? "w-12 h-12 rounded-full bg-gradient-to-br from-[#F2778D] to-[#F291A3] dark:from-[#e8688a] dark:to-[#f0a0c0] text-white dark:text-[#2d0a1e] shadow-lg border-0" : ""}
+                    ${isPending ? "w-10 h-10 rounded-full bg-white dark:bg-[#2d0a1e] text-[#594246]/40 dark:text-[#f8f0f5]/40 border-[3px] border-[#EBEAE8] dark:border-[#e8688a]/30" : ""}
                   `}
                 >
                   {isCompleted ? (
@@ -105,7 +105,7 @@ function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObs
                 className={`mt-4 text-[12px] text-center leading-tight transition-colors duration-300
                   ${isCurrent && isObserved ? "text-red-600 font-bold text-[13px]" : ""}
                   ${isCurrent && !isObserved ? "text-[#594246] font-bold text-[13px]" : ""}
-                  ${!isCurrent ? "text-[#594246]/60 font-medium" : ""}
+                  ${!isCurrent ? "text-[#594246] dark:text-[#f0a0c0] font-bold text-[13px]" : "text-[#594246]/60 dark:text-[#f8f0f5]/60 font-medium"}
                 `}
               >
                 {step}
@@ -141,7 +141,7 @@ export default function ActiveOrdersPage() {
     <div className="space-y-8 w-full">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide mb-2">Pedidos activos</h1>
+        <h1 className="text-3xl font-serif font-medium text-[#594246] dark:text-[#f8f0f5] tracking-wide mb-2">Pedidos activos</h1>
       </div>
 
       {/* Order Cards */}
@@ -152,12 +152,50 @@ export default function ActiveOrdersPage() {
         {!loading && activeOrders.map((order) => {
           const isConfirmed = order.status === 'CONFIRMED';
           const isObserved = order.status === 'OBSERVED';
-          const step = isConfirmed ? 2 : 1;
-          const statusText = isConfirmed ? 'Pago confirmado' : isObserved ? 'Pago Observado' : 'Verificación de Pago';
+          const isPreparing = order.status === 'PREPARING';
+          const isShipped = order.status === 'SHIPPED';
+          
+          let step = 1;
+          let statusText = 'Verificación de Pago';
+          let borderClass = 'border-t-amber-300';
+          let pillBg = 'bg-amber-50 border-amber-200';
+          let pillColor = 'text-[#d67b00]';
+          let PillIcon = Clock;
+
+          if (isConfirmed) {
+            step = 2;
+            statusText = 'Pago confirmado';
+            borderClass = 'border-t-[#594246]/60';
+            pillBg = 'bg-slate-50 border-slate-200';
+            pillColor = 'text-slate-700';
+            PillIcon = Check;
+          } else if (isPreparing) {
+            step = 3;
+            statusText = 'Preparando pedido';
+            borderClass = 'border-t-blue-500';
+            pillBg = 'bg-blue-50 border-blue-250';
+            pillColor = 'text-blue-700';
+            PillIcon = Clock;
+          } else if (isShipped) {
+            step = 4;
+            statusText = 'Pedido en camino';
+            borderClass = 'border-t-indigo-500';
+            pillBg = 'bg-indigo-50 border-indigo-200';
+            pillColor = 'text-indigo-700';
+            PillIcon = Clock;
+          } else if (isObserved) {
+            step = 1;
+            statusText = 'Pago Observado';
+            borderClass = 'border-t-red-500';
+            pillBg = 'bg-red-50 border-red-200';
+            pillColor = 'text-red-700';
+            PillIcon = AlertCircle;
+          }
+
           const dateStr = new Date(order.createdAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
 
           return (
-            <div key={order._id} className={`bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 ${isConfirmed ? 'border-t-[#594246]/60' : isObserved ? 'border-t-red-500' : 'border-t-amber-300'} flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300`}>
+            <div key={order._id} className={`bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 ${borderClass} flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300`}>
               {/* Top Section */}
               <div className="flex justify-between items-start">
                 <div>
@@ -165,22 +203,10 @@ export default function ActiveOrdersPage() {
                   <p className="text-[#594246]/50 text-sm mt-1 font-medium">{dateStr}</p>
                 </div>
                 {/* Status Pill */}
-                {isConfirmed ? (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
-                    <Check className="w-4 h-4 text-slate-600" />
-                    <span className="text-slate-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                ) : isObserved ? (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border border-red-200 shadow-sm">
-                    <AlertCircle className="w-4 h-4 text-red-600" />
-                    <span className="text-red-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                    <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">{statusText}</span>
-                  </div>
-                )}
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${pillBg} border shadow-sm`}>
+                  <PillIcon className={`w-4 h-4 ${pillColor}`} />
+                  <span className={`${pillColor} text-xs font-bold tracking-wide uppercase`}>{statusText}</span>
+                </div>
               </div>
 
               {/* Alert */}
@@ -192,12 +218,47 @@ export default function ActiveOrdersPage() {
                   </div>
                   <p className="text-red-800 text-sm ml-9">Por favor ingresa al detalle del pedido para revisar el motivo y corregir tu número de operación.</p>
                 </div>
-              ) : !isConfirmed && (
+              ) : order.status === 'PRE_ORDER' ? (
                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-50/50 border border-amber-100">
                   <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
                   <p className="text-amber-800 text-sm font-medium">Estamos verificando tu pago por {order.paymentMethod}. Te avisaremos cuando se confirme.</p>
                 </div>
-              )}
+              ) : isPreparing ? (
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-blue-50/50 border border-blue-100">
+                  <Clock className="w-6 h-6 text-blue-500 shrink-0" />
+                  <p className="text-blue-800 text-sm font-medium">¡Pago verificado con éxito! Tu pedido está siendo preparado en nuestro almacén.</p>
+                </div>
+              ) : isShipped ? (
+                <div className="flex flex-col gap-4 p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+                  <div className="flex items-center gap-4">
+                    <Clock className="w-6 h-6 text-indigo-500 shrink-0" />
+                    <p className="text-indigo-800 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
+                  </div>
+                  {(order.trackingNumber || order.shippingEvidenceUrl) && (
+                    <div className="pl-10 flex flex-col gap-2 border-t border-indigo-200/50 pt-3">
+                      {order.trackingNumber && (
+                        <p className="text-indigo-950 text-sm font-medium">
+                          <span className="font-bold text-indigo-800">Código de Seguimiento / Repartidor:</span> {order.trackingNumber}
+                        </p>
+                      )}
+                      {order.shippingEvidenceUrl && (
+                        <a
+                          href={order.shippingEvidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-indigo-750 hover:text-indigo-900 text-sm font-bold underline transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Ver Foto de Evidencia de Despacho
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : null}
 
               {/* Product Details */}
               <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-[#EBEAE8]/50 mt-2">
@@ -237,37 +298,37 @@ export default function ActiveOrdersPage() {
         <p className="text-center text-xs text-gray-400 mb-4">-- Ejemplos Visuales (Mocks) --</p>
         
         {/* Order 1: Pago Pendiente */}
-        <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 border-t-amber-300 flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300">
+        <div className="bg-white dark:bg-[#2d0a1e]/40 p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20 border-t-4 border-t-amber-300 dark:border-t-amber-500/50 flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] dark:hover:shadow-[0_12px_40px_-4px_rgba(232,104,138,0.2)] transition-shadow duration-300">
           {/* Top Section */}
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold text-[#594246]">Pedido #0042</h2>
-              <p className="text-[#594246]/50 text-sm mt-1 font-medium">15 de mayo, 2026</p>
+              <h2 className="text-2xl font-bold text-[#594246] dark:text-[#f0a0c0]">Pedido #0042</h2>
+              <p className="text-[#594246]/50 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">15 de mayo, 2026</p>
             </div>
             {/* Elegant Amber Pending Pill */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 shadow-sm">
-              <Clock className="w-4 h-4 text-amber-600" />
-              <span className="text-amber-700 text-xs font-bold tracking-wide uppercase">Verificación de Pago</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 shadow-sm">
+              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span className="text-amber-700 dark:text-amber-400 text-xs font-bold tracking-wide uppercase">Pago pendiente</span>
             </div>
           </div>
 
           {/* Elegant Amber Alert */}
-          <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-50/50 border border-amber-100">
-            <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
-            <p className="text-amber-800 text-sm font-medium">Estamos verificando tu pago por Yape / Plin / transferencia. Te avisaremos cuando se confirme.</p>
+          <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10">
+            <AlertCircle className="w-6 h-6 text-amber-500 dark:text-amber-400 shrink-0" />
+            <p className="text-amber-800 dark:text-amber-200/90 text-sm font-medium">Estamos verificando tu pago por Yape / Plin / transferencia. Te avisaremos cuando se confirme.</p>
           </div>
 
           {/* Product Details */}
-          <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-[#EBEAE8]/50 mt-2">
-            <p className="text-[#594246]/60 text-xs font-bold uppercase tracking-wider mb-3">Productos</p>
+          <div className="bg-[#FAF9F6] dark:bg-white/5 p-5 rounded-2xl border border-[#EBEAE8]/50 dark:border-[#e8688a]/10 mt-2">
+            <p className="text-[#594246]/60 dark:text-[#f8f0f5]/50 text-xs font-bold uppercase tracking-wider mb-3">Productos</p>
             <div className="space-y-2">
-              <p className="text-[#594246] text-sm font-medium">Blusa Lara - Talla M <span className="text-[#594246]/40 ml-2">x 1</span></p>
-              <p className="text-[#594246] text-sm font-medium">Vestido Floral - Talla S <span className="text-[#594246]/40 ml-2">x 2</span></p>
+              <p className="text-[#594246] dark:text-[#f8f0f5] text-sm font-medium">Blusa Lara - Talla M <span className="text-[#594246]/40 dark:text-[#f8f0f5]/40 ml-2">x 1</span></p>
+              <p className="text-[#594246] dark:text-[#f8f0f5] text-sm font-medium">Vestido Floral - Talla S <span className="text-[#594246]/40 dark:text-[#f8f0f5]/40 ml-2">x 2</span></p>
             </div>
-            <div className="mt-4 pt-4 border-t border-[#EBEAE8]">
-              <p className="text-lg font-medium text-[#594246] flex justify-between items-center">
+            <div className="mt-4 pt-4 border-t border-[#EBEAE8] dark:border-[#e8688a]/20">
+              <p className="text-lg font-medium text-[#594246] dark:text-[#f8f0f5] flex justify-between items-center">
                 <span>Total pagado:</span> 
-                <span className="text-[#F2778D] font-bold text-xl">S/ 189.90</span>
+                <span className="text-[#F2778D] dark:text-[#f0a0c0] font-bold text-xl">S/ 189.90</span>
               </p>
             </div>
           </div>
@@ -277,37 +338,37 @@ export default function ActiveOrdersPage() {
 
           {/* Action Button */}
           <Link href="/client/orders/0042" className="block w-full">
-            <button className="w-full py-4 mt-2 rounded-2xl border-2 border-[#EBEAE8] text-[#594246] font-bold hover:bg-[#FAF9F6] hover:border-[#594246]/30 transition-all duration-300">
+            <button className="w-full py-4 mt-2 rounded-2xl border-2 border-[#EBEAE8] dark:border-[#e8688a]/30 text-[#594246] dark:text-[#f0a0c0] font-bold hover:bg-[#FAF9F6] dark:hover:bg-[#e8688a]/20 hover:border-[#594246]/30 dark:hover:border-[#e8688a]/50 transition-all duration-300">
               Ver detalle completo del pedido
             </button>
           </Link>
         </div>
 
         {/* Order 2: Pago Confirmado */}
-        <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] border border-[#EBEAE8] border-t-4 border-t-[#594246]/60 flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] transition-shadow duration-300">
+        <div className="bg-white dark:bg-[#2d0a1e]/40 p-8 rounded-3xl shadow-[0_8px_30px_-4px_rgba(89,66,70,0.06)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20 border-t-4 border-t-[#594246]/60 dark:border-t-[#f0a0c0]/50 flex flex-col gap-6 hover:shadow-[0_12px_40px_-4px_rgba(89,66,70,0.12)] dark:hover:shadow-[0_12px_40px_-4px_rgba(232,104,138,0.2)] transition-shadow duration-300">
           {/* Top Section */}
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold text-[#594246]">Pedido #0041</h2>
-              <p className="text-[#594246]/50 text-sm mt-1 font-medium">12 de mayo, 2026</p>
+              <h2 className="text-2xl font-bold text-[#594246] dark:text-[#f0a0c0]">Pedido #0041</h2>
+              <p className="text-[#594246]/50 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">12 de mayo, 2026</p>
             </div>
             {/* Elegant Slate Confirmed Pill */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 shadow-sm">
-              <Check className="w-4 h-4 text-slate-600" />
-              <span className="text-slate-700 text-xs font-bold tracking-wide uppercase">Pago confirmado</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-500/10 border border-slate-200 dark:border-slate-500/20 shadow-sm">
+              <Check className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              <span className="text-slate-700 dark:text-slate-400 text-xs font-bold tracking-wide uppercase">Pago confirmado</span>
             </div>
           </div>
 
           {/* Product Details */}
-          <div className="bg-[#FAF9F6] p-5 rounded-2xl border border-[#EBEAE8]/50 mt-2">
-            <p className="text-[#594246]/60 text-xs font-bold uppercase tracking-wider mb-3">Productos</p>
+          <div className="bg-[#FAF9F6] dark:bg-white/5 p-5 rounded-2xl border border-[#EBEAE8]/50 dark:border-[#e8688a]/10 mt-2">
+            <p className="text-[#594246]/60 dark:text-[#f8f0f5]/50 text-xs font-bold uppercase tracking-wider mb-3">Productos</p>
             <div className="space-y-2">
-              <p className="text-[#594246] text-sm font-medium">Pantalón Wide Leg - Talla M <span className="text-[#594246]/40 ml-2">x 1</span></p>
+              <p className="text-[#594246] dark:text-[#f8f0f5] text-sm font-medium">Pantalón Wide Leg - Talla M <span className="text-[#594246]/40 dark:text-[#f8f0f5]/40 ml-2">x 1</span></p>
             </div>
-            <div className="mt-4 pt-4 border-t border-[#EBEAE8]">
-              <p className="text-lg font-medium text-[#594246] flex justify-between items-center">
+            <div className="mt-4 pt-4 border-t border-[#EBEAE8] dark:border-[#e8688a]/20">
+              <p className="text-lg font-medium text-[#594246] dark:text-[#f8f0f5] flex justify-between items-center">
                 <span>Total pagado:</span> 
-                <span className="text-[#F2778D] font-bold text-xl">S/ 95.00</span>
+                <span className="text-[#F2778D] dark:text-[#f0a0c0] font-bold text-xl">S/ 95.00</span>
               </p>
             </div>
           </div>
@@ -317,7 +378,7 @@ export default function ActiveOrdersPage() {
 
           {/* Action Button */}
           <Link href="/client/orders/0041" className="block w-full">
-            <button className="w-full py-4 mt-2 rounded-2xl border-2 border-[#EBEAE8] text-[#594246] font-bold hover:bg-[#FAF9F6] hover:border-[#594246]/30 transition-all duration-300">
+            <button className="w-full py-4 mt-2 rounded-2xl border-2 border-[#EBEAE8] dark:border-[#e8688a]/30 text-[#594246] dark:text-[#f0a0c0] font-bold hover:bg-[#FAF9F6] dark:hover:bg-[#e8688a]/20 hover:border-[#594246]/30 dark:hover:border-[#e8688a]/50 transition-all duration-300">
               Ver detalle completo del pedido
             </button>
           </Link>

@@ -30,7 +30,7 @@ const CheckoutPaymentForm: React.FC = () => {
   const router = useRouter();
   const { handleGoToReview, handleGoToDelivery } = useCheckoutStore();
   const { submitOrder } = useOrderSubmission();
-  const { items } = useCartStore();
+  const { items, clearCart } = useCartStore();
   const { firstName, lastName } = useAuthStore();
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [loadingPreference, setLoadingPreference] = useState(true);
@@ -81,11 +81,13 @@ const CheckoutPaymentForm: React.FC = () => {
     const fetchPreference = async () => {
       try {
         setLoadingPreference(true);
-        const mpItems = items.map(item => ({
+        const mpItems: any[] = items.map(item => ({
           id: item.productId,
           title: item.name,
           quantity: item.quantity,
-          unit_price: item.price
+          unit_price: item.price,
+          size: item.size,
+          color: item.color
         }));
 
         if (selectedDeliveryMethod && selectedDeliveryMethod.price > 0) {
@@ -103,12 +105,13 @@ const CheckoutPaymentForm: React.FC = () => {
           return;
         }
 
+        const token = await getFirebaseAuthToken();
         console.log('📦 [MP_PREFERENCE] Creando preferencia con payload:', mpItems);
         const response = await mercadopagoApi.createPreference({
           items: mpItems,
           orderId: `ORD-${Date.now()}`,
           payerEmail: watch('email') || 'cliente@estilosboom.com'
-        });
+        }, token);
 
         console.log('✅ [MP_PREFERENCE] Respuesta del backend:', response);
 
@@ -175,7 +178,7 @@ const CheckoutPaymentForm: React.FC = () => {
             paymentMethod: paymentMethod === 'qr' ? activeTab : 'transferencia',
             clientName: clientNameStr || 'Cliente Web',
             items: items.map(item => ({
-              id: item.id,
+              id: item.productId,
               name: item.name,
               size: item.size,
               price: item.price,
@@ -186,6 +189,7 @@ const CheckoutPaymentForm: React.FC = () => {
             deliveryMethod: selectedDeliveryMethod?.id
           }, getAuthConfig({ token }));
 
+          await clearCart();
           handleGoToReview();
         } catch (error) {
           toast.error('Error al enviar el pago manual al servidor.');
@@ -206,6 +210,7 @@ const CheckoutPaymentForm: React.FC = () => {
   }, [selectedDeliveryMethod]);
 
   const onSubmitPayment = async (param: any) => {
+    const token = await getFirebaseAuthToken();
     return new Promise((resolve, reject) => {
       const typedFirstName = watch('firstName') || '';
       const typedLastName = watch('lastName') || '';
@@ -220,7 +225,7 @@ const CheckoutPaymentForm: React.FC = () => {
         orderId: `ORD-${Date.now()}`,
         clientName: clientNameStr,
         items: itemsRef.current.map(item => ({
-          id: item.id,
+          id: item.productId,
           name: item.name,
           size: item.size,
           price: item.price,
@@ -228,12 +233,13 @@ const CheckoutPaymentForm: React.FC = () => {
           color: item.color
         })),
         deliveryMethod: deliveryMethodRef.current?.id
-      })
+      }, token)
         .then(async (response) => {
           if (response.status === 'approved') {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
+              await clearCart();
               handleGoToReview();
               resolve(true);
             } else {
@@ -241,6 +247,7 @@ const CheckoutPaymentForm: React.FC = () => {
             }
           } else if (response.status === 'pending') {
             toast('Pago pendiente.', { icon: '⏳' });
+            await clearCart();
             handleGoToReview();
             resolve(true);
           } else {
@@ -270,7 +277,7 @@ const CheckoutPaymentForm: React.FC = () => {
   }), []);
 
   return (
-    <div className="border-[#594246]/30 rounded-sm p-8 space-y-8 border border-[#EBEAE8] shadow-sm">
+    <div className="bg-[#FAF9F6] dark:bg-[#1a0618]/60 dark:backdrop-blur-md border border-[#EBEAE8] dark:border-[#C5A059]/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-sm p-6 lg:p-8 space-y-8 animate-in fade-in duration-300">
       <header>
         <h2 className="text-[25px] font-semibold text-[#594246]">Método de Pago</h2>
       </header>
@@ -530,15 +537,15 @@ const CheckoutPaymentForm: React.FC = () => {
       </div>
 
       {/* 🏠 DIRECCIÓN DE FACTURACIÓN */}
-      <div className="pt-6 border-t border-gray-100">
+      <div className="pt-6 border-t border-gray-100 dark:border-[#C5A059]/20">
         <div className="flex items-center gap-3 mb-4">
           <input
             type="checkbox"
             id="billingCheck"
             {...register('billingSameAsShipping')}
-            className="w-4 h-4 accent-[#F2778D]"
+            className="billing-checkbox w-4 h-4"
           />
-          <label htmlFor="billingCheck" className="text-sm text-[#594246]">
+          <label htmlFor="billingCheck" className="billing-label text-sm text-[#594246]">
             Mi dirección de facturación es la misma que la de envío
           </label>
         </div>
@@ -555,7 +562,7 @@ const CheckoutPaymentForm: React.FC = () => {
         <button
           type="button"
           onClick={handleGoToDelivery}
-          className="w-1/2 py-4 border-2 border-gray-200 rounded-full font-bold text-[#594246] hover:bg-gray-50 transition-colors"
+          className="btn-back w-1/2 py-4 border-2 border-gray-200 rounded-full font-bold text-[#594246] hover:bg-gray-50 transition-colors"
         >
           Atras
         </button>

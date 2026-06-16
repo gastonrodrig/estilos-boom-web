@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Package, Zap, AlertTriangle, CheckCircle2, Scissors, ArrowRight, Clock, Sparkles } from "lucide-react";
+import { Package, Zap, AlertTriangle, CheckCircle2, Scissors, ArrowRight, Clock, Sparkles, Truck } from "lucide-react";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { useStorehouseStore } from "@/hooks";
+import { useStorehouseStore, useAuthStore } from "@/hooks";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -21,6 +21,7 @@ const itemVariants: Variants = {
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   INGRESO_COMPRA: "Recepción de compra",
+  INGRESO_PRODUCCION: "Ingreso por producción",
   SALIDA_VENTA: "Salida por venta",
   TRANSFERENCIA: "Transferencia interna",
   AJUSTE: "Ajuste de inventario",
@@ -28,6 +29,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 
 export default function WarehouseDashboardPage() {
   const { startLoadingWarehouseDocuments, loading } = useStorehouseStore();
+  const { role } = useAuthStore();
   const [docs, setDocs] = useState<any[]>([]);
 
   const today = new Date().toLocaleDateString("es-ES", {
@@ -39,15 +41,54 @@ export default function WarehouseDashboardPage() {
   useEffect(() => {
     const load = async () => {
       const data = await startLoadingWarehouseDocuments();
-      if (Array.isArray(data)) setDocs(data);
+      if (Array.isArray(data)) {
+        const roleFiltered = data.filter((d) => {
+          if (role === "Almacenero Boom") {
+            return (
+              d.id_source_warehouse?.code === "ALM-CEN" ||
+              d.id_target_warehouse?.code === "ALM-CEN"
+            );
+          }
+          if (role === "Almacenero Tienda") {
+            return (
+              d.id_source_warehouse?.code === "TND-PRI" ||
+              d.id_target_warehouse?.code === "TND-PRI"
+            );
+          }
+          return true;
+        });
+        setDocs(roleFiltered);
+      }
     };
     void load();
-  }, [startLoadingWarehouseDocuments]);
+  }, [startLoadingWarehouseDocuments, role]);
 
   const pending    = useMemo(() => docs.filter((d) => d.status === "PENDIENTE"), [docs]);
   const completed  = useMemo(() => docs.filter((d) => d.status === "COMPLETADO"), [docs]);
-  const receptions = useMemo(() => pending.filter((d) => d.type === "INGRESO_COMPRA"), [pending]);
-  const transfers  = useMemo(() => pending.filter((d) => d.type === "TRANSFERENCIA"), [pending]);
+
+  const receptions = useMemo(() => {
+    return pending.filter((d) => {
+      if (d.type !== "INGRESO_COMPRA" && d.type !== "INGRESO_PRODUCCION" && d.type !== "TRANSFERENCIA") return false;
+      const targetCode = role === "Almacenero Boom" ? "ALM-CEN" : "TND-PRI";
+      return d.id_target_warehouse?.code === targetCode;
+    });
+  }, [pending, role]);
+
+  const transfers = useMemo(() => {
+    return pending.filter((d) => {
+      if (d.type !== "TRANSFERENCIA") return false;
+      const sourceCode = role === "Almacenero Boom" ? "ALM-CEN" : "TND-PRI";
+      return d.id_source_warehouse?.code === sourceCode;
+    });
+  }, [pending, role]);
+
+  const dispatches = useMemo(() => {
+    return pending.filter((d) => {
+      if (d.type !== "SALIDA_VENTA") return false;
+      const sourceCode = role === "Almacenero Boom" ? "ALM-CEN" : "TND-PRI";
+      return d.id_source_warehouse?.code === sourceCode;
+    });
+  }, [pending, role]);
 
   const recentPending = useMemo(() => {
     return [...pending]
@@ -67,7 +108,7 @@ export default function WarehouseDashboardPage() {
         <div>
           <div className="flex flex-col md:flex-row md:items-end gap-3 md:gap-5 mb-2">
             <h1 className="text-3xl md:text-4xl font-bold text-[#40202D] dark:text-white flex items-center gap-3 drop-shadow-md tracking-wide">
-              Buenos días, Almacenero
+              Buenos días, {role === "Almacenero Boom" ? "Almacenero BOOM" : role === "Almacenero Tienda" ? "Almacenero Tienda" : "Almacenero"}
               <motion.div 
                 animate={{ rotate: [0, 15, -15, 0] }} 
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -82,7 +123,9 @@ export default function WarehouseDashboardPage() {
           <p className="text-base text-[#8C6B79] dark:text-[#F8BBD0]/80 capitalize font-medium flex items-center gap-2 drop-shadow-sm tracking-wide">
             <span>{today}</span> 
             <span className="w-1.5 h-1.5 rounded-full bg-[#F2778D] dark:bg-[#F8BBD0] opacity-80" /> 
-            <span>Almacén Principal</span>
+            <span>
+              {role === "Almacenero Boom" ? "Almacén BOOM (Central)" : role === "Almacenero Tienda" ? "Tienda Principal (Ventas)" : "Almacén Principal"}
+            </span>
           </p>
         </div>
       </motion.div>
@@ -92,7 +135,7 @@ export default function WarehouseDashboardPage() {
         {[
           { label: "Recepciones pendientes",    value: receptions.length, Icon: Package,     color: "rose" },
           { label: "Transferencias pendientes", value: transfers.length,  Icon: Zap,          color: "orange" },
-          { label: "Con incidencia potencial",  value: 0,                 Icon: AlertTriangle, color: "rose" },
+          { label: "Despachos pendientes",      value: dispatches.length, Icon: Truck,        color: "rose" },
           { label: "Documentos completados",    value: completed.length,  Icon: CheckCircle2,  color: "emerald" },
         ].map(({ label, value, Icon, color }) => (
           <motion.div 
@@ -198,6 +241,8 @@ export default function WarehouseDashboardPage() {
               {recentPending.map((doc) => {
                 const href = doc.type === "TRANSFERENCIA"
                   ? `/storekeeper/warehouse/transfers/${doc._id}/confirm`
+                  : doc.type === "SALIDA_VENTA"
+                  ? `/storekeeper/warehouse/dispatches/${doc._id}`
                   : `/storekeeper/warehouse/receptions/${doc._id}`;
                 return (
                   <Link 

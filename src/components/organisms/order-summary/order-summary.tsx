@@ -44,8 +44,8 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
   };
 
   return (
-    <aside className="sticky top-28 bg-[#FCF5F5] border border-[#E5B3B8] rounded-sm p-6 text-[#594246] shadow-sm">
-      <h3 className="text-[16px] font-medium text-[#632034] mb-6">Resumen del pedido</h3>
+    <aside className="cart-summary sticky top-28 bg-[#FCF5F5] dark:bg-[#1a0618]/60 dark:backdrop-blur-md border border-[#E5B3B8] dark:border-[#C5A059]/20 rounded-xl p-6 text-[#594246] dark:text-[#f0d8e8] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+      <h3 className="summary-title text-[16px] font-medium text-[#632034] dark:text-[#C5A059] uppercase tracking-[0.2em] mb-6">Resumen del pedido</h3>
 
 
 
@@ -83,44 +83,44 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
         </div>
       )}
 
-      <div className="mt-5 space-y-3 text-[13px] font-medium text-[#594246]">
-        <div className="flex items-center justify-between">
-          <span>Subtotal (incluye IGV)</span>
-          <span className="font-semibold">{currency(subtotal)}</span>
+      <div className="mt-5 space-y-3 text-[13px] font-medium text-[#594246] dark:text-[#f0d8e8]">
+        <div className="summary-row flex items-center justify-between">
+          <span className="summary-row-label">Subtotal (incluye IGV)</span>
+          <span className="summary-row-value font-semibold">{currency(subtotal)}</span>
         </div>
-        <div className="flex items-center justify-between">
-          <span>Envío {deliveryName ? `(${deliveryName})` : ''}</span>
+        <div className="summary-row flex items-center justify-between">
+          <span className="summary-row-label">Envío</span>
           <span className="font-semibold">
             {deliveryCost === 0 && !deliveryName ? "Ver al finalizar" : deliveryCost === 0 ? "GRATIS" : currency(deliveryCost)}
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <span>IGV (18%)</span>
-          <span className="font-semibold">{currency(igv)}</span>
+        <div className="summary-row flex items-center justify-between">
+          <span className="summary-row-label">IGV (18%)</span>
+          <span className="summary-row-value font-semibold">{currency(igv)}</span>
         </div>
-        <div className="flex items-center justify-between">
-          <span>Op. gravada</span>
-          <span className="font-semibold">{currency(taxedOperation)}</span>
+        <div className="summary-row flex items-center justify-between">
+          <span className="summary-row-label">Op. gravada</span>
+          <span className="summary-row-value font-semibold">{currency(taxedOperation)}</span>
         </div>
       </div>
 
-      <div className="my-5 h-px bg-[#E5B3B8]" />
+      <div className="my-5 h-px bg-[#E5B3B8] dark:bg-[#e8688a]/30" />
 
-      <div className="flex items-center justify-between text-[#632034]">
-        <span className="text-[14px] font-medium">Total</span>
-        <span className="text-[24px] leading-none font-serif text-[#632034]">{currency(total)}</span>
+      <div className="summary-total flex items-center justify-between text-[#632034] dark:text-white">
+        <span className="summary-total-label text-[14px] font-medium">Total</span>
+        <span className="summary-total-value text-[24px] leading-none text-[#632034] dark:text-[#f0a0c0]">{currency(total)}</span>
       </div>
 
       {showButton && (
         <>
           <button
             onClick={handlePrimaryAction}
-            className="mt-6 w-full rounded-sm bg-black px-4 py-3.5 text-[12px] font-semibold tracking-wider uppercase text-white shadow-sm transition-all hover:bg-[#632034] hover:shadow-lg active:scale-[0.98] hover:cursor-pointer"
+            className="btn-checkout mt-6 w-full rounded-sm bg-black dark:bg-[#e8688a]/10 dark:border dark:border-[#e8688a]/30 px-4 py-3.5 text-[12px] font-semibold tracking-wider uppercase text-white dark:text-[#f0a0c0] shadow-sm transition-all hover:bg-[#632034] dark:hover:bg-[#e8688a]/20 dark:hover:text-white hover:shadow-lg active:scale-[0.98] hover:cursor-pointer"
           >
             {isAuthenticated ? "Proceder al pago" : "Inicie sesión para continuar"}
           </button>
 
-          <p className="mt-2 text-center text-[11px] font-medium text-[#594246]/55">
+          <p className="checkout-security mt-2 text-center text-[11px] font-medium text-[#594246]/55 dark:text-[#f0d8e8]/50">
             Pago 100% seguro y protegido
           </p>
         </>

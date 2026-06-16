@@ -555,20 +555,20 @@ export default function AdminPreProductionCreatePage() {
             <h4 className="text-sm font-bold text-[#594246] uppercase tracking-widest mb-4 flex items-center gap-2">
               <Scissors className="h-4 w-4 text-[#F2778D]" /> Ficha Tecnica de Insumos
             </h4>
-            <div className="bg-[#FCFBFB] border border-rose-50 rounded-2xl overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-rose-50/50">
-                  <tr className="text-[10px] font-bold text-[#b79ca5] uppercase tracking-[0.2em]">
-                    <th className="px-6 py-3">Insumo</th>
-                    <th className="px-6 py-3 text-right">Cantidad</th>
-                    <th className="px-6 py-3 text-right">Unidad</th>
+            <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+              <table className="w-full text-left border-collapse">
+                <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                    <th className="px-6 py-3 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Insumo</th>
+                    <th className="px-6 py-3 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
+                    <th className="px-6 py-3 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidad</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-rose-50">
-                  {supplies.map((s) => (
-                    <tr key={s.id} className="text-sm text-[#594246]">
+                  {supplies.map((s, idx) => (
+                    <tr key={s.id} className={`text-sm text-[#594246] dark:text-gray-300 transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                       <td className="px-6 py-4 font-medium">{s.name}</td>
-                      <td className="px-6 py-4 text-right font-bold text-[#F2778D]">{s.totalQuantity.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-right font-bold text-[#D6405F] dark:text-[#F8BBD0]">{s.totalQuantity.toFixed(2)}</td>
                       <td className="px-6 py-4 text-right text-[#9b8088]">{s.unit}</td>
                     </tr>
                   ))}

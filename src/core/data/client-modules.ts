@@ -12,6 +12,7 @@ export interface ClientModule {
   icon?: string;
   requiredRoles?: string[];
   children?: ClientModuleChild[];
+  position?: 'bottom';
 }
 
 export const clientModules: ClientModule[] = [
@@ -54,10 +55,12 @@ export const clientModules: ClientModule[] = [
     label: "Mi Perfil",
     href: "/client/profile",
     icon: "user",
+    position: "bottom",
   },
   {
     label: "Configuración",
     href: "/client/settings",
     icon: "settings",
+    position: "bottom",
   },
 ];

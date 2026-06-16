@@ -302,6 +302,24 @@ export const useCartStore = () => {
     }
   }, [getAuthConfig, isAuth, setReduxCart]);
 
+  const clearCart = useCallback(async () => {
+    try {
+      if (!isAuth) {
+        removeLocal(GUEST_STORAGE_KEY);
+        setReduxCart([]);
+        return;
+      }
+
+      const config = await getAuthConfig();
+      if (!config) return;
+
+      await cartApi.delete("/clear", config);
+      setReduxCart([]);
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    }
+  }, [getAuthConfig, isAuth, setReduxCart]);
+
   const total = useMemo(
     () => items.reduce((acc, item) => acc + item.price * item.quantity, 0),
     [items],
@@ -315,5 +333,6 @@ export const useCartStore = () => {
     updateQuantity,
     removeItem,
     mergeLocalCartToRemote,
+    clearCart,
   };
 };

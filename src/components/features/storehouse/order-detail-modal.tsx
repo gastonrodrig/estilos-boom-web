@@ -81,8 +81,8 @@ useEffect(() => {
                   const colorName = item.id_variant?.color?.name ?? (typeof item.id_variant?.color === 'string' ? item.id_variant.color : null) ?? item.color ?? '—';
 
                   return (
-                    <tr key={i} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
-                      <td className="p-4 flex items-center gap-3">
+                     <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+                    <td className="p-4 flex items-center gap-3">
                         <span className="font-bold text-[#40202D] dark:text-white">{item.id_variant?.size || item.size}</span>
                         <span className="text-[#EAE0E2] dark:text-gray-600">|</span>
                         {colorHex && (

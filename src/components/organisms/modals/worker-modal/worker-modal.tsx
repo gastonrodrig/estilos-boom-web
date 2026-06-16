@@ -27,6 +27,7 @@ export const WorkerModal = ({ open, onClose, onSaved }: WorkerModalProps) => {
     defaultValues: {
       email: "", first_name: "", last_name: "",
       phone: "", document_type: "DNI", document_number: "",
+      role: "Almacenero Boom",
     },
   });
 
@@ -34,6 +35,7 @@ export const WorkerModal = ({ open, onClose, onSaved }: WorkerModalProps) => {
     if (open) reset({
       email: "", first_name: "", last_name: "",
       phone: "", document_type: "DNI", document_number: "",
+      role: "Almacenero Boom",
     });
   }, [open, reset]);
 
@@ -48,6 +50,7 @@ export const WorkerModal = ({ open, onClose, onSaved }: WorkerModalProps) => {
         phone:           values.phone?.trim() || undefined,
         document_type:   values.document_type || undefined,
         document_number: values.document_number?.trim() || undefined,
+        role:            values.role || undefined,
       });
       toast.success("Trabajador registrado correctamente.");
       if (onSaved) await onSaved();
@@ -168,10 +171,17 @@ export const WorkerModal = ({ open, onClose, onSaved }: WorkerModalProps) => {
             </div>
           </div>
 
-          {/* Nota de rol */}
-          <p className="text-[12px] text-[#8C6B79] bg-rose-50 border border-rose-100 rounded-2xl px-4 py-3 leading-relaxed">
-            🔒 El rol asignado será <strong className="text-[#D6405F]">Almacenero</strong> por defecto. Puede cambiarse desde el panel de Roles.
-          </p>
+          {/* Seleccionar Rol de Almacenero */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-[#8C6B79] uppercase tracking-wider pl-2">Rol / Almacén asignado *</label>
+            <select
+              {...register("role")}
+              className="w-full rounded-full border border-neutral-300 bg-white px-5 py-[11px] text-sm text-neutral-700 outline-none transition-all focus:border-[#f2b6c1] focus:ring-2 focus:ring-[#f2b6c1]/30"
+            >
+              <option value="Almacenero Boom">Almacenero BOOM (Almacén Central)</option>
+              <option value="Almacenero Tienda">Almacenero Tienda (Tienda Principal)</option>
+            </select>
+          </div>
         </div>
 
         {/* Acciones */}

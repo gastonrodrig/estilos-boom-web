@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, CheckCircle2, Sparkles, MessageSquare, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { suggestionsApi } from '../../../api/suggestions/suggestions-api';
+import { getFirebaseAuthToken } from '@helpers';
+import { getAuthConfig } from '@utils';
+import { useAuthStore } from '@hooks';
 
 // Mock Data
 const SUGGESTION_CATEGORIES = [
@@ -31,13 +34,13 @@ const SIZES = ["XS", "S", "M", "L", "XL"];
 // Initial list
 const INITIAL_SUGGESTIONS = [
   {
-    id: 1,
+    id: "1",
     text: "Solicitaste la Blusa Romántica en talla L",
     date: "20 de mayo, 2026",
     status: "En revisión",
   },
   {
-    id: 2,
+    id: "2",
     text: "Sugeriste colores oscuros para la temporada de otoño",
     date: "15 de mayo, 2026",
     status: "Considerada",
@@ -56,12 +59,85 @@ export default function SuggestionsPage() {
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [suggestionsHistory, setSuggestionsHistory] = useState(INITIAL_SUGGESTIONS);
+  const [suggestionsHistory, setSuggestionsHistory] = useState<any[]>(INITIAL_SUGGESTIONS);
+  const [dynamicProducts, setDynamicProducts] = useState<string[]>(MOCK_PRODUCTS);
+  const { status } = useAuthStore();
   
   // Custom Dropdown State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPage, setDropdownPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
+
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      if (status === 'checking') return;
+
+      if (status !== 'authenticated') {
+        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        return;
+      }
+
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await suggestionsApi.get('/user/me', getAuthConfig({ token }));
+        if (data && data.length > 0) {
+          const mapped = data.map((sug: any) => {
+            let desc = sug.message || "";
+            if (sug.category === "Pedir una talla") {
+              desc = `Solicitaste el producto "${sug.productId?.name || 'Producto'}" en talla ${sug.sizeRequested}`;
+            } else if (sug.category === "Repetir un producto") {
+              desc = `Solicitaste volver a producir el producto "${sug.productId?.name || 'Producto'}"`;
+            } else if (sug.category === "Sugerir un nuevo color") {
+              desc = `Sugeriste el color "${sug.colorSuggested}" para el producto "${sug.productId?.name || 'Producto'}"`;
+            }
+            
+            let statusLabel = "Recibida";
+            if (sug.status === "CONSIDERED") statusLabel = "Considerada";
+            else if (sug.status === "UNDER_REVIEW") statusLabel = "En revisión";
+
+            return {
+              id: sug._id,
+              text: desc,
+              date: new Date(sug.createdAt).toLocaleDateString('es-PE'),
+              status: statusLabel
+            };
+          });
+          setSuggestionsHistory(mapped);
+        } else {
+          setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        }
+      } catch (error) {
+        console.error("Error loading user suggestions:", error);
+        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+      }
+    };
+
+    const loadInteractionProducts = async () => {
+      if (status === 'checking') return;
+
+      if (status !== 'authenticated') {
+        setDynamicProducts(MOCK_PRODUCTS);
+        return;
+      }
+
+      try {
+        const token = await getFirebaseAuthToken();
+        const { data } = await suggestionsApi.get('/interaction-products', getAuthConfig({ token }));
+        if (data && data.data && data.data.length > 0) {
+          const names = data.data.map((p: any) => p.name);
+          setDynamicProducts(names);
+        } else {
+          setDynamicProducts(MOCK_PRODUCTS);
+        }
+      } catch (error) {
+        console.error("Error loading interaction products:", error);
+        setDynamicProducts(MOCK_PRODUCTS);
+      }
+    };
+
+    loadSuggestions();
+    loadInteractionProducts();
+  }, [status]);
 
   const isFormValid = () => {
     if (selectedCategory === "Pedir una talla") return selectedProduct !== "" && selectedSize !== "";
@@ -84,6 +160,7 @@ export default function SuggestionsPage() {
     setIsSubmitting(true);
     
     try {
+      const token = await getFirebaseAuthToken();
       // Usamos el API configurada (axios instance)
       await suggestionsApi.post('/', {
         category: selectedCategory,
@@ -92,7 +169,7 @@ export default function SuggestionsPage() {
         sizeRequested: selectedSize,
         colorSuggested: suggestedColor,
         message: suggestionText
-      });
+      }, getAuthConfig({ token }));
     } catch (error) {
       console.error('Error enviando sugerencia:', error);
     }
@@ -104,7 +181,7 @@ export default function SuggestionsPage() {
       
       // Add to history
       const newSuggestion = {
-        id: Date.now(),
+        id: Date.now().toString(),
         text: generateSuggestionText(),
         date: "Hoy",
         status: "Recibida",
@@ -166,19 +243,19 @@ export default function SuggestionsPage() {
 
       {/* Header */}
       <div className="relative z-10">
-        <h1 className="text-3xl font-serif font-medium text-[#594246] tracking-wide">Sugerencias al negocio</h1>
-        <p className="text-[#594246]/70 text-sm mt-1 font-medium">Ayúdanos a decidir nuestra próxima producción mediante este cuestionario.</p>
+        <h1 className="text-3xl font-serif font-medium text-[#594246] dark:text-[#f8f0f5] tracking-wide">Sugerencias al negocio</h1>
+        <p className="text-[#594246]/70 dark:text-[#f0d8e8]/70 text-sm mt-1 font-medium">Ayúdanos a decidir nuestra próxima producción mediante este cuestionario.</p>
       </div>
 
       {/* Main Form Card */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.12)] border border-[#EBEAE8] p-6 lg:p-10 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F2778D] via-[#F2B6C1] to-[#F2D0D3]"></div>
+      <div className="bg-white/90 dark:bg-[#2d0a1e]/40 backdrop-blur-sm rounded-3xl shadow-[0_10px_40px_-10px_rgba(89,66,70,0.12)] dark:shadow-[0_8px_32px_rgba(232,104,138,0.15)] border border-[#EBEAE8] dark:border-[#e8688a]/20 p-6 lg:p-10 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#F2778D] via-[#F2B6C1] to-[#F2D0D3] dark:from-[#e8688a] dark:via-[#f0a0c0] dark:to-[#e8688a]"></div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           
           {/* Categories (Single Select for structured logic) */}
           <div>
-            <label className="block text-[#632034] font-bold text-sm mb-4">¿De qué se trata tu sugerencia?</label>
+            <label className="block text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-4">¿De qué se trata tu sugerencia?</label>
             <div className="flex flex-wrap gap-3">
               {SUGGESTION_CATEGORIES.map((cat) => {
                 const isSelected = selectedCategory === cat;
@@ -189,8 +266,8 @@ export default function SuggestionsPage() {
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border
                       ${isSelected 
-                        ? 'bg-[#F2D0D3] border-[#F2D0D3] text-[#632034] shadow-sm' 
-                        : 'bg-white border-[#EBEAE8] text-[#594246]/60 hover:border-[#F2D0D3] hover:text-[#632034]'}
+                        ? 'bg-[#F2D0D3] dark:bg-[#e8688a]/20 border-[#F2D0D3] dark:border-[#e8688a]/50 text-[#632034] dark:text-[#f8f0f5] shadow-sm' 
+                        : 'bg-white dark:bg-white/5 border-[#EBEAE8] dark:border-[#e8688a]/20 text-[#594246]/60 dark:text-[#f0d8e8]/60 hover:border-[#F2D0D3] dark:hover:border-[#e8688a]/50 hover:text-[#632034] dark:hover:text-[#f8f0f5]'}
                     `}
                   >
                     {cat}
@@ -200,7 +277,7 @@ export default function SuggestionsPage() {
             </div>
           </div>
 
-          <div className="w-full h-px bg-[#EBEAE8]/50"></div>
+          <div className="w-full h-px bg-[#EBEAE8]/50 dark:bg-[#e8688a]/20"></div>
 
           {/* DYNAMIC QUESTIONNAIRE SECTION */}
           <div className="space-y-6 min-h-[120px]">
@@ -217,7 +294,7 @@ export default function SuggestionsPage() {
                 {/* PRODUCT DROPDOWN (Shown for Size, Color, Repeat) */}
                 {["Pedir una talla", "Repetir un producto", "Sugerir un nuevo color"].includes(selectedCategory) && (
                   <div>
-                    <label className="block text-[#632034] font-bold text-sm mb-3">¿Para qué producto es tu sugerencia?</label>
+                    <label className="block text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-3">¿Para qué producto es tu sugerencia?</label>
                     <div className="relative">
                       {/* Custom Dropdown Trigger */}
                       <button
@@ -242,7 +319,7 @@ export default function SuggestionsPage() {
                           >
                             <div className="p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                               {/* Paginated mock display */}
-                              {MOCK_PRODUCTS.slice((dropdownPage - 1) * ITEMS_PER_PAGE, dropdownPage * ITEMS_PER_PAGE).map(prod => (
+                              {dynamicProducts.slice((dropdownPage - 1) * ITEMS_PER_PAGE, dropdownPage * ITEMS_PER_PAGE).map(prod => (
                                 <button
                                   key={prod}
                                   type="button"
@@ -267,11 +344,11 @@ export default function SuggestionsPage() {
                               >
                                 <ChevronLeft className="w-4 h-4 text-[#632034]" />
                               </button>
-                              <span className="text-xs font-bold text-[#632034]/60">Pág {dropdownPage} de {Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}</span>
+                              <span className="text-xs font-bold text-[#632034]/60">Pág {dropdownPage} de {Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE)}</span>
                               <button
                                 type="button"
-                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.min(Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE), dropdownPage + 1)); }}
-                                disabled={dropdownPage === Math.ceil(MOCK_PRODUCTS.length / ITEMS_PER_PAGE)}
+                                onClick={(e) => { e.stopPropagation(); setDropdownPage(Math.min(Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE), dropdownPage + 1)); }}
+                                disabled={dropdownPage === Math.ceil(dynamicProducts.length / ITEMS_PER_PAGE)}
                                 className="p-1.5 rounded-lg hover:bg-[#EBEAE8] disabled:opacity-30 transition-colors"
                               >
                                 <ChevronRight className="w-4 h-4 text-[#632034]" />
@@ -287,7 +364,7 @@ export default function SuggestionsPage() {
                 {/* SIZE SELECTOR */}
                 {selectedCategory === "Pedir una talla" && (
                   <div>
-                    <label className="block text-[#632034] font-bold text-sm mb-3">¿Qué talla necesitas que produzcamos?</label>
+                    <label className="block text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-3">¿Qué talla necesitas que produzcamos?</label>
                     <div className="flex gap-3">
                       {SIZES.map(size => (
                         <button
@@ -296,8 +373,8 @@ export default function SuggestionsPage() {
                           onClick={() => setSelectedSize(size)}
                           className={`w-14 h-14 rounded-2xl font-bold text-lg transition-all duration-300 border shadow-sm
                             ${selectedSize === size 
-                              ? 'bg-[#632034] border-[#632034] text-white' 
-                              : 'bg-white border-[#EBEAE8] text-[#594246]/70 hover:border-[#F2D0D3] hover:text-[#632034]'}
+                              ? 'bg-[#632034] dark:bg-[#e8688a]/30 border-[#632034] dark:border-[#e8688a] text-white dark:text-[#f8f0f5]' 
+                              : 'bg-white dark:bg-white/5 border-[#EBEAE8] dark:border-[#e8688a]/20 text-[#594246]/70 dark:text-[#f0d8e8]/70 hover:border-[#F2D0D3] dark:hover:border-[#e8688a]/50 hover:text-[#632034] dark:hover:text-[#f8f0f5]'}
                           `}
                         >
                           {size}
@@ -310,13 +387,13 @@ export default function SuggestionsPage() {
                 {/* COLOR INPUT */}
                 {selectedCategory === "Sugerir un nuevo color" && (
                   <div>
-                    <label className="block text-[#632034] font-bold text-sm mb-3">¿En qué color te gustaría verlo?</label>
+                    <label className="block text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-3">¿En qué color te gustaría verlo?</label>
                     <input 
                       type="text"
                       value={suggestedColor}
                       onChange={(e) => setSuggestedColor(e.target.value)}
                       placeholder="Ej: Azul Marino, Rojo Vino..."
-                      className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl px-5 py-4 text-[#632034] font-medium placeholder:text-[#594246]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all shadow-inner"
+                      className="w-full bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/30 rounded-2xl px-5 py-4 text-[#632034] dark:text-[#f8f0f5] font-medium placeholder:text-[#594246]/40 dark:placeholder:text-[#f8f0f5]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] dark:focus:ring-[#e8688a]/50 focus:border-[#F2D0D3] dark:focus:border-[#e8688a]/50 transition-all shadow-inner"
                     />
                   </div>
                 )}
@@ -324,13 +401,13 @@ export default function SuggestionsPage() {
                 {/* TEXT AREA (Shown only for "Otro" or "Modelo nuevo") */}
                 {["Pedir un modelo nuevo", "Otro"].includes(selectedCategory) && (
                   <div>
-                    <label className="block text-[#632034] font-bold text-sm mb-3">Cuéntanos tu idea en detalle</label>
+                    <label className="block text-[#632034] dark:text-[#f8f0f5] font-bold text-sm mb-3">Cuéntanos tu idea en detalle</label>
                     <textarea 
                       rows={4}
                       value={suggestionText}
                       onChange={(e) => setSuggestionText(e.target.value)}
                       placeholder="Ej: Me encantaría que lanzaran abrigos largos para el invierno..."
-                      className="w-full bg-[#FAF9F6] border border-[#EBEAE8] rounded-2xl p-5 text-[#632034] font-medium placeholder:text-[#594246]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] focus:border-[#F2D0D3] transition-all resize-none shadow-inner"
+                      className="w-full bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/30 rounded-2xl p-5 text-[#632034] dark:text-[#f8f0f5] font-medium placeholder:text-[#594246]/40 dark:placeholder:text-[#f8f0f5]/40 focus:outline-none focus:ring-2 focus:ring-[#F2D0D3] dark:focus:ring-[#e8688a]/50 focus:border-[#F2D0D3] dark:focus:border-[#e8688a]/50 transition-all resize-none shadow-inner"
                     />
                   </div>
                 )}
@@ -344,10 +421,10 @@ export default function SuggestionsPage() {
             <button 
               type="submit"
               disabled={isSubmitting || !isFormValid()}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-sm
+              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-sm border-2
                 ${isFormValid() && !isSubmitting
-                  ? 'bg-[#632034] text-white hover:bg-[#F2778D] hover:shadow-md' 
-                  : 'bg-[#EBEAE8] text-[#594246]/40 cursor-not-allowed shadow-none'}
+                  ? 'bg-[#632034] dark:bg-[#e8688a]/20 border-transparent dark:border-[#e8688a]/30 text-white dark:text-[#f0a0c0] hover:bg-[#F2778D] dark:hover:bg-[#e8688a] dark:hover:text-[#f8f0f5] hover:shadow-md' 
+                  : 'bg-[#EBEAE8] dark:bg-white/5 border-transparent text-[#594246]/40 dark:text-[#f8f0f5]/40 cursor-not-allowed shadow-none'}
               `}
             >
               {isSubmitting ? (
@@ -366,7 +443,7 @@ export default function SuggestionsPage() {
 
       {/* Previous Suggestions Section */}
       <div className="pt-8">
-        <h2 className="text-2xl font-bold text-[#594246] mb-6">Mis sugerencias enviadas</h2>
+        <h2 className="text-2xl font-bold text-[#594246] dark:text-[#f8f0f5] mb-6">Mis sugerencias enviadas</h2>
         
         <div className="space-y-4">
           <AnimatePresence>
@@ -376,33 +453,33 @@ export default function SuggestionsPage() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 key={sug.id} 
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[#EBEAE8] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:border-[#F2D0D3]/50"
+                className="bg-white/80 dark:bg-[#2d0a1e]/40 backdrop-blur-sm rounded-2xl p-6 border border-[#EBEAE8] dark:border-[#e8688a]/20 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:border-[#F2D0D3]/50 dark:hover:border-[#e8688a]/50"
               >
                 
                 <div className="flex gap-4 items-start sm:items-center">
-                  <div className="w-10 h-10 rounded-full bg-[#FAF9F6] border border-[#EBEAE8] flex items-center justify-center shrink-0 hidden sm:flex">
-                    <MessageSquare className="w-4 h-4 text-[#594246]/40" />
+                  <div className="w-10 h-10 rounded-full bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/30 flex items-center justify-center shrink-0 hidden sm:flex">
+                    <MessageSquare className="w-4 h-4 text-[#594246]/40 dark:text-[#f8f0f5]/40" />
                   </div>
                   <div>
-                    <p className="text-[#632034] font-bold text-[15px] leading-snug">{sug.text}</p>
-                    <p className="text-[#594246]/50 font-medium text-xs mt-1.5">{sug.date}</p>
+                    <p className="text-[#632034] dark:text-[#f0a0c0] font-bold text-[15px] leading-snug">{sug.text}</p>
+                    <p className="text-[#594246]/50 dark:text-[#f0d8e8]/60 font-medium text-xs mt-1.5">{sug.date}</p>
                   </div>
                 </div>
 
                 {/* Status Pill */}
                 <div className="shrink-0 self-start sm:self-auto">
                   {sug.status === "Recibida" && (
-                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200 shadow-sm">
+                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/20 shadow-sm">
                       {sug.status}
                     </span>
                   )}
                   {sug.status === "En revisión" && (
-                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
+                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 shadow-sm">
                       {sug.status}
                     </span>
                   )}
                   {sug.status === "Considerada" && (
-                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 shadow-sm">
                       {sug.status}
                     </span>
                   )}

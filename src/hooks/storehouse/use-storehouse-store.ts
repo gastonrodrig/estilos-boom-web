@@ -585,7 +585,7 @@ const approveInventory = useCallback(async (
    */
   const startCreateWarehouseDocument = useCallback(async (payload: {
     document_number: string;
-    type: "INGRESO_COMPRA" | "SALIDA_VENTA" | "TRANSFERENCIA" | "AJUSTE";
+    type: "INGRESO_COMPRA" | "INGRESO_PRODUCCION" | "SALIDA_VENTA" | "TRANSFERENCIA" | "AJUSTE";
     id_source_warehouse?: string | null;
     id_target_warehouse?: string | null;
     id_origin_doc?: string | null;
@@ -611,12 +611,14 @@ const approveInventory = useCallback(async (
     documentId: string,
     workerId: string,
     items: { id_variant: string; quantity_received: number; incidence_note?: string }[],
+    trackingNumber?: string,
   ) => {
     const result = await executeRequest(async () => {
       const config = await getConfig();
       await storehouseApi.patch(`/inventory/documents/${documentId}/process`, {
         id_worker: workerId,
         items,
+        trackingNumber,
       }, config);
       await startLoadingInventoryMovements();
       toast.success("¡Documento procesado. Stock e historial actualizados!");

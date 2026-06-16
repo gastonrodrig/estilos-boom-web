@@ -375,15 +375,15 @@ function OPPCard({ opp }: { opp: any }) {
           >
             <h4 className="text-[13px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest mb-6">Detalle de Variantes</h4>
             
-            <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner bg-white/30 dark:bg-black/20">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5">
-                    <th className="py-4 px-6">Talla</th>
-                    <th className="py-4 px-6">Color</th>
-                    <th className="py-4 px-6 text-center">Cantidad</th>
-                    <th className="py-4 px-6 text-center">Costo Unitario</th>
-                    <th className="py-4 px-6 text-right">Subtotal</th>
+            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
+              <table className="w-full text-left border-collapse">
+                <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                    <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
+                    <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
+                    <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
+                    <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Costo Unitario</th>
+                    <th className="py-4 px-6 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Subtotal</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[#40202D] dark:text-white">
@@ -690,18 +690,18 @@ function QuotationModal({ isOpen, onClose, opp, onSave }: any) {
 
         {selectedSupplier && (
           <div className="space-y-6">
-            <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner bg-white/30 dark:bg-black/20">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5">
-                    <th className="py-4 px-6">Variante</th>
-                    <th className="py-4 px-6 text-center">Cantidad</th>
-                    <th className="py-4 px-6 text-center">Costo Unitario</th>
+            <div className="overflow-x-auto custom-scrollbar border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl transition-[background-color,border-color] duration-[600ms]">
+              <table className="w-full text-left border-collapse">
+                <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+                  <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                    <th className="py-4 px-6 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Variante</th>
+                    <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
+                    <th className="py-4 px-6 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Costo Unitario</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[#40202D] dark:text-white">
                 {items.map((it, idx) => (
-                  <tr key={idx} className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                  <tr key={idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     <td className="py-5 px-6 flex items-center gap-3">
                       <span className="font-bold text-[13px]">{it.id_variant?.size}</span>
                       <span className="text-[#EAE0E2] dark:text-gray-600">|</span>

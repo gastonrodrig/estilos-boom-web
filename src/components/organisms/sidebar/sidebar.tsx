@@ -84,6 +84,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
 
     useEffect(() => {
         const mediaQuery = window.matchMedia("(min-width: 1024px)");
+        setShowSidebar(mediaQuery.matches);
         const handleChange = (event: MediaQueryListEvent) => setShowSidebar(event.matches);
         mediaQuery.addEventListener("change", handleChange);
         return () => mediaQuery.removeEventListener("change", handleChange);
@@ -158,7 +159,7 @@ export function Sidebar({ items, hasTopBar = false }: SidebarProps) {
                     ${isItemActive 
                         ? "bg-[rgba(139,58,82,0.1)] dark:bg-[rgba(196,96,127,0.2)] text-[#8B3A52] dark:text-[#ffffff] font-medium" 
                         : "hover:bg-[rgba(139,58,82,0.06)] dark:hover:bg-[rgba(255,255,255,0.05)] font-normal " + 
-                          (isMainItem ? "text-[#40202D] dark:text-[#ddc0c8]" : "text-[#8C6B79] dark:text-[#a08088]")
+                          (isMainItem ? "text-[#2d1f25] dark:text-[#ddc0c8]" : "text-[#8C6B79] dark:text-[#a08088]")
                     }
                 `}
                 style={{

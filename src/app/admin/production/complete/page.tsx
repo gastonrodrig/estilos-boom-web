@@ -11,7 +11,18 @@ import { useProductionStore } from "@/hooks/production";
 
 // --- HELPERS ---
 const formatCurrency = (val: number) => val === 0 ? "Sin registrar" : `S/ ${(val || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
-const formatDate = (date?: string) => date ? new Date(date).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : "Fecha no disponible";
+const formatDate = (date?: string | Date) => {
+  if (!date) return "Fecha no disponible";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "Fecha no disponible";
+  return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+const formatSubStateDate = (date?: string | Date) => {
+  if (!date) return '---';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '---';
+  return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' });
+};
 
 const MOCK_COMPLETED_ORDERS = [
   {
@@ -109,8 +120,9 @@ export default function CompletedProductionOrders() {
 
   const filteredOrders = completedOrders.filter((order: any) => {
     const firstItem = order.base_items?.[0]?.id_variant?.id_product?.name || "";
+    const orderNum = order.pre_order_number || order.order_number || "";
     return firstItem.toLowerCase().includes(search.toLowerCase()) || 
-           order.pre_order_number.toLowerCase().includes(search.toLowerCase());
+           orderNum.toLowerCase().includes(search.toLowerCase());
   });
 
   const totalInvestment = useMemo(() => 
@@ -134,7 +146,7 @@ export default function CompletedProductionOrders() {
   const selectedQuoteObj = selectedOrder?.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
   const selectedWorkshopName = selectedQuoteObj?.id_agent?.name_company || selectedQuoteObj?.id_supplier?.name_company || selectedQuoteObj?.id_agent?.name || selectedQuoteObj?.id_supplier?.name || "Taller finalizado";
   const selectedTotalAmount = selectedOrder?.total_amount || 0;
-  const selectedTotalUnits = selectedOrder?.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
+  const selectedTotalUnits = selectedOrder?.base_items?.reduce((acc: any, i: any) => acc + (i.quantity || 0), 0) || 0;
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-10 transition-colors duration-500 relative min-h-screen">
@@ -166,24 +178,25 @@ export default function CompletedProductionOrders() {
       </header>
 
       {/* Tabla */}
-      <main className="overflow-hidden rounded-[2rem] border border-[rgba(139,58,82,0.08)] dark:border-[rgba(255,255,255,0.05)] bg-[#faf5f0] dark:bg-[rgba(255,255,255,0.04)] backdrop-blur-2xl shadow-sm transition-[background-color,border-color] duration-[600ms]">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#f0e8e2] dark:bg-transparent backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Código OP</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Taller</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Fecha Término</th>
-                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Unidades</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Inversión</th>
-                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b-[rgba(255,255,255,0.06)]">Acciones</th>
+            <thead className="relative transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Código OP</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Taller</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Fecha Término</th>
+                <th className="px-6 py-5 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidades</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Inversión</th>
+                <th className="px-6 py-5 text-right border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(139,58,82,0.06)] dark:divide-[rgba(255,255,255,0.06)] text-sm">
-              {filteredOrders.map((order: any) => (
+              {filteredOrders.map((order: any, idx: number) => (
                 <CompletedOrderRow 
                   key={order._id} 
                   order={order} 
+                  idx={idx}
                   onOpenTech={() => handleOpenModal("TECH", order)} 
                   onOpenObs={() => handleOpenModal("OBS", order)} 
                 />
@@ -247,14 +260,14 @@ export default function CompletedProductionOrders() {
                        <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Corte:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CORTE');
-                            return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
-                         })()}
+                            return formatSubStateDate(sub?.date);
+                          })()}
                        </span></p>
                        <p className="text-[9px] font-black text-[#D6405F] dark:text-[#F8BBD0] uppercase flex justify-between gap-4 tracking-widest"><span>Confección:</span> <span className="text-[#8C6B79] dark:text-gray-400 font-medium">
                          {(() => {
                             const sub = selectedOrder.sub_states?.find((s: any) => s.step === 'CONFECCION');
-                            return sub ? new Date(sub.date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' }) : '---';
-                         })()}
+                            return formatSubStateDate(sub?.date);
+                          })()}
                        </span></p>
                     </div>
                   </div>
@@ -283,7 +296,7 @@ export default function CompletedProductionOrders() {
                 <h4 className="text-xs font-black text-[#40202D] dark:text-white uppercase tracking-widest">Resumen de Auditoría</h4>
               </div>
               <p className="text-xs text-[#8C6B79] dark:text-gray-400 leading-relaxed font-medium">
-                La orden <span className="font-black text-[#40202D] dark:text-white">{selectedOrder.pre_order_number}</span> completó satisfactoriamente todas las etapas de validación. 
+                La orden <span className="font-black text-[#40202D] dark:text-white">{selectedOrder.pre_order_number || selectedOrder.order_number}</span> completó satisfactoriamente todas las etapas de validación. 
                 Se confirma el ingreso de <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{selectedTotalUnits} unidades</span> al inventario central bajo la supervisión del taller <span className="font-black text-[#40202D] dark:text-white">{selectedWorkshopName}</span>.
               </p>
             </div>
@@ -309,7 +322,7 @@ export default function CompletedProductionOrders() {
                 <div className="space-y-6 flex-1 w-full">
                    <div>
                       <h4 className="text-3xl font-black text-[#40202D] dark:text-white leading-tight">{selectedFirstItem?.name}</h4>
-                      <p className="text-sm text-[#D6405F] dark:text-[#F8BBD0] font-black mt-1">Orden N° {selectedOrder.pre_order_number}</p>
+                      <p className="text-sm text-[#D6405F] dark:text-[#F8BBD0] font-black mt-1">Orden N° {selectedOrder.pre_order_number || selectedOrder.order_number}</p>
                    </div>
                    
                    <div className="grid grid-cols-2 gap-4">
@@ -319,7 +332,7 @@ export default function CompletedProductionOrders() {
                       </div>
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
                          <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Costo Unit. Promedio</p>
-                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">S/ {(selectedTotalAmount / selectedTotalUnits).toFixed(2)}</p>
+                         <p className="text-sm font-black text-[#40202D] dark:text-white mt-0.5">S/ {selectedTotalUnits > 0 ? (selectedTotalAmount / selectedTotalUnits).toFixed(2) : "0.00"}</p>
                       </div>
                       <div className="bg-white/50 dark:bg-white/5 p-3.5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 shadow-inner">
                          <p className="text-[10px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest">Material</p>
@@ -347,10 +360,10 @@ export default function CompletedProductionOrders() {
                       </thead>
                       <tbody className="text-[#40202D] dark:text-gray-300">
                          {selectedOrder.base_items?.map((item: any, idx: number) => (
-                           <tr key={idx} className="border-b border-[#EAE0E2]/50 dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors last:border-0">
+                           <tr key={idx} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)] border-b border-[#EAE0E2]/50 dark:border-[rgba(255,255,255,0.04)] last:border-0`}>
                               <td className="p-4 font-bold">Lote A-{idx + 1}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.size || "M"}</td>
-                              <td className="p-4 text-center font-medium">{item.id_variant?.color || "N/A"}</td>
+                              <td className="p-4 text-center font-medium">{typeof item.id_variant?.color === "object" ? (item.id_variant?.color?.name || "N/A") : (item.id_variant?.color || "N/A")}</td>
                               <td className="p-4 text-right font-black text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>
                            </tr>
                          ))}
@@ -367,15 +380,15 @@ export default function CompletedProductionOrders() {
   );
 }
 
-function CompletedOrderRow({ order, onOpenTech, onOpenObs }: { order: any; onOpenTech: () => void; onOpenObs: () => void; }) {
+function CompletedOrderRow({ order, idx, onOpenTech, onOpenObs }: { order: any; idx: number; onOpenTech: () => void; onOpenObs: () => void; }) {
   const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO');
   const workshopName = selectedQuote?.id_agent?.name_company || selectedQuote?.id_supplier?.name_company || selectedQuote?.id_agent?.name || selectedQuote?.id_supplier?.name || "Taller finalizado";
   const totalAmount = selectedQuote?.total_amount || 0;
-  const totalUnits = order.base_items?.reduce((acc: any, i: any) => acc + i.quantity, 0);
+  const totalUnits = order.base_items?.reduce((acc: any, i: any) => acc + (i.quantity || 0), 0) || 0;
 
   return (
-    <tr className="hover:bg-white/50 dark:hover:bg-white/5 transition-colors group">
-      <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number}</td>
+    <tr className={`transition-colors group ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+      <td className="px-6 py-5 font-black text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number || order.order_number || "Sin número"}</td>
       <td className="px-6 py-5">
           <p className="font-bold text-[#40202D] dark:text-white">{workshopName}</p>
           <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Producción</p>

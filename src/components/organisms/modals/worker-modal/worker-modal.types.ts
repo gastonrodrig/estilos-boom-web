@@ -5,4 +5,5 @@ export interface WorkerFormValues {
   phone?: string;
   document_type?: string;
   document_number?: string;
+  role?: string;
 }
