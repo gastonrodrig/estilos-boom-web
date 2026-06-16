@@ -1,8 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Carousel, ProductCard } from "@/components/molecules";
-import { products } from "@data";
+import { products as mockProducts } from "@data";
 import { motion } from "framer-motion";
+import { productApi } from "@api";
 
 export const NewArrivals = () => {
+  const [realProducts, setRealProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        // Obtenemos los últimos productos del catálogo
+        const { data } = await productApi.get("", { params: { limit: 8 } });
+        const items = Array.isArray(data?.items) ? data.items : [];
+        
+        const mapped = items.map((p: any) => ({
+          id: p.id_product || p._id || "",
+          name: p.name || "Producto",
+          price: `S/ ${Number(p.base_price || 0).toFixed(2)}`,
+          image: (p.images && p.images.length > 0) ? p.images[0] : "/placeholder.jpg",
+          href: `/product/${p.id_product || p._id}`
+        }));
+        
+        setRealProducts(mapped);
+      } catch (err) {
+        console.error("Error fetching new arrivals:", err);
+      }
+    };
+    
+    fetchNewArrivals();
+  }, []);
+
+  // Desactivamos los mockProducts por ahora, usando realProducts
+  // const displayProducts = mockProducts;
+  const displayProducts = realProducts;
+
   return (
     <section className="relative w-full overflow-hidden bg-transparent dark:bg-[#252021]/80 dark:backdrop-blur-xl border-y border-transparent dark:border-white/5 py-24 md:py-32 px-4 transition-colors duration-500 ease-in-out">
       {/* Glow effects for dark mode glassmorphism */}
@@ -68,8 +102,8 @@ export const NewArrivals = () => {
         </motion.div>
 
         <Carousel
-          items={products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          items={displayProducts.map((product) => (
+            <ProductCard key={product.id} product={product as any} />
           ))}
         />
       </div>
