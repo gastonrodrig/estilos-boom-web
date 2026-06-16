@@ -239,6 +239,7 @@ const CheckoutPaymentForm: React.FC = () => {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
+              sessionStorage.setItem('mp_payment_approved', 'true');
               await clearCart();
               handleGoToReview();
               resolve(true);
@@ -247,6 +248,7 @@ const CheckoutPaymentForm: React.FC = () => {
             }
           } else if (response.status === 'pending') {
             toast('Pago pendiente.', { icon: '⏳' });
+            sessionStorage.setItem('mp_payment_approved', 'true');
             await clearCart();
             handleGoToReview();
             resolve(true);
@@ -317,10 +319,9 @@ const CheckoutPaymentForm: React.FC = () => {
             </label>
 
             {/* CONTENIDO DESPLEGADO SEGÚN MÉTODO */}
-            {paymentMethod === method.id && (
-              <div className="mt-2">
-                {/* 💳 MERCADOPAGO PAYMENT BRICK */}
-                {method.id === 'card' && (
+            <div className={`mt-2 ${paymentMethod === method.id ? 'block' : 'hidden'}`}>
+              {/* 💳 MERCADOPAGO PAYMENT BRICK */}
+              {method.id === 'card' && (
                   <div className="w-full relative min-h-[400px] bg-white p-4 rounded-lg shadow-sm border border-gray-100 mt-2">
 
                     {loadingPreference ? (
@@ -531,7 +532,6 @@ const CheckoutPaymentForm: React.FC = () => {
                   </div>
                 )}
               </div>
-            )}
           </div>
         ))}
       </div>

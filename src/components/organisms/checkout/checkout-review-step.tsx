@@ -3,12 +3,14 @@ import { useFormContext } from 'react-hook-form';
 import { useCheckoutStore, useOrderSubmission } from '@/hooks/extra';
 import { useCartStore } from '@/hooks';
 import { CheckoutFormValues } from '@/core/models/checkout';
-import { AddressInput } from '@models';
 import { Loader2, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const CheckoutReviewStep: React.FC = () => {
+  const router = useRouter();
   const { handleGoToPayment, handleGoToDelivery } = useCheckoutStore();
   const { items } = useCartStore();
   const { watch } = useFormContext<CheckoutFormValues>();
@@ -35,10 +37,13 @@ const CheckoutReviewStep: React.FC = () => {
 
   useEffect(() => {
     // Si llegamos a este paso y el método fue Mercado Pago (card), 
-    // significa que el pago ya fue aprobado por el Brick. 
-    // Por lo tanto, mostramos la tarjeta de éxito directamente.
+    // verificamos que el pago realmente haya sido aprobado consultando sessionStorage.
     if (formData.paymentMethod === 'card') {
-      setIsSuccess(true);
+      const isApproved = sessionStorage.getItem('mp_payment_approved') === 'true';
+      if (isApproved) {
+        setIsSuccess(true);
+        sessionStorage.removeItem('mp_payment_approved');
+      }
     }
   }, [formData.paymentMethod]);
 
@@ -49,6 +54,8 @@ const CheckoutReviewStep: React.FC = () => {
     if(success) {
       setIsModalOpen(false);
       setIsSuccess(true);
+    } else {
+      toast.error('Hubo un error al procesar tu pedido. Intenta nuevamente.');
     }
   };
 
@@ -77,7 +84,7 @@ const CheckoutReviewStep: React.FC = () => {
         </p>
 
         <button 
-          onClick={() => window.location.href = '/client/orders/active'}
+          onClick={() => router.push('/client/orders/active')}
           className="px-8 py-4 bg-white text-[#632034] rounded-full font-bold shadow-xl hover:bg-gray-50 transition-all active:scale-95"
         >
           Ver pedido en mi panel
@@ -175,17 +182,17 @@ const CheckoutReviewStep: React.FC = () => {
                   <p className="text-[11px] text-[#827D7D] font-bold uppercase tracking-wider mb-2">Resumen de Pedido</p>
                   {items.length > 0 && (
                     <div className="flex gap-3 items-center bg-white p-2 rounded-lg border border-[#EBEAE8]">
-                      <div className="w-12 h-16 shrink-0">
-                        <img src={items[0]?.image} alt={items[0]?.name} className="w-full h-full object-cover rounded-md" />
+                      <div className="w-12 h-16 shrink-0 relative">
+                        <Image src={items[0].image} alt={items[0].name} width={48} height={64} className="w-full h-full object-cover rounded-md" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-bold text-[#594246] leading-tight">{items[0]?.name}</p>
-                        <p className="text-xs text-[#827D7D]">{items[0]?.color} | {items[0]?.size}</p>
+                        <p className="text-sm font-bold text-[#594246] leading-tight">{items[0].name}</p>
+                        <p className="text-xs text-[#827D7D]">{items[0].color} | {items[0].size}</p>
                         {items.length > 1 && <p className="text-[10px] text-[#F2778D] font-bold mt-1">Y {items.length - 1} artículo(s) más...</p>}
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-[#594246]">S/ {items[0]?.price?.toFixed(2)}</p>
-                        <p className="text-xs text-[#827D7D]">Cant: {items[0]?.quantity}</p>
+                        <p className="text-sm font-bold text-[#594246]">S/ {(items[0].price || 0).toFixed(2)}</p>
+                        <p className="text-xs text-[#827D7D]">Cant: {items[0].quantity}</p>
                       </div>
                     </div>
                   )}
