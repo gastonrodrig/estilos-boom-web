@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useProductStore } from "@/hooks/product/use-product-store";
 import { ProductDetail, RelatedProducts } from "@/components";
 import { Product } from "@/core/models";
+import { Loader2 } from "lucide-react";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -21,8 +22,9 @@ export default function ProductPage() {
   }, [id, products, getProductById]);
 
   if (loading && !product) return (
-    <div className="h-screen flex items-center justify-center animate-pulse text-pink-400 font-serif">
-      Cargando Estilos Boom...
+    <div className="h-screen flex flex-col items-center justify-center gap-3 text-[#8B3A52] dark:text-[#f0a0c0] animate-in fade-in duration-500">
+      <Loader2 size={32} className="animate-spin opacity-80" />
+      <span className="text-xs font-semibold tracking-widest uppercase opacity-80">Cargando producto...</span>
     </div>
   );
 
