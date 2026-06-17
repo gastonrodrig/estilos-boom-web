@@ -17,12 +17,12 @@ interface StatCardProps {
 
 function StatCard({ label, value, dotColor }: StatCardProps) {
   return (
-    <div className="rounded-2xl border border-pink-100 bg-[#fffcfd] px-6 py-5 shadow-sm">
+    <div className="rounded-2xl border border-pink-100 dark:border-zinc-800/60 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-2xl px-6 py-5 shadow-sm">
       <div className="mb-1 flex items-center gap-2">
         <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
-        <span className="text-xs font-medium text-gray-500">{label}</span>
+        <span className="text-xs font-medium text-gray-500 dark:text-zinc-400">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
+      <p className="text-2xl font-bold text-gray-800 dark:text-zinc-200">{value}</p>
     </div>
   );
 }
@@ -32,7 +32,7 @@ function StatCard({ label, value, dotColor }: StatCardProps) {
 function FormatBadge({ status }: { status: YapeFormatStatus }) {
   if (status === "format_ok") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 dark:bg-green-500/10 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">
         <CheckCircle2 className="h-3 w-3" />
         Formato OK
       </span>
@@ -40,14 +40,14 @@ function FormatBadge({ status }: { status: YapeFormatStatus }) {
   }
   if (status === "duplicate") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600">
+      <span className="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
         <AlertTriangle className="h-3 w-3" />
         Nº repetido
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600">
+    <span className="inline-flex items-center gap-1 rounded-full bg-red-50 dark:bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
       <XCircle className="h-3 w-3" />
       Formato inválido
     </span>
@@ -65,28 +65,28 @@ function StatusBadge({
 }) {
   if (formatStatus === "invalid_format") {
     return (
-      <span className="inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
+      <span className="inline-flex rounded-full bg-red-50 dark:bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400">
         Formato inválido
       </span>
     );
   }
   if (formatStatus === "duplicate") {
     return (
-      <span className="inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
+      <span className="inline-flex rounded-full bg-red-50 dark:bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-600 dark:text-red-400">
         Número duplicado
       </span>
     );
   }
   if (status === PaymentStatus.PENDIENTE) {
     return (
-      <span className="inline-flex rounded-full bg-yellow-50 px-2.5 py-1 text-xs font-medium text-yellow-700">
+      <span className="inline-flex rounded-full bg-yellow-50 dark:bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400">
         Pendiente
       </span>
     );
   }
   if (status === PaymentStatus.OBSERVADO) {
     return (
-      <span className="inline-flex rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-600">
+      <span className="inline-flex rounded-full bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1 text-xs font-medium text-orange-600 dark:text-orange-400">
         Observado
       </span>
     );
@@ -114,22 +114,22 @@ function PaymentTableRow({
   isActioning,
 }: PaymentRowProps) {
   const { payment, formatStatus, canConfirm } = row;
-  const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white";
+  const bgClass = isOdd ? "bg-[#fff1f3]" : "bg-white dark:bg-zinc-900";
 
   return (
     <tr className={`transition-colors group/row ${!isOdd ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-      <td className="px-6 py-5 font-black text-[#40202D] dark:text-white">
+      <td className="px-6 py-5 font-medium text-[#40202D] dark:text-white">
         {payment.orderNumber}
       </td>
-      <td className="px-6 py-4 text-sm text-gray-700">{payment.clientName}</td>
-      <td className="px-6 py-4 text-sm text-gray-700 font-medium">
+      <td className="px-6 py-4 text-sm text-gray-700 dark:text-zinc-300">{payment.clientName}</td>
+      <td className="px-6 py-4 text-sm text-gray-700 dark:text-zinc-300 font-medium">
         {payment.method}
       </td>
-      <td className="px-6 py-4 text-sm text-gray-700">
+      <td className="px-6 py-4 text-sm text-gray-700 dark:text-zinc-300">
         S/ {payment.amount.toFixed(2)}
       </td>
       <td className="px-6 py-4">
-        <p className="mb-1 font-mono text-sm text-gray-800">
+        <p className="mb-1 font-mono text-sm text-gray-800 dark:text-zinc-200">
           {payment.operationNumber}
         </p>
         {payment.transactionType === "MANUAL" && <FormatBadge status={formatStatus} />}
@@ -144,14 +144,14 @@ function PaymentTableRow({
               <button
                 onClick={() => onConfirmClick(payment.id)}
                 disabled={!canConfirm || isActioning}
-                className="rounded-full bg-[#594246] border border-[#594246] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#D6405F] hover:border-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full bg-[#8B3A52] px-4 py-1.5 text-xs font-medium text-white transition hover:bg-[#a04a65] shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Aceptar
               </button>
               <button
                 onClick={() => onObserveClick(payment.id)}
                 disabled={isActioning}
-                className="rounded-full bg-white border border-[#EBEAE8] px-4 py-1.5 text-xs font-semibold text-[#594246] transition hover:bg-[#FAF9F6] hover:border-[#F2D0D3] hover:text-[#D6405F] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full bg-transparent border border-zinc-300 dark:border-zinc-700 px-4 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Observar
               </button>
@@ -159,7 +159,7 @@ function PaymentTableRow({
           ) : (
             <button
               onClick={() => onViewDetail(payment)}
-              className="rounded-full border border-gray-200 bg-neutral-50 px-4 py-1.5 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100"
+              className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-4 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 transition hover:bg-zinc-200 dark:hover:bg-zinc-700"
             >
               Ver detalle
             </button>
@@ -277,12 +277,12 @@ export default function AdminPaymentsPage() {
       {/* Header */}
       <div>
         <div className="mb-1 flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-zinc-200">
             Gestión de Pagos
           </h1>
           <CreditCard className="h-5 w-5 text-[#d6687d]" />
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
           Revisa y confirma pagos enviados por los clientes.
         </p>
       </div>
@@ -314,9 +314,9 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Table */}
-      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+      <main className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[2rem] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
         <div className="flex items-center justify-between border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)] px-6 py-5">
-          <h2 className="text-[14px] font-black text-[#40202D] dark:text-white tracking-wide">
+          <h2 className="text-[14px] font-medium text-[#40202D] dark:text-white tracking-wide">
             Pagos pendientes de verificación
           </h2>
         </div>
@@ -324,10 +324,11 @@ export default function AdminPaymentsPage() {
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+              <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Pedido</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Clienta</th>
-                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto pedido</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cliente</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Método</th>
+                <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Monto</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">N° Operación</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Estado</th>
                 <th className="px-6 py-5 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)] text-right">Acciones</th>
@@ -339,7 +340,7 @@ export default function AdminPaymentsPage() {
                   <tr key={i} className={`transition-colors group/row ${i % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
                     {Array.from({ length: 6 }).map((__, j) => (
                       <td key={j} className="px-6 py-4">
-                        <div className="h-4 animate-pulse rounded bg-gray-100" />
+                        <div className="h-4 animate-pulse rounded bg-gray-100 dark:bg-zinc-800" />
                       </td>
                     ))}
                   </tr>
@@ -348,7 +349,7 @@ export default function AdminPaymentsPage() {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-12 text-center text-sm text-gray-400"
+                    className="px-6 py-12 text-center text-sm text-gray-400 dark:text-zinc-500"
                   >
                     Sin pagos pendientes de verificación.
                   </td>
@@ -371,9 +372,9 @@ export default function AdminPaymentsPage() {
         </div>
 
         {/* Footer note */}
-        <div className="flex items-start gap-2 border-t border-pink-100 bg-blue-50 px-6 py-3">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
-          <p className="text-xs text-blue-700">
+        <div className="flex items-start gap-2 border-t border-pink-100 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10 px-6 py-3">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
+          <p className="text-xs text-blue-700 dark:text-blue-300">
             Recuerda verificar manualmente en tu app Yape que el número de
             operación existe antes de confirmar.
           </p>

@@ -64,12 +64,12 @@ export default function AdminSuppliesPage() {
       width: "140px",
       accessor: (row) => {
         const colors: Record<string, string> = {
-          metros: "bg-blue-50 text-blue-500 border border-blue-100",
-          rollos: "bg-amber-50 text-amber-500 border border-amber-100",
-          unidades: "bg-emerald-50 text-emerald-500 border border-emerald-100",
-          conos: "bg-purple-50 text-purple-500 border border-purple-100"
+          metros: "bg-blue-50 dark:bg-blue-500/10 text-blue-500 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20",
+          rollos: "bg-amber-50 dark:bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20",
+          unidades: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20",
+          conos: "bg-purple-50 dark:bg-purple-500/10 text-purple-500 dark:text-purple-400 border border-purple-100 dark:border-purple-500/20"
         };
-        const currentStyle = colors[row.unit] || "bg-gray-50 text-gray-500";
+        const currentStyle = colors[row.unit] || "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400";
         return (
           <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${currentStyle}`}>
             {row.unit}

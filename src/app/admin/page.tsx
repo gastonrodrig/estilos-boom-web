@@ -91,7 +91,7 @@ function SectionCard({
       <div className="px-5 py-3.5 border-b border-[rgba(212,175,55,0.18)] bg-gradient-to-r from-white/70 to-white/20 dark:from-[rgba(139,58,82,0.22)] dark:to-transparent backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-2">
           <Icon className="h-3.5 w-3.5 text-[#8B3A52] dark:text-[#e8d8dc]" />
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">
+          <h3 className="text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">
             {title}
           </h3>
         </div>
@@ -274,7 +274,7 @@ export default function AdminDashboardPage() {
               <button
                 key={key}
                 onClick={() => setPeriod(key)}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black transition-all tracking-wider uppercase ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-medium transition-all tracking-wider uppercase ${
                   period === key
                     ? 'bg-gradient-to-r from-[rgba(139,58,82,0.85)] to-[rgba(139,58,82,0.65)] text-white shadow-sm'
                     : 'text-[#8C6B79] dark:text-gray-400 hover:text-[#40202D] dark:hover:text-white'
@@ -288,7 +288,7 @@ export default function AdminDashboardPage() {
           <button
             onClick={loadAll}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[rgba(212,175,55,0.2)] bg-white/60 dark:bg-black/40 text-[#8B3A52] dark:text-[#e8d8dc] text-[10px] font-black uppercase tracking-wider hover:border-[rgba(212,175,55,0.45)] transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[rgba(212,175,55,0.2)] bg-white/60 dark:bg-black/40 text-[#8B3A52] dark:text-[#e8d8dc] text-[10px] font-medium uppercase tracking-wider hover:border-[rgba(212,175,55,0.45)] transition-all disabled:opacity-50"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             Actualizar
@@ -328,7 +328,7 @@ export default function AdminDashboardPage() {
               {card.value === null ? (
                 <Skeleton className="h-7 w-20 mb-1" />
               ) : (
-                <p className="text-xl font-black text-[#40202D] dark:text-white">{card.value}</p>
+                <p className="text-xl font-medium text-[#40202D] dark:text-white">{card.value}</p>
               )}
               <p className="text-[11px] font-semibold text-[#8C6B79] dark:text-gray-300 mt-0.5">{card.label}</p>
               <p className="text-[10px] text-[#8C6B79]/60 dark:text-gray-500 mt-0.5">{card.sub}</p>
@@ -368,7 +368,7 @@ export default function AdminDashboardPage() {
                           style={{ background: cfg.color }}
                         />
                       </div>
-                      <span className="text-[12px] font-black text-[#40202D] dark:text-white w-6 text-right">{count}</span>
+                      <span className="text-[12px] font-medium text-[#40202D] dark:text-white w-6 text-right">{count}</span>
                       <span className="text-[10px] text-[#8C6B79] dark:text-gray-500 w-8 text-right">{pct}%</span>
                     </div>
                   );
@@ -411,7 +411,7 @@ export default function AdminDashboardPage() {
                           style={{ background: cfg.color }}
                         />
                       </div>
-                      <span className="text-[12px] font-black text-[#40202D] dark:text-white w-6 text-right">{count}</span>
+                      <span className="text-[12px] font-medium text-[#40202D] dark:text-white w-6 text-right">{count}</span>
                       <span className="text-[10px] text-[#8C6B79] dark:text-gray-500 w-8 text-right">{pct}%</span>
                     </div>
                   );
@@ -420,11 +420,11 @@ export default function AdminDashboardPage() {
               <div className="pt-3 mt-1 border-t border-[rgba(212,175,55,0.12)] grid grid-cols-2 gap-3">
                 <div className="bg-[#fdf8f9] dark:bg-[#321f2b] rounded-xl p-3.5">
                   <p className="text-[10px] text-[#8C6B79] dark:text-gray-400 mb-0.5">Total OC</p>
-                  <p className="text-xl font-black text-[#40202D] dark:text-white">{filteredPurchaseOrders.length}</p>
+                  <p className="text-xl font-medium text-[#40202D] dark:text-white">{filteredPurchaseOrders.length}</p>
                 </div>
                 <div className="bg-[#fdf8f9] dark:bg-[#321f2b] rounded-xl p-3.5">
                   <p className="text-[10px] text-[#8C6B79] dark:text-gray-400 mb-0.5">Invertido</p>
-                  <p className="text-base font-black text-[#40202D] dark:text-white leading-tight">{formatPEN(totalInvertido)}</p>
+                  <p className="text-base font-medium text-[#40202D] dark:text-white leading-tight">{formatPEN(totalInvertido)}</p>
                 </div>
               </div>
             </div>
@@ -447,11 +447,11 @@ export default function AdminDashboardPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gradient-to-r from-white/80 to-white/40 dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] border-b border-[rgba(212,175,55,0.18)] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-                      <th className="text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Tipo</th>
-                      <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Cant.</th>
-                      <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] hidden sm:table-cell">Anterior</th>
-                      <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Nuevo</th>
-                      <th className="text-right px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] hidden md:table-cell">Fecha</th>
+                      <th className="text-left px-4 py-3 text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Tipo</th>
+                      <th className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Cant.</th>
+                      <th className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] hidden sm:table-cell">Anterior</th>
+                      <th className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">Nuevo</th>
+                      <th className="text-right px-4 py-3 text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] hidden md:table-cell">Fecha</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -473,11 +473,11 @@ export default function AdminDashboardPage() {
                           } hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}
                         >
                           <td className="px-4 py-3">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black ${badgeCls}`}>
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium ${badgeCls}`}>
                               {isEntrada ? '↑' : isSalida ? '↓' : '~'} {m.type}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right font-black text-[#40202D] dark:text-white">
+                          <td className="px-4 py-3 text-right font-medium text-[#40202D] dark:text-white">
                             {isEntrada ? '+' : isSalida ? '-' : ''}{m.quantity}
                           </td>
                           <td className="px-4 py-3 text-right text-[#8C6B79] dark:text-gray-400 hidden sm:table-cell">{m.previous_stock}</td>
@@ -510,14 +510,14 @@ export default function AdminDashboardPage() {
                   <div key={s._id} className="space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-[#D4AF37] w-4 flex-shrink-0">#{i + 1}</span>
+                        <span className="text-[10px] font-medium text-[#D4AF37] w-4 flex-shrink-0">#{i + 1}</span>
                         <div>
                           <p className="text-[11px] font-bold text-[#40202D] dark:text-white leading-tight">{s.name_company}</p>
                           <p className="text-[10px] text-[#8C6B79] dark:text-gray-500">{s.total_orders ?? 0} órdenes</p>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-[11px] font-black text-[#40202D] dark:text-white">{rating}/5 ★</p>
+                        <p className="text-[11px] font-medium text-[#40202D] dark:text-white">{rating}/5 ★</p>
                         <p className="text-[10px] text-[#8C6B79] dark:text-gray-500">{onTime}% puntual</p>
                       </div>
                     </div>

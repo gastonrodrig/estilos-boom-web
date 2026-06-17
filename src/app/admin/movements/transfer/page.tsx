@@ -122,12 +122,12 @@ export default function CreateTransferWizard() {
           >
             <ArrowLeft size={14} /> Volver
           </button>
-          <h1 className="text-3xl font-black mt-3 tracking-wide drop-shadow-sm">Crear orden de movimiento</h1>
-          <p className="text-xs text-[#D6405F] dark:text-[#F8BBD0] font-black mt-2 uppercase tracking-widest bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 px-3 py-1 rounded-full w-fit border border-[#D6405F]/20 dark:border-[#F8BBD0]/20">
+          <h1 className="text-3xl font-medium mt-3 tracking-wide drop-shadow-sm">Crear orden de movimiento</h1>
+          <p className="text-xs text-[#D6405F] dark:text-[#F8BBD0] font-medium mt-2 uppercase tracking-widest bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 px-3 py-1 rounded-full w-fit border border-[#D6405F]/20 dark:border-[#F8BBD0]/20">
             Producto {currentIndex + 1} de {itemsToProcess.length}
           </p>
         </div>
-        <span className="px-4 py-2 bg-rose-50 text-[#F2778D] font-black text-xs rounded-full uppercase tracking-wider">
+        <span className="px-4 py-2 bg-rose-50 text-[#F2778D] font-medium text-xs rounded-full uppercase tracking-wider">
           {direction === "to-store" ? "Almacén → Tienda" : "Tienda → Almacén"}
         </span>
       </div>
@@ -135,18 +135,18 @@ export default function CreateTransferWizard() {
       {/* CUERPO */}
       <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 flex-1 items-start my-auto">
         {/* Ficha del producto */}
-        <div className="md:col-span-5 bg-white border border-[#EBEAE8] p-6 rounded-2xl shadow-sm text-center">
-          <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 border mb-4">
+        <div className="md:col-span-5 bg-white dark:bg-zinc-900 border border-[#EBEAE8] p-6 rounded-2xl shadow-sm text-center">
+          <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800 border mb-4">
             <img src={currentProduct.image} className="w-full h-full object-cover" alt={currentProduct.name} />
           </div>
-          <h2 className="text-2xl font-black text-[#40202D] dark:text-white tracking-wide">{currentProduct.name}</h2>
+          <h2 className="text-2xl font-medium text-[#40202D] dark:text-white tracking-wide">{currentProduct.name}</h2>
           <span className="inline-block mt-3 px-4 py-1.5 bg-white/50 dark:bg-white/10 text-[#D6405F] dark:text-[#F8BBD0] rounded-full text-xs font-bold uppercase tracking-wider border border-[#EAE0E2] dark:border-white/20 shadow-sm">
             {currentProduct.category}
           </span>
         </div>
 
         {/* Variantes con cantidades */}
-        <div className="md:col-span-7 bg-white border border-[#EBEAE8] p-6 rounded-2xl shadow-sm space-y-6 max-h-[500px] overflow-y-auto">
+        <div className="md:col-span-7 bg-white dark:bg-zinc-900 border border-[#EBEAE8] p-6 rounded-2xl shadow-sm space-y-6 max-h-[500px] overflow-y-auto">
           <h3 className="font-bold text-sm uppercase opacity-40 tracking-wider">Variantes del producto</h3>
 
           {currentProduct.variants?.map((v: any) => {

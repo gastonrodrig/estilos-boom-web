@@ -36,7 +36,7 @@ export default function AdminStorehouseCreatePage() {
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6">
       <header className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+        <h1 className="text-3xl md:text-4xl font-medium text-[#40202D] dark:text-white tracking-wide">
           Crear Orden de Pre-Compra
         </h1>
         <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
@@ -49,7 +49,7 @@ export default function AdminStorehouseCreatePage() {
         <aside className="space-y-6">
           <article className="overflow-hidden rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl shadow-sm">
             <div className="p-6 border-b border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5">
-               <h2 className="text-[13px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+               <h2 className="text-[13px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                  Información del Producto
                </h2>
             </div>
@@ -73,43 +73,43 @@ export default function AdminStorehouseCreatePage() {
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-2">Producto Seleccionado</p>
-                  <span className="inline-flex rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-4 py-1.5 text-[11px] font-black tracking-widest text-white uppercase shadow-sm">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 mb-2">Producto Seleccionado</p>
+                  <span className="inline-flex rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-4 py-1.5 text-[11px] font-medium tracking-widest text-white uppercase shadow-sm">
                     {productInfo.name || "Vestidos"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center border-b border-[#EAE0E2] dark:border-white/10 pb-3 text-[13px]">
                   <span className="font-bold text-[#8C6B79] dark:text-gray-400">Stock Actual</span>
-                  <span className="flex items-center gap-1.5 font-black text-[#D6405F] dark:text-[#F8BBD0]">
+                  <span className="flex items-center gap-1.5 font-medium text-[#D6405F] dark:text-[#F8BBD0]">
                     {productInfo.stockActual} <AlertCircle className="h-4 w-4" />
                   </span>
                 </div>
                 <div className="flex justify-between items-center border-b border-[#EAE0E2] dark:border-white/10 pb-3 text-[13px]">
                   <span className="font-bold text-[#8C6B79] dark:text-gray-400">Stock Mínimo</span>
-                  <span className="font-black text-[#40202D] dark:text-white">{productInfo.stockMinimo}</span>
+                  <span className="font-medium text-[#40202D] dark:text-white">{productInfo.stockMinimo}</span>
                 </div>
 
                 {/* Sugerencia del Sistema */}
                 <div className="rounded-2xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 p-5 shadow-inner">
                   <div className="flex items-center gap-2 mb-4">
                     <Info className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
-                    <p className="text-[11px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
+                    <p className="text-[11px] font-medium uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
                       Sugerencia del Sistema
                     </p>
                   </div>
                   <div className="space-y-3 text-[12px]">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-[#8C6B79] dark:text-gray-400">Unidades a Reponer</span>
-                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.unidadesReponer}</span>
+                      <span className="font-medium text-[#40202D] dark:text-white">{productInfo.unidadesReponer}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-[#8C6B79] dark:text-gray-400">Ventas Promedio/Mes</span>
-                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.ventasPromedio}</span>
+                      <span className="font-medium text-[#40202D] dark:text-white">{productInfo.ventasPromedio}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-[#8C6B79] dark:text-gray-400">Variantes Seleccionadas</span>
-                      <span className="font-black text-[#40202D] dark:text-white">{productInfo.variantes}</span>
+                      <span className="font-medium text-[#40202D] dark:text-white">{productInfo.variantes}</span>
                     </div>
                   </div>
                 </div>
@@ -132,7 +132,7 @@ export default function AdminStorehouseCreatePage() {
           {/* Seleccionar Proveedor */}
           <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm transition-all">
             <header className="mb-6">
-              <h2 className="text-[16px] font-black text-[#40202D] dark:text-white tracking-wide">Seleccionar Proveedor</h2>
+              <h2 className="text-[16px] font-medium text-[#40202D] dark:text-white tracking-wide">Seleccionar Proveedor</h2>
               <p className="text-[12px] font-medium text-[#8C6B79] dark:text-gray-400 mt-1">
                 Elegir socio comercial más compatible para este pedido
               </p>
@@ -167,8 +167,8 @@ export default function AdminStorehouseCreatePage() {
                 >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className={`text-[14px] font-black tracking-wide ${isSelected ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{s.name_company}</p>
-                        <span className="mt-1.5 inline-flex rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[9px] font-black text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest shadow-sm">
+                        <p className={`text-[14px] font-medium tracking-wide ${isSelected ? "text-[#D6405F] dark:text-[#F8BBD0]" : "text-[#40202D] dark:text-white"}`}>{s.name_company}</p>
+                        <span className="mt-1.5 inline-flex rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 px-3 py-1 text-[9px] font-medium text-[#8C6B79] dark:text-gray-400 uppercase tracking-widest shadow-sm">
                           {s.category?.name || "Ropa formal"}
                         </span>
                       </div>
@@ -185,11 +185,11 @@ export default function AdminStorehouseCreatePage() {
                       </div>
                       <div className="flex justify-between items-center bg-white/30 dark:bg-white/5 p-2 rounded-xl border border-[#EAE0E2] dark:border-white/10">
                         <span>Último precio:</span>
-                        <span className="font-black text-[#40202D] dark:text-white">S/ {s.last_price || "42.50"}</span>
+                        <span className="font-medium text-[#40202D] dark:text-white">S/ {s.last_price || "42.50"}</span>
                       </div>
                       <div className="flex justify-between items-center bg-white/30 dark:bg-white/5 p-2 rounded-xl border border-[#EAE0E2] dark:border-white/10">
                         <span>Confiabilidad:</span>
-                        <span className="font-black text-emerald-500">Excelente</span>
+                        <span className="font-medium text-emerald-500">Excelente</span>
                       </div>
                     </div>
                     <p className="mt-4 border-t border-[#EAE0E2] dark:border-white/10 pt-3 text-[11px] italic text-[#8C6B79] dark:text-gray-500">
@@ -203,11 +203,11 @@ export default function AdminStorehouseCreatePage() {
 
           {/* Variantes Solicitadas */}
           <article className="rounded-[32px] border border-[#EAE0E2] dark:border-white/10 bg-white/70 dark:bg-black/50 backdrop-blur-2xl p-6 md:p-8 shadow-sm">
-            <h2 className="mb-6 text-[16px] font-black text-[#40202D] dark:text-white tracking-wide">
+            <h2 className="mb-6 text-[16px] font-medium text-[#40202D] dark:text-white tracking-wide">
               Variantes Solicitadas
             </h2>
             
-            <div className="mb-4 grid grid-cols-12 gap-4 px-2 text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+            <div className="mb-4 grid grid-cols-12 gap-4 px-2 text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
               <p className="col-span-4 lg:col-span-4">Talla</p>
               <p className="col-span-5 lg:col-span-5">Color</p>
               <p className="col-span-2 lg:col-span-2 text-center">Cant.</p>
@@ -239,7 +239,7 @@ export default function AdminStorehouseCreatePage() {
                       type="number"
                       value={it.quantity}
                       onChange={(e) => handleChangeItem(idx, "quantity", Number(e.target.value))}
-                      className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-2 text-center text-[13px] font-black text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
+                      className="h-12 w-full rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-2 text-center text-[13px] font-medium text-[#40202D] dark:text-white outline-none focus:ring-2 focus:ring-[#D6405F]/50 shadow-inner transition-all"
                     />
                   </div>
                   <button 
@@ -255,20 +255,20 @@ export default function AdminStorehouseCreatePage() {
             <button
               type="button"
               onClick={() => handleAddVariant()}
-              className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#EAE0E2] dark:border-white/20 bg-white/30 dark:bg-white/5 text-[12px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/50 dark:hover:bg-white/10 hover:border-[#8C6B79] hover:text-[#40202D] dark:hover:text-white shadow-inner"
+              className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#EAE0E2] dark:border-white/20 bg-white/30 dark:bg-white/5 text-[12px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/50 dark:hover:bg-white/10 hover:border-[#8C6B79] hover:text-[#40202D] dark:hover:text-white shadow-inner"
             >
               <Plus className="h-5 w-5" /> Agregar Variante (Sugerida)
             </button>
 
             <div className="mt-8 flex items-center justify-between rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 p-6 shadow-inner">
-              <span className="text-[13px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+              <span className="text-[13px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                 Total Solicitadas:
               </span>
-              <span className="text-3xl font-black text-[#40202D] dark:text-white">{totalUnits}</span>
+              <span className="text-3xl font-medium text-[#40202D] dark:text-white">{totalUnits}</span>
             </div>
 
             <div className="mt-8 space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
+              <label className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">
                 Observaciones (opcional)
               </label>
               <textarea
@@ -282,14 +282,14 @@ export default function AdminStorehouseCreatePage() {
             <div className="mt-10 grid grid-cols-2 gap-5">
               <button
                 onClick={() => router.push("/admin/storehouse")}
-                className="h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[12px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white shadow-sm"
+                className="h-14 rounded-2xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[12px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400 transition-all hover:bg-white/80 dark:hover:bg-white/10 hover:text-[#40202D] dark:hover:text-white shadow-sm"
               >
                 Cancelar
               </button>
               <button
                 disabled={loading || !items.length || selectedSupplierIds.length === 0}
                 onClick={handleCreate}
-                className="h-14 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-[12px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                className="h-14 rounded-2xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-[12px] font-medium uppercase tracking-widest text-white shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
               >
                 {loading ? "Procesando..." : "Crear Pre-Compra"}
               </button>

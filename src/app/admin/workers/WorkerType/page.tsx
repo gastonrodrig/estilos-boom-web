@@ -75,8 +75,8 @@ export default function WorkerTypePage() {
       accessor: (row) => (
         <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
           row.is_active
-            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-            : "bg-gray-50 text-gray-500 border-gray-100"
+            ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20"
+            : "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-100 dark:border-zinc-700"
         }`}>
           {row.is_active ? "Activo" : "Inactivo"}
         </span>

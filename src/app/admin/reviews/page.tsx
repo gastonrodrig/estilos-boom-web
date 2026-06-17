@@ -39,20 +39,24 @@ export default function AdminReviewsPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
       {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0]">
-            <MessageSquareHeart className="h-5 w-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Feedback</span>
+      <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 w-full transition-colors duration-500">
+        <div className="flex-1">
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest flex items-center gap-2">
+            <MessageSquareHeart className="h-4 w-4" />
+            <span>FEEDBACK</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide mt-2">Reseñas de Clientes</h1>
-          <p className="text-[13px] font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Lee lo que opinan tus clientes sobre tus productos.</p>
+          <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
+            Reseñas de Clientes
+          </h1>
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+            Lee lo que opinan tus clientes sobre tus productos.
+          </p>
         </div>
 
         <div className="flex gap-4 items-center">
           <div className="text-center px-4">
-            <p className="text-3xl font-black text-[#D6405F] dark:text-[#F8BBD0]">4.6</p>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Promedio Global</p>
+            <p className="text-3xl font-medium text-[#D6405F] dark:text-[#F8BBD0]">4.6</p>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Promedio Global</p>
           </div>
         </div>
       </header>
@@ -72,7 +76,7 @@ export default function AdminReviewsPage() {
         <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
           <button 
             onClick={() => setFilterRating("all")}
-            className={`shrink-0 h-14 px-6 rounded-2xl border ${filterRating === "all" ? 'border-[#D6405F] bg-gradient-to-r from-[#D6405F]/10 to-[#F23B69]/10 text-[#D6405F]' : 'border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80'} font-black text-[11px] uppercase tracking-widest transition-colors shadow-sm`}
+            className={`shrink-0 h-14 px-6 rounded-2xl border ${filterRating === "all" ? 'border-[#D6405F] bg-gradient-to-r from-[#D6405F]/10 to-[#F23B69]/10 text-[#D6405F]' : 'border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80'} font-medium text-[11px] uppercase tracking-widest transition-colors shadow-sm`}
           >
             Todas
           </button>
@@ -80,7 +84,7 @@ export default function AdminReviewsPage() {
             <button 
               key={star}
               onClick={() => setFilterRating(star)}
-              className={`shrink-0 flex items-center gap-1 h-14 px-5 rounded-2xl border ${filterRating === star ? 'border-amber-400 bg-amber-400/10 text-amber-600 dark:text-amber-400' : 'border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80'} font-black text-[13px] transition-colors shadow-sm`}
+              className={`shrink-0 flex items-center gap-1 h-14 px-5 rounded-2xl border ${filterRating === star ? 'border-amber-400 bg-amber-400/10 text-amber-600 dark:text-amber-400' : 'border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80'} font-medium text-[13px] transition-colors shadow-sm`}
             >
               {star} <Star className={`w-4 h-4 ${filterRating === star ? 'fill-amber-400 text-amber-400' : 'text-[#8C6B79] dark:text-gray-400'}`} />
             </button>
@@ -103,7 +107,7 @@ export default function AdminReviewsPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D6405F] to-[#F23B69] flex items-center justify-center text-white font-black shadow-inner">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D6405F] to-[#F23B69] flex items-center justify-center text-white font-medium shadow-inner">
                     {review.clientName.charAt(0)}
                   </div>
                   <div>
@@ -131,10 +135,10 @@ export default function AdminReviewsPage() {
               </p>
 
               <div className="pt-4 border-t border-[#EAE0E2] dark:border-white/10 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
+                <span className="text-[10px] font-medium uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
                   {review.productName}
                 </span>
-                <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${review.status === 'Publicado' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-500/10 text-gray-500'}`}>
+                <span className={`px-2 py-1 rounded-md text-[9px] font-medium uppercase tracking-widest ${review.status === 'Publicado' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-gray-500/10 text-gray-500'}`}>
                   {review.status}
                 </span>
               </div>

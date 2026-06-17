@@ -228,5 +228,6 @@ export const useProductStore = () => {
     startLoadingProducts,
     getProductById,
     createProduct,
+    updateProduct,
   };
 };

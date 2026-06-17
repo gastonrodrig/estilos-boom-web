@@ -7,8 +7,8 @@ import { useManagementStore } from "@/hooks";
 import type { WorkerRow } from "@store";
 
 const STATUS_BADGE: Record<string, string> = {
-  Activo:   "bg-emerald-50 text-emerald-700 border-emerald-100",
-  Inactivo: "bg-gray-50 text-gray-500 border-gray-100",
+  Activo:   "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20",
+  Inactivo: "bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-100 dark:border-zinc-700",
 };
 
 export default function TrabajadoresPage() {
@@ -52,7 +52,7 @@ export default function TrabajadoresPage() {
       sortable: true,
       width: "130px",
       accessor: (row) => (
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-600 border border-rose-100">
+        <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20">
           {row.system_role}
         </span>
       ),
@@ -63,7 +63,7 @@ export default function TrabajadoresPage() {
       sortable: true,
       width: "100px",
       accessor: (row) => (
-        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[row.employment_status] ?? "bg-gray-50 text-gray-400 border-gray-100"}`}>
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${STATUS_BADGE[row.employment_status] ?? "bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-400 border-gray-100 dark:border-zinc-700"}`}>
           {row.employment_status}
         </span>
       ),

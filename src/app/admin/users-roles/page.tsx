@@ -104,12 +104,19 @@ export default function UsuariosRolesPage() {
     };
 
     return (
-        <div className="bg-white/70 dark:bg-black/50 backdrop-blur-2xl border border-[#EAE0E2] dark:border-white/5 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col min-h-[700px] transition-colors duration-500">
+        <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
             {/* Header Principal */}
-            <div className="px-8 py-6 border-b border-[#EAE0E2] dark:border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/30 dark:bg-white/5 backdrop-blur-md">
-                <div>
-                    <h1 className="text-2xl font-bold text-[#40202D] dark:text-white tracking-wide">Usuarios y Roles</h1>
-                    <p className="text-[12px] text-[#8C6B79] dark:text-gray-400 font-medium tracking-wide mt-1">Control de accesos y perfiles del sistema.</p>
+            <header className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 w-full transition-colors duration-500">
+                <div className="flex-1">
+                    <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest flex items-center gap-2">
+                        <span>ACCESOS</span>
+                    </div>
+                    <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
+                        Usuarios y Roles
+                    </h1>
+                    <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+                        Control de accesos y perfiles del sistema.
+                    </p>
                 </div>
                 <div className="flex bg-white/50 dark:bg-black/50 p-1 rounded-xl border border-[#EAE0E2] dark:border-white/10 shadow-inner backdrop-blur-md">
                     {["usuarios", "roles"].map((tab) => (
@@ -118,7 +125,7 @@ export default function UsuariosRolesPage() {
                         </button>
                     ))}
                 </div>
-            </div>
+            </header>
 
             <div className="flex-1 flex flex-col overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -141,7 +148,7 @@ export default function UsuariosRolesPage() {
 
                             <div className="flex-1 flex flex-col bg-transparent overflow-hidden">
                                 <div className="px-7 py-5 border-b border-[#EAE0E2] dark:border-white/10 bg-white/20 dark:bg-black/20 backdrop-blur-md">
-                                    <h3 className="text-md font-bold text-[#8C6B79] dark:text-gray-400 tracking-wide">Configurando: <span className="text-[#40202D] dark:text-white font-black">{selectedRole?.name || "Cargando..."}</span></h3>
+                                    <h3 className="text-md font-bold text-[#8C6B79] dark:text-gray-400 tracking-wide">Configurando: <span className="text-[#40202D] dark:text-white font-medium">{selectedRole?.name || "Cargando..."}</span></h3>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-6 scroll-smooth custom-scrollbar">
                                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -151,8 +158,8 @@ export default function UsuariosRolesPage() {
                                             return (
                                                 <div key={groupId} className="p-5 bg-white/50 dark:bg-white/5 rounded-2xl border border-[#EAE0E2] dark:border-white/10 transition-all hover:bg-white/80 dark:hover:bg-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] hover:shadow-sm backdrop-blur-md group/card">
                                                     <div className="flex items-center gap-3 mb-5 border-b border-[#EAE0E2] dark:border-white/10 pb-3">
-                                                        <div className="p-1.5 bg-white dark:bg-black/50 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={14} /></div>
-                                                        <h4 className="text-[13px] font-black text-[#40202D] dark:text-white tracking-wide">{group.label}</h4>
+                                                        <div className="p-1.5 bg-white dark:bg-zinc-800 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={14} /></div>
+                                                        <h4 className="text-[13px] font-medium text-[#40202D] dark:text-white tracking-wide">{group.label}</h4>
                                                     </div>
                                                     <div className="space-y-4">
                                                         {items.map(item => {
@@ -206,7 +213,7 @@ export default function UsuariosRolesPage() {
 
                                     return (
                                         <div key={id} className="p-4 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-2xl border border-[#EAE0E2] dark:border-white/10 flex items-center gap-4 group animate-in slide-in-from-right-2">
-                                            <div className="bg-white dark:bg-black/50 border border-[#EAE0E2] dark:border-white/5 p-2 rounded-xl shadow-sm text-[#D6405F] dark:text-[#F8BBD0]">
+                                            <div className="bg-white dark:bg-zinc-800 border border-[#EAE0E2] dark:border-white/5 p-2 rounded-xl shadow-sm text-[#D6405F] dark:text-[#F8BBD0]">
                                                 <Icon size={18} />
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -252,8 +259,8 @@ export default function UsuariosRolesPage() {
                         return (
                             <div key={groupId} className="p-5 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-2xl border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] dark:hover:border-[#F8BBD0] transition-colors">
                                 <div className="flex items-center gap-3 mb-4 border-b border-[#EAE0E2] dark:border-white/10 pb-2">
-                                    <div className="bg-white dark:bg-black/50 p-1.5 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={13} /></div>
-                                    <span className="text-[11px] font-black text-[#40202D] dark:text-white uppercase tracking-wider">{group.label}</span>
+                                    <div className="bg-white dark:bg-zinc-800 p-1.5 rounded-lg shadow-sm text-[#D6405F] dark:text-[#F8BBD0] border border-[#EAE0E2] dark:border-white/5"><group.icon size={13} /></div>
+                                    <span className="text-[11px] font-medium text-[#40202D] dark:text-white uppercase tracking-wider">{group.label}</span>
                                 </div>
                                 <div className="space-y-3.5">
                                     {items.map(item => {

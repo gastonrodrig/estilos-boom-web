@@ -10,9 +10,9 @@ export default function AdminQuotationsEditPage() {
         <div>
           <div className="flex items-center gap-2 text-[#D6405F] dark:text-[#F8BBD0] mb-2">
             <Edit3 className="h-5 w-5" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Cotizaciones</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest">Cotizaciones</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">Editar Cotización</h1>
+          <h1 className="text-3xl md:text-4xl font-medium text-[#40202D] dark:text-white tracking-wide">Editar Cotización</h1>
           <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">Aquí podrás modificar una cotización existente.</p>
         </div>
       </header>

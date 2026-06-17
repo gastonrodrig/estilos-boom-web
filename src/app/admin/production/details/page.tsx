@@ -178,30 +178,34 @@ if (trackingViewOrder) {
     <>
       <div className="fixed inset-0 hidden dark:block bg-[#1e1018] pointer-events-none -z-10" />
       <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 font-sans transition-colors duration-500 relative min-h-screen">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 px-2">
-        <div>
-          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase">
-            Inicio / Producción / Seguimiento
+        <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[#8C6B79] dark:text-white/30 mb-2">
+              <span>Inicio</span>
+              <span>/</span>
+              <span>Producción</span>
+              <span>/</span>
+              <span className="text-[#D6405F] dark:text-white/50">Seguimiento</span>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
+              <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
+                Seguimiento de Producción
+              </h1>
+            </div>
+            <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
+              {counts.TODAS} procesos en curso
+            </p>
           </div>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between w-full">
-            <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2rem', fontWeight: 300 }}>
-              Seguimiento de Producción
-            </h1>
-          </div>
-          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
-            {counts.TODAS} procesos en curso
-          </p>
-        </div>
-        <button 
-          onClick={() => {
-            localStorage.removeItem("mocked_created_orders");
-            window.location.reload();
-          }}
-          className="text-[10px] text-[#8B3A52] dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase transition-colors"
-        >
-          Limpiar simulador
-        </button>
-      </header>
+          <button 
+            onClick={() => {
+              localStorage.removeItem("mocked_created_orders");
+              window.location.reload();
+            }}
+            className="text-[10px] text-[#8B3A52] dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-100 underline tracking-wider font-bold uppercase transition-colors"
+          >
+            Limpiar simulador
+          </button>
+        </header>
 
       <div className="flex flex-col lg:flex-row gap-[12px] items-center mb-6 w-full">
         <div className="relative w-full lg:w-80 shrink-0">
@@ -282,13 +286,13 @@ if (trackingViewOrder) {
 
           if (filtered.length === 0) {
             return (
-              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[1.5rem] bg-[#fffcfd] dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
+              <div className="py-24 text-center border-2 border-dashed border-[#EAE0E2] dark:border-white/10 rounded-[1.5rem] bg-white/70 backdrop-blur-2xl dark:bg-black/30 backdrop-blur-md space-y-4 shadow-sm">
                 <div className="bg-white/50 dark:bg-white/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                   <Package className="h-12 w-12 text-[#8C6B79] dark:text-gray-500" />
                 </div>
-                <h3 className="text-2xl font-black text-[#40202D] dark:text-white">No se encontraron órdenes</h3>
+                <h3 className="text-2xl font-medium text-[#40202D] dark:text-white">No se encontraron órdenes</h3>
                 <p className="text-[#8C6B79] dark:text-gray-400 max-w-xs mx-auto text-sm leading-relaxed font-medium">
-                  No hay procesos de producción en la etapa <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black uppercase tracking-wider text-[11px]">"{filter}"</span> que coincidan con tu búsqueda.
+                  No hay procesos de producción en la etapa <span className="text-[#D6405F] dark:text-[#F8BBD0] font-medium uppercase tracking-wider text-[11px]">"{filter}"</span> que coincidan con tu búsqueda.
                 </p>
               </div>
             );
@@ -390,7 +394,7 @@ function ProductionCard({
 
 
   return (
-    <article className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-[#fffcfd] dark:bg-black/40 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative group hover:shadow-md">
+    <article className="overflow-hidden rounded-[1.5rem] border border-pink-100 dark:border-white/5 bg-white/70 backdrop-blur-2xl dark:bg-black/40 backdrop-blur-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 relative group hover:shadow-md">
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
@@ -402,16 +406,16 @@ function ProductionCard({
           </div>
           <div className="space-y-1 sm:space-y-2 flex-1">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <h3 className="text-xl sm:text-2xl font-black text-[#40202D] dark:text-white leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
+              <h3 className="text-xl sm:text-2xl font-medium text-[#40202D] dark:text-white leading-tight">{firstItem?.name || "Producto sin nombre"}</h3>
               <div className="flex flex-wrap gap-1.5">
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                <span className={`rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-widest shadow-sm ${
                   order.status === 'CONTROL_CALIDAD' 
                     ? 'bg-gradient-to-r from-emerald-400 to-emerald-500 text-white' 
                     : 'bg-[#D6405F] dark:bg-[rgba(80,180,120,0.15)] text-white dark:text-[#6dba8a] border border-transparent dark:border-[rgba(80,180,120,0.25)]'
                   }`}>
                   {order.status === 'CONTROL_CALIDAD' ? 'Control Calidad' : 'En Proceso'}
                 </span>
-                <span className="rounded-full bg-[rgba(139,58,82,0.12)] dark:bg-[rgba(160,80,104,0.15)] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#6b3a48] dark:text-[#c4a0ae] border border-[rgba(139,58,82,0.25)] dark:border-[rgba(160,80,104,0.2)] flex items-center gap-2 shadow-sm">
+                <span className="rounded-full bg-[rgba(139,58,82,0.12)] dark:bg-[rgba(160,80,104,0.15)] px-3 py-1 text-[10px] font-medium uppercase tracking-widest text-[#6b3a48] dark:text-[#c4a0ae] border border-[rgba(139,58,82,0.25)] dark:border-[rgba(160,80,104,0.2)] flex items-center gap-2 shadow-sm">
                   {workshopName}
                   {order.status === 'COMPLETADA' && (
                     <div className="flex gap-0.5 ml-1 border-l border-[#EAE0E2] dark:border-white/10 pl-2">
@@ -423,7 +427,7 @@ function ProductionCard({
                   const today = new Date().toISOString().split('T')[0];
                   if (localEstimatedDate?.startsWith(today)) {
                     return (
-                      <span className="rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-sm flex items-center gap-1.5">
+                      <span className="rounded-full bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm flex items-center gap-1.5">
                         <Clock className="w-3 h-3" />
                         ENTREGA HOY
                       </span>
@@ -439,11 +443,11 @@ function ProductionCard({
             <div className="flex flex-wrap items-center gap-3 mt-2">
               <p className="text-xs text-[#6b3a48] dark:text-[#c4a0ae] font-medium flex items-center gap-1.5 bg-white/30 dark:bg-white/5 px-3 py-1.5 rounded-full border border-[#EAE0E2] dark:border-white/10 shadow-sm opacity-100">
                 <CalendarClock className="w-3.5 h-3.5 text-[#D6405F] dark:text-[#F8BBD0]" />
-                Entrega estimada: <span className="text-[#6b3a48] dark:text-[#c4a0ae] font-black">{formatDate(localEstimatedDate)}</span>
+                Entrega estimada: <span className="text-[#6b3a48] dark:text-[#c4a0ae] font-medium">{formatDate(localEstimatedDate)}</span>
               </p>
               <button 
                 onClick={() => setActiveModal("DATE")} 
-                className="flex items-center gap-1 text-[10px] text-[#D6405F] dark:text-[#c4a0ae] font-black uppercase tracking-wider bg-[#D6405F]/10 dark:bg-transparent border border-transparent dark:border-[rgba(139,58,82,0.4)] px-3 py-1.5 rounded-full dark:rounded-[8px] hover:bg-[#D6405F] dark:hover:bg-[rgba(139,58,82,0.2)] hover:text-white dark:hover:text-[#e8d8dc] transition-colors shadow-sm"
+                className="flex items-center gap-1 text-[10px] text-[#D6405F] dark:text-[#c4a0ae] font-medium uppercase tracking-wider bg-[#D6405F]/10 dark:bg-transparent border border-transparent dark:border-[rgba(139,58,82,0.4)] px-3 py-1.5 rounded-full dark:rounded-[8px] hover:bg-[#D6405F] dark:hover:bg-[rgba(139,58,82,0.2)] hover:text-white dark:hover:text-[#e8d8dc] transition-colors shadow-sm"
               >
                 <Plus className="w-3 h-3" /> Prolongar
               </button>
@@ -453,7 +457,7 @@ function ProductionCard({
 
         <div className="flex flex-wrap items-center justify-between xl:justify-end gap-4 sm:gap-8 lg:gap-12 pt-4 xl:pt-0 border-t xl:border-t-0 border-[#EAE0E2] dark:border-white/10">
           <div className="space-y-1 sm:space-y-2 min-w-[120px]">
-            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-black text-[#8B3A52] dark:text-[#c4a0ae] uppercase tracking-widest opacity-70">
+            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-medium text-[#8B3A52] dark:text-[#c4a0ae] uppercase tracking-widest opacity-70">
               <span>Progreso</span>
               <span className="text-[#D6405F] dark:text-[#F8BBD0]">{getProgress()}%</span>
             </div>
@@ -525,12 +529,12 @@ function ProductionCard({
                 return (
                   <div key={wIdx} className="mb-8 last:mb-0">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                      <h4 className="text-lg font-black text-[#40202D] dark:text-white tracking-wide">
+                      <h4 className="text-lg font-medium text-[#40202D] dark:text-white tracking-wide">
                         Detalle de Producción {workshopsToRender.length > 1 && <span className="text-[#D6405F] dark:text-[#F8BBD0]">· {agentName}</span>}
                       </h4>
                     </div>
                     
-                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
+                    <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
                       <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
                         <thead className={`relative transition-[background-color,border-color] duration-[600ms]`}>
                           <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[11px] font-bold uppercase tracking-wider text-[#8B3A52] dark:text-white transition-[background-color,border-color] duration-[600ms]">
@@ -565,19 +569,19 @@ function ProductionCard({
                                 <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc]" style={{ fontSize: "0.85rem" }}>
                                   {item.id_variant?.color?.name || item.id_variant?.color}
                                 </td>
-                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-center font-black" style={{ fontSize: "0.85rem" }}>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-center font-medium" style={{ fontSize: "0.85rem" }}>
                                   {item.quantity}
                                 </td>
                                 <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-center" style={{ fontSize: "0.85rem" }}>
                                   {isPending && unitCost === 0 ? (
-                                    <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black italic">Pendiente</span>
+                                    <span className="text-[#D6405F] dark:text-[#F8BBD0] font-medium italic">Pendiente</span>
                                   ) : (
                                     `S/ ${unitCost.toFixed(2)}`
                                   )}
                                 </td>
-                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-right font-black" style={{ fontSize: "0.85rem" }}>
+                                <td className="px-6 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(255,255,255,0.04)] group-last/row:border-0 text-[#2d1f25] dark:text-[#e8d8dc] text-right font-medium" style={{ fontSize: "0.85rem" }}>
                                   {isPending && unitCost === 0 ? (
-                                    <span className="text-[#D6405F] dark:text-[#F8BBD0] font-black italic opacity-50">S/ 0.00</span>
+                                    <span className="text-[#D6405F] dark:text-[#F8BBD0] font-medium italic opacity-50">S/ 0.00</span>
                                   ) : (
                                     `S/ ${(item.quantity * unitCost).toFixed(2)}`
                                   )}

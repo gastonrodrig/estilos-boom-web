@@ -226,15 +226,15 @@ export const SupplyPlanningBoard = () => {
   return (
     <section className="mx-auto max-w-6xl px-4 space-y-6 pb-24 transition-colors duration-500">
       {/* ── Header ── */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/30 dark:bg-black/30 backdrop-blur-md px-6 py-5 rounded-3xl border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0] mb-2">
-            Inventario y alertas
-          </p>
-          <h1 className="text-3xl md:text-4xl font-black text-[#40202D] dark:text-white tracking-wide">
+      <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2 w-full transition-colors duration-500">
+        <div className="flex-1">
+          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest">
+            INVENTARIO Y ALERTAS
+          </div>
+          <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
             Inventario y Alertas
           </h1>
-          <p className="text-sm font-medium text-[#8C6B79] dark:text-gray-300 mt-1">
+          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
             Sistema de detección automática de stock bajo.
           </p>
         </div>
@@ -243,7 +243,7 @@ export const SupplyPlanningBoard = () => {
       {/* ── Stat cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
-          <p className="text-5xl font-black text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? criticalCount : "…"}</p>
+          <p className="text-5xl font-medium text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? criticalCount : "…"}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Alertas Críticas</p>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
             <AlertTriangle className="h-6 w-6 text-[#D6405F] dark:text-[#F8BBD0]" />
@@ -251,7 +251,7 @@ export const SupplyPlanningBoard = () => {
         </div>
 
         <div className="relative overflow-hidden rounded-3xl bg-white/70 dark:bg-black/50 backdrop-blur-2xl px-8 py-6 border border-[#EAE0E2] dark:border-white/10 shadow-sm transition-all hover:scale-[1.02]">
-          <p className="text-5xl font-black text-[#40202D] dark:text-white">{isStockLoaded ? lowCount : "…"}</p>
+          <p className="text-5xl font-medium text-[#40202D] dark:text-white">{isStockLoaded ? lowCount : "…"}</p>
           <p className="mt-2 text-sm font-bold uppercase tracking-wider text-[#8C6B79] dark:text-gray-400">Stock Bajo</p>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-full bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
             <TrendingDown className="h-6 w-6 text-[#8C6B79] dark:text-gray-400" />
@@ -276,7 +276,7 @@ export const SupplyPlanningBoard = () => {
       {/* ── Product list ── */}
       {!isLoading && filtered.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-black text-[#40202D] dark:text-white tracking-wide px-2">
+          <h2 className="text-xl font-medium text-[#40202D] dark:text-white tracking-wide px-2">
             Productos que Requieren Atención
           </h2>
 
@@ -346,15 +346,15 @@ export const SupplyPlanningBoard = () => {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <span className="truncate text-[18px] font-black text-[#40202D] dark:text-white tracking-wide">
+                        <span className="truncate text-[18px] font-medium text-[#40202D] dark:text-white tracking-wide">
                           {product.name}
                         </span>
-                        <span className="rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 uppercase px-3 py-1 text-[10px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 shadow-sm">
+                        <span className="rounded-full bg-white/50 dark:bg-white/10 border border-[#EAE0E2] dark:border-white/10 uppercase px-3 py-1 text-[10px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 shadow-sm">
                           {product.category?.name ?? product.gender}
                         </span>
                         {isStockLoaded && (critical > 0 || low > 0) && (
                           <span
-                            className={`rounded-full px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
+                            className={`rounded-full px-3 py-1 text-[10px] font-medium tracking-widest uppercase shadow-sm ${
                               critical > 0 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
                             }`}
                           >
@@ -364,9 +364,9 @@ export const SupplyPlanningBoard = () => {
                       </div>
 
                       <p className="mt-1 text-[13px] font-medium text-[#8C6B79] dark:text-gray-400">
-                        Stock: <span className="font-black text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? `${stockTotal} uds` : "…"}</span>
+                        Stock: <span className="font-medium text-[#D6405F] dark:text-[#F8BBD0]">{isStockLoaded ? `${stockTotal} uds` : "…"}</span>
                         <span className="mx-3 opacity-30">|</span>
-                        Mínimo: <span className="font-black text-[#40202D] dark:text-white">{minTotal} uds</span>
+                        Mínimo: <span className="font-medium text-[#40202D] dark:text-white">{minTotal} uds</span>
                       </p>
                     </div>
                   </div>
@@ -376,12 +376,12 @@ export const SupplyPlanningBoard = () => {
                       <div className="hidden md:block rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 px-4 py-2 shadow-inner">
                         <div className="flex items-center gap-1.5">
                           <Lightbulb className="h-4 w-4 text-[#D6405F] dark:text-[#F8BBD0]" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
+                          <span className="text-[10px] font-medium uppercase tracking-widest text-[#D6405F] dark:text-[#F8BBD0]">
                             Sugerencia
                           </span>
                         </div>
                         <p className="mt-1 text-[12px] font-medium text-[#8C6B79] dark:text-gray-300">
-                          Reponer <span className="font-black text-[#40202D] dark:text-white">{deficit} uds</span>
+                          Reponer <span className="font-medium text-[#40202D] dark:text-white">{deficit} uds</span>
                         </p>
                       </div>
                     )}
@@ -396,7 +396,7 @@ export const SupplyPlanningBoard = () => {
                 {isOpen && (
                   <div className="border-t border-[#EAE0E2] dark:border-white/10 bg-white/30 dark:bg-white/5 px-6 py-8 transition-all">
                     <div className="mb-6 flex items-center justify-between">
-                      <h3 className="text-[11px] font-black tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">
+                      <h3 className="text-[11px] font-medium tracking-widest text-[#8C6B79] dark:text-gray-400 uppercase">
                         Detalle por variante
                       </h3>
                     </div>
@@ -404,7 +404,7 @@ export const SupplyPlanningBoard = () => {
                     <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-[#faf5f0] dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-[12px] overflow-hidden transition-[background-color,border-color] duration-[600ms]">
                       <table className="w-full text-left border-collapse">
                         <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-black uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
+                          <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
                             <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Talla</th>
                             <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Color</th>
                             <th className="px-4 py-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Stock</th>
@@ -432,7 +432,7 @@ export const SupplyPlanningBoard = () => {
 
                             return (
                               <tr key={key} className={`transition-colors group/row ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-                                <td className="px-4 py-5 text-[13px] font-black text-[#40202D] dark:text-white">
+                                <td className="px-4 py-5 text-[13px] font-medium text-[#40202D] dark:text-white">
                                   {variant.size || "-"}
                                 </td>
                                 <td className="px-4 py-5 text-[13px] font-bold text-[#8C6B79] dark:text-gray-300 flex items-center gap-2">
@@ -441,11 +441,11 @@ export const SupplyPlanningBoard = () => {
                                   )}
                                   <span>{variant.color?.name || "-"}</span>
                                 </td>
-                                <td className={`px-4 py-5 text-[15px] font-black ${stock < minimum ? 'text-[#D6405F] dark:text-[#F8BBD0]' : 'text-[#40202D] dark:text-white'}`}>
+                                <td className={`px-4 py-5 text-[15px] font-medium ${stock < minimum ? 'text-[#D6405F] dark:text-[#F8BBD0]' : 'text-[#40202D] dark:text-white'}`}>
                                   {stockLoaded ? stock : <span className="text-gray-300 animate-pulse">…</span>}
                                 </td>
                                 <td className="px-4 py-5">
-                                  <div className="inline-flex min-w-[40px] items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-3 py-1 text-[12px] font-black text-[#8C6B79] dark:text-gray-400 shadow-inner">
+                                  <div className="inline-flex min-w-[40px] items-center justify-center rounded-xl border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-black/30 backdrop-blur-md px-3 py-1 text-[12px] font-medium text-[#8C6B79] dark:text-gray-400 shadow-inner">
                                     {minimum}
                                   </div>
                                 </td>
@@ -458,7 +458,7 @@ export const SupplyPlanningBoard = () => {
                                   </div>
                                 </td>
                                 <td className="px-4 py-5">
-                                  <span className={`text-[11px] font-black uppercase tracking-wider ${status.tone} flex items-center gap-1.5`}>
+                                  <span className={`text-[11px] font-medium uppercase tracking-wider ${status.tone} flex items-center gap-1.5`}>
                                     {status.icon}
                                     {status.label}
                                   </span>
@@ -486,7 +486,7 @@ export const SupplyPlanningBoard = () => {
                                         minimum: variant.min_stock_alert ?? 10,
                                         requestUnits: Math.max(1, minimum - stock),
                                       })}
-                                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm
+                                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 px-4 text-[10px] font-medium uppercase tracking-widest transition-all shadow-sm
                                         ${checked 
                                           ? 'bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white' 
                                           : 'bg-white/50 dark:bg-white/5 text-[#8C6B79] dark:text-gray-400 hover:bg-white/80 dark:hover:bg-white/10 border border-[#EAE0E2] dark:border-white/10'
@@ -495,7 +495,7 @@ export const SupplyPlanningBoard = () => {
                                       {checked ? <Check className="h-4 w-4" /> : 'AÑADIR'}
                                     </button>
                                   ) : (
-                                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-full">En camino</span>
+                                    <span className="text-[10px] font-medium text-blue-500 uppercase tracking-widest bg-blue-50 dark:bg-blue-500/10 px-3 py-1.5 rounded-full">En camino</span>
                                   )}
                                 </td>
                               </tr>
@@ -513,7 +513,7 @@ export const SupplyPlanningBoard = () => {
                             <FilePlus2 className="h-6 w-6" />
                           </div>
                           <div>
-                            <p className="text-[14px] font-black text-[#40202D] dark:text-white tracking-wide">Abastecimiento en curso</p>
+                            <p className="text-[14px] font-medium text-[#40202D] dark:text-white tracking-wide">Abastecimiento en curso</p>
                             <p className="text-[12px] font-bold text-[#8C6B79] dark:text-gray-400 mt-0.5">
                               {selectedVariantsForThisProduct.length} variantes seleccionadas · <span className="text-[#D6405F] dark:text-[#F8BBD0]">{totalRequestUnits} uds a reponer</span>
                             </p>
@@ -523,13 +523,13 @@ export const SupplyPlanningBoard = () => {
                         <div className="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
                           <button
                             onClick={() => setSelected({})}
-                            className="flex items-center justify-center gap-2 rounded-xl bg-white/50 dark:bg-white/5 px-6 py-3 text-[12px] font-black text-[#8C6B79] dark:text-gray-400 border border-[#EAE0E2] dark:border-white/10 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm w-full md:w-auto"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-white/50 dark:bg-white/5 px-6 py-3 text-[12px] font-medium text-[#8C6B79] dark:text-gray-400 border border-[#EAE0E2] dark:border-white/10 hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm w-full md:w-auto"
                           >
                             <Trash2 className="h-4 w-4" /> Limpiar
                           </button>
                           <button
                             onClick={startSupply}
-                            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-8 py-3 text-[12px] font-black uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto"
+                            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] px-8 py-3 text-[12px] font-medium uppercase tracking-widest text-white shadow-lg hover:scale-[1.02] transition-all w-full md:w-auto"
                           >
                             <Package2 className="h-4 w-4" /> Orden de precompra
                           </button>
@@ -567,7 +567,7 @@ export const SupplyPlanningBoard = () => {
                       key={pNum}
                       type="button"
                       onClick={() => setPage(pNum)}
-                      className={`min-w-[36px] h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer
+                      className={`min-w-[36px] h-9 rounded-xl text-xs font-medium uppercase tracking-widest transition-all cursor-pointer
                         ${page === pNum
                           ? "bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white shadow-md"
                           : "text-[#8C6B79] hover:text-[#40202D] dark:hover:text-white hover:bg-white/80 dark:hover:bg-white/10"

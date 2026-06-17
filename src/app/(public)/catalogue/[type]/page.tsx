@@ -56,14 +56,14 @@ export default function CollectionPage() {
         sub: "Descubre las últimas tendencias en moda femenina.",
       },
       "best-seller": {
-        titleMain: "Best Sellers",
+        titleMain: "Más Vendidos",
         titleItalic: "Favoritos",
-        sub: "Las prendas más amadas por nuestra comunidad.",
+        sub: "Las prendas favoritas de nuestra comunidad, ahora a tu alcance.",
       },
       dresses: {
-        titleMain: "Vestidos",
-        titleItalic: "Exclusivos",
-        sub: "Diseños pensados para resaltar tu esencia.",
+        titleMain: "Rebajas Especiales",
+        titleItalic: "50% Menos",
+        sub: "Descubre prendas exclusivas a mitad de precio. ¡Solo por tiempo limitado!",
       },
     };
     return (

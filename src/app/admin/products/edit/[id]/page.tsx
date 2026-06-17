@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useProductStore, useCategoryStore, useSupplyStore } from '@/hooks'; // 🚀 Inyectamos useSupplyStore
 import Link from 'next/link';
 import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler, Layers, Trash2 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CSS_COLORS_PALETTE, ColorObject } from '@/core/constants';
@@ -15,8 +16,9 @@ interface SupplyItemInput {
   unit: string;
 }
 
-export default function CreateProductPage() {
-  const { createProduct, loading: loadingProducts } = useProductStore();
+export default function EditProductPage() {
+  const { getProductById, updateProduct, loading: loadingProducts } = useProductStore();
+  const { id } = useParams();
   const { categories, startLoadingCategories } = useCategoryStore();
   
   // 🚀 Cargamos la infraestructura de insumos reales de la base de datos
@@ -35,12 +37,11 @@ export default function CreateProductPage() {
     season: '',
     id_category: '',
     origin_type: 'RETAIL', // 'RETAIL' o 'PRODUCCION'
-    is_active: true,
-    is_best_seller: false,
-    is_new_in: true,
   });
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   
   // 🎨 Estados del Módulo de Colores Avanzado
@@ -92,91 +93,54 @@ export default function CreateProductPage() {
     setVariants(newVariants);
   }, [formData.sku]);
 
-  // Generar SKU base a partir de nombre, temporada y composición/material
-  const generateBaseSKU = () => {
-    if (!formData.name || !formData.season || !formData.composition) {
-      toast.error("Por favor completa los campos: Nombre, Temporada y Material / Tela para poder generar el SKU.");
-      return;
-    }
-
-    // Abreviatura del nombre (ej. VEST para Vestido Gala)
-    const cleanName = formData.name
-      .trim()
-      .toUpperCase()
-      .replace(/[^A-Z0-9\s]/g, "");
-    const nameWords = cleanName.split(/\s+/).filter(Boolean);
-    let nameAbbr = "";
-    if (nameWords.length >= 2) {
-      nameAbbr = (nameWords[0].slice(0, 2) + nameWords[1].slice(0, 2)).padEnd(4, "X");
-    } else if (nameWords.length === 1) {
-      nameAbbr = nameWords[0].slice(0, 4).padEnd(4, "X");
-    } else {
-      nameAbbr = "PROD";
-    }
-
-    // Abreviatura de temporada (ej. PRIM26 para PRIMAVERA 2026)
-    const cleanSeason = formData.season
-      .trim()
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, "");
-    const seasonAbbr = cleanSeason.slice(0, 5).padEnd(4, "X");
-
-    // Abreviatura de material/composición (ej. ALGO para Algodón)
-    const cleanComp = formData.composition
-      .trim()
-      .toUpperCase()
-      .replace(/[0-9%]/g, "")
-      .replace(/[^A-Z0-9]/g, "");
-    const compAbbr = cleanComp.slice(0, 4).padEnd(4, "X");
-
-    const generatedSku = `${nameAbbr}-${seasonAbbr}-${compAbbr}`;
-    setFormData(prev => ({ ...prev, sku: generatedSku }));
-    toast.success(`SKU generado: ${generatedSku}`);
-  };
-
   // Carga inicial de datos desde la API
   useEffect(() => {
     startLoadingCategories();
-    startLoadingSupplies(); // 🚀 Trae los insumos activos registrados en el sistema
-  }, [startLoadingCategories, startLoadingSupplies]);
+    startLoadingSupplies();
+    
+    const fetchProduct = async () => {
+      if (id) {
+        const product = await getProductById(id as string);
+        if (product) {
+          setFormData({
+            name: product.name,
+            description: product.description || '',
+            sku: product.sku,
+            base_price: product.base_price,
+            gender: product.gender || 'MUJER',
+            composition: product.composition || '',
+            season: product.season || '',
+            id_category: typeof product.id_category === 'object' ? product.id_category._id : product.id_category,
+            origin_type: product.origin_type || 'RETAIL'
+          });
+          setExistingImages(product.images || []);
+          setVariants(product.variants || []);
+          setTechnicalSheet(product.technical_sheet || []);
+          
+          if (product.variants) {
+             const sizes = Array.from(new Set(product.variants.map((v: any) => v.size)));
+             setSelectedSizes(sizes as string[]);
+             
+             const colorsMap = new Map();
+             product.variants.forEach((v: any) => {
+               if (v.color && v.color.name && !colorsMap.has(v.color.name)) {
+                 colorsMap.set(v.color.name, v.color);
+               }
+             });
+             setSelectedColors(Array.from(colorsMap.values()));
+          }
+        }
+        setInitialLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id, startLoadingCategories, startLoadingSupplies, getProductById]);
 
   useEffect(() => {
-    generateVariants(selectedSizes, selectedColors);
-  }, [selectedSizes, selectedColors, generateVariants]);
+    if (initialLoading) return;
+  }, [selectedSizes, selectedColors]);
 
-  const toggleSize = (size: string) => {
-    setSelectedSizes(prev => 
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-    );
-  };
-
-  const handleSelectColor = (color: ColorObject) => {
-    if (selectedColors.some(c => c.name.toLowerCase() === color.name.toLowerCase())) {
-      return toast.error("Este color ya fue seleccionado.");
-    }
-    setSelectedColors([...selectedColors, color]);
-    const next = [...selectedColors, color];
-    setSelectedColors(next);
-    generateVariants(selectedSizes, next);
-    setColorSearch('');
-    setShowColorDropdown(false);
-  };
-
-  const handleAddCustomColor = () => {
-    if (!customColorName.trim()) return toast.error("Escribe el nombre del color.");
-    const next = [...selectedColors, { name: customColorName.trim(), hex: customColorHex }];
-    setSelectedColors(next);
-    generateVariants(selectedSizes, next);
-    setCustomColorName('');
-    setIsCreatingCustomColor(false);
-  };
-
-  const handleRemoveColor = (colorName: string) => {
-    const next = selectedColors.filter(c => c.name !== colorName);
-    setSelectedColors(next);
-    generateVariants(selectedSizes, next);
-  };
-
+  
   // 🧵 Gestión de Ficha Técnica vinculando IDs reales de MongoDB
   const handleAddInsumo = () => {
     if (!selectedInsumoId) return toast.error("Selecciona un insumo válido.");
@@ -202,6 +166,38 @@ export default function CreateProductPage() {
     ]);
     setSelectedInsumoId('');
     setInsumoQuantity(1);
+  };
+
+  const toggleSize = (size: string) => {
+    setSelectedSizes(prev => {
+        const next = prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size];
+        generateVariants(next, selectedColors);
+        return next;
+    });
+  };
+  const handleSelectColor = (color: ColorObject) => {
+    if (selectedColors.some(c => c.name.toLowerCase() === color.name.toLowerCase())) {
+      return toast.error("Este color ya fue seleccionado.");
+    }
+    const next = [...selectedColors, color];
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
+    setColorSearch('');
+    setShowColorDropdown(false);
+  };
+  const handleAddCustomColor = () => {
+    if (!customColorName.trim()) return toast.error("Escribe el nombre del color.");
+    const next = [...selectedColors, { name: customColorName.trim(), hex: customColorHex }];
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
+    setCustomColorName('');
+    setIsCreatingCustomColor(false);
+  };
+  
+  const handleRemoveColor = (colorName: string) => {
+    const next = selectedColors.filter(c => c.name !== colorName);
+    setSelectedColors(next);
+    generateVariants(selectedSizes, next);
   };
 
   const handleRemoveInsumo = (index: number) => {
@@ -254,8 +250,8 @@ export default function CreateProductPage() {
     if (!formData.name || !formData.sku || !formData.id_category) {
       return toast.error("Por favor completa los campos obligatorios (*)");
     }
-    if (selectedImages.length === 0) {
-      return toast.error("Debes subir al menos una imagen");
+    if (selectedImages.length === 0 && existingImages.length === 0) {
+      return toast.error("Debes subir o tener al menos una imagen");
     }
     if (variants.length === 0) {
       return toast.error("Debes seleccionar al menos una talla y un color.");
@@ -271,9 +267,6 @@ export default function CreateProductPage() {
     data.append("id_category", formData.id_category);
     data.append("season", formData.season);
     data.append("origin_type", formData.origin_type);
-    data.append("is_active", formData.is_active.toString());
-    data.append("is_best_seller", formData.is_best_seller.toString());
-    data.append("is_new_in", formData.is_new_in.toString());
     data.append("variants", JSON.stringify(variants));
 
     // Si es producción propia, limpiamos el objeto antes de enviarlo
@@ -287,8 +280,9 @@ export default function CreateProductPage() {
     }
 
     selectedImages.forEach((file) => data.append("files", file));
+    // Nota: si no se envían nuevas imágenes, el backend conserva las actuales automáticamente.
 
-    const result = await createProduct(data);
+    const result = await updateProduct(id as string, data);
     if (result) router.push("/admin/products");
   };
 
@@ -300,6 +294,14 @@ export default function CreateProductPage() {
 
   const getSelectableBtnClass = (isSelected: boolean, extraClasses: string = "p-4") => 
     `${extraClasses} text-center transition-all text-[0.82rem] font-medium border rounded-[8px] ${isSelected ? 'bg-[rgba(139,58,82,0.3)] border-[#8B3A52] text-white' : 'bg-transparent border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.1)] text-[#8B3A52]/60 dark:text-[#a08088] hover:text-[#8B3A52] dark:hover:text-white hover:border-[#8B3A52]/40 dark:hover:border-[rgba(255,255,255,0.2)]'}`;
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5efe8] dark:bg-[#1e1018]">
+        <div className="animate-pulse text-[#8B3A52] dark:text-[#F8BBD0] font-medium text-xl">Cargando producto...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-8 text-[#2d1f25] dark:text-[#e8d8dc] bg-[#f5efe8] dark:bg-[#1e1018] relative z-10 transition-[background-color,border-color] duration-[600ms]">
@@ -315,7 +317,7 @@ export default function CreateProductPage() {
             className="text-white flex items-center gap-2 disabled:opacity-50 transition-all font-medium"
             style={{ background: '#8B3A52', borderRadius: '10px', fontSize: '0.82rem', padding: '10px 24px', letterSpacing: '0.05em' }}
           >
-            {loadingProducts ? 'Guardando...' : <><Save size={18} /> Guardar producto</>}
+            {loadingProducts ? 'Actualizando...' : <><Save size={18} /> Actualizar producto</>}
           </button>
         </div>
       </div>
@@ -324,13 +326,22 @@ export default function CreateProductPage() {
         {/* COLUMNA IZQUIERDA: IMÁGENES */}
         <div className="md:col-span-4 flex flex-col gap-[24px]">
           <div className={sectionClass}>
-            <h3 className={titleClass}>Imágenes ({selectedImages.length}/5)</h3>
+            <h3 className={titleClass}>Imágenes ({selectedImages.length + existingImages.length}/5)</h3>
             <input type="file" id="file-upload" multiple accept="image/*" className="hidden" onChange={handleImageChange} />
             <label htmlFor="file-upload" className="border-[2px] border-dashed border-[rgba(139,58,82,0.2)] dark:border-[rgba(160,80,104,0.3)] rounded-[12px] p-8 flex flex-col items-center justify-center cursor-pointer transition-colors group hover:border-[rgba(139,58,82,0.5)] dark:hover:border-[rgba(160,80,104,0.6)] hover:bg-[rgba(139,58,82,0.02)] dark:hover:bg-[rgba(160,80,104,0.05)]">
               <Upload className="text-[#8B3A52] dark:text-[#a05068] mb-2 group-hover:scale-110 transition-transform" size={32} />
               <p className="text-xs text-center opacity-60 group-hover:opacity-100 font-bold uppercase tracking-wider text-[#2d1f25] dark:text-[#e8d8dc]">Haz clic para subir fotos</p>
             </label>
             <div className="grid grid-cols-3 gap-2 mt-4">
+              {existingImages.map((img, idx) => (
+                <div key={`exist-${idx}`} className="relative aspect-square bg-white/50 dark:bg-white/10 rounded-xl overflow-hidden group border border-[#EAE0E2] dark:border-white/10 shadow-sm">
+                  <img src={img} className="object-cover w-full h-full" alt="preview" />
+                  <div className="absolute top-0 right-0 bg-black/60 backdrop-blur-md text-white p-1 rounded-bl-xl text-[10px]">Actual</div>
+                  <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== idx))} className="absolute top-1 left-1 bg-black/60 backdrop-blur-md text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500">
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
               {selectedImages.map((file, idx) => (
                 <div key={idx} className="relative aspect-square bg-white/50 dark:bg-white/10 rounded-xl overflow-hidden group border border-[#EAE0E2] dark:border-white/10 shadow-sm">
                   <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" alt="preview" />
@@ -410,16 +421,7 @@ export default function CreateProductPage() {
             <div className="grid grid-cols-2 gap-[16px]">
               <div>
                 <label className={labelClass}>SKU Base *</label>
-                <div className="flex gap-2">
-                  <input type="text" className={`${inputClass} flex-1`} placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
-                  <button
-                    type="button"
-                    onClick={generateBaseSKU}
-                    className="px-4 bg-[#8B3A52] hover:bg-[#a05068] text-white text-xs font-bold rounded-[10px] hover:scale-105 active:scale-95 transition-all shadow-md shrink-0 flex items-center justify-center uppercase tracking-wider"
-                  >
-                    Generar SKU
-                  </button>
-                </div>
+                <input type="text" className={inputClass} placeholder="Ej: VEST-GALA-01" value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })} />
               </div>
               <div>
                 <label className={labelClass}>Género *</label>
@@ -435,51 +437,6 @@ export default function CreateProductPage() {
             <div>
               <label className={labelClass}>Descripción</label>
               <textarea className={`${inputClass} h-[80px]`} placeholder="Describe el producto..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}></textarea>
-            </div>
-          </div>
-
-          {/* Estados y Promoción */}
-          <div className={sectionClass}>
-            <h3 className={titleClass}>Estados y Promoción</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
-                />
-                <div>
-                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Producto Activo</span>
-                  <p className="text-[10px] text-gray-400 font-medium">Visible en catálogo y compras.</p>
-                </div>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={formData.is_best_seller}
-                  onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
-                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
-                />
-                <div>
-                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Best Seller</span>
-                  <p className="text-[10px] text-gray-400 font-medium">Destacado como más vendido.</p>
-                </div>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={formData.is_new_in}
-                  onChange={(e) => setFormData({ ...formData, is_new_in: e.target.checked })}
-                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
-                />
-                <div>
-                  <span className="text-sm font-bold text-[#40202D] dark:text-white group-hover:text-[#8B3A52] dark:group-hover:text-white transition-colors">Nuevo Ingreso (New In)</span>
-                  <p className="text-[10px] text-gray-400 font-medium">Etiquetado como novedad.</p>
-                </div>
-              </label>
             </div>
           </div>
 

@@ -29,7 +29,7 @@ export const WorkerSelector = ({
                   <UserCircle className="h-7 w-7" />
                 </div>
                 <div>
-                    <p className="text-[15px] font-black tracking-wide text-[#40202D] dark:text-white">Trabajador responsable</p>
+                    <p className="text-[15px] font-medium tracking-wide text-[#40202D] dark:text-white">Trabajador responsable</p>
                     <p className="text-[11px] font-medium text-[#8C6B79] dark:text-gray-400 mt-0.5">
                         {isAdmin ? "Persona que registrará la orden" : "Tu usuario actual"}
                     </p>
