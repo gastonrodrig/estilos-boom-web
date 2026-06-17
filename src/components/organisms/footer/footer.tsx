@@ -68,10 +68,10 @@ export const Footer = () => {
             </h3>
             <div className="w-[24px] h-[1px] bg-[#8B3A52] mt-3 mb-6" />
             <ul className="space-y-4">
-              <li><AnimatedLink href="/shipping">Envíos y Entregas</AnimatedLink></li>
-              <li><AnimatedLink href="/payment">Medios de Pago</AnimatedLink></li>
-              <li><AnimatedLink href="/terms">Términos Legales</AnimatedLink></li>
-              <li><AnimatedLink href="/refund">Devoluciones</AnimatedLink></li>
+              <li><AnimatedLink href="/home">Envíos y Entregas</AnimatedLink></li>
+              <li><AnimatedLink href="/home">Medios de Pago</AnimatedLink></li>
+              <li><AnimatedLink href="/home">Términos Legales</AnimatedLink></li>
+              <li><AnimatedLink href="/home">Devoluciones</AnimatedLink></li>
             </ul>
           </div>
 

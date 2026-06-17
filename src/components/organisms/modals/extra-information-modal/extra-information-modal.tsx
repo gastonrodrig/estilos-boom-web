@@ -103,6 +103,8 @@ export const ExtraInformationModal = ({ open, onClose }: ExtraInformationModalPr
       onClose={onClose}
       title="Complete la información adicional"
       description="Por favor, proporciona la siguiente información adicional para completar tu perfil."
+      panelClassName="relative bg-white/80 dark:bg-[#1a0f18]/90 backdrop-blur-3xl border border-[#EAE0E2] dark:border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl space-y-6"
+      titleClassName="text-2xl font-medium text-[#632034] dark:text-[#f0a0c0] tracking-wide text-center"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="my-6 space-y-4 max-h-[55vh] overflow-y-auto pt-4 pr-2 custom-scrollbar">

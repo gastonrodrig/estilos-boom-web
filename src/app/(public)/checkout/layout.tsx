@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { CheckoutFormValues } from '@/core/models/checkout';
 
@@ -27,6 +27,21 @@ const CheckoutLayout: React.FC<CheckoutLayoutProps> = ({ children }) => {
     },
   });
 
+  const [stars, setStars] = useState<{ width: string; height: string; top: string; left: string; backgroundColor: string; opacity: number; animation: string }[]>([]);
+
+  useEffect(() => {
+    const generatedStars = Array.from({ length: 12 }).map(() => ({
+      width: Math.random() > 0.5 ? '1px' : '2px',
+      height: Math.random() > 0.5 ? '1px' : '2px',
+      top: Math.random() * 80 + 2 + '%',
+      left: Math.random() * 100 + '%',
+      backgroundColor: Math.random() < 0.7 ? '#e8b86d' : '#fdeef5',
+      opacity: Math.random() * 0.3 + 0.2,
+      animation: `twinkle ${Math.random() * 4 + 2}s ease-in-out ${Math.random() * 2}s infinite`,
+    }));
+    setStars(generatedStars);
+  }, []);
+
   return (
     <FormProvider {...methods}>
       <div className="min-h-screen py-12 relative overflow-hidden">
@@ -50,26 +65,26 @@ const CheckoutLayout: React.FC<CheckoutLayoutProps> = ({ children }) => {
               </filter>
             </defs>
           </svg>
-
+ 
           <div className="fixed pointer-events-none z-0" style={{ top: '6%', right: '5%', width: '45px', height: '45px', opacity: 0.15, transform: 'rotate(-20deg)', animation: 'lunaPulse 6s ease-in-out infinite', '--luna-opacity': 0.15 } as React.CSSProperties}>
             <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
               <circle cx="50" cy="50" r="28" fill="#e8b86d" filter="url(#lunaGlowCheckout)" opacity="0.9"/>
               <circle cx="62" cy="50" r="24" fill="#0d0408"/>
             </svg>
           </div>
-
-          {Array.from({ length: 12 }).map((_, i) => (
+ 
+          {stars.map((star, i) => (
             <div 
               key={i}
               className="absolute rounded-full"
               style={{
-                width: Math.random() > 0.5 ? '1px' : '2px',
-                height: Math.random() > 0.5 ? '1px' : '2px',
-                top: Math.random() * 80 + 2 + '%',
-                left: Math.random() * 100 + '%',
-                backgroundColor: Math.random() < 0.7 ? '#e8b86d' : '#fdeef5',
-                opacity: Math.random() * 0.3 + 0.2,
-                animation: `twinkle ${Math.random() * 4 + 2}s ease-in-out ${Math.random() * 2}s infinite`,
+                width: star.width,
+                height: star.height,
+                top: star.top,
+                left: star.left,
+                backgroundColor: star.backgroundColor,
+                opacity: star.opacity,
+                animation: star.animation,
               }}
             />
           ))}

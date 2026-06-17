@@ -112,7 +112,7 @@ export const SummerSale = () => {
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <CTA href="/new-in">
+                  <CTA href="/catalogue/new-in">
                     VER COLECCIÓN
                   </CTA>
                 </motion.div>

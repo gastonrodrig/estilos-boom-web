@@ -44,16 +44,16 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             aria-describedby={helperId}
             className={`
               peer w-full rounded-full
-              border ${error ? "border-red-400" : "border-neutral-300"}
-              bg-white 
+              border ${error ? "border-red-400" : "border-neutral-300 dark:border-white/20"}
+              bg-white dark:bg-[#1a0f18]
               px-4 sm:px-6 
               py-2.5 sm:py-3
-              text-sm sm:text-[15px] text-neutral-700
+              text-sm sm:text-[15px] text-neutral-700 dark:text-white
               outline-none transition-all duration-200
 
               ${error
                 ? "focus:border-red-400 focus:ring-2 focus:ring-red-200"
-                : "focus:border-[#f2b6c1] focus:ring-2 focus:ring-[#f2b6c1]/30"
+                : "focus:border-[#f2b6c1] dark:focus:border-[#e8688a] focus:ring-2 focus:ring-[#f2b6c1]/30 dark:focus:ring-[#e8688a]/30"
               }
 
               ${className}
@@ -63,10 +63,10 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           <label
             htmlFor={id}
             className={`
-              pointer-events-none absolute left-4 sm:left-6
+              pointer-events-none absolute left-4
               top-1/2 -translate-y-1/2
-              bg-white px-2
-              text-sm sm:text-[15px] ${error ? "text-red-500" : "text-neutral-500"}
+              bg-white dark:bg-[#1a0f18] px-1 whitespace-nowrap max-w-[calc(100%-2rem)] truncate
+              text-sm sm:text-[15px] ${error ? "text-red-500" : "text-neutral-500 dark:text-neutral-400"}
               transition-all duration-200
 
               peer-focus:top-0
@@ -75,7 +75,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
               peer-not-placeholder-shown:top-0
               peer-not-placeholder-shown:text-xs
 
-              ${error ? "peer-focus:text-red-500 peer-not-placeholder-shown:text-red-500" : "peer-focus:text-neutral-600 peer-not-placeholder-shown:text-neutral-600"}
+              ${error ? "peer-focus:text-red-500 peer-not-placeholder-shown:text-red-500" : "peer-focus:text-neutral-600 dark:peer-focus:text-neutral-300 peer-not-placeholder-shown:text-neutral-600 dark:peer-not-placeholder-shown:text-neutral-300"}
             `}
           >
             {label}

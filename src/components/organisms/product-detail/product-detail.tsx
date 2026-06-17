@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { Star, Heart, ChevronDown, RefreshCcw, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { CartItem, Product } from "@/core/models";
@@ -19,6 +20,7 @@ type VariantUI = {
   id_variant: string;
   size: string;
   color: string;
+  color_hex: string;
   stock: number;
   sku_variant: string;
 };
@@ -69,6 +71,7 @@ export const ProductDetail = ({ product }: Props) => {
             id_variant: v.id_variant ?? "",
             size: v.size ?? "",
             color: typeof v.color === 'string' ? v.color : (v.color?.name ?? ""),
+            color_hex: typeof v.color === 'object' && v.color !== null ? (v.color.hex ?? "#F2D0D3") : "#F2D0D3",
             stock: Number(v.stock ?? 0),
             sku_variant: v.sku_variant ?? "",
           }))
@@ -76,12 +79,17 @@ export const ProductDetail = ({ product }: Props) => {
     [product.variants],
   );
 
-  const uniqueColors = useMemo(
-    () => Array.from(new Set(variants.map((v) => v.color).filter(Boolean))),
-    [variants],
-  );
+  const uniqueColors = useMemo(() => {
+    const map = new Map<string, string>();
+    variants.forEach((v) => {
+      if (v.color && !map.has(v.color)) {
+        map.set(v.color, v.color_hex);
+      }
+    });
+    return Array.from(map.entries()).map(([name, hex]) => ({ name, hex }));
+  }, [variants]);
 
-  const [selectedColor, setSelectedColor] = useState<string>(uniqueColors[0] ?? "");
+  const [selectedColor, setSelectedColor] = useState<string>(uniqueColors[0]?.name ?? "");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(product.images?.[0] ?? "/placeholder.jpg");
@@ -148,8 +156,8 @@ export const ProductDetail = ({ product }: Props) => {
     <div className="min-h-screen bg-[#FAF9F6] dark:bg-transparent text-[#594246] dark:text-[#f0d8e8] font-sans transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <nav className="breadcrumb text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-[#e8688a]/80 mb-10 flex gap-2">
-          <span className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">INICIO</span> /
-          <span className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">CATÁLOGO</span> /
+          <Link href="/" className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">INICIO</Link> /
+          <Link href="/catalogue/all" className="hover:text-[#632034] dark:hover:text-[#f0a0c0] cursor-pointer transition-colors">CATÁLOGO</Link> /
           <span className="active font-bold text-[#632034] dark:text-[#f0a0c0] uppercase">{product.name}</span>
         </nav>
 
@@ -225,24 +233,24 @@ export const ProductDetail = ({ product }: Props) => {
                 COLOR: <span className="font-light text-gray-500 dark:text-[#f0d8e8]/70 uppercase">{selectedColor || "SELECCIONAR"}</span>
               </span>
               <div className="flex gap-4">
-                {uniqueColors.map((color) => (
+                {uniqueColors.map((colorObj) => (
                   <button
-                    key={color}
+                    key={colorObj.name}
                     onClick={() => {
-                      setSelectedColor(color);
+                      setSelectedColor(colorObj.name);
                       setSelectedSize("");
                       setQuantity(1);
                     }}
                     className={`color-swatch w-9 h-9 rounded-full border transition-all flex items-center justify-center ${
-                      selectedColor === color ? "active border-[#C5A059] dark:border-white p-[3px] scale-110" : "border-[#EBEAE8] dark:border-transparent"
+                      selectedColor === colorObj.name ? "active border-[#C5A059] dark:border-white p-[3px] scale-110" : "border-[#EBEAE8] dark:border-transparent"
                     }`}
                   >
                     <div
                       className="w-full h-full rounded-full border border-white"
                       style={{
-                        backgroundColor:
-                          color === "Negro" ? "#000" : color === "Blanco" ? "#fff" : "#F2D0D3",
+                        backgroundColor: colorObj.hex,
                       }}
+                      title={colorObj.name}
                     />
                   </button>
                 ))}
