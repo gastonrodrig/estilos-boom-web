@@ -8,25 +8,7 @@ import { getFirebaseAuthToken } from '@helpers';
 import { getAuthConfig } from '@utils';
 import { useAuthStore } from '@hooks';
 
-// Mock Data for pending reviews
-const PENDING_REVIEWS = [
-  {
-    id: 1,
-    name: "Blusa Romántica",
-    size: "S",
-    orderId: "0038",
-    deliveryDate: "10 de mayo, 2026",
-    image: "/assets/product/vestido-corto-floral-cuello-v.png",
-  },
-  {
-    id: 2,
-    name: "Falda Midi Elegante",
-    size: "M",
-    orderId: "0038",
-    deliveryDate: "10 de mayo, 2026",
-    image: "/assets/product/vestido-elegante-encaje-volantes.png",
-  }
-];
+
 
 const RATING_PHRASES: Record<number, string> = {
   1: "No era lo que esperaba 😔",
@@ -40,6 +22,8 @@ export default function ReviewsPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
   const [completedReviews, setCompletedReviews] = useState<any[]>([]);
   const [loadingCompleted, setLoadingCompleted] = useState(false);
+  const [pendingReviews, setPendingReviews] = useState<any[]>([]);
+  const [loadingPending, setLoadingPending] = useState(false);
   const { status } = useAuthStore();
 
   useEffect(() => {
@@ -65,6 +49,28 @@ export default function ReviewsPage() {
         }
       };
       loadCompletedReviews();
+    } else if (activeTab === 'pending') {
+      const loadPendingReviews = async () => {
+        if (status === 'checking') return;
+
+        if (status !== 'authenticated') {
+          setPendingReviews([]);
+          setLoadingPending(false);
+          return;
+        }
+
+        setLoadingPending(true);
+        try {
+          const token = await getFirebaseAuthToken();
+          const { data } = await reviewsApi.get('/user/pending', getAuthConfig({ token }));
+          setPendingReviews(data || []);
+        } catch (error) {
+          console.error("Error loading pending reviews:", error);
+        } finally {
+          setLoadingPending(false);
+        }
+      };
+      loadPendingReviews();
     }
   }, [activeTab, status]);
 
@@ -123,9 +129,27 @@ export default function ReviewsPage() {
 
       {/* Review Cards */}
       <div className="space-y-8 relative z-10">
-        {activeTab === 'pending' && PENDING_REVIEWS.map((product) => (
-          <ReviewCard key={product.id} product={product} />
-        ))}
+        {activeTab === 'pending' && (
+          loadingPending ? (
+            <p className="text-center text-[#594246]/50">Cargando productos pendientes...</p>
+          ) : pendingReviews.length > 0 ? (
+            pendingReviews.map((product) => (
+              <ReviewCard 
+                key={`${product.id}-${product.orderId}`} 
+                product={product} 
+                onReviewSubmitted={() => {
+                  setPendingReviews(prev => prev.filter(p => !(p.id === product.id && p.orderId === product.orderId)));
+                  setCompletedReviews([]); // Reset to force refetch when switching tabs
+                }}
+              />
+            ))
+          ) : (
+            <div className="py-20 flex flex-col items-center justify-center text-[#594246]/40 dark:text-[#f8f0f5]/40 bg-white/60 backdrop-blur-sm rounded-3xl border border-[#EBEAE8] shadow-sm">
+              <Camera className="w-16 h-16 mb-4 stroke-1 opacity-50" />
+              <p className="text-lg font-medium">No tienes productos pendientes de reseñar.</p>
+            </div>
+          )
+        )}
 
         {activeTab === 'completed' && (
           loadingCompleted ? (
@@ -174,7 +198,7 @@ export default function ReviewsPage() {
 }
 
 // Separate component for the review card to handle its own state
-function ReviewCard({ product }: { product: any }) {
+function ReviewCard({ product, onReviewSubmitted }: { product: any, onReviewSubmitted?: () => void }) {
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [reviewText, setReviewText] = useState("");
@@ -281,6 +305,7 @@ function ReviewCard({ product }: { product: any }) {
                 alert('¡Reseña publicada con éxito!');
                 setReviewText("");
                 setRating(0);
+                if (onReviewSubmitted) onReviewSubmitted();
               } catch (error) {
                 console.error("Error submitting review:", error);
                 alert('Hubo un error al publicar tu reseña. Por favor intenta de nuevo.');

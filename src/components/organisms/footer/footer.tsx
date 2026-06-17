@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
 import { FacebookIcon, InstagramIcon, Logo, TiktokIcon } from "@/components/atoms";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Modal } from "@/components/atoms/modal/modal";
+import { Mail, MapPin, Phone, Truck, CreditCard, FileText, RefreshCw } from "lucide-react";
 
 export const Footer = () => {
   const TopSeparator = () => (
@@ -15,6 +18,15 @@ export const Footer = () => {
       <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full" />
     </Link>
   );
+
+  const AnimatedButton = ({ onClick, children }: { onClick: () => void, children: React.ReactNode }) => (
+    <button onClick={onClick} className="group relative inline-block opacity-60 hover:opacity-100 transition-opacity duration-300 text-left" style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+      {children}
+      <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full" />
+    </button>
+  );
+
+  const [openModal, setOpenModal] = useState<string | null>(null);
 
   return (
     <footer className="relative w-full bg-[#faf7f4] dark:bg-[#0e080c] text-[#1a1018] dark:text-white transition-colors duration-500 overflow-hidden">
@@ -68,10 +80,10 @@ export const Footer = () => {
             </h3>
             <div className="w-[24px] h-[1px] bg-[#8B3A52] mt-3 mb-6" />
             <ul className="space-y-4">
-              <li><AnimatedLink href="/home">Envíos y Entregas</AnimatedLink></li>
-              <li><AnimatedLink href="/home">Medios de Pago</AnimatedLink></li>
-              <li><AnimatedLink href="/home">Términos Legales</AnimatedLink></li>
-              <li><AnimatedLink href="/home">Devoluciones</AnimatedLink></li>
+              <li><AnimatedButton onClick={() => setOpenModal('shipping')}>Envíos y Entregas</AnimatedButton></li>
+              <li><AnimatedButton onClick={() => setOpenModal('payment')}>Medios de Pago</AnimatedButton></li>
+              <li><AnimatedButton onClick={() => setOpenModal('terms')}>Términos Legales</AnimatedButton></li>
+              <li><AnimatedButton onClick={() => setOpenModal('refund')}>Devoluciones</AnimatedButton></li>
             </ul>
           </div>
 
@@ -108,6 +120,115 @@ export const Footer = () => {
           </p>
         </div>
       </div>
+
+      {/* Modals de Información */}
+      <Modal 
+        open={openModal === 'shipping'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <div className="flex items-center gap-2 text-[#8B3A52] dark:text-[#f0a0c0]">
+            <Truck className="w-6 h-6" />
+            <span>Envíos y Entregas</span>
+          </div>
+        }
+      >
+        <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed space-y-4 mt-2">
+          <p>Realizamos envíos a todo el Perú mediante agencias de confianza (Shalom, Marvisur, Olva Courier).</p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Lima Metropolitana:</strong> Entregas estimadas entre 24 a 48 horas hábiles.</li>
+            <li><strong>Provincias:</strong> Entregas estimadas entre 2 a 5 días hábiles, dependiendo del destino.</li>
+          </ul>
+          <p>El costo de envío varía según la provincia y agencia seleccionada. Te confirmaremos el número de seguimiento una vez despachado tu pedido.</p>
+        </div>
+      </Modal>
+
+      <Modal 
+        open={openModal === 'payment'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <div className="flex items-center gap-2 text-[#8B3A52] dark:text-[#f0a0c0]">
+            <CreditCard className="w-6 h-6" />
+            <span>Medios de Pago</span>
+          </div>
+        }
+      >
+        <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed space-y-6 mt-2">
+          <p>Para tu mayor comodidad y seguridad, aceptamos los siguientes métodos de pago:</p>
+          
+          <div className="space-y-4">
+            {/* Mercado Pago */}
+            <div className="flex items-start gap-4">
+              <div className="relative w-16 h-10 flex-shrink-0 bg-white rounded overflow-hidden p-1 border border-gray-100 dark:border-white/10 flex items-center justify-center">
+                <Image src="/assets/visaymaster.png" alt="Tarjetas" fill className="object-contain p-1" />
+              </div>
+              <div>
+                <strong>Mercado Pago:</strong> Paga de forma segura con cualquier tarjeta de crédito o débito (Visa, Mastercard, Amex).
+              </div>
+            </div>
+
+            {/* Yape/Plin */}
+            <div className="flex items-start gap-4">
+              <div className="relative w-16 h-10 flex-shrink-0 bg-white rounded overflow-hidden p-1 border border-gray-100 dark:border-white/10 flex items-center justify-center">
+                <Image src="/assets/yapeyplin.png" alt="Yape y Plin" fill className="object-contain p-1" />
+              </div>
+              <div>
+                <strong>Yape / Plin:</strong> Transferencias rápidas y sin comisiones.
+              </div>
+            </div>
+
+            {/* Transferencias */}
+            <div className="flex items-start gap-4">
+              <div className="relative w-16 h-10 flex-shrink-0 bg-white rounded overflow-hidden p-1 border border-gray-100 dark:border-white/10 flex items-center justify-center">
+                <Image src="/assets/bank.png" alt="Bancos" fill className="object-contain p-1" />
+              </div>
+              <div>
+                <strong>Transferencias Bancarias:</strong> Aceptamos pagos directos a nuestras cuentas BCP, Interbank y BBVA.
+              </div>
+            </div>
+          </div>
+
+          <p className="pt-2 border-t border-gray-200 dark:border-white/10">Los pedidos se procesan una vez confirmado el pago en nuestros sistemas.</p>
+        </div>
+      </Modal>
+
+      <Modal 
+        open={openModal === 'terms'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <div className="flex items-center gap-2 text-[#8B3A52] dark:text-[#f0a0c0]">
+            <FileText className="w-6 h-6" />
+            <span>Términos Legales</span>
+          </div>
+        }
+      >
+        <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed space-y-4 mt-2">
+          <p>Bienvenido a Estilos Boom. Al utilizar nuestra tienda online, aceptas nuestras condiciones generales.</p>
+          <p>Toda la información personal proporcionada (nombres, correos, direcciones) será tratada de manera estrictamente confidencial y se usará únicamente para procesar tus pedidos.</p>
+          <p>Nos reservamos el derecho de modificar precios, ofertas y disponibilidad de productos sin previo aviso. Las promociones están sujetas a stock.</p>
+        </div>
+      </Modal>
+
+      <Modal 
+        open={openModal === 'refund'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <div className="flex items-center gap-2 text-[#8B3A52] dark:text-[#f0a0c0]">
+            <RefreshCw className="w-6 h-6" />
+            <span>Devoluciones y Cambios</span>
+          </div>
+        }
+      >
+        <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed space-y-4 mt-2">
+          <p>En Estilos Boom queremos que estés feliz con tu compra. Si no estás satisfecha, aceptamos cambios y devoluciones bajo las siguientes condiciones:</p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Tienes un plazo máximo de <strong>7 días calendario</strong> desde la recepción del pedido para solicitar el cambio.</li>
+            <li>La prenda debe estar en <strong>perfectas condiciones</strong>, sin uso, sin manchas, sin olores y con todas sus etiquetas originales intactas.</li>
+            <li>Los costos de envío por devoluciones o cambios por talla/modelo corren por cuenta del cliente, salvo que se trate de un defecto de fábrica.</li>
+          </ul>
+          <p>Contáctanos a nuestro WhatsApp o correo oficial para iniciar tu proceso de cambio.</p>
+        </div>
+      </Modal>
+
     </footer>
   );
 };

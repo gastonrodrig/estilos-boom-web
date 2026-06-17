@@ -163,7 +163,14 @@ const CheckoutPaymentForm: React.FC = () => {
         try {
           const operationNumber = watch('operationNumber');
           const token = await getFirebaseAuthToken();
-          const clientNameStr = (firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : 'Cliente Web';
+          
+          const typedFirstName = watch('firstName') || '';
+          const typedLastName = watch('lastName') || '';
+          const clientNameStr = (firstName || lastName) 
+            ? `${firstName || ''} ${lastName || ''}`.trim() 
+            : (typedFirstName || typedLastName) 
+              ? `${typedFirstName} ${typedLastName}`.trim() 
+              : 'Cliente Web';
 
           await manualPaymentApi.post('/process', {
             operationNumber,
@@ -205,9 +212,18 @@ const CheckoutPaymentForm: React.FC = () => {
   const onSubmitPayment = async (param: any) => {
     const token = await getFirebaseAuthToken();
     return new Promise((resolve, reject) => {
+      const typedFirstName = watch('firstName') || '';
+      const typedLastName = watch('lastName') || '';
+      const clientNameStr = (firstName || lastName) 
+        ? `${firstName || ''} ${lastName || ''}`.trim() 
+        : (typedFirstName || typedLastName) 
+          ? `${typedFirstName} ${typedLastName}`.trim() 
+          : 'Cliente Web';
+
       mercadopagoApi.processPayment({ 
         ...param.formData, 
         orderId: `ORD-${Date.now()}`,
+        clientName: clientNameStr,
         items: itemsRef.current.map(item => ({
           id: item.productId,
           name: item.name,
@@ -223,6 +239,7 @@ const CheckoutPaymentForm: React.FC = () => {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
+              sessionStorage.setItem('mp_payment_approved', 'true');
               await clearCart();
               handleGoToReview();
               resolve(true);
@@ -231,6 +248,7 @@ const CheckoutPaymentForm: React.FC = () => {
             }
           } else if (response.status === 'pending') {
             toast('Pago pendiente.', { icon: '⏳' });
+            sessionStorage.setItem('mp_payment_approved', 'true');
             await clearCart();
             handleGoToReview();
             resolve(true);
@@ -301,10 +319,9 @@ const CheckoutPaymentForm: React.FC = () => {
             </label>
 
             {/* CONTENIDO DESPLEGADO SEGÚN MÉTODO */}
-            {paymentMethod === method.id && (
-              <div className="mt-2">
-                {/* 💳 MERCADOPAGO PAYMENT BRICK */}
-                {method.id === 'card' && (
+            <div className={`mt-2 ${paymentMethod === method.id ? 'block' : 'hidden'}`}>
+              {/* 💳 MERCADOPAGO PAYMENT BRICK */}
+              {method.id === 'card' && (
                   <div className="w-full relative min-h-[400px] bg-white p-4 rounded-lg shadow-sm border border-gray-100 mt-2">
 
                     {loadingPreference ? (
@@ -515,7 +532,6 @@ const CheckoutPaymentForm: React.FC = () => {
                   </div>
                 )}
               </div>
-            )}
           </div>
         ))}
       </div>

@@ -27,24 +27,7 @@ export default function OrderDetailsPage() {
 
   useEffect(() => {
     const fetchOrder = async () => {
-      // Fallback de desarrollo / Mocks controlados
-      if (orderId === '0041' || orderId === '0042') {
-        setOrderData({
-          orderNumber: orderId,
-          createdAt: new Date().toISOString(),
-          clientName: "Cliente de Prueba",
-          amount: orderId === '0041' ? 95.00 : 189.90,
-          status: orderId === '0041' ? "CONFIRMED" : "PRE_ORDER",
-          paymentMethod: "Yape",
-          deliveryMethod: "DELIVERY",
-          items: [
-            { productId: "1", name: "Blusa Lara", size: "M", color: "Blanco", quantity: 1, price: orderId === '0041' ? 95.00 : 139.90 },
-            { productId: "2", name: "Vestido Floral", size: "S", color: "Rosado", quantity: 1, price: 50.00 }
-          ]
-        });
-        setLoading(false);
-        return;
-      }
+
 
       try {
         const token = await getFirebaseAuthToken();

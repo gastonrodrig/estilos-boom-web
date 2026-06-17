@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Product } from "@/core/models";
@@ -106,7 +107,13 @@ export const ProductCardCatalogue = ({ product }: Props) => {
           </span>
         </div>
 
-        <button className="btn-carrito" onClick={() => router.push(`/product/${product.id_product}`)}>
+        <button 
+          className="btn-carrito"
+          onClick={(e) => {
+            e.preventDefault();
+            router.push(`/product/${product.id_product}`);
+          }}
+        >
           <span className="text-[14px]">🛒</span> Elegir Opciones
         </button>
       </div>
