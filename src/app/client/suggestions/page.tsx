@@ -17,35 +17,9 @@ const SUGGESTION_CATEGORIES = [
   "Otro"
 ];
 
-const MOCK_PRODUCTS = [
-  "Blusa Romántica",
-  "Vestido Floral Primavera",
-  "Vestido Escote V",
-  "Vestido Elegante Encaje",
-  "Pantalón Wide Leg",
-  "Falda Midi Plisada",
-  "Chaqueta Denim Clásica",
-  "Top Cruzado Satén",
-  "Vestido Boho Chic"
-];
-
 const SIZES = ["XS", "S", "M", "L", "XL"];
 
-// Initial list
-const INITIAL_SUGGESTIONS = [
-  {
-    id: "1",
-    text: "Solicitaste la Blusa Romántica en talla L",
-    date: "20 de mayo, 2026",
-    status: "En revisión",
-  },
-  {
-    id: "2",
-    text: "Sugeriste colores oscuros para la temporada de otoño",
-    date: "15 de mayo, 2026",
-    status: "Considerada",
-  }
-];
+
 
 export default function SuggestionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Pedir una talla");
@@ -59,8 +33,8 @@ export default function SuggestionsPage() {
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [suggestionsHistory, setSuggestionsHistory] = useState<any[]>(INITIAL_SUGGESTIONS);
-  const [dynamicProducts, setDynamicProducts] = useState<string[]>(MOCK_PRODUCTS);
+  const [suggestionsHistory, setSuggestionsHistory] = useState<any[]>([]);
+  const [dynamicProducts, setDynamicProducts] = useState<string[]>([]);
   const { status } = useAuthStore();
   
   // Custom Dropdown State
@@ -73,7 +47,7 @@ export default function SuggestionsPage() {
       if (status === 'checking') return;
 
       if (status !== 'authenticated') {
-        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        setSuggestionsHistory([]);
         return;
       }
 
@@ -104,11 +78,11 @@ export default function SuggestionsPage() {
           });
           setSuggestionsHistory(mapped);
         } else {
-          setSuggestionsHistory(INITIAL_SUGGESTIONS);
+          setSuggestionsHistory([]);
         }
       } catch (error) {
         console.error("Error loading user suggestions:", error);
-        setSuggestionsHistory(INITIAL_SUGGESTIONS);
+        setSuggestionsHistory([]);
       }
     };
 
@@ -116,7 +90,7 @@ export default function SuggestionsPage() {
       if (status === 'checking') return;
 
       if (status !== 'authenticated') {
-        setDynamicProducts(MOCK_PRODUCTS);
+        setDynamicProducts([]);
         return;
       }
 
@@ -127,11 +101,11 @@ export default function SuggestionsPage() {
           const names = data.data.map((p: any) => p.name);
           setDynamicProducts(names);
         } else {
-          setDynamicProducts(MOCK_PRODUCTS);
+          setDynamicProducts([]);
         }
       } catch (error) {
         console.error("Error loading interaction products:", error);
-        setDynamicProducts(MOCK_PRODUCTS);
+        setDynamicProducts([]);
       }
     };
 
