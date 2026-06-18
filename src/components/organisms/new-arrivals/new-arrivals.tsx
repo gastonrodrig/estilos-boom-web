@@ -26,7 +26,7 @@ export const NewArrivals = () => {
             href: `/product/${p.id_product || p._id}`,
             isSoldOut: totalStock === 0,
           };
-        }).filter((p: any) => !p.isSoldOut);
+        });
         
         setRealProducts(mapped);
       } catch (err) {
