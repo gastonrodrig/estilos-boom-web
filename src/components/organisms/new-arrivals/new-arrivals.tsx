@@ -16,13 +16,17 @@ export const NewArrivals = () => {
         const { data } = await productApi.get("", { params: { limit: 8 } });
         const items = Array.isArray(data?.items) ? data.items : [];
         
-        const mapped = items.map((p: any) => ({
-          id: p.id_product || p._id || "",
-          name: p.name || "Producto",
-          price: `S/ ${Number(p.base_price || 0).toFixed(2)}`,
-          image: (p.images && p.images.length > 0) ? p.images[0] : "/placeholder.jpg",
-          href: `/product/${p.id_product || p._id}`
-        }));
+        const mapped = items.map((p: any) => {
+          const totalStock = p.variants?.reduce((sum: number, v: any) => sum + (v.stock || 0), 0) || 0;
+          return {
+            id: p.id_product || p._id || "",
+            name: p.name || "Producto",
+            price: `S/ ${Number(p.base_price || 0).toFixed(2)}`,
+            image: (p.images && p.images.length > 0) ? p.images[0] : "/placeholder.jpg",
+            href: `/product/${p.id_product || p._id}`,
+            isSoldOut: totalStock === 0,
+          };
+        }).filter((p: any) => !p.isSoldOut);
         
         setRealProducts(mapped);
       } catch (err) {

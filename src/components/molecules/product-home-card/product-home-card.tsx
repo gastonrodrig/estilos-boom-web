@@ -11,6 +11,7 @@ export interface Product {
   price: string;
   image: string;
   href: string;
+  isSoldOut?: boolean;
 }
 
 interface ProductCardProps {
@@ -43,6 +44,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             fill
             className="object-cover"
           />
+
+          {product.isSoldOut && (
+            <div className="absolute top-4 -left-10 w-40 z-30 transform -rotate-45 bg-red-600 text-white text-[11px] font-bold py-1 shadow-sm text-center tracking-wider">
+              AGOTADO
+            </div>
+          )}
 
           {/* Shine effect */}
           <motion.div
