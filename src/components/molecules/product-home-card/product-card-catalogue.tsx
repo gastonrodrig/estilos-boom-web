@@ -20,9 +20,11 @@ export const ProductCardCatalogue = ({ product }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Colores únicos para mostrar como texto
   const uniqueColorNames = Array.from(new Set((product.variants || []).map((v) => v.color).filter(Boolean))).slice(0, 3).map(c => String(c).toUpperCase());
   const colorsText = uniqueColorNames.join(" · ");
+
+  const totalStock = product.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0;
+  const isSoldOut = totalStock === 0;
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -68,7 +70,7 @@ export const ProductCardCatalogue = ({ product }: Props) => {
       className="product-card flex flex-col h-full"
     >
       {/* ZONA IMAGEN */}
-      <div className="product-image-wrapper">
+      <div className="product-image-wrapper relative overflow-hidden">
         <Link href={`/product/${product.id_product}`} className="block w-full h-full">
           <img
             src={product.images[0] || "/placeholder.jpg"}
@@ -76,6 +78,12 @@ export const ProductCardCatalogue = ({ product }: Props) => {
             className="product-image"
           />
         </Link>
+
+        {isSoldOut && (
+          <div className="absolute top-4 -left-10 w-40 z-30 transform -rotate-45 bg-red-600 text-white text-[11px] font-bold py-1 shadow-sm text-center tracking-wider">
+            AGOTADO
+          </div>
+        )}
 
         {/* Botón Favoritos dorado */}
         <motion.button 
