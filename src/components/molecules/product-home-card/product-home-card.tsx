@@ -46,7 +46,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
 
           {product.isSoldOut && (
-            <div className="absolute top-4 -left-10 w-40 z-30 transform -rotate-45 bg-red-600 text-white text-[11px] font-bold py-1 shadow-sm text-center tracking-wider">
+            <div className="absolute top-4 -left-10 w-40 z-30 transform -rotate-45 bg-red-700 text-white text-[11px] font-bold py-1 shadow-sm text-center tracking-wider">
               AGOTADO
             </div>
           )}
