@@ -27,6 +27,12 @@ export const storekeeperModules: StorekeeperModule[] = [
     requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
   },
   {
+    label: "Almacén de Insumos",
+    icon: "spool", // Usa el icono spool para insumos o el icono warehouse
+    href: "/storekeeper/warehouse/supplies",
+    requiredRoles: ["Almacenero", "Almacenero Boom"], // Solo Almacenero Boom / Central
+  },
+  {
     label: "Movimientos de Prendas",
     icon: "warehouse",
     href: "/storekeeper/warehouse/transfers",

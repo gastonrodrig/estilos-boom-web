@@ -365,7 +365,8 @@ export default function CompletedProductionOrders() {
                               <td className="p-4 font-bold">Lote A-{idx + 1}</td>
                               <td className="p-4 text-center font-medium">{item.id_variant?.size || "M"}</td>
                               <td className="p-4 text-center font-medium">{typeof item.id_variant?.color === "object" ? (item.id_variant?.color?.name || "N/A") : (item.id_variant?.color || "N/A")}</td>
-                              <td className="p-4 text-right font-medium text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>                           </tr>
+                              <td className="p-4 text-right font-medium text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity} uds.</td>
+                           </tr>
                          ))}
                       </tbody>
                    </table>
@@ -388,7 +389,8 @@ function CompletedOrderRow({ order, idx, onOpenTech, onOpenObs }: { order: any; 
 
   return (
     <tr className={`transition-colors group ${idx % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-      <td className="px-6 py-5 font-medium text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number || order.order_number || "Sin número"}</td>      <td className="px-6 py-5">
+      <td className="px-6 py-5 font-medium text-[#D6405F] dark:text-[#F8BBD0]">{order.pre_order_number || order.order_number || "Sin número"}</td>
+      <td className="px-6 py-5">
           <p className="font-bold text-[#40202D] dark:text-white">{workshopName}</p>
           <p className="text-[10px] font-medium uppercase tracking-widest text-[#8C6B79] dark:text-gray-400">Producción</p>
       </td>

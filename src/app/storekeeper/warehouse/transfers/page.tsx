@@ -217,9 +217,9 @@ export default function AdminDocumentsMovementsPage() {
                     <div className="flex flex-col gap-2.5 mt-2">
                       {(doc.items || []).slice(0, 3).map((item: any, idx: number) => {
                         const variant = item.id_variant;
-                        const product = typeof variant === "object" ? variant.id_product?.name : "Prenda";
-                        const size    = typeof variant === "object" ? variant.size : "—";
-                        const color   = typeof variant === "object" ? variant.color?.name : "—";
+                        const product = variant && typeof variant === "object" ? variant.id_product?.name || "Prenda" : "Prenda";
+                        const size    = variant && typeof variant === "object" ? variant.size || "—" : "—";
+                        const color   = variant && typeof variant === "object" ? variant.color?.name || variant.color || "—" : "—";
                         return (
                           <div key={idx} className="flex justify-between items-center bg-white/60 dark:bg-white/5 border border-[#F2DEE4] dark:border-white/10 rounded-xl px-4 py-3 backdrop-blur-md hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
                             <span className="text-[14px] text-[#40202D] dark:text-white/95 font-medium tracking-wide">

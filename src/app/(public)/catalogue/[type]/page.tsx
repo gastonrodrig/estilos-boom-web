@@ -36,8 +36,8 @@ export default function CollectionPage() {
   // Si es dresses, mandamos "Dresses" (con D mayúscula como está en tu DB)
   const categoryFilter = currentType === "dresses" ? "Dresses" : undefined;
   
-  // Solo mandamos section si NO es una categoría
-  const sectionFilter = currentType !== "dresses" ? currentType : undefined;
+  // Solo mandamos section si NO es una categoría (y ahora admite 'discount')
+  const sectionFilter = (currentType !== "dresses") ? currentType : undefined;
 
   console.log("📡 Petición Catálogo:", { section: sectionFilter, category: categoryFilter });
 
@@ -60,7 +60,7 @@ export default function CollectionPage() {
         titleItalic: "Favoritos",
         sub: "Las prendas favoritas de nuestra comunidad, ahora a tu alcance.",
       },
-      dresses: {
+      discount: {
         titleMain: "Rebajas Especiales",
         titleItalic: "50% Menos",
         sub: "Descubre prendas exclusivas a mitad de precio. ¡Solo por tiempo limitado!",

@@ -16,7 +16,15 @@ const steps = [
   "Entregado"
 ];
 
-function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObserved?: boolean }) {
+function OrderTimeline({ currentStep, isObserved, deliveryMethod }: { currentStep: number; isObserved?: boolean; deliveryMethod?: string }) {
+  const isStorePickup = deliveryMethod === 'store';
+  const stepsLabels = [
+    "Inicio de pedido",
+    "Pago confirmado",
+    "Preparando",
+    isStorePickup ? "Listo para recoger" : "En camino",
+    "Entregado"
+  ];
   const progressPercent = ((currentStep - 1) / (steps.length - 1)) * 100;
 
   return (
@@ -45,7 +53,7 @@ function OrderTimeline({ currentStep, isObserved }: { currentStep: number; isObs
         </div>
 
         {/* Steps */}
-        {steps.map((step, index) => {
+        {stepsLabels.map((step, index) => {
           const stepNumber = index + 1;
           const isCompleted = stepNumber < currentStep;
           const isCurrent = stepNumber === currentStep;
@@ -181,12 +189,21 @@ export default function ActiveOrdersPage() {
             PillIcon = Clock;
           } else if (isShipped) {
             step = 4;
-            statusText = 'Pedido en camino';
-            borderClass = 'border-t-indigo-500 dark:border-t-indigo-500/50';
-            pillBg = 'bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20';
-            pillColor = 'text-indigo-700 dark:text-indigo-400';
-            iconColor = 'text-indigo-600 dark:text-indigo-400';
-            PillIcon = Clock;
+            if (order.deliveryMethod === 'store') {
+              statusText = 'Listo para recoger';
+              borderClass = 'border-t-emerald-500 dark:border-t-emerald-500/50';
+              pillBg = 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20';
+              pillColor = 'text-emerald-700 dark:text-emerald-400';
+              iconColor = 'text-emerald-600 dark:text-emerald-400';
+              PillIcon = Check;
+            } else {
+              statusText = 'Pedido en camino';
+              borderClass = 'border-t-indigo-500 dark:border-t-indigo-500/50';
+              pillBg = 'bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20';
+              pillColor = 'text-indigo-700 dark:text-indigo-400';
+              iconColor = 'text-indigo-600 dark:text-indigo-400';
+              PillIcon = Clock;
+            }
           } else if (isObserved) {
             step = 1;
             statusText = 'Pago Observado';
@@ -234,35 +251,51 @@ export default function ActiveOrdersPage() {
                   <p className="text-blue-800 dark:text-blue-200/90 text-sm font-medium">¡Pago verificado con éxito! Tu pedido está siendo preparado en nuestro almacén.</p>
                 </div>
               ) : isShipped ? (
-                <div className="flex flex-col gap-4 p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10">
-                  <div className="flex items-center gap-4">
-                    <Clock className="w-6 h-6 text-indigo-500 dark:text-indigo-400 shrink-0" />
-                    <p className="text-indigo-800 dark:text-indigo-200/90 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
-                  </div>
-                  {(order.trackingNumber || order.shippingEvidenceUrl) && (
-                    <div className="pl-10 flex flex-col gap-2 border-t border-indigo-200/50 dark:border-indigo-500/20 pt-3">
-                      {order.trackingNumber && (
-                        <p className="text-indigo-950 dark:text-indigo-200 text-sm font-medium">
-                          <span className="font-bold text-indigo-800 dark:text-indigo-300">Código de Seguimiento / Repartidor:</span> {order.trackingNumber}
-                        </p>
-                      )}
-                      {order.shippingEvidenceUrl && (
-                        <a
-                          href={order.shippingEvidenceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-indigo-750 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-100 text-sm font-bold underline transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          Ver Foto de Evidencia de Despacho
-                        </a>
-                      )}
+                order.deliveryMethod === 'store' ? (
+                  <div className="flex flex-col gap-4 p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10">
+                    <div className="flex items-center gap-4">
+                      <Check className="w-6 h-6 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                      <p className="text-emerald-800 dark:text-emerald-200/90 text-sm font-medium">¡Tu pedido está listo para ser recogido! Puedes acercarte a nuestra tienda principal en Miraflores.</p>
                     </div>
-                  )}
-                </div>
+                    {order.trackingNumber && (
+                      <div className="pl-10 flex flex-col gap-2 border-t border-emerald-200/50 dark:border-emerald-500/20 pt-3">
+                        <p className="text-emerald-950 dark:text-emerald-200 text-sm font-medium">
+                          <span className="font-bold text-emerald-800 dark:text-emerald-300">Detalles de Recojo:</span> {order.trackingNumber}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4 p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10">
+                    <div className="flex items-center gap-4">
+                      <Clock className="w-6 h-6 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                      <p className="text-indigo-800 dark:text-indigo-200/90 text-sm font-medium">Tu pedido ha sido despachado y está en camino a tu dirección de entrega.</p>
+                    </div>
+                    {(order.trackingNumber || order.shippingEvidenceUrl) && (
+                      <div className="pl-10 flex flex-col gap-2 border-t border-indigo-200/50 dark:border-indigo-500/20 pt-3">
+                        {order.trackingNumber && (
+                          <p className="text-indigo-950 dark:text-indigo-200 text-sm font-medium">
+                            <span className="font-bold text-indigo-800 dark:text-indigo-300">Código de Seguimiento / Repartidor:</span> {order.trackingNumber}
+                          </p>
+                        )}
+                        {order.shippingEvidenceUrl && (
+                          <a
+                            href={order.shippingEvidenceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-indigo-750 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-100 text-sm font-bold underline transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Ver Foto de Evidencia de Despacho
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
               ) : null}
 
               {/* Product Details */}
@@ -286,7 +319,7 @@ export default function ActiveOrdersPage() {
               </div>
 
               {/* Timeline */}
-              <OrderTimeline currentStep={step} isObserved={isObserved} />
+              <OrderTimeline currentStep={step} isObserved={isObserved} deliveryMethod={order.deliveryMethod} />
 
               {/* Action Button */}
               <Link href={`/client/orders/${order._id}`} className="block w-full">

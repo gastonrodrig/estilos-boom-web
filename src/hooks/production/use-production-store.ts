@@ -144,6 +144,18 @@ export const useProductionStore = () => {
         }
     }, [dispatch, getConfig]);
 
+    const startDeleteProductionOrder = useCallback(async (id: string) => {
+        try {
+            const config = await getConfig();
+            await productionApi.delete(`/production-orders/${id}`, config);
+            await startLoadingProductionOrders();
+            return { ok: true };
+        } catch (error: any) {
+            const msg = error?.response?.data?.message || "Error al eliminar la orden";
+            return { ok: false, message: msg };
+        }
+    }, [dispatch, getConfig, startLoadingProductionOrders]);
+
     return {
         orders,
         selectedOrder,
@@ -157,5 +169,6 @@ export const useProductionStore = () => {
         startConfirmWorkshop,
         startUpdateProductionStatus,
         startUpdateSubState,
+        startDeleteProductionOrder,
     };
 };

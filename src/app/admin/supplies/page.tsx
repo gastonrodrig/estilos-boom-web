@@ -6,6 +6,7 @@ import { SupplySidebar } from "@/components/organisms";
 import { useSupplyStore } from "@/hooks";
 import { Pencil, Power, PowerOff, Eye } from "lucide-react";
 import { Supply } from "@/store";
+import Link from "next/link";
 
 export default function AdminSuppliesPage() {
   const { supplies, loading, startLoadingSupplies, startToggleSupplyStatus } = useSupplyStore();

@@ -73,13 +73,13 @@ export default function ProductDetailPage() {
           {/* Info Principal */}
           <section className="bg-white/70 dark:bg-[#1a0f18]/40 backdrop-blur-2xl p-8 rounded-3xl border border-[#EAE0E2] dark:border-[#8B3A52]/20 shadow-sm space-y-4">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="bg-zinc-800 text-zinc-500 dark:text-[#F8BBD0]/80 border border-zinc-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              <span className="bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
                 {product.id_category?.name || 'Sin Categoría'}
               </span>
-              <span className="bg-[#8B3A52]/20 text-[#e8c4cc] border border-[#8B3A52]/40 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <span className="bg-[#8B3A52]/10 text-[#8B3A52] dark:bg-[#8B3A52]/20 dark:text-[#e8c4cc] border border-[#8B3A52]/20 dark:border-[#8B3A52]/40 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <Layers size={10}/> {product.origin_type === 'PRODUCCION' ? 'Producción Propia' : 'Retail / Comercial'}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-[#F8BBD0]/90 font-mono ml-auto">{product.sku}</span>
+              <span className="text-xs text-zinc-600 dark:text-[#F8BBD0]/90 font-mono ml-auto">{product.sku}</span>
             </div>
             <h1 className="text-2xl font-normal text-[#40202D] dark:text-[#fdf6f0] tracking-wide">{product.name}</h1>
             <p className="text-xl font-medium text-[#8B3A52] pb-4 border-b border-zinc-200 dark:border-[#8B3A52]/20">S/ {(product.base_price || 0).toFixed(2)}</p>
@@ -137,8 +137,16 @@ export default function ProductDetailPage() {
                   <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                     {product.technical_sheet.map((item: any, idx: number) => (
                       <tr key={idx} className="border-b border-zinc-200 dark:border-[#8B3A52]/10 transition-colors hover:bg-zinc-100 dark:hover:bg-[#8B3A52]/10">
-                        <td className="p-4 text-sm text-zinc-300 font-normal">{item.name}</td>
-                        <td className="p-4 text-xs text-zinc-500 dark:text-[#F8BBD0]/80 uppercase">{item.unit}</td>
+                        <td className="p-4 text-sm font-medium text-zinc-700 dark:text-[#fdf6f0]">
+                          <div>{item.id_supply?.name ?? item.name ?? '—'}</div>
+                          {item.detail && <div className="text-[11px] text-zinc-400 dark:text-[#F8BBD0]/50 font-normal mt-0.5">{item.detail}</div>}
+                          {item.applies_to && item.applies_to !== 'TODOS' && (
+                            <div className="text-[10px] text-[#8B3A52]/60 mt-0.5">
+                              {item.applies_to === 'MISMO_COLOR' ? 'Mismo color que variante' : `Color: ${item.applies_to}`}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 text-xs text-zinc-500 dark:text-[#F8BBD0]/80 uppercase">{item.id_supply?.unit ?? item.unit ?? '—'}</td>
                         <td className="p-4 text-right text-sm text-zinc-800 dark:text-[#fdf6f0] font-semibold">{item.quantity}</td>
                       </tr>
                     ))}
@@ -186,7 +194,7 @@ export default function ProductDetailPage() {
                             <span>{colorName}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-2.5 text-xs font-mono text-zinc-500 dark:text-[#F8BBD0]/60">{variant.sku_variant}</td>
+                        <td className="px-6 py-2.5 text-xs font-mono text-zinc-600 dark:text-[#F8BBD0]/80">{variant.sku_variant}</td>
                         <td className="px-6 py-2.5 text-right">
                           <div className="flex flex-col items-end">
                             <span className={`text-sm font-medium ${isStockLow ? 'text-red-400' : 'text-[#40202D] dark:text-white'}`}>

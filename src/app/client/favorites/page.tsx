@@ -44,7 +44,7 @@ export default function FavoritesPage() {
                 name: prod.name || "Producto sin nombre",
                 price: prod.base_price || 0,
                 image: (prod.images && prod.images.length > 0) ? prod.images[0] : "/assets/product/vestido-corto-floral-cuello-v.png",
-                inStock: prod.is_active !== false,
+                inStock: prod.total_stock > 0,
               };
             })
             .filter(Boolean) as any[];

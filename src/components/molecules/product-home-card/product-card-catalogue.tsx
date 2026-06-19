@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Product } from "@/core/models";
@@ -121,7 +121,7 @@ export const ProductCardCatalogue = ({ product }: Props) => {
             router.push(`/product/${product.id_product}`);
           }}
         >
-          <span className="text-[14px]">🛒</span> Agregar al carrito
+          <span className="text-[14px]">🛒</span> Elegir Opciones
         </button>
       </div>
     </motion.div>

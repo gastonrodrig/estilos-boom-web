@@ -171,10 +171,17 @@ export default function OrderDetailsPage() {
                   <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Preparando Pedido</span>
                 </div>
               ) : isShipped ? (
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500 shadow-[0_4px_12px_rgba(99,102,241,0.3)]">
-                  <Clock className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-                  <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Pedido en Camino</span>
-                </div>
+                orderData.deliveryMethod === 'store' ? (
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">
+                    <Check className="w-3.5 h-3.5 text-white" />
+                    <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Listo para recoger</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500 shadow-[0_4px_12px_rgba(99,102,241,0.3)]">
+                    <Clock className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                    <span className="text-white text-[11px] font-bold tracking-wider uppercase font-sans">Pedido en Camino</span>
+                  </div>
+                )
               ) : isDelivered ? (
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 shadow-[0_4px_12px_rgba(16,185,129,0.3)]">
                   <Check className="w-3.5 h-3.5 text-white" />
@@ -195,25 +202,29 @@ export default function OrderDetailsPage() {
 
       {/* Action Banner for Confirming Receipt */}
       {isShipped && (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-indigo-50 border border-indigo-200 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+        <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border shadow-sm relative overflow-hidden ${orderData.deliveryMethod === 'store' ? 'bg-emerald-50 border-emerald-200' : 'bg-indigo-50 border-indigo-200'}`}>
+          <div className={`absolute top-0 left-0 w-1.5 h-full ${orderData.deliveryMethod === 'store' ? 'bg-emerald-500' : 'bg-indigo-500'}`}></div>
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <Truck className="w-5 h-5" />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${orderData.deliveryMethod === 'store' ? 'bg-emerald-100 text-emerald-600' : 'bg-indigo-100 text-indigo-600'}`}>
+              {orderData.deliveryMethod === 'store' ? <Check className="w-5 h-5" /> : <Truck className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="font-bold text-[#1a0c12] dark:text-[#fdeef5] text-base">¿Tu pedido ya llegó?</h3>
+              <h3 className="font-bold text-[#1a0c12] dark:text-[#fdeef5] text-base">
+                {orderData.deliveryMethod === 'store' ? '¿Ya retiraste tu pedido?' : '¿Tu pedido ya llegó?'}
+              </h3>
               <p className="text-gray-600 dark:text-[#b8afc8] text-sm mt-0.5">
-                Si ya tienes tu paquete contigo, por favor confirma la recepción para finalizar el pedido.
+                {orderData.deliveryMethod === 'store'
+                  ? 'Si ya recogiste tu paquete en nuestra tienda principal, por favor confirma el recojo para finalizar el pedido.'
+                  : 'Si ya tienes tu paquete contigo, por favor confirma la recepción para finalizar el pedido.'}
               </p>
             </div>
           </div>
           <button
             onClick={handleConfirmReceipt}
             disabled={isConfirming}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow transition-all duration-300 active:scale-[0.98] shrink-0 disabled:opacity-50"
+            className={`px-6 py-3 text-white text-sm font-bold rounded-xl shadow transition-all duration-300 active:scale-[0.98] shrink-0 disabled:opacity-50 ${orderData.deliveryMethod === 'store' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
-            {isConfirming ? "Confirmando..." : "Confirmar que lo recibí"}
+            {isConfirming ? "Confirmando..." : orderData.deliveryMethod === 'store' ? "Confirmar que lo recogí" : "Confirmar que lo recibí"}
           </button>
         </div>
       )}
@@ -280,12 +291,23 @@ export default function OrderDetailsPage() {
               {/* Shipping Address Section */}
               <div className="flex flex-col md:pr-8">
                 <h3 className="text-xs tracking-widest uppercase text-[#9a6f00] dark:text-[rgba(232,184,109,0.6)] font-bold mb-3">
-                  Dirección de envío
+                  {orderData.deliveryMethod === 'store' ? 'Información de Recojo' : 'Dirección de envío'}
                 </h3>
                 <p className="text-[#1a0c12] dark:text-[#fdeef5] font-semibold text-base mb-1.5">{orderData.clientName || 'Cliente'}</p>
                 <div className="flex flex-col gap-1 text-sm text-[#9b6070] dark:text-[#b8afc8]">
-                  <p>Método: {orderData.deliveryMethod === 'motorized' ? 'Delivery Motorizado' : 'Envío Courier / Provincial'}</p>
-                  <p>Lima, Perú</p>
+                  <p>
+                    Método: {' '}
+                    {orderData.deliveryMethod === 'store'
+                      ? 'Recojo en tienda principal'
+                      : orderData.deliveryMethod === 'motorized'
+                      ? 'Delivery Motorizado (Lima)'
+                      : 'Envío Courier / Provincial'}
+                  </p>
+                  <p>
+                    {orderData.deliveryMethod === 'store'
+                      ? 'Tienda Principal: Av. Larco 456, Miraflores'
+                      : 'Lima, Perú'}
+                  </p>
 
                   {(orderData.trackingNumber || orderData.shippingEvidenceUrl) && (
                     <div className="mt-4 pt-3 border-t border-[rgba(196,84,122,0.15)] dark:border-[rgba(180,170,200,0.12)] flex flex-col gap-2">

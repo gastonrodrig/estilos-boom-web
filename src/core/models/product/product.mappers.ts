@@ -25,11 +25,14 @@ type ApiProduct = {
   is_active?: boolean;
   is_best_seller?: boolean;
   is_new_in?: boolean;
+  is_discount?: boolean;
   gender?: string;
-  images?: string[];
+  images?: (string | { url: string; color?: string | null })[];
   id_category?: string;
   category?: ApiCategory;
   variants?: ApiVariant[];
+  // images puede llegar como string[] (legado) o como { url, color }[] (nuevo)
+  // (el tipo string[] de arriba se mantiene por compatibilidad de lectura)
   origin_type?: 'RETAIL' | 'PRODUCCION';
   technical_sheet?: { id_supply: string; quantity: number }[];
   created_at?: string;
@@ -53,7 +56,15 @@ export const mapApiProductToModel = (apiProduct: ApiProduct): Product => ({
   is_active: Boolean(apiProduct.is_active),
   is_best_seller: Boolean(apiProduct.is_best_seller),
   is_new_in: Boolean(apiProduct.is_new_in),
-  images: Array.isArray(apiProduct.images) ? apiProduct.images : [],
+  is_discount: Boolean(apiProduct.is_discount),
+  images: Array.isArray(apiProduct.images) ? apiProduct.images.map(img => typeof img === 'object' && img !== null && 'url' in img ? (img as any).url : String(img)) : [],
+  imagesWithColor: Array.isArray(apiProduct.images)
+    ? apiProduct.images.map(img =>
+        typeof img === 'object' && img !== null && 'url' in img
+          ? { url: (img as any).url, color: (img as any).color ?? null }
+          : { url: String(img), color: null },
+      )
+    : [],
   id_category: apiProduct.id_category ?? apiProduct.category?._id ?? "",
   category: apiProduct.category?.name ? { name: apiProduct.category.name } : undefined,
   gender: (apiProduct.gender as any) ?? "MUJER",
