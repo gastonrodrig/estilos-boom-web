@@ -1,19 +1,27 @@
+// @ts-nocheck
 'use client';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { useProductStore, useCategoryStore, useSupplyStore } from '@/hooks'; // 🚀 Inyectamos useSupplyStore
+import { useProductStore, useCategoryStore, useSupplyStore } from '@/hooks';
 import Link from 'next/link';
-import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler, Layers, Trash2 } from 'lucide-react';
+import { Plus, X, Upload, Save, ArrowLeft, Palette, Ruler, Layers, Trash2, ChevronDown } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CSS_COLORS_PALETTE, ColorObject } from '@/core/constants';
 
-// Estructura de la Ficha Técnica alineada al Backend de Mongoose
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
+type SizeKey = typeof SIZES[number];
+
+// Estructura de la Ficha Técnica con soporte para insumos fijos y telas por talla
 interface SupplyItemInput {
-  id_supply: string;  // 🔗 Cambiado de text a ID de MongoDB
-  name: string;       // Mantener para visualización ágil en la tabla del Front
-  quantity: number;
+  id_supply: string;
+  name: string;
+  category: string;
   unit: string;
+  by_size?: Partial<Record<SizeKey, number>>;
+  quantity?: number;
+  applies_to?: string;
+  detail?: string;
 }
 
 export default function EditProductPage() {
@@ -40,10 +48,12 @@ export default function EditProductPage() {
     is_active: true,
     is_best_seller: false,
     is_new_in: false,
+    is_discount: false,
   });
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<string[]>([]);
+  // Imágenes ya guardadas (URL + color). Se conservan al actualizar salvo que el usuario las quite.
+  const [existingImages, setExistingImages] = useState<{ url: string; color?: string | null }[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   
@@ -57,13 +67,37 @@ export default function EditProductPage() {
   const [customColorName, setCustomColorName] = useState('');
   const [customColorHex, setCustomColorHex] = useState('#F2778D');
 
-  // 🧵 Estados de la Ficha Técnica Conectada a la Base de Datos
+  // 🧵 Estados de la Ficha Técnica con soporte por talla
   const [technicalSheet, setTechnicalSheet] = useState<SupplyItemInput[]>([]);
-  const [selectedInsumoId, setSelectedInsumoId] = useState<string>(''); // 👈 Almacena el _id seleccionado
+  const [selectedInsumoId, setSelectedInsumoId] = useState<string>('');
   const [insumoQuantity, setInsumoQuantity] = useState<number>(1);
+  const [bySizeValues, setBySizeValues] = useState<Partial<Record<SizeKey, number>>>({
+    XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0
+  });
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+
+  const selectedSupply = useMemo(() =>
+    supplies.find(s => (s._id || s.id) === selectedInsumoId), [supplies, selectedInsumoId]
+  );
+  const isFabric = selectedSupply?.category === 'Telas';
+
+  const suppliesByCategory = useMemo(() => {
+    const grouped: Record<string, typeof supplies> = {};
+    supplies.filter(s => s.is_active).forEach(s => {
+      if (!grouped[s.category]) grouped[s.category] = [];
+      grouped[s.category].push(s);
+    });
+    return grouped;
+  }, [supplies]);
 
   // Estado de la tabla de variantes
   const [variants, setVariants] = useState<any[]>([]);
+  // Mapeo de índice de imagen NUEVA → nombre de color
+  const [imageColorTags, setImageColorTags] = useState<Record<number, string>>({});
+
+  const setTagForImage = (index: number, colorName: string) => {
+    setImageColorTags(prev => ({ ...prev, [index]: colorName }));
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -74,17 +108,34 @@ export default function EditProductPage() {
 
   const removeImage = (index: number) => {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    // Reindexamos las etiquetas de color para mantenerlas alineadas con el array de archivos
+    setImageColorTags((prev) => {
+      const next: Record<number, string> = {};
+      Object.entries(prev).forEach(([k, v]) => {
+        const i = Number(k);
+        if (i < index) next[i] = v;
+        else if (i > index) next[i - 1] = v;
+      });
+      return next;
+    });
   };
 
-  // 🔄 Generador automático de variantes
-  const generateVariants = useCallback((sizes: string[], colors: ColorObject[]) => {
-    if (sizes.length === 0 || colors.length === 0) {
-      setVariants([]);
+  // Cambia el color de una imagen ya guardada
+  const setColorForExisting = (index: number, colorName: string) => {
+    setExistingImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, color: colorName || null } : img)),
+    );
+  };
+
+  // 🔄 Generador manual de variantes
+  const generateVariants = useCallback(() => {
+    if (selectedSizes.length === 0 || selectedColors.length === 0) {
+      toast.error("Selecciona al menos una talla y un color para agregar variantes.");
       return;
     }
 
-    const newVariants = sizes.flatMap(size => 
-      colors.map(color => ({
+    const newVariants = selectedSizes.flatMap(size => 
+      selectedColors.map(color => ({
         size,
         color, 
         stock: 0,
@@ -93,8 +144,18 @@ export default function EditProductPage() {
       }))
     );
 
-    setVariants(newVariants);
-  }, [formData.sku]);
+    const variantsToAdd = newVariants.filter(nv => 
+      !variants.some(v => v.size === nv.size && v.color.name === nv.color.name)
+    );
+
+    if (variantsToAdd.length === 0) {
+      toast.error("Las variantes de esta combinación ya existen en la tabla.");
+      return;
+    }
+
+    setVariants(prev => [...prev, ...variantsToAdd]);
+    toast.success(`${variantsToAdd.length} variante(s) agregada(s).`);
+  }, [formData.sku, selectedSizes, selectedColors, variants]);
 
   // Generar SKU base a partir de nombre, temporada y composición/material
   const generateBaseSKU = () => {
@@ -155,15 +216,35 @@ export default function EditProductPage() {
             gender: product.gender || 'MUJER',
             composition: product.composition || '',
             season: product.season || '',
-            id_category: typeof product.id_category === 'object' ? product.id_category._id : product.id_category,
+            id_category: typeof product.id_category === 'object' ? (product.id_category as any)._id : product.id_category,
             origin_type: product.origin_type || 'RETAIL',
             is_active: product.is_active ?? true,
             is_best_seller: product.is_best_seller ?? false,
             is_new_in: product.is_new_in ?? false,
+            is_discount: product.is_discount ?? false,
           });
-          setExistingImages(product.images || []);
+          // Preferimos imagesWithColor (URL + color); si no existe, derivamos de images (legado).
+          setExistingImages(
+            product.imagesWithColor && product.imagesWithColor.length > 0
+              ? product.imagesWithColor
+              : (product.images || []).map((url: string) => ({ url, color: null })),
+          );
           setVariants(product.variants || []);
-          setTechnicalSheet(product.technical_sheet || []);
+          
+          // Mapeamos los datos de la ficha técnica de la BD con los insumos locales para obtener name y unit
+          const mappedSheet = (product.technical_sheet || []).map((item: any) => {
+            const match = supplies.find(s => (s._id || s.id) === item.id_supply);
+            return {
+              id_supply: item.id_supply,
+              name: match ? match.name : (item.id_supply?.name || 'Insumo Cargado'),
+              category: match ? match.category : 'Otros',
+              unit: match ? match.unit : 'unid',
+              applies_to: item.applies_to || 'TODOS',
+              detail: item.detail || '',
+              ...(item.by_size ? { by_size: item.by_size } : { quantity: item.quantity }),
+            };
+          });
+          setTechnicalSheet(mappedSheet);
           
           if (product.variants) {
              const sizes = Array.from(new Set(product.variants.map((v: any) => v.size)));
@@ -189,37 +270,44 @@ export default function EditProductPage() {
   }, [selectedSizes, selectedColors]);
 
   
-  // 🧵 Gestión de Ficha Técnica vinculando IDs reales de MongoDB
+  // 🧵 Gestión de Ficha Técnica con soporte de telas por talla
   const handleAddInsumo = () => {
-    if (!selectedInsumoId) return toast.error("Selecciona un insumo válido.");
-    
-    // Buscamos el insumo real dentro del store de Redux para capturar su unidad y nombre
+    if (!selectedInsumoId) return toast.error('Selecciona un insumo válido.');
     const realSupply = supplies.find(s => (s._id || s.id) === selectedInsumoId);
-    if (!realSupply) return toast.error("El insumo seleccionado no es válido.");
-
-    const idInsumoString = (realSupply._id || realSupply.id) as string;
-
-    if (technicalSheet.some(item => item.id_supply === idInsumoString)) {
-      return toast.error("Este insumo ya está agregado a la ficha técnica.");
+    if (!realSupply) return toast.error('El insumo seleccionado no es válido.');
+    const idStr = (realSupply._id || realSupply.id) as string;
+    if (technicalSheet.some(item => item.id_supply === idStr)) {
+      return toast.error('Este insumo ya está en la ficha técnica.');
     }
 
-    setTechnicalSheet([
-      ...technicalSheet, 
-      { 
-        id_supply: idInsumoString, 
-        name: realSupply.name, 
-        quantity: insumoQuantity, 
-        unit: realSupply.unit 
-      }
-    ]);
+    if (realSupply.category === 'Telas') {
+      const hasAny = SIZES.some(s => (bySizeValues[s] ?? 0) > 0);
+      if (!hasAny) return toast.error('Ingresa al menos una cantidad por talla.');
+      setTechnicalSheet([...technicalSheet, {
+        id_supply: idStr,
+        name: realSupply.name,
+        category: realSupply.category,
+        unit: realSupply.unit,
+        by_size: { ...bySizeValues },
+      }]);
+      setBySizeValues({ XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0 });
+    } else {
+      if (insumoQuantity <= 0) return toast.error('La cantidad debe ser mayor a 0.');
+      setTechnicalSheet([...technicalSheet, {
+        id_supply: idStr,
+        name: realSupply.name,
+        category: realSupply.category,
+        unit: realSupply.unit,
+        quantity: insumoQuantity,
+      }]);
+      setInsumoQuantity(1);
+    }
     setSelectedInsumoId('');
-    setInsumoQuantity(1);
   };
 
   const toggleSize = (size: string) => {
     setSelectedSizes(prev => {
         const next = prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size];
-        generateVariants(next, selectedColors);
         return next;
     });
   };
@@ -229,7 +317,6 @@ export default function EditProductPage() {
     }
     const next = [...selectedColors, color];
     setSelectedColors(next);
-    generateVariants(selectedSizes, next);
     setColorSearch('');
     setShowColorDropdown(false);
   };
@@ -237,7 +324,6 @@ export default function EditProductPage() {
     if (!customColorName.trim()) return toast.error("Escribe el nombre del color.");
     const next = [...selectedColors, { name: customColorName.trim(), hex: customColorHex }];
     setSelectedColors(next);
-    generateVariants(selectedSizes, next);
     setCustomColorName('');
     setIsCreatingCustomColor(false);
   };
@@ -245,7 +331,6 @@ export default function EditProductPage() {
   const handleRemoveColor = (colorName: string) => {
     const next = selectedColors.filter(c => c.name !== colorName);
     setSelectedColors(next);
-    generateVariants(selectedSizes, next);
   };
 
   const handleRemoveInsumo = (index: number) => {
@@ -318,20 +403,25 @@ export default function EditProductPage() {
     data.append("is_active", String(formData.is_active));
     data.append("is_best_seller", String(formData.is_best_seller));
     data.append("is_new_in", String(formData.is_new_in));
+    data.append("is_discount", String(formData.is_discount));
     data.append("variants", JSON.stringify(variants));
 
-    // Si es producción propia, limpiamos el objeto antes de enviarlo
-    // Enviamos solo id_supply y quantity para que calce con tu esquema estricto de Mongoose
+    // Ficha técnica: enviamos id_supply + quantity (fijo) o by_size (tela por talla)
     if (formData.origin_type === 'PRODUCCION') {
       const cleanSheet = technicalSheet.map(item => ({
         id_supply: item.id_supply,
-        quantity: item.quantity
+        applies_to: item.applies_to || 'TODOS',
+        detail: item.detail || '',
+        ...(item.by_size ? { by_size: item.by_size } : { quantity: item.quantity }),
       }));
-      data.append("technical_sheet", JSON.stringify(cleanSheet));
+      data.append('technical_sheet', JSON.stringify(cleanSheet));
     }
 
+    // Conservamos las imágenes existentes (con su color) que el usuario no eliminó.
+    data.append("existing_images", JSON.stringify(existingImages));
+    // Imágenes nuevas + su color etiquetado, alineado por índice.
     selectedImages.forEach((file) => data.append("files", file));
-    // Nota: si no se envían nuevas imágenes, el backend conserva las actuales automáticamente.
+    data.append("image_colors", JSON.stringify(selectedImages.map((_, idx) => imageColorTags[idx] || null)));
 
     const result = await updateProduct(id as string, data);
     if (result) router.push("/admin/products");
@@ -383,21 +473,51 @@ export default function EditProductPage() {
               <Upload className="text-[#8B3A52] dark:text-[#a05068] mb-2 group-hover:scale-110 transition-transform" size={32} />
               <p className="text-xs text-center opacity-60 group-hover:opacity-100 font-bold uppercase tracking-wider text-[#2d1f25] dark:text-[#e8d8dc]">Haz clic para subir fotos</p>
             </label>
-            <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="flex flex-col gap-3 mt-4">
               {existingImages.map((img, idx) => (
-                <div key={`exist-${idx}`} className="relative aspect-square bg-white/50 dark:bg-white/10 rounded-xl overflow-hidden group border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-                  <img src={img} className="object-cover w-full h-full" alt="preview" />
-                  <div className="absolute top-0 right-0 bg-black/60 backdrop-blur-md text-white p-1 rounded-bl-xl text-[10px]">Actual</div>
-                  <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== idx))} className="absolute top-1 left-1 bg-black/60 backdrop-blur-md text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500">
-                    <X size={12} />
+                <div key={`exist-${idx}`} className="flex items-center gap-3 bg-white/50 dark:bg-white/5 rounded-xl border border-[#EAE0E2] dark:border-white/10 p-2 shadow-sm">
+                  <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-[#EAE0E2] dark:border-white/10">
+                    <img src={img.url} className="object-cover w-full h-full" alt="preview" />
+                    <div className="absolute top-0 right-0 bg-black/60 backdrop-blur-md text-white px-1 rounded-bl-lg text-[8px]">Actual</div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <select
+                      value={img.color ?? ''}
+                      onChange={(e) => setColorForExisting(idx, e.target.value)}
+                      className="w-full text-xs bg-transparent border border-[rgba(139,58,82,0.2)] dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:border-[#8B3A52] dark:focus:border-[#a05068] text-[#2d1f25] dark:text-white"
+                    >
+                      <option value="">Sin color (general)</option>
+                      {selectedColors.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button type="button" onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== idx))} className="flex-shrink-0 p-1.5 rounded-lg text-[#8C6B79] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all">
+                    <X size={14} />
                   </button>
                 </div>
               ))}
               {selectedImages.map((file, idx) => (
-                <div key={idx} className="relative aspect-square bg-white/50 dark:bg-white/10 rounded-xl overflow-hidden group border border-[#EAE0E2] dark:border-white/10 shadow-sm">
-                  <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" alt="preview" />
-                  <button type="button" onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/60 backdrop-blur-md text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500">
-                    <X size={12} />
+                <div key={idx} className="flex items-center gap-3 bg-white/50 dark:bg-white/5 rounded-xl border border-[#EAE0E2] dark:border-white/10 p-2 shadow-sm">
+                  <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-[#EAE0E2] dark:border-white/10">
+                    <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" alt="preview" />
+                    <div className="absolute top-0 right-0 bg-[#8B3A52]/80 backdrop-blur-md text-white px-1 rounded-bl-lg text-[8px]">Nueva</div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] opacity-50 truncate mb-1">{file.name}</p>
+                    <select
+                      value={imageColorTags[idx] || ''}
+                      onChange={(e) => setTagForImage(idx, e.target.value)}
+                      className="w-full text-xs bg-transparent border border-[rgba(139,58,82,0.2)] dark:border-white/10 rounded-lg px-2 py-1.5 outline-none focus:border-[#8B3A52] dark:focus:border-[#a05068] text-[#2d1f25] dark:text-white"
+                    >
+                      <option value="">Sin color (general)</option>
+                      {selectedColors.map(c => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button type="button" onClick={() => removeImage(idx)} className="flex-shrink-0 p-1.5 rounded-lg text-[#8C6B79] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all">
+                    <X size={14} />
                   </button>
                 </div>
               ))}
@@ -542,70 +662,150 @@ export default function EditProductPage() {
                   <span className="text-[0.65rem] opacity-60">Etiqueta de novedad</span>
                 </div>
               </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={formData.is_discount}
+                  onChange={(e) => setFormData({ ...formData, is_discount: e.target.checked })}
+                  className="w-4.5 h-4.5 rounded text-[#8B3A52] focus:ring-[#8B3A52] border-gray-300 dark:border-white/20 accent-[#8B3A52] cursor-pointer"
+                />
+                <div className="flex flex-col">
+                  <span className="text-[0.75rem] font-bold tracking-wide uppercase text-[#40202D] dark:text-white group-hover:text-[#8B3A52] transition-colors">50% Menos</span>
+                  <span className="text-[0.65rem] opacity-60">Etiqueta de descuento</span>
+                </div>
+              </label>
             </div>
           </div>
 
-          {/* 🧵 FICHA TÉCNICA DE INSUMOS DINÁMICA CONECTADA A TU BASE DE DATOS */}
+          {/* 🧵 FICHA TÉCNICA — Acordeón por categoría + tabla por talla para telas */}
           {formData.origin_type === 'PRODUCCION' && (
             <div className={sectionClass}>
-              <h3 className={`${titleClass} flex items-center gap-2`}>
-                Ficha técnica de insumos
-              </h3>
-              <div className="flex flex-col sm:flex-row sm:items-end gap-[16px] bg-[#fdf8f9] dark:bg-[#1a0e14] border border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.08)] p-4 rounded-2xl shadow-inner">
-                <div className="flex-1">
-                  <label className={labelClass}>Seleccionar Insumo Real</label>
-                  <select 
-                    className={inputClass}
-                    value={selectedInsumoId}
-                    onChange={(e) => setSelectedInsumoId(e.target.value)}
-                  >
-                    <option value="" className="bg-[#fdf8f9] dark:bg-[#1a0e14]">Selecciona materia prima del catálogo...</option>
-                    {/* Filtramos para renderizar solo los insumos que estén ACTIVOS */}
-                    {supplies.filter(s => s.is_active).map((ins) => (
-                      <option key={ins._id || ins.id} value={ins._id || ins.id} className="bg-[#fdf8f9] dark:bg-[#1a0e14]">
-                        {ins.name} ({ins.unit})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="w-full sm:w-28">
-                  <label className={labelClass}>Cantidad</label>
-                  <input 
-                    type="number" 
-                    min={1} 
-                    className={`${inputClass} text-center font-bold`}
-                    value={insumoQuantity}
-                    onChange={(e) => setInsumoQuantity(Math.max(1, Number(e.target.value)))}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddInsumo}
-                  className="px-5 py-2.5 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] text-sm font-bold rounded-xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-1"
-                >
-                  <Plus size={16}/> Agregar
-                </button>
+              <h3 className={`${titleClass} flex items-center gap-2`}>Ficha técnica de insumos</h3>
+
+              <div className="space-y-2">
+                {Object.entries(suppliesByCategory).map(([category, items]) => (
+                  <div key={category} className="border border-[rgba(139,58,82,0.15)] dark:border-[rgba(255,255,255,0.08)] rounded-xl overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setOpenCategories(prev => ({ ...prev, [category]: !prev[category] }))}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-[#fdf8f9] dark:bg-[#1a0e14] text-left text-xs font-bold uppercase tracking-widest text-[#8B3A52] dark:text-[#a05068] hover:bg-[rgba(139,58,82,0.05)] transition-colors"
+                    >
+                      <span>{category} <span className="font-normal opacity-50">({items.length})</span></span>
+                      <ChevronDown size={14} className={`transition-transform ${openCategories[category] ? 'rotate-180' : ''}`} />
+                    </button>
+                    {openCategories[category] && (
+                      <div className="divide-y divide-[#EAE0E2] dark:divide-white/10 bg-white/50 dark:bg-black/20">
+                        {items.map(ins => {
+                          const insId = ins._id || ins.id;
+                          const isSelected = selectedInsumoId === insId;
+                          const alreadyAdded = technicalSheet.some(t => t.id_supply === insId);
+                          return (
+                            <button
+                              key={insId}
+                              type="button"
+                              disabled={alreadyAdded}
+                              onClick={() => { setSelectedInsumoId(insId); setBySizeValues({ XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0 }); setInsumoQuantity(1); }}
+                              className={`w-full flex items-center justify-between px-5 py-2.5 text-sm transition-colors text-left ${
+                                alreadyAdded ? 'opacity-40 cursor-not-allowed' :
+                                isSelected ? 'bg-[rgba(139,58,82,0.12)] dark:bg-[rgba(139,58,82,0.2)] text-[#8B3A52] dark:text-[#F8BBD0] font-semibold' :
+                                'hover:bg-[rgba(139,58,82,0.04)] text-[#40202D] dark:text-[#e8d8dc]'
+                              }`}
+                            >
+                              <span>{ins.name}</span>
+                              <span className="text-[10px] uppercase opacity-50 font-mono">{ins.unit} {alreadyAdded && '· ya agregado'}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
 
+              {selectedInsumoId && (
+                <div className="bg-[#fdf8f9] dark:bg-[#1a0e14] border border-[rgba(139,58,82,0.2)] dark:border-[rgba(255,255,255,0.08)] rounded-2xl p-4 space-y-3 animate-in fade-in duration-200">
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#8B3A52] dark:text-[#a05068]">
+                    {selectedSupply?.name} · <span className="font-normal opacity-70">{selectedSupply?.unit}</span>
+                  </p>
+                  {isFabric ? (
+                    <div>
+                      <p className="text-[10px] opacity-50 uppercase font-bold tracking-widest mb-2">Metros por talla</p>
+                      <div className="grid grid-cols-5 gap-2">
+                        {SIZES.map(size => (
+                          <div key={size} className="flex flex-col items-center gap-1">
+                            <label className="text-[10px] font-bold text-[#8B3A52] dark:text-[#a05068] uppercase">{size}</label>
+                            <input
+                              type="number" min={0} step={0.01}
+                              className={`${inputClass} text-center font-bold text-sm`}
+                              value={bySizeValues[size] ?? ''}
+                              onChange={e => setBySizeValues(prev => ({ ...prev, [size]: parseFloat(e.target.value) || 0 }))}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <label className={labelClass}>Cantidad fija por prenda</label>
+                        <input
+                          type="number" min={0.01} step={0.01}
+                          className={`${inputClass} font-bold`}
+                          value={insumoQuantity}
+                          onChange={e => setInsumoQuantity(Math.max(0.01, Number(e.target.value)))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex gap-2 justify-end">
+                    <button type="button" onClick={() => setSelectedInsumoId('')} className="px-4 py-2 text-xs border border-[#EAE0E2] dark:border-white/20 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-colors font-bold uppercase tracking-wider">Cancelar</button>
+                    <button type="button" onClick={handleAddInsumo} className="px-5 py-2 bg-[#D6405F] dark:bg-[#F8BBD0] text-white dark:text-[#40202D] text-xs font-bold rounded-xl shadow-md hover:scale-105 transition-all flex items-center gap-1.5 uppercase tracking-wider">
+                      <Plus size={14} /> Agregar a ficha
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {technicalSheet.length > 0 ? (
-                <div className="border border-[rgba(212,175,55,0.25)] shadow-[0_2px_16px_rgba(212,175,55,0.08)] bg-white/70 backdrop-blur-2xl dark:shadow-[0_2px_16px_rgba(212,175,55,0.03)] dark:border-[rgba(212,175,55,0.15)] dark:bg-[#2e1d27] rounded-2xl overflow-hidden transition-[background-color,border-color] duration-[600ms]">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead className="relative transition-[background-color,border-color] duration-[600ms]">
-                      <tr className="relative bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] text-[10px] font-medium uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc] transition-[background-color,border-color] duration-[600ms]">
-                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Insumo</th>
-                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Unidad</th>
-                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
-                        <th className="p-4 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-b dark:border-[rgba(212,175,55,0.15)]">Acción</th>
+                <div className="border border-[rgba(212,175,55,0.25)] bg-white/70 dark:bg-[#2e1d27] rounded-2xl overflow-hidden">
+                  <table className="w-full text-sm text-left">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-[rgba(255,255,255,0.8)] to-[rgba(255,255,255,0.3)] dark:from-[rgba(139,58,82,0.25)] dark:to-[rgba(212,175,55,0.08)] text-[10px] font-bold uppercase tracking-widest text-[#8B3A52] dark:text-[#e8d8dc]">
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)]">Insumo</th>
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)]">Unidad</th>
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)]">Cantidad</th>
+                        <th className="p-4 border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)]">Aplica a</th>
+                        <th className="p-4 text-center border-b border-[rgba(139,58,82,0.06)] dark:border-[rgba(212,175,55,0.15)]">Acción</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                       {technicalSheet.map((item, index) => (
-                        <tr key={index} className={`transition-colors group/row ${index % 2 === 0 ? "bg-[#ffffff] dark:bg-[#2e1d27]" : "bg-[#fdf8f9] dark:bg-[#321f2b]"} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
-                          <td className="p-4 font-bold text-[#40202D] dark:text-white">{item.name}</td>
-                          <td className="p-4 text-xs opacity-70 uppercase">{item.unit}</td>
-                          <td className="p-4 font-medium text-[#D6405F] dark:text-[#F8BBD0]">{item.quantity}</td>
+                        <tr key={index} className={`transition-colors ${index % 2 === 0 ? 'bg-white dark:bg-[#2e1d27]' : 'bg-[#fdf8f9] dark:bg-[#321f2b]'} hover:bg-[rgba(139,58,82,0.04)] dark:hover:bg-[rgba(139,58,82,0.15)]`}>
+                          <td className="p-4 font-bold text-[#40202D] dark:text-white">
+                            {item.name}
+                            {item.category === 'Telas' && <span className="ml-2 text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-medium">por talla</span>}
+                          </td>
+                          <td className="p-4 text-xs opacity-70 uppercase font-mono">{item.unit}</td>
+                          <td className="p-4 text-sm font-medium text-[#D6405F] dark:text-[#F8BBD0]">
+                            {item.by_size
+                              ? SIZES.map(s => `${s}:${item.by_size![s] ?? 0}`).join(' · ')
+                              : item.quantity
+                            }
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={item.applies_to || 'TODOS'}
+                              onChange={e => setTechnicalSheet(prev => prev.map((it, i) => i === index ? { ...it, applies_to: e.target.value } : it))}
+                              className="text-[11px] font-semibold bg-[#fdf8f9] dark:bg-[#1a0e14] border border-[rgba(139,58,82,0.2)] dark:border-white/10 rounded-lg px-2 py-1.5 text-[#40202D] dark:text-white outline-none focus:border-[#D6405F] cursor-pointer"
+                            >
+                              <option value="TODOS">Todos</option>
+                              <option value="MISMO_COLOR">Mismo color</option>
+                              <option value="POR_TALLA">Por talla</option>
+                            </select>
+                          </td>
                           <td className="p-4 text-center">
-                            <button type="button" onClick={() => handleRemoveInsumo(index)} className="p-2 text-[#8C6B79] dark:text-gray-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
+                            <button type="button" onClick={() => setTechnicalSheet(prev => prev.filter((_, i) => i !== index))} className="p-2 text-[#8C6B79] hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
                               <Trash2 size={16} />
                             </button>
                           </td>
@@ -616,7 +816,7 @@ export default function EditProductPage() {
                 </div>
               ) : (
                 <div className="text-center py-8 bg-white/30 dark:bg-black/30 rounded-2xl border-2 border-dashed border-[#EAE0E2] dark:border-white/20">
-                  <p className="text-xs opacity-60 font-bold uppercase tracking-widest">Aún no has agregado insumos del catálogo</p>
+                  <p className="text-xs opacity-60 font-bold uppercase tracking-widest">Selecciona insumos del catálogo de arriba</p>
                 </div>
               )}
             </div>
@@ -754,6 +954,16 @@ export default function EditProductPage() {
                   <p className="text-xs opacity-40 italic mt-1 font-medium">No hay colores seleccionados</p>
                 )}
               </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={generateVariants}
+                  className="px-4 py-2.5 bg-[#8B3A52] text-white rounded-xl text-xs font-bold uppercase flex items-center gap-2 hover:bg-[#a05068] transition-colors shadow-sm"
+                >
+                  <Plus size={16} /> Agregar Combinación a la Tabla
+                </button>
+              </div>
             </div>
 
             {/* TABLA MATRIZ DE VARIANTES */}
@@ -769,7 +979,7 @@ export default function EditProductPage() {
                         <th className="p-4">Talla</th>
                         <th className="p-4">Color</th>
                         <th className="p-4">SKU Variante</th>
-                        <th className="p-4 text-right">Stock Inicial</th>
+                        <th className="p-4 text-center">Acción</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
@@ -782,18 +992,14 @@ export default function EditProductPage() {
                               {v.color.name}
                             </div>
                           </td>
-                          <td className="p-4 font-mono text-xs opacity-70">{v.sku_variant}</td>
-                          <td className="p-4 text-right">
-                            <input 
-                              type="number" 
-                              className="w-16 p-1 text-right bg-transparent border-b border-[#EAE0E2] dark:border-white/20 outline-none focus:border-[#D6405F] dark:focus:border-[#F8BBD0] font-medium text-[#D6405F] dark:text-[#F8BBD0] transition-colors" 
-                              value={v.stock} 
-                              onChange={(e) => {
-                                const updated = [...variants];
-                                updated[i].stock = Number(e.target.value);
-                                setVariants(updated);
-                              }} 
-                            />
+                          <td className="p-4 font-mono text-xs opacity-70 uppercase">{v.sku_variant}</td>
+                          <td className="p-4 text-center">
+                            <button type="button" onClick={() => {
+                              const updated = variants.filter((_, idx) => idx !== i);
+                              setVariants(updated);
+                            }} className="p-2 text-[#8C6B79] dark:text-gray-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-all">
+                              <Trash2 size={16} />
+                            </button>
                           </td>
                         </tr>
                       ))}

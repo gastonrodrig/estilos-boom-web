@@ -137,8 +137,16 @@ export default function ProductDetailPage() {
                   <tbody className="divide-y divide-[#EAE0E2] dark:divide-white/10">
                     {product.technical_sheet.map((item: any, idx: number) => (
                       <tr key={idx} className="border-b border-zinc-200 dark:border-[#8B3A52]/10 transition-colors hover:bg-zinc-100 dark:hover:bg-[#8B3A52]/10">
-                        <td className="p-4 text-sm text-zinc-300 font-normal">{item.name}</td>
-                        <td className="p-4 text-xs text-zinc-500 dark:text-[#F8BBD0]/80 uppercase">{item.unit}</td>
+                        <td className="p-4 text-sm font-medium text-zinc-700 dark:text-[#fdf6f0]">
+                          <div>{item.id_supply?.name ?? item.name ?? '—'}</div>
+                          {item.detail && <div className="text-[11px] text-zinc-400 dark:text-[#F8BBD0]/50 font-normal mt-0.5">{item.detail}</div>}
+                          {item.applies_to && item.applies_to !== 'TODOS' && (
+                            <div className="text-[10px] text-[#8B3A52]/60 mt-0.5">
+                              {item.applies_to === 'MISMO_COLOR' ? 'Mismo color que variante' : `Color: ${item.applies_to}`}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-4 text-xs text-zinc-500 dark:text-[#F8BBD0]/80 uppercase">{item.id_supply?.unit ?? item.unit ?? '—'}</td>
                         <td className="p-4 text-right text-sm text-zinc-800 dark:text-[#fdf6f0] font-semibold">{item.quantity}</td>
                       </tr>
                     ))}

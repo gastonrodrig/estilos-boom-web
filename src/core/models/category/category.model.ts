@@ -4,10 +4,11 @@ export interface Category {
   _id: string;
   id_category: string;
   name: string;
+  abbr?: string;
   description?: string;
-  status?: boolean;     // ✅ En tu log salía 'status', no 'is_active'
+  status?: boolean;
   created_at?: string;
-  updated_at?: string;  // ✅ Agregamos este que también venía en el log
+  updated_at?: string;
   __v?: number;
 }
 
@@ -27,5 +28,6 @@ export interface CategoryState {
 
 export interface CreateCategoryModelInput {
   name: string;
+  abbr?: string;
   description?: string;
 }

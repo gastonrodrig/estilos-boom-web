@@ -14,6 +14,11 @@ export interface ProductVariantColor {
   hex: string;
 }
 
+export interface ProductImage {
+  url: string;
+  color?: string | null;
+}
+
 // 2. Actualizamos la interfaz del Producto
 export interface Product {
   id_product: string;
@@ -24,8 +29,12 @@ export interface Product {
   is_active: boolean;
   is_best_seller: boolean;
   is_new_in: boolean;
+  is_discount: boolean;
   images: string[];
-  
+  // Imágenes con su color asociado (para filtrar por color en el detalle).
+  // Paralelo a `images` para no romper los consumidores que solo usan URLs.
+  imagesWithColor?: ProductImage[];
+
   // --- NUEVOS CAMPOS (Coinciden con NestJS) ---
   gender: 'MUJER' | 'HOMBRE' | 'UNISEX';
   style_type?: string;        // Ej: 'CASUAL PREMIUM'

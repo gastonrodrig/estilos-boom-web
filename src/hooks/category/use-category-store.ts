@@ -62,6 +62,23 @@ export const useCategoryStore = () => {
     }
   };
 
+  const startDeactivateCategory = async (id: string) => {
+    dispatch(setLoadingCategory(true));
+    try {
+      const token = await getFirebaseAuthToken();
+      await categoryApi.delete(`/${id}`, getAuthConfig({ token }));
+      await startLoadingCategories();
+      toast.success("Categoría desactivada correctamente.");
+      return true;
+    } catch (error: unknown) {
+      const message = (error as HttpError).response?.data?.message;
+      toast.error(message ?? "Ocurrió un error al desactivar la categoría.");
+      return false;
+    } finally {
+      dispatch(setLoadingCategory(false));
+    }
+  };
+
   const startLoadingCategories = useCallback(async () => {
     dispatch(setLoadingCategory(true));
     try {
@@ -86,7 +103,8 @@ export const useCategoryStore = () => {
     total,
     loading,
     startCreateCategory,
-    startUpdateCategory, // 👈 Expuesto para el modal
-    startLoadingCategories
+    startUpdateCategory,
+    startDeactivateCategory,
+    startLoadingCategories,
   };
 };

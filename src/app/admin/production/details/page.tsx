@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { 
-  Search, ChevronDown, Package, Factory, 
-  ClipboardCheck, CheckCircle2, XCircle, Eye, 
+import {
+  Search, ChevronDown, Package, Factory,
+  ClipboardCheck, CheckCircle2, XCircle, Eye,
   CalendarClock, FileText, Plus, ArrowRight,
-  Clock, Activity, Star
+  Clock, Activity, Star, ShoppingBag, Trash2
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-hot-toast";
@@ -53,7 +53,7 @@ const StarRating = ({ rating, setRating, size = 6 }: { rating: number; setRating
 // COMPONENTE PRINCIPAL DE LA PÁGINA
 // ==========================================
 export default function ProductionOrderTracking() {
-  const { orders, startLoadingProductionOrders, startUpdateProductionStatus, startConfirmWorkshop, startUpdateWorkshopQuote, startUpdateSubState } = useProductionStore();
+  const { orders, startLoadingProductionOrders, startUpdateProductionStatus, startConfirmWorkshop, startUpdateWorkshopQuote, startUpdateSubState, startDeleteProductionOrder } = useProductionStore();
   const [filter, setFilter] = useState("TODAS");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedWorkshop, setSelectedWorkshop] = useState("Todos los Talleres");
@@ -100,9 +100,34 @@ export default function ProductionOrderTracking() {
     const order = orders.find((o: any) => o._id === orderId);
     if (!order) return;
 
+    // Detect format: new modal sends { variantId: totalForVariant }, old sends { workshopId_variantId: unitCost }
+    const selectedQuote = order.quotes?.find((q: any) => q.quote_status === 'SELECCIONADO')
+      || order.quotes?.[0];
+    const defaultWorkshopId = selectedQuote?.id_agent?._id || (typeof selectedQuote?.id_agent === 'string' ? selectedQuote.id_agent : null);
+
     const workshopCosts: Record<string, any[]> = {};
+
     Object.keys(costs).forEach(key => {
-      const [workshopId, varId] = key.split('_');
+      // New format: key is just variantId (no underscore separator with a known workshopId)
+      const matchingItem = order.base_items?.find((i: any) => {
+        const varId = typeof i.id_variant === 'string' ? i.id_variant : i.id_variant?._id;
+        return varId === key;
+      });
+
+      if (matchingItem && defaultWorkshopId) {
+        const wId = String(defaultWorkshopId);
+        const varId = typeof matchingItem.id_variant === 'string' ? matchingItem.id_variant : matchingItem.id_variant?._id;
+        if (!workshopCosts[wId]) workshopCosts[wId] = [];
+        const perUnit = matchingItem.quantity > 0 ? costs[key] / matchingItem.quantity : costs[key];
+        workshopCosts[wId].push({ id_variant: varId, quantity: matchingItem.quantity, unit_cost: perUnit });
+        return;
+      }
+
+      // Legacy format: workshopId_variantId
+      const underscoreIdx = key.indexOf('_');
+      if (underscoreIdx === -1) return;
+      const workshopId = key.slice(0, underscoreIdx);
+      const varId = key.slice(underscoreIdx + 1);
       if (!workshopId || !varId) return;
       if (!workshopCosts[workshopId]) workshopCosts[workshopId] = [];
       const item = order.base_items?.find((i: any) => (typeof i.id_variant === 'string' ? i.id_variant : i.id_variant?._id) === varId);
@@ -162,6 +187,13 @@ const handleApproveTrackingQuality = async (orderId: string) => {
     toast.error("Error al actualizar la orden.");
   }
 };
+
+  const deleteOrder = async (id: string) => {
+    if (!confirm("¿Eliminar esta orden de producción?")) return;
+    const result = await startDeleteProductionOrder(id);
+    if (result.ok) toast.success("Orden eliminada");
+    else toast.error(result.message || "Error al eliminar la orden");
+  };
 
 if (trackingViewOrder) {
   return (
@@ -306,6 +338,7 @@ if (trackingViewOrder) {
               onUpdateCosts={updateOrderCosts}
               onOpenTracking={openTrackingView}
               onUpdateSubState={startUpdateSubState}
+              onDelete={deleteOrder}
             />
           ));
         })()}
@@ -324,11 +357,13 @@ function ProductionCard({
   onUpdateCosts,
   onOpenTracking,
   onUpdateSubState,
+  onDelete,
 }: {
   order: any;
   onUpdateStatus: (id: string, status: string, winnerId?: string) => Promise<void>;
   onUpdateCosts: (id: string, costs: Record<string, number>) => Promise<void>;
   onOpenTracking: (order: any) => void;
+  onDelete: (id: string) => Promise<void>;
   onUpdateSubState: (id: string, step: string) => Promise<any>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -371,12 +406,8 @@ function ProductionCard({
   };
 
   const handleConfirmCosts = async (costs: Record<string, number>) => {
-    let sum = 0;
-    order.base_items?.forEach((item: any, idx: number) => {
-      const anyKey = Object.keys(costs).find(k => k.endsWith(`_${item.id_variant?._id || idx}`));
-      if (anyKey) sum += (costs[anyKey] || 0) * item.quantity;
-      else if (costs[item.id_variant?._id || idx]) sum += (costs[item.id_variant?._id || idx] || 0) * item.quantity;
-    });
+    // El modal ya guarda perUnit * quantity por variante — solo sumamos los valores
+    const sum = Object.values(costs).reduce((acc, val) => acc + (val || 0), 0);
     setLocalTotal(sum);
     setConfirmedCosts({...costs});
     await onUpdateCosts(order._id, costs);
@@ -398,10 +429,14 @@ function ProductionCard({
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-4 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-             <img 
-                src={firstItem?.images?.[0] || firstItem?.image || "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=400"} 
-                alt={firstItem?.name || "Product"} 
-                className="h-full w-full object-cover transition-transform group-hover:scale-110 duration-700" 
+             <img
+                src={
+                  (typeof firstItem?.images?.[0] === 'object' ? firstItem?.images?.[0]?.url : firstItem?.images?.[0])
+                  || firstItem?.image
+                  || "/placeholder.jpg"
+                }
+                alt={firstItem?.name || "Product"}
+                className="h-full w-full object-cover transition-transform group-hover:scale-110 duration-700"
              />
           </div>
           <div className="space-y-1 sm:space-y-2 flex-1">
@@ -445,12 +480,6 @@ function ProductionCard({
                 <CalendarClock className="w-3.5 h-3.5 text-[#D6405F] dark:text-[#F8BBD0]" />
                 Entrega estimada: <span className="text-[#6b3a48] dark:text-[#c4a0ae] font-medium">{formatDate(localEstimatedDate)}</span>
               </p>
-              <button 
-                onClick={() => setActiveModal("DATE")} 
-                className="flex items-center gap-1 text-[10px] text-[#D6405F] dark:text-[#c4a0ae] font-medium uppercase tracking-wider bg-[#D6405F]/10 dark:bg-transparent border border-transparent dark:border-[rgba(139,58,82,0.4)] px-3 py-1.5 rounded-full dark:rounded-[8px] hover:bg-[#D6405F] dark:hover:bg-[rgba(139,58,82,0.2)] hover:text-white dark:hover:text-[#e8d8dc] transition-colors shadow-sm"
-              >
-                <Plus className="w-3 h-3" /> Prolongar
-              </button>
             </div>
           </div>
         </div>
@@ -471,7 +500,14 @@ function ProductionCard({
             <div className="text-2xl sm:text-[1.3rem] font-semibold text-[#2d1f25] dark:text-[#e8d8dc] tracking-tighter drop-shadow-sm">
               {formatCurrency(actualTotal)}
             </div>
-            <button 
+            <button
+              onClick={() => onDelete(order._id)}
+              title="Eliminar orden"
+              className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-red-200 dark:border-red-900/40 bg-white/50 dark:bg-white/5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-400 hover:text-red-600 transition-colors shadow-sm"
+            >
+              <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+            <button
               onClick={() => setIsOpen(!isOpen)}
               className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-[#EAE0E2] dark:border-white/10 bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm"
             >
@@ -483,25 +519,31 @@ function ProductionCard({
 
       <div className="mt-10 sm:mt-14 mb-6 px-2 sm:px-4 relative overflow-x-auto sm:overflow-visible no-scrollbar">
         <div className="min-w-[600px] sm:min-w-0 pb-2">
-          <div className="absolute top-[22px] sm:top-[26px] left-[15%] right-[15%] h-[6px] sm:h-[8px] bg-[rgba(139,58,82,0.2)] dark:bg-[rgba(255,255,255,0.1)] z-0" />
-          <div className="grid grid-cols-3 relative z-10">
-            <StepItem 
-              active={true} icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />} 
+          <div className="absolute top-[22px] sm:top-[26px] left-[10%] right-[10%] h-[6px] sm:h-[8px] bg-[rgba(139,58,82,0.2)] dark:bg-[rgba(255,255,255,0.1)] z-0" />
+          <div className="grid grid-cols-4 relative z-10">
+            <StepItem
+              active={true} icon={<Package className="h-5 w-5 sm:h-6 sm:w-6" />}
               label="Contacto Inicial" sub="Orden confirmada" date={order.created_at}
             />
-           <StepItem 
-  active={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"} 
-  icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />} 
-  label="En Preparación"
-  sub="Corte y Confección" 
-  date={(order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD") ? (getStepDate("EN_PRODUCCION") || undefined) : undefined}
-  interactive={order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"}
-  onClick={() => onOpenTracking(order)}
-/>
             <StepItem
-              active={order.status === "CONTROL_CALIDAD" || order.status === "COMPLETADA"} icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />}
+              active={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"}
+              icon={<ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />}
+              label="Alistando Insumos" sub="Almacén confirmando"
+              date={order.status === "COMPARANDO" || order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD" ? (getStepDate("COMPARANDO") || undefined) : undefined}
+            />
+            <StepItem
+              active={order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"}
+              icon={<Factory className="h-5 w-5 sm:h-6 sm:w-6" />}
+              label="En Preparación" sub="Corte y Confección"
+              date={order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD" ? (getStepDate("EN_PRODUCCION") || undefined) : undefined}
+              interactive={order.status === "EN_PRODUCCION" || order.status === "CONTROL_CALIDAD"}
+              onClick={() => onOpenTracking(order)}
+            />
+            <StepItem
+              active={order.status === "CONTROL_CALIDAD" || order.status === "COMPLETADA"}
+              icon={<ClipboardCheck className="h-5 w-5 sm:h-6 sm:w-6" />}
               label="Verificación" sub="Revisión y aprobación"
-              date={(order.status === "CONTROL_CALIDAD" || order.status === "COMPLETADA") ? (getStepDate("CONTROL_CALIDAD") || undefined) : undefined}
+              date={order.status === "CONTROL_CALIDAD" || order.status === "COMPLETADA" ? (getStepDate("CONTROL_CALIDAD") || undefined) : undefined}
             />
           </div>
         </div>
@@ -614,9 +656,9 @@ function ProductionCard({
               
               {(order.status === "CONTACTO_INICIAL" || order.status === "COMPARANDO") && (
                 <>
-                  <CTA 
-                    onClick={() => setActiveModal("COST")}
-                    className="!bg-white/50 dark:!bg-white/5 border border-[#8C6B79] dark:border-gray-500 !text-[#40202D] dark:!text-white !py-3 !px-8 shadow-sm hover:!bg-white/80 dark:hover:!bg-white/10 backdrop-blur-md"
+                  <CTA
+                    onClick={() => order.status === "CONTACTO_INICIAL" && setActiveModal("COST")}
+                    className={`!bg-white/50 dark:!bg-white/5 border !py-3 !px-8 shadow-sm backdrop-blur-md ${order.status === "COMPARANDO" ? "border-gray-200 dark:border-gray-700 !text-gray-400 dark:!text-gray-600 cursor-not-allowed opacity-50" : "border-[#8C6B79] dark:border-gray-500 !text-[#40202D] dark:!text-white hover:!bg-white/80 dark:hover:!bg-white/10"}`}
                     icon={FileText}
                   >
                     Registrar Costos de Taller
@@ -631,10 +673,10 @@ function ProductionCard({
                   >
                     Rechazar Orden
                   </CTA>
-                  {displayTotal > 0 && (
-                    <CTA 
+                  {displayTotal > 0 && order.status === "CONTACTO_INICIAL" && (
+                    <CTA
                       onClick={() => setActiveModal("WINNER")}
-                      className="!bg-gradient-to-r from-[#D6405F] to-[#F23B69] dark:from-[#F8BBD0] dark:to-[#F48FB1] !text-white dark:!text-[#1A0B11] !border-none !py-3 !px-8 shadow-[0_8px_20px_rgba(214,64,95,0.3)] dark:shadow-[0_8px_20px_rgba(248,187,208,0.3)] hover:scale-[1.02]"
+                      className="!py-3 !px-8 !bg-gradient-to-r from-[#D6405F] to-[#F23B69] !text-white !border-none shadow-[0_8px_20px_rgba(214,64,95,0.3)] hover:scale-[1.02]"
                       icon={CheckCircle2}
                     >
                       Confirmar Taller
@@ -659,6 +701,25 @@ function ProductionCard({
                   >
                     Continuar Orden
                   </CTA>
+                </div>
+              )}
+
+              {order.status === "COMPARANDO" && (
+                <div className="flex items-center gap-3 mt-2">
+                  {order.insumos_confirmados ? (
+                    <CTA
+                      onClick={() => setActiveModal("STATUS")}
+                      className="!py-3 !px-8 !bg-gradient-to-r from-[#D6405F] to-[#F23B69] !text-white !border-none shadow-[0_8px_20px_rgba(214,64,95,0.3)] hover:scale-[1.02]"
+                      icon={Factory}
+                    >
+                      Iniciar En Preparación
+                    </CTA>
+                  ) : (
+                    <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 text-amber-700 dark:text-amber-300 text-xs font-medium">
+                      <Clock className="w-3.5 h-3.5 shrink-0" />
+                      Esperando confirmación de insumos del almacenero
+                    </div>
+                  )}
                 </div>
               )}
 

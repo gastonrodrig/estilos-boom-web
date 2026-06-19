@@ -118,27 +118,44 @@ export default function AdminPreProductionCreatePage() {
     void loadWorkshops();
   }, []);
 
-  // Recalcular insumos automáticamente cuando cambie la cantidad total o el producto
+  // Cargar ficha técnica real del producto desde la API
   useEffect(() => {
-    if (totalQuantity > 0) {
-      const categoryRaw = (prefillData?.items?.[0]?.category_name || "DEFAULT").toUpperCase();
-      // Búsqueda inteligente: si la categoría real contiene alguna de nuestras claves
-      const categoryKey = Object.keys(categoryBOMs).find(key => categoryRaw.includes(key)) || "DEFAULT";
-      const bomToUse = categoryBOMs[categoryKey];
+    const productId = prefillData?.items?.[0]?.product_id;
+    if (!productId || totalQuantity === 0) return;
 
-      setSupplies(bomToUse.map((item, idx) => {
-        const theoretical = parseFloat((item.unitConsumption * totalQuantity).toFixed(2));
-        return {
-          id: idx.toString(),
-          name: item.name,
-          unitConsumption: item.unitConsumption,
-          theoreticalQuantity: theoretical,
-          totalQuantity: theoretical,
-          unit: item.unit
-        };
-      }));
-    }
-  }, [totalQuantity, prefillData, categoryBOMs]);
+    import("@/api/product/product-api").then(({ productApi }) => {
+      productApi.get(`/${productId}`).then(({ data }) => {
+        const sheet = data.technical_sheet;
+        if (!sheet || sheet.length === 0) {
+          // Fallback a BOM por categoría si no hay ficha técnica
+          const categoryRaw = (prefillData?.items?.[0]?.category_name || "DEFAULT").toUpperCase();
+          const categoryKey = Object.keys(categoryBOMs).find(key => categoryRaw.includes(key)) || "DEFAULT";
+          const bomToUse = categoryBOMs[categoryKey];
+          setSupplies(bomToUse.map((item, idx) => {
+            const theoretical = parseFloat((item.unitConsumption * totalQuantity).toFixed(2));
+            return { id: idx.toString(), name: item.name, unitConsumption: item.unitConsumption, theoreticalQuantity: theoretical, totalQuantity: theoretical, unit: item.unit };
+          }));
+          return;
+        }
+
+        setSupplies(sheet.map((item: any, idx: number) => {
+          const supply = item.id_supply;
+          const name = supply?.name ?? "Insumo";
+          const unit = supply?.unit ?? "unidades";
+          const unitConsumption = item.quantity ?? 1;
+          const theoretical = parseFloat((unitConsumption * totalQuantity).toFixed(3));
+          return {
+            id: idx.toString(),
+            name,
+            unitConsumption,
+            theoreticalQuantity: theoretical,
+            totalQuantity: theoretical,
+            unit,
+          };
+        }));
+      }).catch(() => {});
+    });
+  }, [totalQuantity, prefillData]);
 
   const specialties = useMemo(() => {
     const set = new Set(workshops.map(w => w.specialty).filter(Boolean));

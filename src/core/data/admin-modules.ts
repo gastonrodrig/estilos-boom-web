@@ -41,7 +41,7 @@ export const adminModules: SidebarModule[] = [
       icon: "spool", // ✂️ Evoca confección, telas e hilados
       href: "/admin/supplies",
       requiredRoles: ["Administrador"],
-    },
+  },
   {
     label: "Produccion",
     icon: "factory",
