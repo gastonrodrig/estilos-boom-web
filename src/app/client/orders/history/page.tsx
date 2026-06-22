@@ -85,7 +85,7 @@ export default function OrderHistoryPage() {
                   {order.items && order.items.map((item: any, idx: number) => (
                     <div key={idx} className="relative group cursor-pointer">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-[#FAF9F6] dark:bg-white/5 border border-[#EBEAE8] dark:border-[#e8688a]/20 shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:border-[#F2D0D3] dark:group-hover:border-[#e8688a] group-hover:shadow-md">
-                        <img src={item.image || "/placeholder.jpg"} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.image || "/assets/logo-eb.png"} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       {/* Tooltip on hover */}
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#632034] dark:bg-[#e8688a] text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg pointer-events-none z-20">

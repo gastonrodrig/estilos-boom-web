@@ -112,7 +112,8 @@ export const ProductDetail = ({ product }: Props) => {
     return legacy.length > 0 ? legacy : (product.images ?? []);
   }, [selectedColor, product.imagesWithColor, product.images]);
 
-  const [mainImage, setMainImage] = useState(product.images?.[0] ?? "/placeholder.jpg");
+  const getImageSrc = (img: any) => typeof img === "object" ? img?.url : img;
+  const [mainImage, setMainImage] = useState(getImageSrc(product.images?.[0]) || "/assets/logo-eb.png");
 
   // Cuando cambia el color, actualiza la imagen principal
   const handleColorChange = (colorName: string) => {
@@ -129,7 +130,7 @@ export const ProductDetail = ({ product }: Props) => {
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/\s+/g, '_');
     const match = product.images?.find(url => url.toLowerCase().includes(safeColor));
-    setMainImage(match ?? product.images?.[0] ?? "/placeholder.jpg");
+    setMainImage(getImageSrc(match ?? product.images?.[0]) ?? "/assets/logo-eb.png");
   };
 
   const availableSizes = useMemo(() => {
@@ -173,7 +174,7 @@ export const ProductDetail = ({ product }: Props) => {
       quantity,
       color: selectedColor,
       size: selectedSize,
-      image: product.images?.[0] ?? "/placeholder.jpg",
+      image: getImageSrc(product.images?.[0]) ?? "/assets/logo-eb.png",
       stock: maxStockForSelection,
       categoryId: product.id_category,
       categoryName: product.category?.name,
@@ -203,7 +204,7 @@ export const ProductDetail = ({ product }: Props) => {
           <div className="lg:col-span-8 flex flex-col gap-6">
             <motion.div layoutId="main-img" className="aspect-3/4 bg-white dark:bg-transparent overflow-hidden relative border border-transparent dark:border-transparent">
               <img
-                src={mainImage || "/placeholder.jpg"}
+                src={getImageSrc(mainImage) || "/assets/logo-eb.png"}
                 className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                 alt={product.name}
               />

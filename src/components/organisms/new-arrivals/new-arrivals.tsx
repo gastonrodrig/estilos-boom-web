@@ -23,7 +23,7 @@ export const NewArrivals = () => {
             id: p.id_product || p._id || "",
             name: p.name || "Producto",
             price: `S/ ${Number(p.base_price || 0).toFixed(2)}`,
-            image: (p.images && p.images.length > 0) ? p.images[0] : "/placeholder.jpg",
+            image: (typeof p.images?.[0] === "object" ? (p.images[0] as any).url : p.images?.[0]) || "/assets/logo-eb.png",
             href: `/product/${p.id_product || p._id}`,
             isSoldOut: hasVariants && totalStock === 0,
           };

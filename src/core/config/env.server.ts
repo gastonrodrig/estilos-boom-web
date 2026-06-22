@@ -8,8 +8,12 @@ const IS_DEV = process.env.NODE_ENV === "development";
 const IS_PROD = process.env.NODE_ENV === "production";
 
 // Backend NestJS
+// Lee el puerto desde la variable de entorno. Si no está definida, usa 3000 (default NestJS).
+// Cada dev puede personalizar su puerto en su archivo .env local.
 const BASE_URL = IS_DEV
-  ? process.env.NEXT_PUBLIC_BASE_URL_DEV
+  ? (process.env.NEXT_PUBLIC_BASE_URL_DEV?.startsWith('http')
+      ? process.env.NEXT_PUBLIC_BASE_URL_DEV
+      : "http://localhost:3000/api/v1")
   : process.env.NEXT_PUBLIC_BASE_URL_PROD;
 
 if (!BASE_URL) {

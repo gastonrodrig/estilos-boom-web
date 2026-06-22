@@ -39,9 +39,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Image */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-transparent">
           <Image
-            src={product.image}
+            src={(typeof product.image === "string" && product.image.trim() !== "") ? product.image : (typeof product.image === "object" && (product.image as any)?.url ? (product.image as any).url : "/assets/logo-eb.png")}
             alt={product.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
           />
 

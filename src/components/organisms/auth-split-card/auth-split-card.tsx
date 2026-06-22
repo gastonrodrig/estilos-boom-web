@@ -17,10 +17,11 @@ export const AuthSplitCard = ({
       <div className="relative hidden md:block md:w-1/2 lg:w-[55%]">
         <Image
           src="/assets/auth-split-card-img.png"
-          alt="Auth visual"
+          alt="Auth background"
           fill
+          sizes="50vw"
           priority
-          className="object-cover object-top"
+          className="object-cover object-top transition-transform duration-1000 hover:scale-105"
         />
         {/* Subtle elegant overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#632034]/60 via-transparent to-transparent mix-blend-multiply" />
@@ -44,8 +45,9 @@ export const AuthSplitCard = ({
             <div className="relative w-10 sm:w-12 h-10 sm:h-12 mb-1">
               <Image
                 src="/assets/auth-icon.png"
-                alt="Logo"
+                alt="Auth decoration"
                 fill
+                sizes="100px"
                 className="object-contain"
               />
             </div>

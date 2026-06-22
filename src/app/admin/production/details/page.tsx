@@ -433,7 +433,7 @@ function ProductionCard({
                 src={
                   (typeof firstItem?.images?.[0] === 'object' ? firstItem?.images?.[0]?.url : firstItem?.images?.[0])
                   || firstItem?.image
-                  || "/placeholder.jpg"
+                  || "/assets/logo-eb.png"
                 }
                 alt={firstItem?.name || "Product"}
                 className="h-full w-full object-cover transition-transform group-hover:scale-110 duration-700"

@@ -16,6 +16,10 @@ export const Carousel: React.FC<CarouselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
 
+  if (!items || items.length === 0) {
+    return null;
+  }
+
   const handlePrev = () => {
     setDirection(-1);
     setCurrentIndex((prev) =>

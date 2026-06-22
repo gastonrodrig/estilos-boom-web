@@ -73,7 +73,7 @@ export const ProductCardCatalogue = ({ product }: Props) => {
       <div className="product-image-wrapper relative overflow-hidden">
         <Link href={`/product/${product.id_product}`} className="block w-full h-full">
           <img
-            src={product.images[0] || "/placeholder.jpg"}
+            src={(typeof product.images?.[0] === "object" ? (product.images[0] as any).url : product.images?.[0]) || "/assets/logo-eb.png"}
             alt={product.name}
             className="product-image"
           />
