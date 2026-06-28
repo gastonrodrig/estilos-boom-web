@@ -457,11 +457,16 @@ export default function AdminPreProductionCreatePage() {
                   
                   {/* VARIANTES Y CANTIDADES */}
                   <div>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-4">
                       <h2 className="text-sm font-semibold text-[#40202D] dark:text-white">Variantes y Cantidades</h2>
                       <button onClick={addVariant} className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D6405F]/10 dark:bg-[#F8BBD0]/10 text-xs font-bold text-[#D6405F] dark:text-[#F8BBD0] hover:bg-[#D6405F]/20 dark:hover:bg-[#F8BBD0]/20 transition-all hover:scale-105">
                         <Plus className="h-4 w-4" /> Agregar Variante
                       </button>
+                    </div>
+                    {/* Aplicar cantidad a todas */}
+                    <div className="flex items-center gap-3 mb-5 p-3 rounded-2xl bg-[#D6405F]/5 dark:bg-[#F8BBD0]/5 border border-[#D6405F]/15 dark:border-[#F8BBD0]/15">
+                      <span className="text-xs font-medium text-[#8C6B79] dark:text-gray-400 whitespace-nowrap">Aplicar a todas:</span>
+                      <BulkQuantityInput onApply={(qty) => setVariants(v => v.map(item => ({ ...item, quantity: qty })))} />
                     </div>
                     <div className="space-y-3">
                       <div className="grid grid-cols-12 gap-4 px-3 pb-1 text-xs font-medium text-[#8C6B79] dark:text-gray-400 uppercase">
@@ -839,6 +844,29 @@ export default function AdminPreProductionCreatePage() {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #F2D0D3; border-radius: 10px; }
       `}</style>
     </section>
+  );
+}
+
+function BulkQuantityInput({ onApply }: { onApply: (qty: number) => void }) {
+  const [value, setValue] = useState(5);
+  return (
+    <div className="flex items-center gap-2 flex-1">
+      <div className="flex items-center bg-white/60 dark:bg-black/40 border border-[#EAE0E2]/50 dark:border-white/5 rounded-xl p-1">
+        <button onClick={() => setValue(v => Math.max(1, v - 1))} className="h-7 w-7 rounded-lg bg-white dark:bg-zinc-800 text-[#D6405F] dark:text-[#F8BBD0] flex items-center justify-center font-bold hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors text-sm">-</button>
+        <input
+          type="number" min={1} value={value}
+          onChange={e => setValue(Math.max(1, parseInt(e.target.value) || 1))}
+          className="w-12 text-center bg-transparent text-sm font-medium text-[#40202D] dark:text-white outline-none"
+        />
+        <button onClick={() => setValue(v => v + 1)} className="h-7 w-7 rounded-lg bg-white dark:bg-zinc-800 text-[#D6405F] dark:text-[#F8BBD0] flex items-center justify-center font-bold hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors text-sm">+</button>
+      </div>
+      <button
+        onClick={() => onApply(value)}
+        className="px-4 py-2 rounded-xl bg-[#D6405F] text-white text-xs font-bold hover:bg-[#F23B69] transition-all hover:scale-105 shadow-sm"
+      >
+        Aplicar
+      </button>
+    </div>
   );
 }
 

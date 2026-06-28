@@ -239,7 +239,9 @@ const CheckoutPaymentForm: React.FC = () => {
             toast.success('¡Pago aprobado!');
             const success = await submitOrder();
             if (success) {
+              const orderTotal = itemsRef.current.reduce((acc, i) => acc + i.price * i.quantity, 0) + (deliveryMethodRef.current?.price || 0);
               sessionStorage.setItem('mp_payment_approved', 'true');
+              sessionStorage.setItem('mp_order_total', String(orderTotal));
               await clearCart();
               handleGoToReview();
               resolve(true);
@@ -248,7 +250,9 @@ const CheckoutPaymentForm: React.FC = () => {
             }
           } else if (response.status === 'pending') {
             toast('Pago pendiente.', { icon: '⏳' });
+            const orderTotal = itemsRef.current.reduce((acc, i) => acc + i.price * i.quantity, 0) + (deliveryMethodRef.current?.price || 0);
             sessionStorage.setItem('mp_payment_approved', 'true');
+            sessionStorage.setItem('mp_order_total', String(orderTotal));
             await clearCart();
             handleGoToReview();
             resolve(true);

@@ -51,6 +51,7 @@ const toApiItem = (item: CartItemWithStock) => ({
   quantity: item.quantity,
   size: item.size,
   color: item.color,
+  image: item.image,
 });
 
 export const useCartStore = () => {
@@ -148,7 +149,11 @@ export const useCartStore = () => {
         setReduxCart(next);
 
         const { data } = await cartApi.post<CartResponse>("/items", payload, config);
-        setReduxCart((data.items ?? []) as CartItemWithStock[]);
+        const enriched = (data.items ?? []).map((serverItem: CartItemWithStock) => {
+          const local = next.find((x) => sameItem(x, serverItem));
+          return { ...serverItem, image: local?.image ?? serverItem.image };
+        });
+        setReduxCart(enriched as CartItemWithStock[]);
       } catch (err: any) {
         setReduxCart(items); // Rollback
         const msg = err.response?.data?.message || "No se pudo agregar al carrito";

@@ -35,7 +35,8 @@ type SupplySelection = {
   requestUnits: number;
 };
 
-const minimumForStock = (stock: number) => (stock <= 0 ? 10 : Math.max(5, stock + 8));
+const minimumForStock = (stock: number, minStockAlert?: number) =>
+  minStockAlert != null && minStockAlert > 0 ? minStockAlert : (stock <= 0 ? 10 : Math.max(5, stock + 8));
 
 const stockState = (stock: number, minimum: number, pendingTransit: number) => {
   if (pendingTransit > 0) return { label: `En producción`, tone: "text-blue-500", icon: <Factory className="h-3 w-3" /> };
@@ -53,17 +54,17 @@ const getProductImage = (product: Product) => product.images?.[0] ?? "";
 
 const getProductStockSummary = (variants: Product["variants"]) => {
   const total = variants?.reduce((acc, v) => acc + Number(v.stock ?? 0), 0) ?? 0;
-  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0)), 0) ?? 0;
+  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0), v.min_stock_alert), 0) ?? 0;
   return { total, minTotal };
 };
 
 const getSupplySuggestion = (variants: Product["variants"]) => {
   const deficit = variants?.reduce((acc, v) => {
     const stock = Number(v.stock ?? 0);
-    const min = minimumForStock(stock);
+    const min = minimumForStock(stock, v.min_stock_alert);
     return acc + Math.max(0, min - stock);
   }, 0) ?? 0;
-  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0)), 0) ?? 1;
+  const minTotal = variants?.reduce((acc, v) => acc + minimumForStock(Number(v.stock ?? 0), v.min_stock_alert), 0) ?? 1;
   const avgMonthlySales = Math.max(1, Math.round(minTotal / 2));
   return { deficit, avgMonthlySales };
 };
@@ -103,7 +104,7 @@ export const ProductionBoard = () => {
         const critical = variants.filter((v) => Number(v.stock ?? 0) <= 0).length;
         const low = variants.filter((v) => {
           const stock = Number(v.stock ?? 0);
-          return stock > 0 && stock < minimumForStock(stock);
+          return stock > 0 && stock < minimumForStock(stock, v.min_stock_alert);
         }).length;
         return { product, variants, critical, low };
       })
@@ -360,7 +361,7 @@ export const ProductionBoard = () => {
                           {variants.map((variant, idx) => {
                             const stock = Number(variant.stock ?? 0);
                             const key = `${product.id_product}-${variant.id_variant}`;
-                            const minimum = selected[key]?.minimum ?? minimumForStock(stock);
+                            const minimum = selected[key]?.minimum ?? minimumForStock(stock, variant.min_stock_alert);
                             const pendingTransit = pendingTransitByVariant[variant.id_variant] || 0;
                             const status = stockState(stock, minimum, pendingTransit);
                             const percentage = Math.min(100, (stock / Math.max(minimum, 1)) * 100);

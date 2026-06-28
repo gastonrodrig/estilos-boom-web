@@ -166,6 +166,7 @@ export default function CreateProductPage() {
   const [insumoBtnMaterial, setInsumoBtnMaterial] = useState<string>('');
   const [insumoBtnSize, setInsumoBtnSize]         = useState<string>('');
   const [insumoCierreTipo, setInsumoCierreTipo]   = useState<string>('');
+  const [insumoCierreLargo, setInsumoCierreLargo] = useState<string>('');
   const [insumoElasticoAncho, setInsumoElasticoAncho] = useState<string>('');
   const [insumoTelaAncho, setInsumoTelaAncho]             = useState<string>('');
   const [insumoHiloMetros, setInsumoHiloMetros]           = useState<string>('');
@@ -308,6 +309,7 @@ export default function CreateProductPage() {
     setInsumoBtnMaterial('');
     setInsumoBtnSize('');
     setInsumoCierreTipo('');
+    setInsumoCierreLargo('');
     setInsumoElasticoAncho('');
     setInsumoTelaAncho('');
     setIsCreatingInsumoColor(false);
@@ -370,7 +372,7 @@ export default function CreateProductPage() {
         const parts = [colorStr, insumoBtnMaterial, insumoBtnSize ? `${insumoBtnSize}mm` : ''].filter(Boolean);
         return parts.join(' · ');
       }
-      case 'CIERRE':  return [colorStr, insumoCierreTipo].filter(Boolean).join(' · ');
+      case 'CIERRE':  return [colorStr, insumoCierreTipo, insumoCierreLargo ? `${insumoCierreLargo}cm` : ''].filter(Boolean).join(' · ');
       case 'ELASTICO': return [colorStr, insumoElasticoAncho ? `${insumoElasticoAncho}cm ancho` : ''].filter(Boolean).join(' · ');
       case 'ETIQUETA': return insumoDetail;
       default:        return insumoDetail;
@@ -1100,18 +1102,25 @@ export default function CreateProductPage() {
                     {type === 'CIERRE' && <>
                       <div className={isCreatingInsumoColor ? 'col-span-3' : 'col-span-1'}>{colorPickerJSX}</div>
                       {!isCreatingInsumoColor && (
-                        <div className="col-span-2">
-                          <label className={labelClass}>Tipo</label>
-                          <div className="flex gap-2 flex-wrap">
-                            {['Invisible', 'Metálico', 'Nylon', 'Plástico'].map(t => (
-                              <button key={t} type="button"
-                                onClick={() => setInsumoCierreTipo(t)}
-                                className={getSelectableBtnClass(insumoCierreTipo === t, "px-3 py-1.5 text-xs")}>
-                                {t}
-                              </button>
-                            ))}
+                        <>
+                          <div className="col-span-1">
+                            <label className={labelClass}>Tipo</label>
+                            <div className="flex gap-2 flex-wrap">
+                              {['Invisible', 'Metálico', 'Nylon', 'Plástico'].map(t => (
+                                <button key={t} type="button"
+                                  onClick={() => setInsumoCierreTipo(t)}
+                                  className={getSelectableBtnClass(insumoCierreTipo === t, "px-3 py-1.5 text-xs")}>
+                                  {t}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                          <div className="col-span-1">
+                            <label className={labelClass}>Largo (cm)</label>
+                            <input type="number" min={1} className={inputClass} placeholder="Ej: 25"
+                              value={insumoCierreLargo} onChange={e => setInsumoCierreLargo(e.target.value)} />
+                          </div>
+                        </>
                       )}
                     </>}
 

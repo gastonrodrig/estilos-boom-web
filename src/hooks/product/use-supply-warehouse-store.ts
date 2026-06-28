@@ -60,19 +60,26 @@ export const useSupplyWarehouseStore = () => {
     supplier_name?: string;
     notes?: string;
     items: { id_supply: string; quantity: number; cost: number; specifications?: string }[];
+    evidence_files?: File[];
   }) => {
     setLoading(true);
     try {
       const token = await getFirebaseAuthToken();
-      await supplyWarehouseApi.post("/purchase", purchaseData, {
-        headers: { Authorization: `Bearer ${token}` },
+      const formData = new FormData();
+      if (purchaseData.supplier_name) formData.append('supplier_name', purchaseData.supplier_name);
+      if (purchaseData.notes) formData.append('notes', purchaseData.notes);
+      formData.append('items', JSON.stringify(purchaseData.items));
+      (purchaseData.evidence_files || []).forEach(f => formData.append('evidence_files', f));
+      await supplyWarehouseApi.post("/purchase", formData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
       });
       toast.success("Compra en Gamarra registrada e inventario actualizado");
       await loadInventory();
       return true;
-    } catch (error) {
-      console.error("Error registrando compra:", error);
-      toast.error("Error al registrar compra de insumos");
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || error?.message || "Error desconocido";
+      console.error("Error registrando compra:", msg, error?.response?.data);
+      toast.error(`Error: ${msg}`);
       return false;
     } finally {
       setLoading(false);
@@ -103,7 +110,7 @@ export const useSupplyWarehouseStore = () => {
   }, [loadInventory]);
 
   const recordReturn = useCallback(async (returnData: {
-    id_workshop: string;
+    id_workshop?: string;
     notes?: string;
     items: { id_supply: string; quantity: number; specifications?: string }[];
   }) => {

@@ -2,6 +2,7 @@ export type StorekeeperModule = {
   label: string;
   href?: string;
   icon?: string;
+  badge?: number;
   highlighted?: boolean;
   requiredRoles?: string[];
   children?: StorekeeperModule[];
@@ -15,25 +16,13 @@ export const storekeeperModules: StorekeeperModule[] = [
     requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
   },
   {
-    label: "Recepciones",
-    icon: "inventory",
-    href: "/storekeeper/warehouse/receptions",
-    requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
-  },
-  {
-    label: "Despachos de Ventas",
-    icon: "truck",
-    href: "/storekeeper/warehouse/dispatches",
-    requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],
-  },
-  {
-    label: "Almacén de Insumos",
-    icon: "spool", // Usa el icono spool para insumos o el icono warehouse
+    label: "Insumos",
+    icon: "spool",
     href: "/storekeeper/warehouse/supplies",
-    requiredRoles: ["Almacenero", "Almacenero Boom"], // Solo Almacenero Boom / Central
+    requiredRoles: ["Almacenero", "Almacenero Boom"],
   },
   {
-    label: "Movimientos de Prendas",
+    label: "Movimientos",
     icon: "warehouse",
     href: "/storekeeper/warehouse/transfers",
     requiredRoles: ["Almacenero", "Almacenero Boom", "Almacenero Tienda"],

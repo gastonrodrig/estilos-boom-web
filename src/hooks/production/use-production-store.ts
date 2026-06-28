@@ -39,7 +39,7 @@ export const useProductionStore = () => {
         dispatch(setLoadingProduction(true));
         try {
             const config = await getConfig();
-            const { data } = await productionApi.get("/production-orders", config);
+            const { data } = await productionApi.get(`/production-orders?_t=${Date.now()}`, config);
             dispatch(setProductionOrders(data));
         } catch (error: any) {
             dispatch(setProductionError(error?.response?.data?.message || "Error al cargar órdenes de producción"));

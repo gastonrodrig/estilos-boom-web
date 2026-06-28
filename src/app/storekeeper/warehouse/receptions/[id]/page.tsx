@@ -4,7 +4,7 @@ import { useState, use, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, UploadCloud, Camera, Check, ChevronDown, FileText, Home, AlertTriangle } from "lucide-react";
-import { useStorehouseStore } from "@/hooks";
+import { useStorehouseStore, useSupplyWarehouseStore } from "@/hooks";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
@@ -21,12 +21,14 @@ const INCIDENCE_OPTIONS = [
 export default function ReceptionConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { 
-    startLoadingWarehouseDocuments, 
-    startProcessWarehouseDocument, 
+  const {
+    startLoadingWarehouseDocuments,
+    startProcessWarehouseDocument,
     startUploadWarehouseDocAttachments,
-    loading 
+    loading
   } = useStorehouseStore();
+  const { inventory, loadInventory, recordReturn } = useSupplyWarehouseStore();
+  const [returnQtys, setReturnQtys] = useState<Record<string, number>>({});
 
   const [doc, setDoc] = useState<any>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -79,6 +81,8 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
     };
     void load();
   }, [id, startLoadingWarehouseDocuments]);
+
+  useEffect(() => { loadInventory(); }, []);
 
   const handleConfirm = async () => {
     if (!doc) return;
@@ -135,6 +139,15 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
 
     const success = await startProcessWarehouseDocument(doc._id, workerId, items);
     if (success) {
+      // Registrar devolución de insumos retornables si los hay
+      if (doc.type === "INGRESO_PRODUCCION") {
+        const returnItems = Object.entries(returnQtys)
+          .filter(([, qty]) => qty > 0)
+          .map(([supplyId, qty]) => ({ id_supply: supplyId, quantity: qty }));
+        if (returnItems.length > 0) {
+          await recordReturn({ items: returnItems });
+        }
+      }
       setIsConfirmed(true);
     }
   };
@@ -521,6 +534,43 @@ export default function ReceptionConfirmationPage({ params }: { params: Promise<
             </div>
           </div>
         </div>
+
+        {/* DEVOLUCIÓN DE INSUMOS — solo para recepciones de producción */}
+        {doc.type === "INGRESO_PRODUCCION" && (() => {
+          const retornables = inventory.filter((inv: any) => inv.retornable !== false);
+          if (!retornables.length) return null;
+          return (
+            <div className="mb-10">
+              <h3 className="text-xl font-bold font-sans text-[#40202D] dark:text-white mb-2">Insumos devueltos por el taller</h3>
+              <p className="text-sm text-[#844C60] dark:text-[#C9B3BC] mb-5 font-medium">Ingresá la cantidad de cada insumo retornable que vino con el pedido. Dejá en 0 si no volvió nada.</p>
+              <div className="bg-white dark:bg-black/50 backdrop-blur-2xl rounded-2xl p-6 shadow-[0_8px_30px_rgba(242,119,141,0.06)] dark:shadow-none border border-[#EEDCE1] dark:border-white/5 space-y-4">
+                {retornables.map((inv: any, idx: number) => {
+                  const id = String(inv._id);
+                  const qty = returnQtys[id] ?? 0;
+                  return (
+                    <div key={`${id}_${idx}`} className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-bold text-[#40202D] dark:text-white">{inv.name}</p>
+                        {inv.specification && <p className="text-[11px] text-[#844C60] dark:text-[#C9B3BC]">{inv.specification}</p>}
+                        <p className="text-[11px] text-[#844C60] dark:text-[#C9B3BC]">Stock actual: {inv.physical_stock} {inv.unit}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button type="button" onClick={() => setReturnQtys(p => ({ ...p, [id]: Math.max(0, (p[id] ?? 0) - 1) }))}
+                          className="w-8 h-8 rounded-lg bg-[#FCF8F9] dark:bg-white/10 border border-[#EEDCE1] dark:border-white/10 font-bold text-[#40202D] dark:text-white flex items-center justify-center hover:border-[#D6405F]">−</button>
+                        <input type="number" min={0} value={qty}
+                          onChange={e => setReturnQtys(p => ({ ...p, [id]: Math.max(0, parseInt(e.target.value) || 0) }))}
+                          className="w-16 text-center border border-[#EEDCE1] dark:border-white/10 rounded-lg py-1.5 text-sm font-bold text-[#40202D] dark:text-white bg-white dark:bg-white/5 outline-none focus:border-[#D6405F]" />
+                        <button type="button" onClick={() => setReturnQtys(p => ({ ...p, [id]: (p[id] ?? 0) + 1 }))}
+                          className="w-8 h-8 rounded-lg bg-[#FCF8F9] dark:bg-white/10 border border-[#EEDCE1] dark:border-white/10 font-bold text-[#40202D] dark:text-white flex items-center justify-center hover:border-[#D6405F]">+</button>
+                        <span className="text-xs text-[#844C60] dark:text-[#C9B3BC] w-12">{inv.unit}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* SUBMIT BUTTONS */}
         <div className="flex justify-between items-center pb-12">

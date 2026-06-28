@@ -79,12 +79,12 @@ export default function ProductionOrderTracking() {
     startLoadingProductionOrders();
   }, [startLoadingProductionOrders]);
 
-  // Polling: refresca la orden cada 5s mientras el tracking view está abierto
+  // Polling: 5s cuando el tracking está abierto, 15s en lista general
   useEffect(() => {
-    if (!trackingOrderId) return;
+    const ms = trackingOrderId ? 5000 : 15000;
     const interval = setInterval(() => {
       startLoadingProductionOrders();
-    }, 5000);
+    }, ms);
     return () => clearInterval(interval);
   }, [trackingOrderId, startLoadingProductionOrders]);
 
@@ -336,9 +336,11 @@ if (trackingViewOrder) {
               order={order}
               onUpdateStatus={updateOrderStatus}
               onUpdateCosts={updateOrderCosts}
+              onConfirmWorkshop={(orderId, workshopId) => startConfirmWorkshop(orderId, workshopId)}
               onOpenTracking={openTrackingView}
               onUpdateSubState={startUpdateSubState}
               onDelete={deleteOrder}
+              onReload={startLoadingProductionOrders}
             />
           ));
         })()}
@@ -355,15 +357,19 @@ function ProductionCard({
   order,
   onUpdateStatus,
   onUpdateCosts,
+  onConfirmWorkshop,
   onOpenTracking,
   onUpdateSubState,
   onDelete,
+  onReload,
 }: {
   order: any;
   onUpdateStatus: (id: string, status: string, winnerId?: string) => Promise<void>;
   onUpdateCosts: (id: string, costs: Record<string, number>) => Promise<void>;
+  onConfirmWorkshop: (orderId: string, workshopId: string) => Promise<any>;
   onOpenTracking: (order: any) => void;
   onDelete: (id: string) => Promise<void>;
+  onReload: () => Promise<void>;
   onUpdateSubState: (id: string, step: string) => Promise<any>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -406,13 +412,20 @@ function ProductionCard({
   };
 
   const handleConfirmCosts = async (costs: Record<string, number>) => {
-    // El modal ya guarda perUnit * quantity por variante — solo sumamos los valores
     const sum = Object.values(costs).reduce((acc, val) => acc + (val || 0), 0);
     setLocalTotal(sum);
     setConfirmedCosts({...costs});
     await onUpdateCosts(order._id, costs);
-    toast.success("Costos registrados con éxito");
+
+    // Confirmar automáticamente el taller como ganador
+    const workshopId = order.quotes?.[0]?.id_agent?._id || (typeof order.quotes?.[0]?.id_agent === 'string' ? order.quotes[0].id_agent : null);
+    if (workshopId) {
+      await onConfirmWorkshop(order._id, workshopId);
+    }
+
+    toast.success("Taller confirmado y costos registrados");
     setActiveModal(null);
+    await onReload();
   };
 
   const handleAdvancePhase = async () => {

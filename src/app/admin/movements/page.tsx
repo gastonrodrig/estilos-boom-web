@@ -2,40 +2,42 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { DataTable, DataTableAction, DataTableColumn } from "@/components/organisms";
-import { useStorehouseStore } from "@/hooks";
-import { CheckCircle, FileText, Eye, Activity, Paperclip, AlertTriangle, ExternalLink } from "lucide-react";
+import { useStorehouseStore, useSupplyWarehouseStore } from "@/hooks";
+import { CheckCircle, FileText, Eye, Activity, Paperclip, AlertTriangle, ExternalLink, ShoppingBag, Image } from "lucide-react";
 import toast from "react-hot-toast";
 import { Modal } from "@/components/atoms";
 
-type ActiveTab = "documentos" | "kardex";
+type ActiveTab = "documentos" | "kardex" | "insumos";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 const NUEVOS_LABELS_LIMPIOS: Record<string, string> = {
-  INGRESO_COMPRA: "Ingreso compra",
-  SALIDA_VENTA: "Salida venta",
-  TRANSFERENCIA: "Transferencia",
-  AJUSTE: "Ajuste",
-  ENTRADA: "Entrada",
-  SALIDA: "Salida"
+  INGRESO_COMPRA:     "Ingreso por compra",
+  INGRESO_PRODUCCION: "Ingreso por producción",
+  SALIDA_VENTA:       "Salida por venta",
+  TRANSFERENCIA:      "Transferencia",
+  AJUSTE:             "Ajuste de inventario",
+  ENTRADA:            "Entrada",
+  SALIDA:             "Salida",
 };
 
 const NUEVOS_ESTILOS_DE_BADGE_TIPO: Record<string, React.CSSProperties> = {
-  INGRESO_COMPRA: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
-  ENTRADA: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
-  SALIDA_VENTA: { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' }, // rose
-  SALIDA: { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' }, // rose
-  TRANSFERENCIA: { backgroundColor: '#2e1065', color: '#c4b5fd', borderColor: '#5b21b6' }, // violet
-  AJUSTE: { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' }, // amber
-  default: { backgroundColor: '#27272a', color: '#a1a1aa', borderColor: '#3f3f46' } // zinc
+  INGRESO_COMPRA:     { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' },
+  INGRESO_PRODUCCION: { backgroundColor: '#0c1a3a', color: '#93c5fd', borderColor: '#1e40af' },
+  ENTRADA:            { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' },
+  SALIDA_VENTA:       { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' },
+  SALIDA:             { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' },
+  TRANSFERENCIA:      { backgroundColor: '#2e1065', color: '#c4b5fd', borderColor: '#5b21b6' },
+  AJUSTE:             { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' },
+  default:            { backgroundColor: '#27272a', color: '#a1a1aa', borderColor: '#3f3f46' },
 };
 
 const NUEVOS_ESTILOS_DE_ESTADO: Record<string, React.CSSProperties> = {
-  PENDIENTE: { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' }, // amber
-  COMPLETADO: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' }, // emerald
-  CANCELADO: { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' }, // zinc
-  default: { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' } // zinc
+  PENDIENTE:  { backgroundColor: '#451a03', color: '#fcd34d', borderColor: '#92400e' },
+  COMPLETADO: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' },
+  CANCELADO:  { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' },
+  default:    { backgroundColor: '#18181b', color: '#a1a1aa', borderColor: '#3f3f46' },
 };
 
 const workerName = (w: any) =>
@@ -44,6 +46,18 @@ const workerName = (w: any) =>
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPONENTE PRINCIPAL
 // ─────────────────────────────────────────────────────────────────────────────
+const SUPPLY_TX_LABELS: Record<string, string> = {
+  PURCHASE: "Compra de insumos",
+  DISPATCH: "Despacho a taller",
+  RETURN: "Devolución de taller",
+};
+
+const SUPPLY_TX_STYLES: Record<string, React.CSSProperties> = {
+  PURCHASE: { backgroundColor: '#022c22', color: '#6ee7b7', borderColor: '#065f46' },
+  DISPATCH: { backgroundColor: '#4c0519', color: '#fda4af', borderColor: '#9f1239' },
+  RETURN:   { backgroundColor: '#2e1065', color: '#c4b5fd', borderColor: '#5b21b6' },
+};
+
 export default function AdminMovementsPage() {
   const {
     startLoadingWarehouseDocuments,
@@ -52,9 +66,10 @@ export default function AdminMovementsPage() {
     loading,
   } = useStorehouseStore();
 
+  const { loadTransactions, transactions } = useSupplyWarehouseStore();
+
   const [activeTab, setActiveTab] = useState<ActiveTab>("documentos");
   const [documents, setDocuments] = useState<any[]>([]);
-  // rawMovements: datos directos del API sin pasar por el mapper del store (conserva objetos populados)
   const [rawMovements, setRawMovements] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [tableLoading, setTableLoading] = useState(false);
@@ -62,6 +77,8 @@ export default function AdminMovementsPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedTx, setSelectedTx] = useState<any>(null);
+  const [isTxDetailOpen, setIsTxDetailOpen] = useState(false);
 
   // ── Carga inicial ──────────────────────────────────────────────────────────
   const loadData = async () => {
@@ -72,7 +89,6 @@ export default function AdminMovementsPage() {
         startLoadingInventoryMovements(),
       ]);
       setDocuments(Array.isArray(docs) ? docs : []);
-      // startLoadingInventoryMovements retorna el array crudo antes del dispatch
       setRawMovements(Array.isArray(moves) ? moves : []);
     } catch {
       toast.error("Error al cargar los datos de inventario.");
@@ -83,6 +99,7 @@ export default function AdminMovementsPage() {
 
   useEffect(() => {
     void loadData();
+    void loadTransactions();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -375,6 +392,106 @@ export default function AdminMovementsPage() {
     },
   ];
 
+  // ── Columnas — Compras de Insumos (SupplyTransactions) ────────────────────
+  const supplyTxColumns: DataTableColumn<any>[] = [
+    {
+      id: "created_at",
+      label: "Fecha",
+      sortable: true,
+      width: "150px",
+      accessor: (row) => {
+        const d = new Date(row.created_at);
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm text-zinc-200 font-medium">{d.toLocaleDateString("es-PE")}</span>
+            <span className="text-xs text-zinc-500">{d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}</span>
+          </div>
+        );
+      },
+    },
+    {
+      id: "type",
+      label: "Tipo",
+      width: "200px",
+      accessor: (row) => (
+        <span className="text-xs font-medium px-2 py-0.5 rounded-md border whitespace-nowrap"
+          style={SUPPLY_TX_STYLES[row.type] || { backgroundColor: '#27272a', color: '#a1a1aa', borderColor: '#3f3f46' }}>
+          • {SUPPLY_TX_LABELS[row.type] ?? row.type}
+        </span>
+      ),
+    },
+    {
+      id: "supplier_name",
+      label: "Proveedor / Taller",
+      width: "200px",
+      accessor: (row) => (
+        <span className="text-sm text-zinc-300">{row.supplier_name || row.id_workshop?.name || "—"}</span>
+      ),
+    },
+    {
+      id: "items_count",
+      label: "Insumos",
+      width: "100px",
+      accessor: (row) => (
+        <span className="text-sm text-zinc-300 text-center block">{row.items?.length ?? 0}</span>
+      ),
+    },
+    {
+      id: "total",
+      label: "Total S/",
+      width: "120px",
+      accessor: (row) => {
+        const total = (row.items || []).reduce((acc: number, i: any) => acc + ((i.cost ?? 0) * (i.quantity ?? 0)), 0);
+        return <span className="text-sm font-bold text-zinc-200 text-right block">{total > 0 ? `S/ ${total.toFixed(2)}` : "—"}</span>;
+      },
+    },
+    {
+      id: "evidence",
+      label: "Evidencias",
+      width: "120px",
+      accessor: (row) => {
+        const imgs = (row.evidence_images || []).filter((u: string) => typeof u === "string" && u.startsWith("http"));
+        if (!imgs.length) return <span className="text-zinc-500 text-xs italic block text-center">—</span>;
+        return (
+          <div className="flex items-center justify-center gap-1">
+            {imgs.map((url: string, i: number) => (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                className="p-1 bg-violet-900/30 text-violet-400 hover:bg-violet-900/60 rounded border border-violet-800/40 transition-colors" title="Ver evidencia">
+                <Image className="w-3.5 h-3.5" />
+              </a>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      id: "notes",
+      label: "Notas",
+      width: "200px",
+      accessor: (row) => (
+        <span className="text-xs text-zinc-500 truncate block max-w-[180px]">{row.notes || "—"}</span>
+      ),
+    },
+  ];
+
+  const supplyTxActions: DataTableAction<any>[] = [
+    {
+      label: "Ver detalle",
+      icon: <Eye className="h-4 w-4 text-purple-500" />,
+      onClick: (row) => { setSelectedTx(row); setIsTxDetailOpen(true); },
+      show: () => true,
+    },
+  ];
+
+  const filteredSupplyTx = useMemo(() => {
+    if (!searchTerm.trim()) return transactions;
+    const lower = searchTerm.toLowerCase();
+    return transactions.filter((t) =>
+      [t.type, t.supplier_name, t.notes, t.id_workshop?.name]
+        .filter(Boolean).some((v) => String(v).toLowerCase().includes(lower))
+    );
+  }, [transactions, searchTerm]);
+
   // ── Filtros ────────────────────────────────────────────────────────────────
   const filteredDocuments = useMemo(() => {
     if (!searchTerm.trim()) return documents;
@@ -410,55 +527,66 @@ export default function AdminMovementsPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
-      {/* Header Administrativo */}
-      <header className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-end justify-between px-2 w-full transition-colors duration-500">
-        <div className="flex-1">
-          <div style={{ fontSize: '0.72rem', letterSpacing: '0.05em' }} className="mb-2 text-[#8B3A52] opacity-60 dark:text-white dark:opacity-35 font-medium uppercase tracking-widest flex items-center gap-2">
-            <span>MOVIMIENTOS</span>
+      {/* Header */}
+      <header className="mb-8 px-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B3A52]/60 dark:text-white/30 mb-2">Movimientos</p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-[#40202D] dark:text-white leading-none" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.8rem', fontWeight: 300 }}>
+              Documentos de Almacén
+            </h1>
+            <p className="text-[#8C6B79]/60 dark:text-white/30 text-xs mt-2 tracking-wide">
+              Gestión de ingresos, salidas, transferencias y movimientos físicos del inventario
+            </p>
           </div>
-          <h1 className="text-[#40202D] dark:text-white leading-none mb-2" style={{ fontFamily: 'var(--font-cormorant), serif', fontSize: '2.5rem', fontWeight: 300 }}>
-            Documentos de Almacén y Kárdex
-          </h1>
-          <p className="text-[#8C6B79] dark:text-white tracking-[0.03em] mt-3" style={{ fontSize: '0.78rem', opacity: 0.45 }}>
-            Gestión de ingresos, salidas, transferencias y movimientos físicos del inventario.
-          </p>
+          {/* Stats rápidas */}
+          <div className="flex gap-3 shrink-0">
+            {[
+              { label: "Documentos", value: documents.length, color: "zinc" },
+              { label: "Kárdex", value: rawMovements.length, color: "zinc" },
+              { label: "Compras", value: transactions.length, color: "violet" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className={`text-center px-4 py-2.5 rounded-xl border ${color === "violet" ? "bg-violet-900/20 border-violet-800/30" : "bg-zinc-800/40 border-zinc-700/40"}`}>
+                <p className={`text-xl font-bold ${color === "violet" ? "text-violet-400" : "text-zinc-200"}`}>{value}</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-medium">{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-auto p-4 md:p-6 space-y-4">
         {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#EBEAE8]">
-        {(
-          [
-            { id: "documentos", label: "Documentos de Almacén", icon: FileText },
-            { id: "kardex", label: "Historial Kárdex", icon: Activity },
-          ] as const
-        ).map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => { setActiveTab(id); setPage(0); setSearchTerm(""); }}
-            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors border border-b-0 ${
-              activeTab === id
-                ? "bg-zinc-900 text-zinc-100 border-zinc-800 border-b-2 !border-b-[#8B3A52]"
-                : "bg-transparent text-zinc-400 border-transparent hover:text-zinc-200"
-            }`}
-          >
-            <Icon size={14} />
-            {label}
-          </button>
-        ))}
-      </div>
+        <div className="flex gap-1 p-1 bg-zinc-900/60 border border-zinc-800/60 rounded-2xl w-fit mb-6">
+          {(
+            [
+              { id: "documentos", label: "Documentos de Almacén", icon: FileText },
+              { id: "kardex",     label: "Historial Kárdex",      icon: Activity },
+              { id: "insumos",    label: "Compras de Insumos",    icon: ShoppingBag },
+            ] as const
+          ).map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => { setActiveTab(id); setPage(0); setSearchTerm(""); }}
+              className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                activeTab === id
+                  ? id === "insumos"
+                    ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40"
+                    : "bg-[#8B3A52] text-white shadow-lg shadow-rose-900/40"
+                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
+              }`}
+            >
+              <Icon size={13} />
+              {label}
+            </button>
+          ))}
+        </div>
 
       {/* Tab: Documentos de Almacén */}
       {activeTab === "documentos" && (
         <DataTable
           rows={filteredDocuments}
           loading={loading || tableLoading}
-          onAddClick={() =>
-            toast("Selecciona productos en 'Stock Actual' y usa el asistente de movimiento.", {
-              icon: "💡",
-            })
-          }
           page={page}
           rowsPerPage={rowsPerPage}
           onPageChange={(_, p) => setPage(p)}
@@ -499,6 +627,35 @@ export default function AdminMovementsPage() {
         />
       )}
 
+      {/* Tab: Compras de Insumos */}
+      {activeTab === "insumos" && (
+        <DataTable
+          rows={filteredSupplyTx}
+          loading={tableLoading}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, p) => setPage(p)}
+          onRowsPerPageChange={(e) => { setRowsPerPage(Number(e.target.value)); setPage(0); }}
+          globalFilter={searchTerm}
+          onGlobalFilterChange={(v) => { setSearchTerm(v); setPage(0); }}
+          columns={supplyTxColumns}
+          actions={supplyTxActions}
+          containerClassName="bg-transparent shadow-none w-full h-full"
+          headerRowClassName="bg-zinc-900 border-b border-zinc-700 text-xs font-medium text-zinc-400 uppercase tracking-wide"
+          rowClassName={(_, idx) => `transition-colors border-b border-zinc-800 ${idx % 2 === 0 ? "bg-zinc-900/40" : "bg-zinc-800/20"}`}
+          hasActions
+        />
+      )}
+
+      {/* Modal detalle compra insumo */}
+      {selectedTx && (
+        <SupplyTxDetailModal
+          isOpen={isTxDetailOpen}
+          onClose={() => { setIsTxDetailOpen(false); setSelectedTx(null); }}
+          tx={selectedTx}
+        />
+      )}
+
       {/* Modal de Detalles del Documento */}
       {selectedDoc && (
         <MovementDetailsModal
@@ -512,6 +669,106 @@ export default function AdminMovementsPage() {
       )}
       </div>
     </div>
+  );
+}
+
+// ── SUBCOMPONENTE: MODAL DETALLE COMPRA INSUMOS ────────────────────────────────
+function SupplyTxDetailModal({ isOpen, onClose, tx }: { isOpen: boolean; onClose: () => void; tx: any }) {
+  const total = (tx.items || []).reduce((acc: number, i: any) => acc + ((i.cost ?? 0) * (i.quantity ?? 0)), 0);
+  return (
+    <Modal open={isOpen} onClose={onClose} title={`Documento de ${SUPPLY_TX_LABELS[tx.type] ?? tx.type}`}>
+      <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar text-left font-sans">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10">
+            <p className="text-[10px] font-bold tracking-widest text-[#8C6B79] uppercase mb-1">Tipo</p>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-md border" style={SUPPLY_TX_STYLES[tx.type]}>
+              {SUPPLY_TX_LABELS[tx.type] ?? tx.type}
+            </span>
+          </div>
+          <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10">
+            <p className="text-[10px] font-bold tracking-widest text-[#8C6B79] uppercase mb-1">Fecha</p>
+            <p className="text-sm font-bold text-[#40202D] dark:text-white">
+              {new Date(tx.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" })}
+            </p>
+          </div>
+        </div>
+
+        {(tx.supplier_name || tx.id_workshop?.name) && (
+          <div className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10">
+            <p className="text-[10px] font-bold tracking-widest text-[#8C6B79] uppercase mb-1">
+              {tx.type === "PURCHASE" ? "Proveedor" : "Taller"}
+            </p>
+            <p className="text-sm font-bold text-[#40202D] dark:text-white">{tx.supplier_name || tx.id_workshop?.name}</p>
+            {tx.notes && <p className="text-xs text-[#8C6B79] mt-1">{tx.notes}</p>}
+          </div>
+        )}
+
+        <section className="space-y-2">
+          <h5 className="text-[11px] font-bold tracking-wider text-[#8C6B79] uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+            Detalle de Insumos ({tx.items?.length ?? 0})
+          </h5>
+          <div className="rounded-xl border border-[#EAE0E2] dark:border-white/10 overflow-hidden text-[12px]">
+            <table className="w-full">
+              <thead className="bg-white/50 dark:bg-white/5">
+                <tr className="text-[9px] font-bold text-[#8C6B79] uppercase tracking-widest border-b border-[#EAE0E2] dark:border-white/5">
+                  <th className="p-3 text-left">Insumo</th>
+                  <th className="p-3 text-left">Especificación</th>
+                  <th className="p-3 text-center">Cantidad</th>
+                  <th className="p-3 text-center">Costo unit.</th>
+                  <th className="p-3 text-center">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                {(tx.items || []).map((item: any, idx: number) => {
+                  const subtotal = (item.cost ?? 0) * (item.quantity ?? 0);
+                  return (
+                    <tr key={idx} className="hover:bg-white/30 dark:hover:bg-white/5 transition-colors">
+                      <td className="p-3 font-semibold text-[#40202D] dark:text-white">{item.id_supply?.name ?? "—"}</td>
+                      <td className="p-3 text-[#8C6B79]">{item.specifications || "—"}</td>
+                      <td className="p-3 text-center font-bold text-[#40202D] dark:text-white">{item.quantity}</td>
+                      <td className="p-3 text-center text-[#8C6B79]">{item.cost ? `S/ ${item.cost.toFixed(2)}` : "—"}</td>
+                      <td className="p-3 text-center font-bold text-[#D6405F]">{subtotal > 0 ? `S/ ${subtotal.toFixed(2)}` : "—"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              {total > 0 && (
+                <tfoot className="bg-white/50 dark:bg-white/5 border-t border-[#EAE0E2] dark:border-white/10">
+                  <tr>
+                    <td colSpan={4} className="p-3 text-right text-xs font-bold text-[#8C6B79] uppercase tracking-wider">Total</td>
+                    <td className="p-3 text-center font-bold text-lg text-[#D6405F]">S/ {total.toFixed(2)}</td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
+        </section>
+
+        {(() => {
+          const validImgs = (tx.evidence_images || []).filter((u: string) => typeof u === "string" && u.startsWith("http"));
+          return validImgs.length > 0 && (
+          <section className="space-y-2">
+            <h5 className="text-[11px] font-bold tracking-wider text-[#8C6B79] uppercase border-b border-[#EAE0E2] dark:border-white/5 pb-1">
+              Evidencias ({validImgs.length})
+            </h5>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {validImgs.map((url: string, i: number) => (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                  className="block rounded-xl overflow-hidden border border-[#EAE0E2] dark:border-white/10 hover:border-[#D6405F] transition-colors">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`Evidencia ${i + 1}`} className="w-full h-28 object-cover" />
+                </a>
+              ))}
+            </div>
+          </section>
+        );})()}
+
+        <button onClick={onClose}
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#D6405F] to-[#F23B69] text-white font-bold text-[11px] uppercase tracking-widest transition-all">
+          Cerrar
+        </button>
+      </div>
+    </Modal>
   );
 }
 

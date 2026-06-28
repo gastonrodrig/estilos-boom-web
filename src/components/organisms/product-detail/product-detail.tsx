@@ -173,7 +173,7 @@ export const ProductDetail = ({ product }: Props) => {
       quantity,
       color: selectedColor,
       size: selectedSize,
-      image: product.images?.[0] ?? "/placeholder.jpg",
+      image: (product.imagesWithColor ?? []).find(img => img.color?.toLowerCase() === selectedColor?.toLowerCase())?.url ?? product.images?.[0] ?? "/placeholder.jpg",
       stock: maxStockForSelection,
       categoryId: product.id_category,
       categoryName: product.category?.name,

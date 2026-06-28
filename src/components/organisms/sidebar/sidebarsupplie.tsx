@@ -31,6 +31,7 @@ export function SupplySidebar({ open, selectedSupply, onClose, onSaved }: Supply
   const [unit, setUnit] = useState<'metros' | 'unidades' | 'rollos'>("metros");
   const [category, setCategory] = useState("Otros");
   const [notes, setNotes] = useState("");
+  const [retornable, setRetornable] = useState(true);
 
   useEffect(() => {
     if (selectedSupply) {
@@ -38,23 +39,32 @@ export function SupplySidebar({ open, selectedSupply, onClose, onSaved }: Supply
       setUnit((selectedSupply.unit as any) || "metros");
       setCategory((selectedSupply as any).category || "Otros");
       setNotes((selectedSupply as any).notes || "");
+      setRetornable((selectedSupply as any).retornable !== false);
     } else {
       setName("");
       setUnit("metros");
       setCategory("Otros");
       setNotes("");
+      setRetornable(true);
     }
   }, [selectedSupply, open]);
+
+  // Auto-sugerir retornable=false cuando categoría es Telas
+  useEffect(() => {
+    if (category === "Telas") setRetornable(false);
+    else setRetornable(true);
+  }, [category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    const payload = { 
-      name: name.trim(), 
-      unit, 
-      category, 
-      notes: notes.trim() 
+    const payload = {
+      name: name.trim(),
+      unit,
+      category,
+      notes: notes.trim(),
+      retornable,
     };
 
     let success = false;
@@ -182,6 +192,23 @@ export function SupplySidebar({ open, selectedSupply, onClose, onSaved }: Supply
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
+            </div>
+
+            {/* Campo: Retornable */}
+            <div className="flex items-center justify-between p-3.5 border border-gray-200 rounded-xl">
+              <div>
+                <p className="text-xs font-bold text-gray-700">Retornable al almacén</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  {retornable ? "Los sobrantes vuelven al inventario" : "Los sobrantes no se devuelven (ej: tela)"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRetornable(v => !v)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${retornable ? 'bg-[#F2778D]' : 'bg-gray-200'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${retornable ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
             </div>
 
             {/* Campo: Notas Internas */}

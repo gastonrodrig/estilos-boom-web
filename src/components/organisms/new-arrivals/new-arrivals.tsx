@@ -13,14 +13,14 @@ export const NewArrivals = () => {
     const fetchNewArrivals = async () => {
       try {
         // Obtenemos los últimos productos del catálogo
-        const { data } = await productApi.get("", { params: { limit: 8 } });
+        const { data } = await productApi.get("", { params: { limit: 8, season: "VERANO 2026" } });
         const items = Array.isArray(data?.items) ? data.items : [];
         
         const mapped = items.map((p: any) => ({
           id: p.id_product || p._id || "",
           name: p.name || "Producto",
           price: `S/ ${Number(p.base_price || 0).toFixed(2)}`,
-          image: (p.images && p.images.length > 0) ? p.images[0] : "/placeholder.jpg",
+          image: (p.images && p.images.length > 0) ? (p.images[0]?.url ?? p.images[0]) : "/placeholder.jpg",
           href: `/product/${p.id_product || p._id}`
         }));
         
@@ -86,7 +86,7 @@ export const NewArrivals = () => {
               },
             }}
           >
-            VESTIDOS DE VERANO
+            COLECCIÓN VERANO
           </motion.h2>
           <motion.div
             className="mx-auto mt-4 h-1 w-24 rounded-full bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500"

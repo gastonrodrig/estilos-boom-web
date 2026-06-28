@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupplyStore, useSupplyWarehouseStore } from '@/hooks';
-import { workshopApi } from '@/api';
+import { workshopApi, productionApi } from '@/api';
 import { getFirebaseAuthToken } from '@helpers';
 import { Plus, Archive, ArrowUpRight, ShoppingBag, ChevronDown, X, CheckCircle2, AlertTriangle, PackageCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -436,12 +436,11 @@ export default function StorekeeperSupplyWarehousePage() {
                               onClick={async () => {
                                 try {
                                   const token = await getFirebaseAuthToken();
-                                  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production-orders/${order._id}/confirm-supplies`, {
-                                    method: 'PATCH',
+                                  await productionApi.patch(`/production-orders/${order._id}/confirm-supplies`, {}, {
                                     headers: { Authorization: `Bearer ${token}` },
                                   });
                                   toast.success('Insumos confirmados. La producción puede iniciar.');
-                                  loadProductionOrders();
+                                  await loadProductionOrders();
                                 } catch {
                                   toast.error('Error al confirmar insumos');
                                 }

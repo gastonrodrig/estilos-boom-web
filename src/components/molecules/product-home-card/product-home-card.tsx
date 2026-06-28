@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Image */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 dark:bg-transparent">
           <Image
-            src={product.image}
+            src={typeof product.image === 'object' ? (product.image as any)?.url : product.image || '/placeholder.jpg'}
             alt={product.name}
             fill
             className="object-cover"

@@ -320,7 +320,7 @@ export default function CompletedProductionOrders() {
           <div className="space-y-8 pt-4">
              <div className="flex flex-col sm:flex-row items-start gap-8">
                 <div className="relative h-48 w-full sm:w-48 shrink-0 overflow-hidden rounded-[20px] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner">
-                   <Image src={selectedFirstItem?.images?.[0] || "/placeholder.png"} alt="Product" fill className="object-cover" />
+                   <Image src={(typeof selectedFirstItem?.images?.[0] === 'object' ? selectedFirstItem?.images?.[0]?.url : selectedFirstItem?.images?.[0]) || "/placeholder.png"} alt="Product" fill className="object-cover" />
                 </div>
                 <div className="space-y-6 flex-1 w-full">
                    <div>

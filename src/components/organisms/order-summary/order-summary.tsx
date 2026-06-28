@@ -12,6 +12,7 @@ interface OrderSummaryProps {
   showButton?: boolean;
   deliveryCost?: number;
   deliveryName?: string;
+  confirmedTotal?: number;
 }
 
 const currency = (value: number) =>
@@ -21,7 +22,7 @@ const currency = (value: number) =>
     minimumFractionDigits: 2,
   }).format(value);
 
-export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliveryName }: OrderSummaryProps) => {
+export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliveryName, confirmedTotal }: OrderSummaryProps) => {
   const router = useRouter();
   const authUid = useAppSelector((state) => state.auth.uid);
   const authStatus = useAppSelector((state) => state.auth.status);
@@ -29,10 +30,10 @@ export const OrderSummary = ({ items, showButton = true, deliveryCost = 0, deliv
 
   const isAuthenticated = Boolean(authUid) || authStatus === "authenticated";
 
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = confirmedTotal ?? items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const igv = subtotal * 0.18;
   const taxedOperation = subtotal * 0.82;
-  const total = subtotal + deliveryCost;
+  const total = confirmedTotal ?? subtotal + deliveryCost;
 
   const handlePrimaryAction = () => {
     if (!isAuthenticated) {
