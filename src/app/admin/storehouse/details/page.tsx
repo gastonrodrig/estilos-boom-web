@@ -264,10 +264,10 @@ function OPPCard({ opp }: { opp: any }) {
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 sm:gap-8">
         <div className="flex items-start gap-5 sm:gap-6">
           <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-[1.5rem] bg-white/50 dark:bg-white/5 border border-[#EAE0E2] dark:border-white/10 shadow-inner flex items-center justify-center transition-transform group-hover:scale-105">
-            {firstItem?.images?.[0] && firstItem.images[0].trim() !== "" ? (
-              <Image 
-                src={firstItem.images[0]} 
-                alt={firstItem?.name || "Product"} 
+            {firstItem?.images?.[0] && (firstItem.images[0]?.url || firstItem.images[0]) && (firstItem.images[0]?.url ?? firstItem.images[0]).trim() !== "" ? (
+              <Image
+                src={firstItem.images[0]?.url ?? firstItem.images[0]}
+                alt={firstItem?.name || "Product"}
                 fill 
                 className="object-cover" 
               />
@@ -388,7 +388,7 @@ function OPPCard({ opp }: { opp: any }) {
                 </thead>
                 <tbody className="divide-y divide-[#EAE0E2]/50 dark:divide-white/5 text-[#40202D] dark:text-white">
 					{opp.base_items?.map((item: any, idx: number) => {
-						const quoteItem = selectedQuote?.items.find(
+						const quoteItem = selectedQuote?.items?.find(
 						(qi: any) => (qi.id_variant?._id || qi.id_variant) === (item.id_variant?._id || item.id_variant)
 						);
 						const unitPrice = (opp.status === 'CONVERTIDA' || opp.status === 'EN_REVISION') 
